@@ -294,15 +294,30 @@ class NotificationService {
       try {
         final medication = await DatabaseHelper.instance.getMedication(medicationId);
 
-        if (medication == null || doseIndex >= medication.doseTimes.length) {
-          print('Medication not found or invalid dose index');
-          return;
+        if (medication == null) {
+          print('⚠️ Medication not found for notification ID ${response.id}');
+          // Cancel this orphaned notification to prevent future taps
+          await _notificationsPlugin.cancel(response.id ?? 0);
+          // Still try to navigate - DoseActionScreen will show an error message
+          // Use a dummy time since we can't get the real dose time
+          doseTime = '00:00';
+          print('⚠️ Using dummy time 00:00 - DoseActionScreen will show error');
+        } else if (doseIndex >= medication.doseTimes.length) {
+          print('⚠️ Invalid dose index $doseIndex for medication ${medication.name} (has ${medication.doseTimes.length} doses)');
+          await _notificationsPlugin.cancel(response.id ?? 0);
+          // Use the first dose time as fallback
+          doseTime = medication.doseTimes.isNotEmpty ? medication.doseTimes[0] : '00:00';
+          print('⚠️ Using fallback time $doseTime - DoseActionScreen will handle it');
+        } else {
+          doseTime = medication.doseTimes[doseIndex];
         }
-
-        doseTime = medication.doseTimes[doseIndex];
       } catch (e) {
-        print('Error loading medication: $e');
-        return;
+        print('❌ Error loading medication: $e');
+        // Try to cancel the notification since something went wrong
+        await _notificationsPlugin.cancel(response.id ?? 0);
+        // Still try to navigate with a dummy time
+        doseTime = '00:00';
+        print('⚠️ Using dummy time 00:00 due to error - DoseActionScreen will show error');
       }
     }
 
@@ -312,13 +327,13 @@ class NotificationService {
 
   /// Navigate to DoseActionScreen with retry logic for when app is starting
   Future<void> _navigateWithRetry(String medicationId, String doseTime, {int attempt = 1}) async {
-    print('Attempting navigation (attempt $attempt)...');
+    print('📱 Attempting navigation (attempt $attempt) for medication $medicationId at $doseTime');
 
     final context = navigatorKey.currentContext;
     if (context != null && context.mounted) {
-      print('Context available, navigating to DoseActionScreen');
+      print('✅ Context available, navigating to DoseActionScreen');
       try {
-        Navigator.push(
+        await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => DoseActionScreen(
@@ -330,21 +345,25 @@ class NotificationService {
         // Clear pending notification since we successfully navigated
         _pendingMedicationId = null;
         _pendingDoseTime = null;
+        print('✅ Navigation successful, screen was shown');
         return;
       } catch (e) {
-        print('Error navigating: $e');
+        print('❌ Error navigating: $e');
+        print('Stack trace: ${StackTrace.current}');
       }
+    } else {
+      print('⏳ Context not available yet (context: $context, mounted: ${context?.mounted})');
     }
 
     // If context is not available, retry with exponential backoff
-    if (attempt <= 5) {
-      final delayMs = 100 * attempt; // 100ms, 200ms, 300ms, 400ms, 500ms
-      print('Context not available, retrying in ${delayMs}ms...');
+    if (attempt <= 10) { // Increased from 5 to 10 attempts
+      final delayMs = 200 * attempt; // Increased delay: 200ms, 400ms, 600ms, ...
+      print('⏳ Will retry in ${delayMs}ms (attempt ${attempt + 1} of 10)');
       await Future.delayed(Duration(milliseconds: delayMs));
       await _navigateWithRetry(medicationId, doseTime, attempt: attempt + 1);
     } else {
-      // After 5 attempts, store as pending notification
-      print('Failed to navigate after 5 attempts, storing as pending notification');
+      // After 10 attempts, store as pending notification
+      print('⚠️ Failed to navigate after 10 attempts, storing as pending notification');
       _pendingMedicationId = medicationId;
       _pendingDoseTime = doseTime;
     }
@@ -354,7 +373,7 @@ class NotificationService {
   /// Should be called after the app is fully initialized
   Future<void> processPendingNotification() async {
     if (_pendingMedicationId != null && _pendingDoseTime != null) {
-      print('Processing pending notification: $_pendingMedicationId | $_pendingDoseTime');
+      print('🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime');
 
       final medicationId = _pendingMedicationId!;
       final doseTime = _pendingDoseTime!;
@@ -363,13 +382,14 @@ class NotificationService {
       _pendingMedicationId = null;
       _pendingDoseTime = null;
 
-      // Wait a bit to ensure the app is fully ready
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Wait a bit longer to ensure the app is fully ready
+      await Future.delayed(const Duration(milliseconds: 1000));
 
       final context = navigatorKey.currentContext;
       if (context != null && context.mounted) {
+        print('✅ Context available, navigating to pending DoseActionScreen');
         try {
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DoseActionScreen(
@@ -378,12 +398,19 @@ class NotificationService {
               ),
             ),
           );
+          print('✅ Pending notification processed successfully');
         } catch (e) {
-          print('Error processing pending notification: $e');
+          print('❌ Error processing pending notification: $e');
+          print('Stack trace: ${StackTrace.current}');
         }
       } else {
-        print('Context still not available for pending notification');
+        print('❌ Context still not available for pending notification (context: $context, mounted: ${context?.mounted})');
+        // Try one more time with retry logic
+        print('🔄 Attempting to navigate with retry logic...');
+        await _navigateWithRetry(medicationId, doseTime, attempt: 1);
       }
+    } else {
+      print('ℹ️ No pending notifications to process');
     }
   }
 
@@ -1042,6 +1069,112 @@ class NotificationService {
       }
     }
 
+    // Cancel any fasting notifications (static "before" fasting and dynamic "after" fasting)
+    if (medication == null || medication.requiresFasting) {
+      print('Cancelling fasting notifications for medication $medicationId');
+
+      // Calculate date range for fasting notifications
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final daysToCheck = medication?.endDate != null
+          ? medication!.endDate!.difference(today).inDays + 7
+          : 365; // Default to checking a year ahead
+
+      // If we have medication info with dose times, calculate exact fasting notification times
+      if (medication != null && medication.doseTimes.isNotEmpty && medication.fastingDurationMinutes != null) {
+        print('Using exact fasting times from medication data');
+
+        for (int day = 0; day < daysToCheck; day++) {
+          final targetDate = today.add(Duration(days: day));
+
+          // For each dose time, calculate the exact fasting notification time
+          for (final doseTime in medication.doseTimes) {
+            final parts = doseTime.split(':');
+            final hour = int.parse(parts[0]);
+            final minute = int.parse(parts[1]);
+
+            final doseDateTime = tz.TZDateTime(
+              tz.local,
+              targetDate.year,
+              targetDate.month,
+              targetDate.day,
+              hour,
+              minute,
+            );
+
+            // Cancel "before" fasting notification
+            if (medication.fastingType == 'before' || medication.fastingType == null) {
+              final fastingStartTime = doseDateTime.subtract(
+                Duration(minutes: medication.fastingDurationMinutes!),
+              );
+              final beforeId = _generateFastingNotificationId(medicationId, fastingStartTime, true);
+              await _notificationsPlugin.cancel(beforeId);
+            }
+
+            // Cancel "after" fasting notification (for the dose time itself)
+            if (medication.fastingType == 'after' || medication.fastingType == null) {
+              final afterId = _generateFastingNotificationId(medicationId, doseDateTime, false);
+              await _notificationsPlugin.cancel(afterId);
+            }
+
+            // Cancel dynamic fasting notifications (these can be at any minute when dose was taken)
+            // Check a window around the dose time (e.g., ±30 minutes)
+            for (int minuteOffset = -30; minuteOffset <= 30; minuteOffset++) {
+              final actualDoseTime = DateTime(
+                targetDate.year,
+                targetDate.month,
+                targetDate.day,
+                hour,
+                minute,
+              ).add(Duration(minutes: minuteOffset));
+
+              final dynamicId = _generateDynamicFastingNotificationId(medicationId, actualDoseTime);
+              await _notificationsPlugin.cancel(dynamicId);
+            }
+          }
+        }
+      } else {
+        // No medication info or no dose times: use broader cancellation
+        print('Using broad cancellation approach for fasting notifications');
+
+        // Check common intervals throughout the day (every hour)
+        for (int day = -1; day < daysToCheck; day++) { // Include yesterday for edge cases
+          final targetDate = today.add(Duration(days: day));
+
+          for (int hour = 0; hour < 24; hour++) {
+            // Check every 5 minutes (compromise between thoroughness and performance)
+            for (int minute = 0; minute < 60; minute += 5) {
+              final fastingTime = tz.TZDateTime(
+                tz.local,
+                targetDate.year,
+                targetDate.month,
+                targetDate.day,
+                hour,
+                minute,
+              );
+
+              // Cancel both "before" and "after" fasting notification IDs
+              final beforeId = _generateFastingNotificationId(medicationId, fastingTime, true);
+              final afterId = _generateFastingNotificationId(medicationId, fastingTime, false);
+              await _notificationsPlugin.cancel(beforeId);
+              await _notificationsPlugin.cancel(afterId);
+
+              // Cancel dynamic fasting notifications
+              final doseTime = DateTime(
+                targetDate.year,
+                targetDate.month,
+                targetDate.day,
+                hour,
+                minute,
+              );
+              final dynamicId = _generateDynamicFastingNotificationId(medicationId, doseTime);
+              await _notificationsPlugin.cancel(dynamicId);
+            }
+          }
+        }
+      }
+    }
+
     print('Finished cancelling notifications for medication $medicationId');
   }
 
@@ -1051,6 +1184,69 @@ class NotificationService {
     if (_isTestMode) return;
 
     await _notificationsPlugin.cancelAll();
+  }
+
+  /// Synchronize system notifications with database medications
+  /// This cancels any orphaned notifications (from deleted medications)
+  /// and ensures only active medications have scheduled notifications
+  ///
+  /// Call this during app initialization to clean up notifications from:
+  /// - Deleted medications
+  /// - Previous installations
+  /// - Database imports/restores
+  Future<void> syncNotificationsWithMedications(List<Medication> activeMedications) async {
+    // Skip in test mode
+    if (_isTestMode) return;
+
+    print('========================================');
+    print('Syncing notifications with database medications');
+    print('Active medications: ${activeMedications.length}');
+    print('========================================');
+
+    // Get all pending notifications from the system
+    final pendingNotifications = await getPendingNotifications();
+    print('Found ${pendingNotifications.length} pending notifications in system');
+
+    // Create a set of active medication IDs for fast lookup
+    final activeMedicationIds = activeMedications.map((m) => m.id).toSet();
+
+    // Track notifications to cancel (orphaned)
+    final orphanedNotificationIds = <int>[];
+
+    // Check each pending notification
+    for (final notification in pendingNotifications) {
+      // Extract medication ID from payload (format: "medicationId|doseIndex" or "medicationId|...")
+      if (notification.payload != null && notification.payload!.isNotEmpty) {
+        final parts = notification.payload!.split('|');
+        if (parts.isNotEmpty) {
+          final medicationId = parts[0];
+
+          // If this medication is not in the active medications list, mark for cancellation
+          if (!activeMedicationIds.contains(medicationId)) {
+            orphanedNotificationIds.add(notification.id);
+            print('Found orphaned notification ID ${notification.id} for deleted medication: $medicationId');
+          }
+        }
+      } else {
+        // No payload - could be an orphaned notification, mark for cancellation
+        orphanedNotificationIds.add(notification.id);
+        print('Found notification without payload ID ${notification.id}, marking for cancellation');
+      }
+    }
+
+    // Cancel all orphaned notifications
+    if (orphanedNotificationIds.isNotEmpty) {
+      print('Cancelling ${orphanedNotificationIds.length} orphaned notifications');
+      for (final notificationId in orphanedNotificationIds) {
+        await _notificationsPlugin.cancel(notificationId);
+      }
+      print('Successfully cancelled orphaned notifications');
+    } else {
+      print('No orphaned notifications found - system is clean');
+    }
+
+    print('Notification sync completed');
+    print('========================================');
   }
 
   /// Get list of pending notifications (for debugging)

@@ -266,6 +266,10 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     final allMedications = await DatabaseHelper.instance.getAllMedications();
     print('Loaded ${allMedications.length} medications');
 
+    // Synchronize system notifications with database medications
+    // This removes orphaned notifications from deleted medications or previous installations
+    await NotificationService.instance.syncNotificationsWithMedications(allMedications);
+
     // Get medication IDs that have doses registered today
     final medicationIdsWithDosesToday = await DatabaseHelper.instance.getMedicationIdsWithDosesToday();
     print('Found ${medicationIdsWithDosesToday.length} medications with doses taken today');
