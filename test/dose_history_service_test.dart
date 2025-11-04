@@ -8,9 +8,42 @@ import 'package:medicapp/services/dose_history_service.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 
+/// Helper to insert medication and assign to default person (V19+ requirement)
+Future<void> insertMedicationWithPerson(Medication medication) async {
+  await DatabaseHelper.instance.insertMedication(medication);
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson != null) {
+    await DatabaseHelper.instance.assignMedicationToPerson(
+      personId: defaultPerson.id,
+      medicationId: medication.id,
+      scheduleData: medication,
+    );
+  }
+}
+
+/// Helper to get medication for default person (V19+ requirement)
+Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson == null) return null;
+  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
+  return medications.where((m) => m.id == medicationId).firstOrNull;
+}
+
+/// Helper to get default person ID (V19+ requirement)
+Future<String> getDefaultPersonId() async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson == null) throw Exception('No default person found');
+  return defaultPerson.id;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   DatabaseTestHelper.setup();
+
+  setUp(() async {
+    // Ensure default person exists (V19+ requirement)
+    await DatabaseTestHelper.ensureDefaultPerson();
+  });
 
   group('DoseHistoryService - deleteHistoryEntry', () {
     test('should delete history entry from today and restore stock for taken dose', () async {
@@ -25,16 +58,17 @@ void main() {
           .withTakenDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Create history entry for today's taken dose
+      final personId = await getDefaultPersonId();
       final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
       final historyEntry = DoseHistoryEntry(
         id: 'entry1',
         medicationId: 'med1',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -51,7 +85,7 @@ void main() {
       expect(history.length, 0);
 
       // Verify medication was updated
-      final updatedMed = await DatabaseHelper.instance.getMedication('med1');
+      final updatedMed = await getMedicationForDefaultPerson('med1');
       expect(updatedMed, isNotNull);
       expect(updatedMed!.stockQuantity, 10.0); // Stock restored
       expect(updatedMed.takenDosesToday, isEmpty); // Removed from taken list
@@ -68,15 +102,16 @@ void main() {
           .withSkippedDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
+      final personId = await getDefaultPersonId();
       final historyEntry = DoseHistoryEntry(
         id: 'entry2',
         medicationId: 'med2',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.skipped,
@@ -87,7 +122,7 @@ void main() {
 
       await DoseHistoryService.deleteHistoryEntry(historyEntry);
 
-      final updatedMed = await DatabaseHelper.instance.getMedication('med2');
+      final updatedMed = await getMedicationForDefaultPerson('med2');
       expect(updatedMed!.stockQuantity, 10.0); // Stock unchanged
       expect(updatedMed.skippedDosesToday, isEmpty); // Removed from skipped list
     });
@@ -104,16 +139,17 @@ void main() {
           .withTakenDoses(['08:00'], todayString) // Today's dose
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Create history entry for yesterday
       final scheduledTime = DateTime(yesterday.year, yesterday.month, yesterday.day, 8, 0);
+      final personId = await getDefaultPersonId();
       final historyEntry = DoseHistoryEntry(
         id: 'entry3',
         medicationId: 'med3',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -129,7 +165,7 @@ void main() {
       expect(history.length, 0);
 
       // Medication should remain unchanged (no stock restoration, lists unchanged)
-      final updatedMed = await DatabaseHelper.instance.getMedication('med3');
+      final updatedMed = await getMedicationForDefaultPerson('med3');
       expect(updatedMed!.stockQuantity, 9.0); // Stock NOT restored
       expect(updatedMed.takenDosesToday, ['08:00']); // Today's list unchanged
     });
@@ -138,12 +174,13 @@ void main() {
       final today = DateTime.now();
       final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
 
+      final personId = await getDefaultPersonId();
       final historyEntry = DoseHistoryEntry(
         id: 'entry4',
         medicationId: 'nonexistent',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -167,15 +204,16 @@ void main() {
           .withTakenDoses(['08:00', '16:00', '22:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final scheduledTime = DateTime(today.year, today.month, today.day, 16, 0);
+      final personId = await getDefaultPersonId();
       final historyEntry = DoseHistoryEntry(
         id: 'entry5',
         medicationId: 'med5',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -185,7 +223,7 @@ void main() {
       await DatabaseHelper.instance.insertDoseHistory(historyEntry);
       await DoseHistoryService.deleteHistoryEntry(historyEntry);
 
-      final updatedMed = await DatabaseHelper.instance.getMedication('med5');
+      final updatedMed = await getMedicationForDefaultPerson('med5');
       expect(updatedMed!.stockQuantity, 8.0);
       expect(updatedMed.takenDosesToday, ['08:00', '22:00']); // Only 16:00 removed
       expect(updatedMed.takenDosesToday.length, 2);
@@ -202,15 +240,16 @@ void main() {
           .withTakenDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
+      final personId = await getDefaultPersonId();
       final historyEntry = DoseHistoryEntry(
         id: 'entry6',
         medicationId: 'med6',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -220,22 +259,23 @@ void main() {
       await DatabaseHelper.instance.insertDoseHistory(historyEntry);
       await DoseHistoryService.deleteHistoryEntry(historyEntry);
 
-      final updatedMed = await DatabaseHelper.instance.getMedication('med6');
+      final updatedMed = await getMedicationForDefaultPerson('med6');
       expect(updatedMed!.stockQuantity, 10.0); // 9.5 + 0.5 = 10.0
     });
   });
 
   group('DoseHistoryService - changeEntryStatus', () {
     test('should change status from taken to skipped', () async {
-      final today = DateTime.now();
-      final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
+      // Use a time in the past to ensure registeredDateTime is always after it
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
 
+      final personId = await getDefaultPersonId();
       final originalEntry = DoseHistoryEntry(
         id: 'entry7',
         medicationId: 'med7',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,
@@ -267,15 +307,16 @@ void main() {
     });
 
     test('should change status from skipped to taken', () async {
-      final today = DateTime.now();
-      final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
+      // Use a time in the past to ensure registeredDateTime is always after it
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
 
+      final personId = await getDefaultPersonId();
       final originalEntry = DoseHistoryEntry(
         id: 'entry8',
         medicationId: 'med8',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.skipped,
@@ -296,16 +337,17 @@ void main() {
     });
 
     test('should update registeredDateTime when changing status', () async {
-      final today = DateTime.now();
-      final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
-      final originalRegisteredTime = today.subtract(const Duration(minutes: 30));
+      // Use a time in the past to ensure registeredDateTime is always after it
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 5));
 
+      final personId = await getDefaultPersonId();
       final originalEntry = DoseHistoryEntry(
         id: 'entry9',
         medicationId: 'med9',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: originalRegisteredTime,
         status: DoseStatus.taken,
@@ -330,12 +372,13 @@ void main() {
       final today = DateTime.now();
       final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
 
+      final personId = await getDefaultPersonId();
       final originalEntry = DoseHistoryEntry(
         id: 'entry10',
         medicationId: 'med10',
         medicationName: 'Special Med',
         medicationType: MedicationType.injection,
-        personId: 'test-person-id',
+        personId: personId,
         scheduledDateTime: scheduledTime,
         registeredDateTime: scheduledTime,
         status: DoseStatus.taken,

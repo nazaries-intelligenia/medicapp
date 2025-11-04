@@ -45,15 +45,36 @@ void main() {
       // Check Display section exists
       expect(find.text('Visualización'), findsOneWidget);
 
-      // Check Backup section exists
+      // Check Backup section exists (might need scrolling)
+      await tester.dragUntilVisible(
+        find.text('Copia de Seguridad'),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
       expect(find.text('Copia de Seguridad'), findsOneWidget);
 
-      // Check preference switches exist
+      // Check preference switches exist (scroll back up if needed)
+      await tester.dragUntilVisible(
+        find.text('Mostrar hora real de toma'),
+        find.byType(ListView),
+        const Offset(0, 100),
+      );
       expect(find.text('Mostrar hora real de toma'), findsOneWidget);
       expect(find.text('Mostrar cuenta atrás de ayuno'), findsOneWidget);
 
-      // Check export/import options exist
+      // Check export/import options exist (scroll to bottom)
+      await tester.dragUntilVisible(
+        find.text('Exportar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
       expect(find.text('Exportar Base de Datos'), findsOneWidget);
+
+      await tester.dragUntilVisible(
+        find.text('Importar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
       expect(find.text('Importar Base de Datos'), findsOneWidget);
     });
 
@@ -200,16 +221,15 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
-      // Find import button
-      final importButton = find.ancestor(
-        of: find.text('Importar Base de Datos'),
-        matching: find.byType(InkWell),
+      // Scroll to import option
+      await tester.dragUntilVisible(
+        find.text('Importar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
       );
 
-      expect(importButton, findsOneWidget);
-
-      // Tap import
-      await tester.tap(importButton);
+      // Tap on the text directly (Card has onTap)
+      await tester.tap(find.text('Importar Base de Datos'));
       await tester.pumpAndSettle();
 
       // Should show confirmation dialog
@@ -223,12 +243,15 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
-      // Tap import button
-      final importButton = find.ancestor(
-        of: find.text('Importar Base de Datos'),
-        matching: find.byType(InkWell),
+      // Scroll to import option
+      await tester.dragUntilVisible(
+        find.text('Importar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
       );
-      await tester.tap(importButton);
+
+      // Tap on the text directly (Card has onTap)
+      await tester.tap(find.text('Importar Base de Datos'));
       await tester.pumpAndSettle();
 
       // Tap cancel
@@ -245,12 +268,15 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
-      // Tap import button
-      final importButton = find.ancestor(
-        of: find.text('Importar Base de Datos'),
-        matching: find.byType(InkWell),
+      // Scroll to import option
+      await tester.dragUntilVisible(
+        find.text('Importar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
       );
-      await tester.tap(importButton);
+
+      // Tap on the text directly (Card has onTap)
+      await tester.tap(find.text('Importar Base de Datos'));
       await tester.pumpAndSettle();
 
       // Tap continue
@@ -294,9 +320,23 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      // Scroll to export/import section
+      await tester.dragUntilVisible(
+        find.text('Exportar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
+
       // Check export
       expect(find.text('Exportar Base de Datos'), findsOneWidget);
       expect(find.text('Guarda una copia de todos tus medicamentos e historial'), findsOneWidget);
+
+      // Scroll to import
+      await tester.dragUntilVisible(
+        find.text('Importar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
 
       // Check import
       expect(find.text('Importar Base de Datos'), findsOneWidget);
