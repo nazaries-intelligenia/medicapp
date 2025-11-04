@@ -616,6 +616,45 @@ class DatabaseHelper {
     return null;
   }
 
+  /// Get a single medication for a specific person (includes doseSchedule from person_medications)
+  Future<Medication?> getMedicationForPerson(String medicationId, String personId) async {
+    final db = await database;
+    final result = await db.rawQuery('''
+      SELECT
+        m.id,
+        m.name,
+        m.type,
+        m.stockQuantity,
+        m.lastRefillAmount,
+        m.lowStockThresholdDays,
+        m.lastDailyConsumption,
+        pm.durationType,
+        pm.dosageIntervalHours,
+        pm.doseSchedule,
+        pm.takenDosesToday,
+        pm.skippedDosesToday,
+        pm.takenDosesDate,
+        pm.selectedDates,
+        pm.weeklyDays,
+        pm.dayInterval,
+        pm.startDate,
+        pm.endDate,
+        pm.requiresFasting,
+        pm.fastingType,
+        pm.fastingDurationMinutes,
+        pm.notifyFasting,
+        pm.isSuspended
+      FROM medications m
+      INNER JOIN person_medications pm ON m.id = pm.medicationId
+      WHERE m.id = ? AND pm.personId = ?
+    ''', [medicationId, personId]);
+
+    if (result.isNotEmpty) {
+      return Medication.fromJson(result.first);
+    }
+    return null;
+  }
+
   /// Update medication data for a specific person
   /// Updates both shared data (stock) and individual schedule
   Future<int> updateMedicationForPerson({
@@ -669,7 +708,7 @@ class DatabaseHelper {
   // NOTE: In v19+, this only updates shared data (stock)
   Future<int> updateMedication(Medication medication) async {
     final db = await database;
-    return await db.update(
+    final result = await db.update(
       'medications',
       {
         'name': medication.name,
@@ -682,6 +721,7 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [medication.id],
     );
+    return result;
   }
 
   // Delete - Delete a medication

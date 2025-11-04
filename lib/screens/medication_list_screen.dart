@@ -89,7 +89,6 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     await DatabaseHelper.instance.migrateUnassignedMedicationsToDefaultPerson();
 
     final persons = await DatabaseHelper.instance.getAllPersons();
-    print('DEBUG: Loaded ${persons.length} persons from database (names: ${persons.map((p) => p.name).join(", ")})');
 
     // Sort persons: default person first, then alphabetically
     persons.sort((a, b) {
@@ -422,7 +421,9 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     // Sort medications by next dose proximity
     MedicationSorter.sortByNextDose(medications);
 
-    if (!mounted) return; // Check if widget is still mounted
+    if (!mounted) {
+      return; // Check if widget is still mounted
+    }
 
     // Update UI immediately
     setState(() {
@@ -430,6 +431,10 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       _medications.addAll(medications);
       _isLoading = false;
     });
+
+    // Force a microtask to ensure setState is fully processed
+    // This is especially important for tests
+    await Future.microtask(() {});
 
     print('UI updated with ${_medications.length} medications');
 
@@ -611,7 +616,10 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     Navigator.pop(context);
 
     // ALWAYS get the fresh medication from database to ensure we have the latest taken doses
-    final freshMedication = await DatabaseHelper.instance.getMedication(medication.id);
+    // Use getMedicationForPerson to get complete medication data including doseSchedule
+    final freshMedication = _selectedPerson != null
+        ? await DatabaseHelper.instance.getMedicationForPerson(medication.id, _selectedPerson!.id)
+        : await DatabaseHelper.instance.getMedication(medication.id);
 
     // If medication was deleted, show error and return
     if (freshMedication == null) {
@@ -785,8 +793,20 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         lastDailyConsumption: freshMedication.lastDailyConsumption,
       );
 
-      // Update in database
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      // Get default person for history entry and updates
+      final defaultPerson = _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
+      final personId = defaultPerson?.id ?? '';
+
+      // Update in database (V19+: use updateMedicationForPerson to update person-specific data)
+      if (defaultPerson != null) {
+        await DatabaseHelper.instance.updateMedicationForPerson(
+          medication: updatedMedication,
+          personId: defaultPerson.id,
+        );
+      } else {
+        // Fallback to legacy method if no person is found
+        await DatabaseHelper.instance.updateMedication(updatedMedication);
+      }
 
       // Create history entry
       final now = DateTime.now();
@@ -797,10 +817,6 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         int.parse(selectedDoseTime.split(':')[0]),
         int.parse(selectedDoseTime.split(':')[1]),
       );
-
-      // Get default person for history entry
-      final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-      final personId = defaultPerson?.id ?? '';
 
       final historyEntry = DoseHistoryEntry(
         id: '${freshMedication.id}_${now.millisecondsSinceEpoch}',

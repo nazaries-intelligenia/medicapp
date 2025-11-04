@@ -106,14 +106,13 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    // The system shows the ExtraDoseConfirmationDialog because getAvailableDosesToday()
-    // returns empty (the medication was just added, but the system may have marked doses)
-    // V19+: The actual behavior shows extra dose confirmation dialog
-    expect(find.text(getL10n(tester).allDosesTakenToday), findsOneWidget);
-    expect(find.text(getL10n(tester).extraDoseConfirm), findsOneWidget);
+    // The medication has one dose available (08:00), so the DoseSelectionDialog should appear
+    // The dialog shows the available dose and an option to register an extra dose
+    expect(find.text('Registrar toma de Vitamina C'), findsOneWidget);
+    expect(find.text('08:00'), findsOneWidget);
 
-    // Confirm registering extra dose
-    await tester.tap(find.text(getL10n(tester).extraDoseConfirm));
+    // Select the available dose time (08:00) to register it
+    await tester.tap(find.text('08:00'));
     await tester.pump();
 
     // Wait for dose registration to complete

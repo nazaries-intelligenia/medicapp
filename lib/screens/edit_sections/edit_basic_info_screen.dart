@@ -152,6 +152,7 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
                       existingMedications: widget.existingMedications,
                       existingMedicationId: widget.medication.id,
                       showDescription: false,
+                      validateDuplicates: true,
                     ),
                   ),
                 ),

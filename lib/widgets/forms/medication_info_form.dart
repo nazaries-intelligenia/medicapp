@@ -13,6 +13,7 @@ class MedicationInfoForm extends StatelessWidget {
   final String? existingMedicationId;
   final bool showDescription;
   final ValueChanged<Medication?>? onMedicationSelected;
+  final bool validateDuplicates;
 
   const MedicationInfoForm({
     super.key,
@@ -23,6 +24,7 @@ class MedicationInfoForm extends StatelessWidget {
     this.existingMedicationId,
     this.showDescription = true,
     this.onMedicationSelected,
+    this.validateDuplicates = false,
   });
 
   /// Get unique medication names (ignoring current medication being edited)
@@ -147,6 +149,21 @@ class MedicationInfoForm extends StatelessWidget {
                 if (value == null || value.trim().isEmpty) {
                   return l10n.validationMedicationName;
                 }
+
+                // Check for duplicate medication names (case-insensitive)
+                // Only validate duplicates in edit mode (not when adding new medications)
+                if (validateDuplicates) {
+                  final trimmedValue = value.trim();
+                  final isDuplicate = existingMedications.any((medication) =>
+                    medication.id != existingMedicationId &&
+                    medication.name.toLowerCase() == trimmedValue.toLowerCase()
+                  );
+
+                  if (isDuplicate) {
+                    return l10n.validationDuplicateMedication;
+                  }
+                }
+
                 return null;
               },
               onFieldSubmitted: (value) => onFieldSubmitted(),
