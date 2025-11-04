@@ -8,7 +8,7 @@ import 'edit_sections/edit_frequency_screen.dart';
 import 'edit_sections/edit_schedule_screen.dart';
 import 'edit_sections/edit_quantity_screen.dart';
 import 'edit_sections/edit_fasting_screen.dart';
-import 'edit_medication_menu/widgets/medication_header_card.dart';
+import '../widgets/medication_header_card.dart';
 import 'edit_medication_menu/widgets/edit_menu_option.dart';
 
 /// Pantalla de menú para editar diferentes aspectos de un medicamento

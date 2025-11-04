@@ -7,7 +7,7 @@ import 'medication_dates/widgets/date_selector_card.dart';
 import 'medication_dates/widgets/clear_date_button.dart';
 import 'medication_dates/widgets/duration_summary.dart';
 import 'medication_dates/widgets/dates_help_info.dart';
-import 'medication_frequency/widgets/continue_back_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 /// Pantalla 3: Fechas de inicio y fin del tratamiento (opcional)
 class MedicationDatesScreen extends StatefulWidget {
@@ -249,9 +249,13 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
 
               const SizedBox(height: 24),
 
-              ContinueBackButtons(
-                onContinue: _continueToNextStep,
-                onBack: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.btnContinue,
+                primaryIcon: Icons.arrow_forward,
+                onPrimaryPressed: _continueToNextStep,
+                secondaryLabel: l10n.btnBack,
+                secondaryIcon: Icons.arrow_back,
+                onSecondaryPressed: () => Navigator.pop(context),
               ),
             ],
           ),

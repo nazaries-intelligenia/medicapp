@@ -5,7 +5,7 @@ import '../../models/medication.dart';
 import '../../widgets/forms/fasting_configuration_form.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
-import 'edit_duration/widgets/save_cancel_buttons.dart';
+import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar la configuración de ayuno
 class EditFastingScreen extends StatefulWidget {
@@ -164,6 +164,8 @@ class _EditFastingScreenState extends State<EditFastingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Editar Configuración de Ayuno'),
@@ -207,10 +209,15 @@ class _EditFastingScreenState extends State<EditFastingScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              SaveCancelButtons(
-                isSaving: _isSaving,
-                onSave: _saveChanges,
-                onCancel: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.editBasicInfoSaveChanges,
+                primaryIcon: Icons.check,
+                onPrimaryPressed: _saveChanges,
+                secondaryLabel: l10n.btnCancel,
+                secondaryIcon: Icons.cancel,
+                onSecondaryPressed: () => Navigator.pop(context),
+                isLoading: _isSaving,
+                loadingLabel: l10n.editBasicInfoSaving,
               ),
             ],
           ),

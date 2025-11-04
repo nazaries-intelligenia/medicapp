@@ -3607,6 +3607,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Suspendido'**
   String get suspended;
+
+  /// No description provided for @activeFastingPeriodsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ayunos Activos'**
+  String get activeFastingPeriodsTitle;
 }
 
 class _AppLocalizationsDelegate

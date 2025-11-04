@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medicapp/main.dart';
-import 'package:medicapp/database/database_helper.dart';
-import 'package:medicapp/services/notification_service.dart';
 import '../helpers/widget_test_helpers.dart';
 import '../helpers/database_test_helper.dart';
 
@@ -14,30 +11,12 @@ void main() {
 
   // Clean up database before each test to ensure test isolation
   setUp(() async {
-    // Set larger window size for accessibility tests (larger fonts and buttons)
-    final binding = TestWidgetsFlutterBinding.instance;
-    binding.platformDispatcher.implicitView!.physicalSize = const Size(1200, 1800);
-    binding.platformDispatcher.implicitView!.devicePixelRatio = 1.0;
-
-    // Mock SharedPreferences to avoid plugin errors in tests
-    SharedPreferences.setMockInitialValues({});
-
-    // Close and reset the database to get a fresh in-memory instance
-    await DatabaseHelper.resetDatabase();
-    // Enable in-memory mode for this test
-    DatabaseHelper.setInMemoryDatabase(true);
-    // Enable test mode for notifications (disables actual notifications)
-    NotificationService.instance.enableTestMode();
-    // Ensure default person exists (V19+ requirement) BEFORE starting the app
-    await DatabaseTestHelper.ensureDefaultPerson();
+    await setupIntegrationTest();
   });
 
   // Clean up after each test
-  tearDown(() {
-    // Reset window size to default
-    final binding = TestWidgetsFlutterBinding.instance;
-    binding.platformDispatcher.implicitView!.resetPhysicalSize();
-    binding.platformDispatcher.implicitView!.resetDevicePixelRatio();
+  tearDown(() async {
+    await tearDownIntegrationTest();
   });
 
   testWidgets('Should show "Registrar toma" button in medication modal', (WidgetTester tester) async {
@@ -129,6 +108,12 @@ void main() {
     // We verify the operation succeeded by checking the medication is still in the list
     // In a real app, the stock would be 29 now, but we can't easily verify text in this test
     // The important thing is that the app didn't crash and the medication is still there
+
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 
   testWidgets('Should show dose selection dialog for medication with multiple doses', (WidgetTester tester) async {
@@ -209,6 +194,12 @@ void main() {
     // The stock should have decreased from 15 to 14, but we can't easily verify
     // the exact number in the UI. The important thing is the operation completed
     // without errors and the medication is still displayed.
+
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 
   testWidgets('Should show error when registering dose without stock', (WidgetTester tester) async {
@@ -324,24 +315,39 @@ void main() {
     });
     await tester.pump(); // Start dose registration
 
-    // Wait for database to complete the update and reload
+    // Wait for dose dialog to close and database operation to complete
     await waitForDatabase(tester);
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    });
+
+    // Extra pumps to allow dialog to fully close and list to reload
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Extra wait for getMedicationIdsWithDosesToday() query and setState to complete
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 3000));
     });
 
-    // Pump to process all pending updates
-    await tester.pumpAndSettle();
+    // Pump to process all pending updates - use manual pumps to avoid timeout
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    // Force many frame updates to ensure setState has executed
+    // Wait for any remaining async operations
+    await waitForDatabase(tester);
+
+    // One more round of pumps to ensure everything is settled
     for (int i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
     // Try to register another dose immediately
-    await tester.tap(find.text(getL10n(tester).summaryMedication));
+    // Wait for medication to appear in the list after reload
+    await waitForWidget(tester, find.text('Medicamento'));
+    await tester.tap(find.text('Medicamento'));
     await tester.pumpAndSettle(); // Wait for modal animation
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
@@ -368,6 +374,12 @@ void main() {
       matching: find.byIcon(Icons.alarm),
     );
     expect(alarmIconsInDialog, findsNWidgets(2));
+
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 
   testWidgets('Should register last dose automatically when only one remains', (WidgetTester tester) async {
@@ -381,45 +393,75 @@ void main() {
 
     // Register first dose
     await tester.tap(find.text('MedDual'));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps to avoid ViewModel async timeout
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     await tester.tap(find.text('08:00'));
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 500));
     });
     await tester.pump(); // Start dose registration
+
+    // Wait for dose dialog to close and database operation to complete
     await waitForDatabase(tester);
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    });
+
+    // Extra pumps to allow dialog to fully close and list to reload
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Extra wait for getMedicationIdsWithDosesToday() query and setState to complete
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 3000));
     });
 
-    // Pump to process all pending updates
-    await tester.pumpAndSettle();
+    // Pump to process all pending updates - use manual pumps to avoid timeout
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    // Force many frame updates to ensure setState has executed
+    // Wait for any remaining async operations
+    await waitForDatabase(tester);
+
+    // One more round of pumps to ensure everything is settled
     for (int i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
     // Register second dose - should be automatic since only one remains
+    // Wait for medication to appear in the list after first dose registration
+    await waitForWidget(tester, find.text('MedDual'));
+    expect(find.text('MedDual'), findsOneWidget);
     await tester.tap(find.text('MedDual'));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query and automatic dose registration
     await waitForDatabase(tester);
-    await tester.pumpAndSettle();
+    // Use manual pumps instead of pumpAndSettle
+    for (int i = 0; i < 15; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Wait for database reload after dose registration
     await waitForDatabase(tester);
@@ -451,6 +493,12 @@ void main() {
 
     // Verify the medication is still in the list (operation completed successfully)
     expect(find.text('MedDual'), findsOneWidget);
+
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 
   testWidgets('Should prevent registering after all doses are completed', (WidgetTester tester) async {
@@ -467,45 +515,75 @@ void main() {
 
     // Register first dose
     await tester.tap(find.text('MedCompleto'));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     await tester.tap(find.text('08:00'));
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 500));
     });
     await tester.pump(); // Start dose registration
+
+    // Wait for dose dialog to close and database operation to complete
     await waitForDatabase(tester);
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    });
+
+    // Extra pumps to allow dialog to fully close and list to reload
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Extra wait for getMedicationIdsWithDosesToday() query and setState to complete
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 3000));
     });
 
-    // Pump to process all pending updates
-    await tester.pumpAndSettle();
+    // Pump to process all pending updates - use manual pumps to avoid timeout
+    for (int i = 0; i < 30; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    // Force many frame updates to ensure setState has executed
+    // Wait for any remaining async operations
+    await waitForDatabase(tester);
+
+    // One more round of pumps to ensure everything is settled
     for (int i = 0; i < 20; i++) {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
     // Register second and last dose (should be automatic since only one remains)
+    // Wait for medication to appear in the list after first dose registration
+    await waitForWidget(tester, find.text('MedCompleto'));
+    expect(find.text('MedCompleto'), findsOneWidget);
     await tester.tap(find.text('MedCompleto'));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query and automatic dose registration
     await waitForDatabase(tester);
-    await tester.pumpAndSettle();
+    // Use manual pumps instead of pumpAndSettle
+    for (int i = 0; i < 15; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Verify the medication is still in the list (operations completed successfully)
     expect(find.text('MedCompleto'), findsOneWidget);
@@ -518,5 +596,11 @@ void main() {
     // Note: Testing the exact error message in SnackBar is not reliable in automated tests
     // due to timing issues, but the functionality is verified through the successful
     // completion of the two dose registrations above
+
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 }

@@ -17,7 +17,7 @@ void main() {
     });
 
     test('_buildNotificationTitle should hide name for default user', () {
-      // Simulate a default person
+      // Simulate a default person with name
       final isDefault = true;
       final personName = 'Yo';
 
@@ -27,6 +27,15 @@ void main() {
       // Should NOT include person name
       expect(title, equals('💊 Hora de tomar medicamento'));
       expect(title, isNot(contains('Yo')));
+
+      // Also test with null name
+      final String? nullName = null;
+      final titleWithNull = service.buildNotificationTitle(nullName, isDefault);
+
+      // Should NOT include any name
+      expect(titleWithNull, equals('💊 Hora de tomar medicamento'));
+      expect(titleWithNull, isNot(contains('Usuario')));
+      expect(titleWithNull, isNot(contains('null')));
     });
 
     test('_buildNotificationTitle should show name for non-default user', () {
@@ -94,20 +103,6 @@ void main() {
       // Should use fallback 'Usuario'
       expect(title, equals('💊 Usuario - Hora de tomar medicamento'));
       expect(title, contains('Usuario'));
-    });
-
-    test('_buildNotificationTitle should hide null name for default user', () {
-      // Simulate a default person with null name
-      final isDefault = true;
-      final String? personName = null;
-
-      // Build title with null name for default user
-      final title = service.buildNotificationTitle(personName, isDefault);
-
-      // Should NOT include any name
-      expect(title, equals('💊 Hora de tomar medicamento'));
-      expect(title, isNot(contains('Usuario')));
-      expect(title, isNot(contains('null')));
     });
   });
 

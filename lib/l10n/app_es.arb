@@ -1475,5 +1475,6 @@
     }
   },
   "done": "Hecho",
-  "suspended": "Suspendido"
+  "suspended": "Suspendido",
+  "activeFastingPeriodsTitle": "Ayunos Activos"
 }

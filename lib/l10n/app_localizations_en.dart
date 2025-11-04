@@ -2082,4 +2082,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get suspended => 'Suspended';
+
+  @override
+  String get activeFastingPeriodsTitle => 'Active Fasting Periods';
 }

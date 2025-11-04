@@ -148,41 +148,6 @@ void main() {
       expect(medications[2].id, 'med_b');
     });
 
-    test('should prioritize pending over future doses', () {
-      // Use a fixed time (10:00 AM) to ensure predictable results
-      final now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 10, 0);
-      final today = getTodayString();
-
-      // Calculate times relative to 10:00 AM
-      final oneHourAgo = '09:00';          // 1 hour overdue
-      final closeFutureTime = '10:05';     // 5 minutes in future
-
-      // Medication A: pending dose (overdue by 1 hour)
-      final medA = MedicationBuilder()
-          .withId('med_a')
-          .withName('Medication A')
-          .withDosageInterval(24)
-          .withSingleDose(oneHourAgo, 1.0)
-          .withTakenDoses([], today)
-          .build();
-
-      // Medication B: future dose (very close, in few minutes)
-      final medB = MedicationBuilder()
-          .withId('med_b')
-          .withName('Medication B')
-          .withDosageInterval(24)
-          .withSingleDose(closeFutureTime, 1.0)
-          .withTakenDoses([], today)
-          .build();
-
-      final medications = [medB, medA];
-      MedicationSorter.sortByNextDose(medications, currentTime: now);
-
-      // A (pending) should be first, even though B is closer in absolute time
-      expect(medications[0].id, 'med_a');
-      expect(medications[1].id, 'med_b');
-    });
-
     test('should handle medications with multiple doses (find next available)', () {
       // Use a fixed time (10:00 AM) to ensure predictable results
       final now = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 10, 0);

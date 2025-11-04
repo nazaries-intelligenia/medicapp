@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:medicapp/main.dart';
-import 'package:medicapp/database/database_helper.dart';
-import 'package:medicapp/services/notification_service.dart';
 import '../helpers/widget_test_helpers.dart';
 import '../helpers/database_test_helper.dart';
 
@@ -14,30 +11,12 @@ void main() {
 
   // Clean up database before each test to ensure test isolation
   setUp(() async {
-    // Set larger window size for accessibility tests (larger fonts and buttons)
-    final binding = TestWidgetsFlutterBinding.instance;
-    binding.platformDispatcher.implicitView!.physicalSize = const Size(1200, 1800);
-    binding.platformDispatcher.implicitView!.devicePixelRatio = 1.0;
-
-    // Mock SharedPreferences to avoid plugin errors in tests
-    SharedPreferences.setMockInitialValues({});
-
-    // Close and reset the database to get a fresh in-memory instance
-    await DatabaseHelper.resetDatabase();
-    // Enable in-memory mode for this test
-    DatabaseHelper.setInMemoryDatabase(true);
-    // Enable test mode for notifications (disables actual notifications)
-    NotificationService.instance.enableTestMode();
-    // Ensure default person exists (V19+ requirement) BEFORE starting the app
-    await DatabaseTestHelper.ensureDefaultPerson();
+    await setupIntegrationTest();
   });
 
   // Clean up after each test
-  tearDown(() {
-    // Reset window size to default
-    final binding = TestWidgetsFlutterBinding.instance;
-    binding.platformDispatcher.implicitView!.resetPhysicalSize();
-    binding.platformDispatcher.implicitView!.resetDevicePixelRatio();
+  tearDown(() async {
+    await tearDownIntegrationTest();
   });
 
   testWidgets('Should show edit button in modal', (WidgetTester tester) async {
@@ -129,8 +108,10 @@ void main() {
     await tester.pump();
     await waitForDatabase(tester);
 
-    // Additional pump to ensure navigation is complete
-    await tester.pumpAndSettle();
+    // Wait for navigation and ViewModel async operations - use manual pumps
+    for (int i = 0; i < 15; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Check for confirmation message EARLY (before it disappears after 2 seconds)
     expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
@@ -209,8 +190,10 @@ void main() {
     await tester.pump();
     await waitForDatabase(tester);
 
-    // Additional pump to ensure navigation is complete
-    await tester.pumpAndSettle();
+    // Wait for navigation and ViewModel async operations - use manual pumps
+    for (int i = 0; i < 15; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Check for confirmation message EARLY (before it disappears after 2 seconds)
     expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
@@ -448,17 +431,46 @@ void main() {
     await tester.pump();
     await waitForDatabase(tester);
 
-    // Additional pump to ensure navigation is complete
-    await tester.pumpAndSettle();
+    // Wait for navigation and ViewModel async operations - use manual pumps
+    for (int i = 0; i < 15; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    // Wait for the success message SnackBar to appear
+    await waitForWidget(tester, find.text(getL10n(tester).editBasicInfoUpdated));
+    expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
 
     // Wait for main screen to complete its async operations (reload from DB)
     await waitForDatabase(tester);
 
+    // Wait actively for the medication to appear in the UI after reload
+    bool foundMedication = false;
+    for (int attempt = 0; attempt < 30 && !foundMedication; attempt++) {
+      await tester.runAsync(() async {
+        await Future.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+
+      // Check if the medication name is visible
+      if (find.text('Insulina').evaluate().isNotEmpty) {
+        foundMedication = true;
+        break;
+      }
+    }
+
+    // Final pump to ensure everything is settled
+    for (int i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
     // Verify the medication is still there with the same name
     expect(find.text('Insulina'), findsOneWidget);
 
-    // Verify confirmation message
-    expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
+    // Wait for ViewModel async operations to complete before tearDown
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
   });
 
   testWidgets('Edit validation should be case-insensitive', (WidgetTester tester) async {

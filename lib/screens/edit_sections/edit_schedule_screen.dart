@@ -4,7 +4,7 @@ import '../../models/medication.dart';
 import '../../widgets/forms/dose_schedule_editor.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
-import 'edit_duration/widgets/save_cancel_buttons.dart';
+import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar horarios y cantidades de las tomas
 class EditScheduleScreen extends StatefulWidget {
@@ -159,10 +159,15 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
           // Botones de acción
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: SaveCancelButtons(
-              isSaving: _isSaving,
-              onSave: _saveChanges,
-              onCancel: () => Navigator.pop(context),
+            child: ActionButtons(
+              primaryLabel: l10n.editBasicInfoSaveChanges,
+              primaryIcon: Icons.check,
+              onPrimaryPressed: _saveChanges,
+              secondaryLabel: l10n.btnCancel,
+              secondaryIcon: Icons.cancel,
+              onSecondaryPressed: () => Navigator.pop(context),
+              isLoading: _isSaving,
+              loadingLabel: l10n.editBasicInfoSaving,
             ),
           ),
         ],

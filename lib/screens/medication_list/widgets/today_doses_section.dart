@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
+import '../../../utils/datetime_extensions.dart';
 
 class TodayDosesSection extends StatelessWidget {
   final Medication medication;
@@ -54,7 +55,7 @@ class TodayDosesSection extends StatelessWidget {
               String displayTime = time;
               if (isTaken && showActualTime && actualDoseTimes != null && actualDoseTimes!.containsKey(time)) {
                 final actualTime = actualDoseTimes![time]!;
-                displayTime = '${actualTime.hour.toString().padLeft(2, '0')}:${actualTime.minute.toString().padLeft(2, '0')}';
+                displayTime = actualTime.toTimeString();
               }
 
               // Determine colors and icons based on status

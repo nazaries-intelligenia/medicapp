@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
+import '../../../utils/datetime_extensions.dart';
 
 class MedicationCard extends StatelessWidget {
   final Medication medication;
@@ -174,7 +175,7 @@ class MedicationCard extends StatelessWidget {
                         final lastDoseTime = asNeededDoseInfo!['lastDoseTime'] as DateTime;
                         final unit = asNeededDoseInfo!['unit'] as String;
 
-                        final lastDoseTimeStr = '${lastDoseTime.hour.toString().padLeft(2, '0')}:${lastDoseTime.minute.toString().padLeft(2, '0')}';
+                        final lastDoseTimeStr = lastDoseTime.toTimeString();
                         final quantityStr = totalQuantity % 1 == 0
                             ? totalQuantity.toInt().toString()
                             : totalQuantity.toString();
@@ -234,7 +235,7 @@ class MedicationCard extends StatelessWidget {
                         }
 
                         // Format end time
-                        final endTimeStr = '${fastingEndTime.hour.toString().padLeft(2, '0')}:${fastingEndTime.minute.toString().padLeft(2, '0')}';
+                        final endTimeStr = fastingEndTime.toTimeString();
 
                         final text = isActive
                             ? l10n.fastingActive(timeText, endTimeStr)

@@ -5,7 +5,7 @@ import '../../models/medication_type.dart';
 import '../../widgets/forms/medication_info_form.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
-import 'edit_duration/widgets/save_cancel_buttons.dart';
+import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar información básica del medicamento (nombre y tipo)
 class EditBasicInfoScreen extends StatefulWidget {
@@ -157,10 +157,15 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                SaveCancelButtons(
-                  isSaving: _isSaving,
-                  onSave: _saveChanges,
-                  onCancel: () => Navigator.pop(context),
+                ActionButtons(
+                  primaryLabel: l10n.editBasicInfoSaveChanges,
+                  primaryIcon: Icons.check,
+                  onPrimaryPressed: _saveChanges,
+                  secondaryLabel: l10n.btnCancel,
+                  secondaryIcon: Icons.cancel,
+                  onSecondaryPressed: () => Navigator.pop(context),
+                  isLoading: _isSaving,
+                  loadingLabel: l10n.editBasicInfoSaving,
                 ),
               ],
             ),

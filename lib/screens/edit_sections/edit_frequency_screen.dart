@@ -8,7 +8,7 @@ import 'edit_frequency/widgets/frequency_options_list.dart';
 import 'edit_frequency/widgets/specific_dates_config_card.dart';
 import 'edit_frequency/widgets/weekly_pattern_config_card.dart';
 import 'edit_frequency/widgets/custom_interval_config_card.dart';
-import 'edit_duration/widgets/save_cancel_buttons.dart';
+import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar la frecuencia del medicamento
 class EditFrequencyScreen extends StatefulWidget {
@@ -306,10 +306,15 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
               ],
 
               const SizedBox(height: 24),
-              SaveCancelButtons(
-                isSaving: _isSaving,
-                onSave: _saveChanges,
-                onCancel: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.editBasicInfoSaveChanges,
+                primaryIcon: Icons.check,
+                onPrimaryPressed: _saveChanges,
+                secondaryLabel: l10n.btnCancel,
+                secondaryIcon: Icons.cancel,
+                onSecondaryPressed: () => Navigator.pop(context),
+                isLoading: _isSaving,
+                loadingLabel: l10n.editBasicInfoSaving,
               ),
             ],
           ),

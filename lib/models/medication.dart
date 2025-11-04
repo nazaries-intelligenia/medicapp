@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'medication_type.dart';
 import 'treatment_duration_type.dart';
+import '../utils/datetime_extensions.dart';
 
 class Medication {
   final String id;
@@ -238,7 +239,7 @@ class Medication {
     if (!isActive) return false;
 
     final today = DateTime.now();
-    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final todayString = today.toDateString();
 
     switch (durationType) {
       case TreatmentDurationType.everyday:
@@ -329,7 +330,7 @@ class Medication {
     }
 
     final today = DateTime.now();
-    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final todayString = today.toDateString();
 
     // If the taken doses date is not today, all doses are available
     if (takenDosesDate != todayString) {
@@ -345,7 +346,7 @@ class Medication {
   /// Check if the taken doses date is today
   bool get isTakenDosesDateToday {
     final today = DateTime.now();
-    final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
+    final todayString = today.toDateString();
     return takenDosesDate == todayString;
   }
 
@@ -439,5 +440,60 @@ class Medication {
       return 'Día $currentDay de $totalDays';
     }
     return ''; // No special status
+  }
+
+  /// Create a copy of this Medication with updated fields
+  Medication copyWith({
+    String? id,
+    String? name,
+    MedicationType? type,
+    int? dosageIntervalHours,
+    TreatmentDurationType? durationType,
+    Map<String, double>? doseSchedule,
+    double? stockQuantity,
+    List<String>? takenDosesToday,
+    List<String>? skippedDosesToday,
+    List<String>? extraDosesToday,
+    String? takenDosesDate,
+    double? lastRefillAmount,
+    int? lowStockThresholdDays,
+    List<String>? selectedDates,
+    List<int>? weeklyDays,
+    int? dayInterval,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? requiresFasting,
+    String? fastingType,
+    int? fastingDurationMinutes,
+    bool? notifyFasting,
+    bool? isSuspended,
+    double? lastDailyConsumption,
+  }) {
+    return Medication(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      dosageIntervalHours: dosageIntervalHours ?? this.dosageIntervalHours,
+      durationType: durationType ?? this.durationType,
+      doseSchedule: doseSchedule ?? this.doseSchedule,
+      stockQuantity: stockQuantity ?? this.stockQuantity,
+      takenDosesToday: takenDosesToday ?? this.takenDosesToday,
+      skippedDosesToday: skippedDosesToday ?? this.skippedDosesToday,
+      extraDosesToday: extraDosesToday ?? this.extraDosesToday,
+      takenDosesDate: takenDosesDate ?? this.takenDosesDate,
+      lastRefillAmount: lastRefillAmount ?? this.lastRefillAmount,
+      lowStockThresholdDays: lowStockThresholdDays ?? this.lowStockThresholdDays,
+      selectedDates: selectedDates ?? this.selectedDates,
+      weeklyDays: weeklyDays ?? this.weeklyDays,
+      dayInterval: dayInterval ?? this.dayInterval,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      requiresFasting: requiresFasting ?? this.requiresFasting,
+      fastingType: fastingType ?? this.fastingType,
+      fastingDurationMinutes: fastingDurationMinutes ?? this.fastingDurationMinutes,
+      notifyFasting: notifyFasting ?? this.notifyFasting,
+      isSuspended: isSuspended ?? this.isSuspended,
+      lastDailyConsumption: lastDailyConsumption ?? this.lastDailyConsumption,
+    );
   }
 }

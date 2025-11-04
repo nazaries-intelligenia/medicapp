@@ -7,7 +7,7 @@ import 'medication_dosage/widgets/dosage_mode_option_card.dart';
 import 'medication_dosage/widgets/interval_input_card.dart';
 import 'medication_dosage/widgets/custom_doses_input_card.dart';
 import 'medication_dosage/widgets/dose_summary_info.dart';
-import 'medication_frequency/widgets/continue_back_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 /// Pantalla 4: Dosis (todos los días igual o cada día diferente)
 class MedicationDosageScreen extends StatefulWidget {
@@ -282,9 +282,13 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
 
               const SizedBox(height: 24),
 
-              ContinueBackButtons(
-                onContinue: _continueToNextStep,
-                onBack: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.btnContinue,
+                primaryIcon: Icons.arrow_forward,
+                onPrimaryPressed: _continueToNextStep,
+                secondaryLabel: l10n.btnBack,
+                secondaryIcon: Icons.arrow_back,
+                onSecondaryPressed: () => Navigator.pop(context),
               ),
             ],
           ),

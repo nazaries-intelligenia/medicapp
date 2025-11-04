@@ -7,7 +7,7 @@ import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import 'medication_quantity/widgets/stock_input_card.dart';
 import 'medication_quantity/widgets/medication_summary_card.dart';
-import 'medication_quantity/widgets/save_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 /// Pantalla 7: Cantidad de medicamentos (última pantalla del flujo)
 class MedicationQuantityScreen extends StatefulWidget {
@@ -207,10 +207,16 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
 
                 const SizedBox(height: 24),
 
-                SaveButtons(
-                  isSaving: _isSaving,
-                  onSave: _saveMedication,
-                  onBack: () => Navigator.pop(context),
+                ActionButtons(
+                  primaryLabel: l10n.saveMedicationButton,
+                  primaryIcon: Icons.check,
+                  onPrimaryPressed: _saveMedication,
+                  secondaryLabel: l10n.btnBack,
+                  secondaryIcon: Icons.arrow_back,
+                  onSecondaryPressed: () => Navigator.pop(context),
+                  isLoading: _isSaving,
+                  loadingLabel: l10n.savingButton,
+                  primaryButtonColor: Colors.green,
                 ),
               ],
             ),

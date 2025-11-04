@@ -14,6 +14,9 @@ class DatabaseHelper {
   static Database? _database;
   static bool _useInMemory = false; // For testing
 
+  // Cache for default person to avoid repeated database queries
+  Person? _cachedDefaultPerson;
+
   DatabaseHelper._init();
 
   // Set to use in-memory database for testing
@@ -28,6 +31,8 @@ class DatabaseHelper {
       await _database!.close();
       _database = null;
     }
+    // Invalidate cached default person when database is reset
+    instance._invalidateDefaultPersonCache();
   }
 
   Future<Database> get database async {
@@ -925,11 +930,14 @@ class DatabaseHelper {
   // Create - Insert a person
   Future<int> insertPerson(Person person) async {
     final db = await database;
-    return await db.insert(
+    final result = await db.insert(
       'persons',
       person.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    // Invalidate cache when a person is inserted (especially if it's the default)
+    _invalidateDefaultPersonCache();
+    return result;
   }
 
   // Read - Get all persons
@@ -954,8 +962,14 @@ class DatabaseHelper {
     return null;
   }
 
-  // Read - Get the default person
+  // Read - Get the default person (with caching)
   Future<Person?> getDefaultPerson() async {
+    // Return cached value if available
+    if (_cachedDefaultPerson != null) {
+      return _cachedDefaultPerson;
+    }
+
+    // Query database if not cached
     final db = await database;
     final maps = await db.query(
       'persons',
@@ -965,36 +979,52 @@ class DatabaseHelper {
     );
 
     if (maps.isNotEmpty) {
-      return Person.fromJson(maps.first);
+      _cachedDefaultPerson = Person.fromJson(maps.first);
+      return _cachedDefaultPerson;
     }
     return null;
+  }
+
+  /// Invalidate the cached default person
+  /// This should be called whenever person data is modified
+  void _invalidateDefaultPersonCache() {
+    _cachedDefaultPerson = null;
   }
 
   // Update - Update a person
   Future<int> updatePerson(Person person) async {
     final db = await database;
-    return await db.update(
+    final result = await db.update(
       'persons',
       person.toJson(),
       where: 'id = ?',
       whereArgs: [person.id],
     );
+    // Invalidate cache when a person is updated (name or default status might change)
+    _invalidateDefaultPersonCache();
+    return result;
   }
 
   // Delete - Delete a person
   Future<int> deletePerson(String id) async {
     final db = await database;
-    return await db.delete(
+    final result = await db.delete(
       'persons',
       where: 'id = ?',
       whereArgs: [id],
     );
+    // Invalidate cache when a person is deleted (might be the default person)
+    _invalidateDefaultPersonCache();
+    return result;
   }
 
   // Delete all persons (useful for testing)
   Future<int> deleteAllPersons() async {
     final db = await database;
-    return await db.delete('persons');
+    final result = await db.delete('persons');
+    // Invalidate cache when all persons are deleted
+    _invalidateDefaultPersonCache();
+    return result;
   }
 
   // Check if default person exists
