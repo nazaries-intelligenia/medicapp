@@ -79,9 +79,15 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
 
       await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-      // Reprogramar notificaciones si el nombre cambió
+      // V19+: Reprogramar notificaciones para todas las personas asignadas si el nombre cambió
       if (widget.medication.name != updatedMedication.name) {
-        await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+        final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+        for (final person in persons) {
+          await NotificationService.instance.scheduleMedicationNotifications(
+            updatedMedication,
+            personId: person.id,
+          );
+        }
       }
 
       if (!mounted) return;
@@ -146,6 +152,7 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
                       existingMedications: widget.existingMedications,
                       existingMedicationId: widget.medication.id,
                       showDescription: false,
+                      validateDuplicates: true,
                     ),
                   ),
                 ),

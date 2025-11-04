@@ -123,8 +123,14 @@ class _EditFastingScreenState extends State<EditFastingScreen> {
 
       await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-      // Always reschedule notifications when fasting settings change
-      await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+      // V19+: Always reschedule notifications for all assigned persons when fasting settings change
+      final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+      for (final person in persons) {
+        await NotificationService.instance.scheduleMedicationNotifications(
+          updatedMedication,
+          personId: person.id,
+        );
+      }
 
       if (!mounted) return;
 

@@ -1,5 +1,19 @@
 # Funcionalidades
 
+## Gestión Multi-Persona (V19+)
+
+- **Soporte para múltiples personas**: Gestiona medicamentos para toda la familia desde una única aplicación (usuario principal, familiares, pacientes a cargo)
+- **Sistema de tabs por persona**: Navegación rápida entre personas mediante pestañas en la pantalla principal, persona por defecto identificada visualmente
+- **Asignación de medicamentos**: Interfaz dedicada para asignar/desasignar medicamentos a personas, visualización clara del estado de asignaciones, gestión desde menú contextual de cada medicamento
+- **Configuración independiente**: Cada persona puede tener sus propios horarios, frecuencias y configuraciones para el mismo medicamento compartido
+- **Stock compartido**: Los medicamentos físicos se comparten (un solo stock), pero cada persona tiene su seguimiento independiente
+- **Notificaciones por persona**: Las notificaciones se envían según la configuración de cada persona, con identificación clara del destinatario
+- **Historial por persona**: Seguimiento independiente de adherencia y tomas para cada persona
+- **Gestión de personas**: Crear, editar y eliminar personas desde Ajustes, una persona siempre marcada como por defecto, protección contra eliminación accidental
+- **Migración automática**: Los datos existentes se migran automáticamente a la persona por defecto al actualizar a V19+
+
+## Gestión de Medicamentos
+
 - **Añadir medicamentos**: Flujo guiado modular con 8 pasos para medicamentos programados (información básica, duración, fechas, frecuencia, dosis, horarios, ayuno, stock) o flujo simplificado de 2 pasos para medicamentos ocasionales
 - **Tipos de medicamento**: 7 tipos disponibles (Pastilla, Inyección, Óvulo, Aplicación, Gota, Gramo, Mililitro), cada uno con su unidad específica
 - **Programación de horarios**: Múltiples horarios por medicamento con dosis personalizadas, intervalo de dosis fijo o horarios específicos, validación de divisores de 24 horas

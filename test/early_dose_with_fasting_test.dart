@@ -33,7 +33,7 @@ void main() {
           .build();
 
       // Schedule the original notification (for 8:15)
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // User takes medication at 8:00 (15 minutes before scheduled time)
       final actualDoseTime = DateTime(2025, 10, 24, 8, 0);
@@ -42,12 +42,14 @@ void main() {
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '08:15',
+        personId: 'test-person-id',
       );
 
       // Cancel any fasting notification that was scheduled based on 8:15
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '08:15',
+        personId: 'test-person-id',
       );
 
       // Schedule dynamic fasting notification based on ACTUAL time (8:00)
@@ -55,6 +57,7 @@ void main() {
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       // In test mode, these operations should complete without errors
@@ -97,24 +100,27 @@ void main() {
             .build();
 
         // Schedule original notification
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Cancel scheduled notifications
         await service.cancelTodaysDoseNotification(
           medication: medication,
           doseTime: scenario['scheduledTime'] as String,
+        personId: 'test-person-id',
         );
 
         await service.cancelTodaysFastingNotification(
           medication: medication,
           doseTime: scenario['scheduledTime'] as String,
+        personId: 'test-person-id',
         );
 
         // Schedule dynamic fasting based on actual time
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: scenario['actualTime'] as DateTime,
-        );
+        personId: 'test-person-id',
+      );
       }
 
       expect(true, true);
@@ -129,24 +135,27 @@ void main() {
           .withFasting(type: 'after', duration: 45)
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final exactTime = DateTime(2025, 10, 24, 10, 0);
 
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '10:00',
+        personId: 'test-person-id',
       );
 
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '10:00',
+        personId: 'test-person-id',
       );
 
       // Schedule fasting for 10:00 + 45 min = 10:45
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: exactTime,
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -161,7 +170,7 @@ void main() {
           .withFasting(type: 'after', duration: 60)
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Take medication 20 minutes late
       final actualDoseTime = DateTime(2025, 10, 24, 9, 20);
@@ -169,17 +178,20 @@ void main() {
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '09:00',
+        personId: 'test-person-id',
       );
 
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '09:00',
+        personId: 'test-person-id',
       );
 
       // Should schedule fasting for 9:20 + 60 min = 10:20 (NOT 10:00)
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -194,25 +206,28 @@ void main() {
           .withFasting(type: 'before', duration: 120)
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final actualDoseTime = DateTime(2025, 10, 24, 10, 45);
 
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '11:00',
+        personId: 'test-person-id',
       );
 
       // Should cancel the "before" fasting notification
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '11:00',
+        personId: 'test-person-id',
       );
 
       // This should NOT schedule anything (early return for "before" type)
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -227,7 +242,7 @@ void main() {
           .withFasting(type: 'after', duration: 45)
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Take the 14:00 dose at 13:45 (15 minutes early)
       final actualDoseTime = DateTime(2025, 10, 24, 13, 45);
@@ -236,11 +251,13 @@ void main() {
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '14:00',
+        personId: 'test-person-id',
       );
 
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '14:00',
+        personId: 'test-person-id',
       );
 
       // Schedule dynamic fasting for the 14:00 dose taken at 13:45
@@ -248,6 +265,7 @@ void main() {
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       // Other doses (08:00 and 20:00) should remain unaffected
@@ -263,24 +281,27 @@ void main() {
           .withFasting(type: 'after', duration: 5)
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final actualDoseTime = DateTime(2025, 10, 24, 11, 55);
 
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '12:00',
+        personId: 'test-person-id',
       );
 
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '12:00',
+        personId: 'test-person-id',
       );
 
       // Should schedule for 11:55 + 5 min = 12:00
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -295,24 +316,27 @@ void main() {
           .withFasting(type: 'after', duration: 240) // 4 hours
           .build();
 
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final actualDoseTime = DateTime(2025, 10, 24, 17, 30);
 
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '18:00',
+        personId: 'test-person-id',
       );
 
       await service.cancelTodaysFastingNotification(
         medication: medication,
         doseTime: '18:00',
+        personId: 'test-person-id',
       );
 
       // Should schedule for 17:30 + 240 min = 21:30 (not 22:00)
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
       );
 
       expect(true, true);

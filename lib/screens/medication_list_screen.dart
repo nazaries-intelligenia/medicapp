@@ -1,11 +1,13 @@
 import 'dart:io' show Platform;
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/medication.dart';
 import '../models/treatment_duration_type.dart';
 import '../models/dose_history_entry.dart';
+import '../models/person.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/preferences_service.dart';
@@ -35,7 +37,7 @@ class MedicationListScreen extends StatefulWidget {
   State<MedicationListScreen> createState() => _MedicationListScreenState();
 }
 
-class _MedicationListScreenState extends State<MedicationListScreen> with WidgetsBindingObserver {
+class _MedicationListScreenState extends State<MedicationListScreen> with WidgetsBindingObserver, TickerProviderStateMixin {
   final List<Medication> _medications = [];
   bool _isLoading = true;
   bool _debugMenuVisible = false;
@@ -46,8 +48,8 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
   final Map<String, Map<String, dynamic>> _asNeededDosesInfo = {};
   // Cache for actual dose times (scheduled time -> actual time)
   final Map<String, Map<String, DateTime>> _actualDoseTimes = {};
-  // Cache for fasting periods
-  final Map<String, Map<String, dynamic>> _fastingPeriods = {};
+  // Cache for fasting periods - now stores list of all active fasting periods across all persons
+  final List<Map<String, dynamic>> _activeFastingPeriods = [];
   // User preference for showing actual time
   bool _showActualTime = false;
   // User preference for showing fasting countdown
@@ -56,6 +58,12 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
   bool _showFastingNotification = false;
   // Timer for updating ongoing fasting notification
   Timer? _fastingNotificationTimer;
+  // Tab controller for person tabs
+  TabController? _tabController;
+  // List of persons
+  List<Person> _persons = [];
+  // Selected person (null means "all")
+  Person? _selectedPerson;
 
   @override
   void initState() {
@@ -65,9 +73,61 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     _loadShowActualTimePreference();
     _loadShowFastingCountdownPreference();
     _loadShowFastingNotificationPreference();
-    _loadMedications();
+    // Initialize persons first, then load medications
+    // Use post-frame callback to ensure initialization runs after first frame
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _initializePersonsAndTabs();
+    });
+    // DO NOT call _loadMedications() here - it will be called after persons are loaded
     _checkNotificationPermissions();
     _startFastingNotificationTimer();
+  }
+
+  /// Initialize persons and tab controller
+  Future<void> _initializePersonsAndTabs() async {
+    // Migrate any unassigned medications to default person
+    await DatabaseHelper.instance.migrateUnassignedMedicationsToDefaultPerson();
+
+    final persons = await DatabaseHelper.instance.getAllPersons();
+
+    // Sort persons: default person first, then alphabetically
+    persons.sort((a, b) {
+      // Default person always comes first
+      if (a.isDefault) return -1;
+      if (b.isDefault) return 1;
+      // Others sorted alphabetically
+      return a.name.compareTo(b.name);
+    });
+
+    if (mounted) {
+      setState(() {
+        _persons = persons;
+        // Initialize tab controller with number of persons
+        _tabController = TabController(
+          length: _persons.length,
+          vsync: this,
+        );
+        // Set selected person to first person (default user)
+        _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+        // Listen to tab changes
+        _tabController?.addListener(_onTabChanged);
+      });
+
+      // Now that persons are loaded, load medications
+      _loadMedications();
+    }
+  }
+
+  /// Handle tab changes
+  void _onTabChanged() {
+    if (_tabController == null || _tabController!.indexIsChanging) {
+      return;
+    }
+    setState(() {
+      _selectedPerson = _persons[_tabController!.index];
+    });
+    // Reload medications for the selected person
+    _loadMedications();
   }
 
   /// Load show actual time preference
@@ -103,6 +163,7 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
   @override
   void dispose() {
     _fastingNotificationTimer?.cancel();
+    _tabController?.dispose();
     WidgetsBinding.instance.removeObserver(this); // Remove lifecycle observer
     super.dispose();
   }
@@ -163,6 +224,9 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
 
   /// Start timer to update ongoing fasting notification every minute
   void _startFastingNotificationTimer() {
+    // Don't start timer in test mode to prevent pumpAndSettle from timing out
+    if (NotificationService.instance.isTestMode) return;
+
     _fastingNotificationTimer?.cancel();
     _fastingNotificationTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       _updateOngoingFastingNotification();
@@ -179,27 +243,12 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       return;
     }
 
-    // Find the most urgent active fasting period
-    Map<String, dynamic>? mostUrgentFasting;
-    Medication? mostUrgentMedication;
-
-    for (final med in _medications) {
-      if (med.requiresFasting) {
-        final fastingInfo = await DoseCalculationService.getActiveFastingPeriod(med);
-        if (fastingInfo != null && fastingInfo['isActive'] == true) {
-          final remainingMinutes = fastingInfo['remainingMinutes'] as int;
-          if (mostUrgentFasting == null || remainingMinutes < (mostUrgentFasting['remainingMinutes'] as int)) {
-            mostUrgentFasting = fastingInfo;
-            mostUrgentMedication = med;
-          }
-        }
-      }
-    }
-
-    // Show or cancel notification based on whether we have an active fasting
-    if (mostUrgentFasting != null && mostUrgentMedication != null) {
-      final remainingMinutes = mostUrgentFasting['remainingMinutes'] as int;
-      final endTime = mostUrgentFasting['fastingEndTime'] as DateTime;
+    // Show or cancel notification based on active fasting periods
+    if (_activeFastingPeriods.isNotEmpty) {
+      // Get the most urgent fasting period (already sorted by end time)
+      final mostUrgent = _activeFastingPeriods.first;
+      final endTime = mostUrgent['fastingEndTime'] as DateTime;
+      final remainingMinutes = endTime.difference(DateTime.now()).inMinutes;
 
       // Format time remaining
       String timeRemaining;
@@ -218,8 +267,12 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       // Format end time
       final endTimeFormatted = '${endTime.hour.toString().padLeft(2, '0')}:${endTime.minute.toString().padLeft(2, '0')}';
 
+      // Extract info from mostUrgent map
+      final personName = mostUrgent['personName'] as String;
+      final medicationName = mostUrgent['medicationName'] as String;
+
       await NotificationService.instance.showOngoingFastingNotification(
-        medicationName: mostUrgentMedication.name,
+        medicationName: '$medicationName ($personName)',
         timeRemaining: timeRemaining,
         endTime: endTimeFormatted,
       );
@@ -263,8 +316,18 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
 
   Future<void> _loadMedications() async {
     print('Loading medications from database...');
-    final allMedications = await DatabaseHelper.instance.getAllMedications();
-    print('Loaded ${allMedications.length} medications');
+
+    // Load medications for selected person
+    List<Medication> allMedications;
+    if (_selectedPerson != null) {
+      // Load medications assigned to the selected person
+      allMedications = await DatabaseHelper.instance.getMedicationsForPerson(_selectedPerson!.id);
+      print('Loaded ${allMedications.length} medications for person: ${_selectedPerson!.name}');
+    } else {
+      // Load all medications (fallback)
+      allMedications = await DatabaseHelper.instance.getAllMedications();
+      print('Loaded ${allMedications.length} medications (no person selected)');
+    }
 
     // Synchronize system notifications with database medications
     // This removes orphaned notifications from deleted medications or previous installations
@@ -319,23 +382,48 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       }
     }
 
-    // Load fasting periods if user preference is enabled
-    _fastingPeriods.clear();
+    // Load fasting periods from ALL persons (not just selected tab) if user preference is enabled
+    _activeFastingPeriods.clear();
     if (_showFastingCountdown) {
-      for (final med in medications) {
-        if (med.requiresFasting) {
-          final fastingInfo = await DoseCalculationService.getActiveFastingPeriod(med);
-          if (fastingInfo != null) {
-            _fastingPeriods[med.id] = fastingInfo;
+      // Load all persons to check their fasting periods
+      final allPersons = await DatabaseHelper.instance.getAllPersons();
+
+      for (final person in allPersons) {
+        // Load medications for this person
+        final personMeds = await DatabaseHelper.instance.getMedicationsForPerson(person.id);
+
+        for (final med in personMeds) {
+          if (med.requiresFasting) {
+            final fastingInfo = await DoseCalculationService.getActiveFastingPeriod(med);
+            if (fastingInfo != null) {
+              // Add fasting period with person information
+              _activeFastingPeriods.add({
+                'personId': person.id,
+                'personName': person.name,
+                'personIsDefault': person.isDefault,
+                'medicationId': med.id,
+                'medicationName': med.name,
+                ...fastingInfo, // includes: fastingEndTime, fastingType, medicationName
+              });
+            }
           }
         }
       }
+
+      // Sort by fasting end time (soonest first)
+      _activeFastingPeriods.sort((a, b) {
+        final aTime = a['fastingEndTime'] as DateTime;
+        final bTime = b['fastingEndTime'] as DateTime;
+        return aTime.compareTo(bTime);
+      });
     }
 
     // Sort medications by next dose proximity
     MedicationSorter.sortByNextDose(medications);
 
-    if (!mounted) return; // Check if widget is still mounted
+    if (!mounted) {
+      return; // Check if widget is still mounted
+    }
 
     // Update UI immediately
     setState(() {
@@ -343,6 +431,10 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       _medications.addAll(medications);
       _isLoading = false;
     });
+
+    // Force a microtask to ensure setState is fully processed
+    // This is especially important for tests
+    await Future.microtask(() {});
 
     print('UI updated with ${_medications.length} medications');
 
@@ -355,10 +447,17 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
 
   void _scheduleNotificationsInBackground(List<Medication> medications) {
     // Run notification scheduling in background without awaiting
+    // V19+: Schedule for all persons assigned to each medication
     Future.microtask(() async {
       for (final medication in medications) {
         try {
-          await NotificationService.instance.scheduleMedicationNotifications(medication);
+          final persons = await DatabaseHelper.instance.getPersonsForMedication(medication.id);
+          for (final person in persons) {
+            await NotificationService.instance.scheduleMedicationNotifications(
+              medication,
+              personId: person.id,
+            );
+          }
         } catch (e) {
           // Log error but don't block the UI
           print('Error scheduling notifications for ${medication.name}: $e');
@@ -368,11 +467,14 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
   }
 
   void _navigateToAddMedication() async {
+    // Get ALL medications for autocomplete suggestions (not just current person's)
+    final allMedications = await DatabaseHelper.instance.getAllMedications();
+
     final newMedication = await Navigator.push<Medication>(
       context,
       MaterialPageRoute(
         builder: (context) => MedicationInfoScreen(
-          existingMedications: _medications,
+          existingMedications: allMedications,
         ),
       ),
     );
@@ -383,20 +485,23 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       print('Adding new medication: ${newMedication.name}');
       print('Dose times: ${newMedication.doseTimes}');
 
-      // Reload medications from database
-      final reloadedMeds = await DatabaseHelper.instance.getAllMedications();
-      print('Reloaded ${reloadedMeds.length} medications from DB after insert');
-
-      // Sort by next dose proximity
-      MedicationSorter.sortByNextDose(reloadedMeds);
-
-      // Update UI immediately
-      if (mounted) {
-        setState(() {
-          _medications.clear();
-          _medications.addAll(reloadedMeds);
-        });
+      // Get target person (currently selected or default)
+      Person? targetPerson = _selectedPerson;
+      if (targetPerson == null) {
+        targetPerson = await DatabaseHelper.instance.getDefaultPerson();
       }
+
+      if (targetPerson != null) {
+        // Use V19+ method: creates medication (or reuses existing) and assigns to person
+        await DatabaseHelper.instance.createMedicationForPerson(
+          medication: newMedication,
+          personId: targetPerson.id,
+        );
+        print('Created/assigned medication to ${targetPerson.name}');
+      }
+
+      // Reload medications for the selected person
+      await _loadMedications();
     } else {
       print('newMedication is null - user cancelled or error occurred');
     }
@@ -421,24 +526,26 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       print('Updating medication: ${updatedMedication.name}');
       print('Dose times: ${updatedMedication.doseTimes}');
 
-      // Update in database
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      // Get current person
+      Person? targetPerson = _selectedPerson;
+      if (targetPerson == null) {
+        targetPerson = await DatabaseHelper.instance.getDefaultPerson();
+      }
 
-      // Reload medications from database to ensure we have fresh data
-      final reloadedMeds = await DatabaseHelper.instance.getAllMedications();
-      print('Reloaded ${reloadedMeds.length} medications from DB');
+      if (targetPerson != null) {
+        // V19+: Update medication for specific person (updates both shared stock and individual schedule)
+        await DatabaseHelper.instance.updateMedicationForPerson(
+          medication: updatedMedication,
+          personId: targetPerson.id,
+        );
+        print('Updated medication for person: ${targetPerson.name}');
+      }
 
-      // Sort by next dose proximity
-      MedicationSorter.sortByNextDose(reloadedMeds);
+      // Reload medications for the selected person
+      await _loadMedications();
 
-      // Update UI immediately
+      // Show confirmation message
       if (mounted) {
-        setState(() {
-          _medications.clear();
-          _medications.addAll(reloadedMeds);
-        });
-
-        // Show confirmation message
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -448,10 +555,16 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         );
       }
 
-      // Reschedule notifications in background (non-blocking)
+      // V19+: Reschedule notifications in background for all assigned persons (non-blocking)
       Future.microtask(() async {
         try {
-          await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+          final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+          for (final person in persons) {
+            await NotificationService.instance.scheduleMedicationNotifications(
+              updatedMedication,
+              personId: person.id,
+            );
+          }
           print('Notifications rescheduled for ${updatedMedication.name}');
         } catch (e) {
           print('Error rescheduling notifications for ${updatedMedication.name}: $e');
@@ -503,7 +616,10 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     Navigator.pop(context);
 
     // ALWAYS get the fresh medication from database to ensure we have the latest taken doses
-    final freshMedication = await DatabaseHelper.instance.getMedication(medication.id);
+    // Use getMedicationForPerson to get complete medication data including doseSchedule
+    final freshMedication = _selectedPerson != null
+        ? await DatabaseHelper.instance.getMedicationForPerson(medication.id, _selectedPerson!.id)
+        : await DatabaseHelper.instance.getMedication(medication.id);
 
     // If medication was deleted, show error and return
     if (freshMedication == null) {
@@ -677,8 +793,20 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         lastDailyConsumption: freshMedication.lastDailyConsumption,
       );
 
-      // Update in database
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      // Get default person for history entry and updates
+      final defaultPerson = _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
+      final personId = defaultPerson?.id ?? '';
+
+      // Update in database (V19+: use updateMedicationForPerson to update person-specific data)
+      if (defaultPerson != null) {
+        await DatabaseHelper.instance.updateMedicationForPerson(
+          medication: updatedMedication,
+          personId: defaultPerson.id,
+        );
+      } else {
+        // Fallback to legacy method if no person is found
+        await DatabaseHelper.instance.updateMedication(updatedMedication);
+      }
 
       // Create history entry
       final now = DateTime.now();
@@ -695,6 +823,7 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         medicationId: freshMedication.id,
         medicationName: freshMedication.name,
         medicationType: freshMedication.type,
+        personId: personId,
         scheduledDateTime: scheduledDateTime,
         registeredDateTime: now,
         status: DoseStatus.taken,
@@ -704,28 +833,36 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
       await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
       // Cancel today's notification for this specific dose to prevent it from firing
+      // V19+: Pass personId to cancel person-specific notification
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: updatedMedication,
         doseTime: selectedDoseTime,
+        personId: personId,
       );
 
-      // Reschedule medication notifications to restore future notifications
+      // V19+: Reschedule medication notifications to restore future notifications
       // This is needed because cancelTodaysDoseNotification may cancel recurring notifications
-      await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+      await NotificationService.instance.scheduleMedicationNotifications(
+        updatedMedication,
+        personId: personId,
+      );
 
       // Cancel today's fasting notification if it's a "before" fasting type
+      // V19+: Pass personId to cancel person-specific fasting notification
       await NotificationService.instance.cancelTodaysFastingNotification(
         medication: updatedMedication,
         doseTime: selectedDoseTime,
+        personId: personId,
       );
 
-      // Schedule dynamic fasting notification if medication requires fasting after dose
+      // V19+: Schedule dynamic fasting notification if medication requires fasting after dose
       if (updatedMedication.requiresFasting &&
           updatedMedication.fastingType == 'after' &&
           updatedMedication.notifyFasting) {
         await NotificationService.instance.scheduleDynamicFastingNotification(
           medication: updatedMedication,
           actualDoseTime: DateTime.now(),
+          personId: personId,
         );
         print('Dynamic fasting notification scheduled for ${updatedMedication.name}');
       }
@@ -821,11 +958,17 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
 
       // Create history entry with current time
       final now = DateTime.now();
+
+      // Get default person for history entry
+      final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+      final personId = defaultPerson?.id ?? '';
+
       final historyEntry = DoseHistoryEntry(
         id: '${medication.id}_${now.millisecondsSinceEpoch}',
         medicationId: medication.id,
         medicationName: medication.name,
         medicationType: medication.type,
+        personId: personId,
         scheduledDateTime: now, // For manual doses, scheduled time = actual time
         registeredDateTime: now,
         status: DoseStatus.taken,
@@ -862,25 +1005,31 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
 
         // If we found a next dose time, cancel its notification
         if (nextDoseTime != null) {
+          // V19+: Pass personId to cancel person-specific notification
           await NotificationService.instance.cancelTodaysDoseNotification(
             medication: updatedMedication,
             doseTime: nextDoseTime,
+            personId: personId,
           );
           print('Cancelled notification for $nextDoseTime after manual dose registration');
 
-          // Reschedule medication notifications to restore future notifications
+          // V19+: Reschedule medication notifications to restore future notifications
           // This is needed because cancelTodaysDoseNotification may cancel recurring notifications
-          await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+          await NotificationService.instance.scheduleMedicationNotifications(
+            updatedMedication,
+            personId: personId,
+          );
         }
       }
 
-      // Schedule dynamic fasting notification if medication requires fasting after dose
+      // V19+: Schedule dynamic fasting notification if medication requires fasting after dose
       if (updatedMedication.requiresFasting &&
           updatedMedication.fastingType == 'after' &&
           updatedMedication.notifyFasting) {
         await NotificationService.instance.scheduleDynamicFastingNotification(
           medication: updatedMedication,
           actualDoseTime: now,
+          personId: personId,
         );
         print('Dynamic fasting notification scheduled for ${updatedMedication.name}');
       }
@@ -947,8 +1096,14 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
         medication: updatedMedication,
       );
     } else {
-      // If reactivating, reschedule notifications
-      await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+      // V19+: If reactivating, reschedule notifications for all assigned persons
+      final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+      for (final person in persons) {
+        await NotificationService.instance.scheduleMedicationNotifications(
+          updatedMedication,
+          personId: person.id,
+        );
+      }
     }
 
     // Reload medications
@@ -1065,6 +1220,153 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
     );
   }
 
+  Widget _buildAllFastingCountdowns() {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.restaurant,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  'Ayunos Activos',
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          // Fasting countdowns
+          ...List.generate(_activeFastingPeriods.length, (index) {
+            final fasting = _activeFastingPeriods[index];
+            final personName = fasting['personName'] as String;
+            final personIsDefault = fasting['personIsDefault'] as bool;
+            final medicationName = fasting['medicationName'] as String;
+            final fastingEndTime = fasting['fastingEndTime'] as DateTime;
+            final fastingType = fasting['fastingType'] as String;
+
+            return _buildFastingCountdownRow(
+              personName: personName,
+              personIsDefault: personIsDefault,
+              medicationName: medicationName,
+              fastingEndTime: fastingEndTime,
+              fastingType: fastingType,
+              isLast: index == _activeFastingPeriods.length - 1,
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFastingCountdownRow({
+    required String personName,
+    required bool personIsDefault,
+    required String medicationName,
+    required DateTime fastingEndTime,
+    required String fastingType,
+    required bool isLast,
+  }) {
+    final now = DateTime.now();
+    final remaining = fastingEndTime.difference(now);
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes.remainder(60);
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(16, 8, 16, isLast ? 12 : 8),
+      decoration: BoxDecoration(
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: Theme.of(context).dividerColor.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+      ),
+      child: Row(
+        children: [
+          // Person indicator
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: personIsDefault
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.secondary,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                personName[0].toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Person and medication info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  personName,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                Text(
+                  medicationName,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.grey[600],
+                      ),
+                ),
+              ],
+            ),
+          ),
+          // Countdown
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              '${hours}h ${minutes}m',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showDebugInfo() async {
     await DebugInfoDialog.show(
       context: context,
@@ -1101,9 +1403,16 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
   void _rescheduleAllNotifications() async {
     print('Reprogramando todas las notificaciones...');
 
+    // V19+: Reschedule for all persons assigned to each medication
     for (final medication in _medications) {
       if (medication.doseTimes.isNotEmpty) {
-        await NotificationService.instance.scheduleMedicationNotifications(medication);
+        final persons = await DatabaseHelper.instance.getPersonsForMedication(medication.id);
+        for (final person in persons) {
+          await NotificationService.instance.scheduleMedicationNotifications(
+            medication,
+            personId: person.id,
+          );
+        }
       }
     }
 
@@ -1360,6 +1669,19 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
                 ),
               ]
             : null,
+        // Add TabBar if there are persons
+        bottom: _tabController != null && _persons.isNotEmpty
+            ? TabBar(
+                controller: _tabController,
+                isScrollable: _persons.length > 3, // Make scrollable if more than 3 tabs
+                tabs: _persons.map((person) {
+                  return Tab(
+                    text: person.name,
+                    icon: person.isDefault ? const Icon(Icons.person) : const Icon(Icons.person_outline),
+                  );
+                }).toList(),
+              )
+            : null,
       ),
       body: _isLoading
           ? const Center(
@@ -1372,6 +1694,9 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
                 // Battery optimization info (only show on Android and if not dismissed)
                 if (Platform.isAndroid && !_batteryBannerDismissed)
                   BatteryOptimizationBanner(onDismiss: _dismissBatteryBanner),
+                // All active fasting countdowns
+                if (_activeFastingPeriods.isNotEmpty)
+                  _buildAllFastingCountdowns(),
                 // Medications list
                 Expanded(
                   child: RefreshIndicator(
@@ -1384,7 +1709,6 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
                         final nextDoseInfo = DoseCalculationService.getNextDoseInfo(medication);
                         final nextDoseText = nextDoseInfo != null ? DoseCalculationService.formatNextDose(nextDoseInfo, context) : null;
                         final asNeededDoseInfo = _asNeededDosesInfo.containsKey(medication.id) ? _asNeededDosesInfo[medication.id] : null;
-                        final fastingPeriod = _fastingPeriods.containsKey(medication.id) ? _fastingPeriods[medication.id] : null;
                         final todayDosesWidget = (medication.isTakenDosesDateToday &&
                             (medication.takenDosesToday.isNotEmpty || medication.skippedDosesToday.isNotEmpty))
                             ? _buildTodayDosesSection(medication)
@@ -1395,7 +1719,7 @@ class _MedicationListScreenState extends State<MedicationListScreen> with Widget
                           nextDoseInfo: nextDoseInfo,
                           nextDoseText: nextDoseText,
                           asNeededDoseInfo: asNeededDoseInfo,
-                          fastingPeriod: fastingPeriod,
+                          fastingPeriod: null, // No longer show individual fasting periods in cards
                           todayDosesWidget: todayDosesWidget,
                           onTap: () => _showDeleteModal(medication),
                         );

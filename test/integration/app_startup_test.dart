@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medicapp/main.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/notification_service.dart';
+import 'package:medicapp/screens/medication_list/widgets/empty_medications_view.dart';
 import '../helpers/widget_test_helpers.dart';
 import '../helpers/database_test_helper.dart';
 
@@ -28,6 +29,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -45,24 +48,35 @@ void main() {
     // Initial pump to let initState run
     await tester.pump();
 
-    // Wait for database operations and async timers to complete
+    // Wait for database operations
     await waitForDatabase(tester);
 
-    // Additional wait for the new getMedicationIdsWithDosesToday query
-    await tester.runAsync(() async {
-      await Future.delayed(const Duration(milliseconds: 1000));
-    });
+    // V19+: Wait for loading indicator to disappear
+    // Poll until loading is complete (indicated by CircularProgressIndicator disappearing)
+    int attempts = 0;
+    const maxAttempts = 30; // Try for up to 15 seconds (30 * 500ms)
+    while (attempts < maxAttempts) {
+      await tester.runAsync(() async {
+        await Future.delayed(const Duration(milliseconds: 500));
+      });
+      await tester.pump();
 
-    // Pump to rebuild UI after all database operations
-    await tester.pump();
-    await tester.pump();
+      final loadingIndicator = find.byType(CircularProgressIndicator);
+      if (loadingIndicator.evaluate().isEmpty) {
+        break; // Loading complete
+      }
+
+      attempts++;
+    }
+
+    // Final pump to ensure UI is stable
     await tester.pump();
 
     // Verify that the app shows the correct title.
     expect(find.text(getL10n(tester).mainScreenTitle), findsWidgets);
 
-    // Verify that the empty state is shown.
-    expect(find.text(getL10n(tester).mainScreenEmptyTitle), findsWidgets);
+    // V19+: After multi-person changes, the empty state uses noMedicationsRegistered
+    expect(find.text(getL10n(tester).noMedicationsRegistered), findsWidgets);
 
     // Verify that the add button is present.
     expect(find.byIcon(Icons.add), findsOneWidget);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication.dart';
+import '../models/person.dart'; // V19+: Import Person model
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
@@ -13,11 +14,13 @@ import 'dose_action/widgets/postpone_buttons.dart';
 class DoseActionScreen extends StatefulWidget {
   final String medicationId;
   final String doseTime;
+  final String personId; // V19+: Person ID for this medication
 
   const DoseActionScreen({
     super.key,
     required this.medicationId,
     required this.doseTime,
+    required this.personId,
   });
 
   @override
@@ -26,20 +29,23 @@ class DoseActionScreen extends StatefulWidget {
 
 class _DoseActionScreenState extends State<DoseActionScreen> {
   Medication? _medication;
+  Person? _person; // V19+: Store person information
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadMedication();
+    _loadData(); // V19+: Load both medication and person
   }
 
-  Future<void> _loadMedication() async {
+  Future<void> _loadData() async {
     final medication = await DatabaseHelper.instance.getMedication(widget.medicationId);
+    final person = await DatabaseHelper.instance.getPerson(widget.personId); // V19+: Load person
 
     if (mounted) {
       setState(() {
         _medication = medication;
+        _person = person; // V19+: Store person
         _isLoading = false;
       });
     }
@@ -139,11 +145,12 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     // Format the new time
     final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
 
-    // Schedule a one-time notification for this dose
+    // Schedule a one-time notification for this dose (V19+: includes personId)
     await NotificationService.instance.schedulePostponedDoseNotification(
       medication: _medication!,
       originalDoseTime: widget.doseTime,
       newTime: newTime,
+      personId: widget.personId, // V19+: Pass personId
     );
 
     if (!mounted) return;
@@ -172,11 +179,12 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     // Format the new time
     final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
 
-    // Schedule a one-time notification for this dose
+    // Schedule a one-time notification for this dose (V19+: includes personId)
     await NotificationService.instance.schedulePostponedDoseNotification(
       medication: _medication!,
       originalDoseTime: widget.doseTime,
       newTime: newTime,
+      personId: widget.personId, // V19+: Pass personId
     );
 
     if (!mounted) return;
@@ -243,7 +251,32 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
               medication: _medication!,
               doseTime: widget.doseTime,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            // V19+: Person information
+            if (_person != null)
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.person,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Para: ${_person!.name}',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            if (_person != null) const SizedBox(height: 16),
             // Title
             Text(
               l10n.doseActionWhatToDo,

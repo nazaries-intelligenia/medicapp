@@ -9,12 +9,35 @@ import 'package:medicapp/services/notification_service.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 
+/// Helper to insert medication and assign to default person (V19+ requirement)
+Future<void> insertMedicationWithPerson(Medication medication) async {
+  await DatabaseHelper.instance.insertMedication(medication);
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson != null) {
+    await DatabaseHelper.instance.assignMedicationToPerson(
+      personId: defaultPerson.id,
+      medicationId: medication.id,
+      scheduleData: medication,
+    );
+  }
+}
+
+/// Helper to get medication for default person (V19+ requirement)
+Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson == null) return null;
+  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
+  return medications.where((m) => m.id == medicationId).firstOrNull;
+}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   DatabaseTestHelper.setup();
 
-  setUp(() {
+  setUp(() async {
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement)
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   group('DoseActionService - registerTakenDose', () {
@@ -25,7 +48,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerTakenDose(
         medication: medication,
@@ -44,7 +67,7 @@ void main() {
           .withStock(1.0) // Not enough for dose of 2.0
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       expect(
         () => DoseActionService.registerTakenDose(
@@ -63,7 +86,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerTakenDose(
         medication: medication,
@@ -88,7 +111,7 @@ void main() {
           .withTakenDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerTakenDose(
         medication: medication,
@@ -110,7 +133,7 @@ void main() {
           .withTakenDoses(['08:00', '16:00'], yesterdayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerTakenDose(
         medication: medication,
@@ -128,7 +151,7 @@ void main() {
           .withStock(5.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerTakenDose(
         medication: medication,
@@ -145,7 +168,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerTakenDose(
         medication: medication,
@@ -153,7 +176,7 @@ void main() {
       );
 
       // Reload from database
-      final reloadedMed = await DatabaseHelper.instance.getMedication('med7');
+      final reloadedMed = await getMedicationForDefaultPerson('med7');
       expect(reloadedMed!.stockQuantity, 9.0);
       expect(reloadedMed.takenDosesToday, ['08:00']);
     });
@@ -167,7 +190,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerSkippedDose(
         medication: medication,
@@ -186,7 +209,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerSkippedDose(
         medication: medication,
@@ -210,7 +233,7 @@ void main() {
           .withSkippedDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerSkippedDose(
         medication: medication,
@@ -232,7 +255,7 @@ void main() {
           .withSkippedDoses(['16:00'], yesterdayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerSkippedDose(
         medication: medication,
@@ -250,14 +273,14 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerSkippedDose(
         medication: medication,
         doseTime: '08:00',
       );
 
-      final reloadedMed = await DatabaseHelper.instance.getMedication('med12');
+      final reloadedMed = await getMedicationForDefaultPerson('med12');
       expect(reloadedMed!.skippedDosesToday, ['08:00']);
       expect(reloadedMed.stockQuantity, 10.0);
     });
@@ -271,7 +294,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerManualDose(
         medication: medication,
@@ -288,7 +311,7 @@ void main() {
           .withStock(1.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       expect(
         () => DoseActionService.registerManualDose(
@@ -306,7 +329,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerManualDose(
         medication: medication,
@@ -327,7 +350,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerManualDose(
         medication: medication,
@@ -347,7 +370,7 @@ void main() {
           .withFasting(type: 'after', duration: 60, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Should not throw and should handle fasting notification scheduling
       final updatedMed = await DoseActionService.registerManualDose(
@@ -367,7 +390,7 @@ void main() {
           .withFasting(type: 'before', duration: 60, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerManualDose(
         medication: medication,
@@ -384,7 +407,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerManualDose(
         medication: medication,
@@ -401,7 +424,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerManualDose(
         medication: medication,
@@ -409,7 +432,7 @@ void main() {
         lastDailyConsumption: 3.0,
       );
 
-      final reloadedMed = await DatabaseHelper.instance.getMedication('med20');
+      final reloadedMed = await getMedicationForDefaultPerson('med20');
       expect(reloadedMed!.stockQuantity, 8.0);
       expect(reloadedMed.lastDailyConsumption, 3.0);
     });

@@ -18,7 +18,7 @@ void main() {
       NotificationService.instance.disableTestMode();
     });
 
-    test('should cancel today\'s dose notification when dose is registered', () async {
+    test("should cancel today's dose notification when dose is registered", () async {
       final medication = MedicationBuilder()
           .withId('test_cancel_1')
           .withName('Test Medication')
@@ -31,12 +31,13 @@ void main() {
           .build();
 
       // Schedule notifications first
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Cancel notification for 16:00 dose
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '16:00',
+        personId: 'test-person-id',
       );
 
       // Should complete without errors
@@ -51,11 +52,12 @@ void main() {
           .withSingleDose('09:00', 1.0)
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '09:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -71,11 +73,12 @@ void main() {
           .withMultipleDoses(['08:00', '20:00'], 1.0)
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '08:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -93,11 +96,12 @@ void main() {
           .withDateRange(now, tomorrow)
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '10:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -115,11 +119,12 @@ void main() {
           .withSpecificDates([todayString])
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '12:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -136,11 +141,12 @@ void main() {
           .withWeeklyPattern([today.weekday]) // Today's weekday
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '15:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -158,6 +164,7 @@ void main() {
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '15:00', // This time is not in the schedule
+        personId: 'test-person-id',
       );
 
       // Should complete without errors (graceful handling)
@@ -177,17 +184,19 @@ void main() {
           })
           .build();
 
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Cancel multiple doses
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '08:00',
+        personId: 'test-person-id',
       );
 
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '16:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -202,19 +211,21 @@ void main() {
           .build();
 
       // Schedule regular notification
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Schedule a postponed notification
       await NotificationService.instance.schedulePostponedDoseNotification(
         medication: medication,
         originalDoseTime: '09:00',
         newTime: const TimeOfDay(hour: 11, minute: 30),
+        personId: 'test-person-id',
       );
 
       // Cancel should remove both regular and postponed notifications
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '09:00',
+        personId: 'test-person-id',
       );
 
       expect(true, true);
@@ -239,11 +250,12 @@ void main() {
             .withSingleDose('10:00', 1.0)
             .build();
 
-        await NotificationService.instance.scheduleMedicationNotifications(medication);
+        await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         await NotificationService.instance.cancelTodaysDoseNotification(
           medication: medication,
           doseTime: '10:00',
+        personId: 'test-person-id',
         );
       }
 
@@ -262,6 +274,7 @@ void main() {
       await NotificationService.instance.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '14:00',
+        personId: 'test-person-id',
       );
 
       // Should complete without errors (idempotent operation)

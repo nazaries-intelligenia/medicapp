@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
+import 'package:medicapp/models/person.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:uuid/uuid.dart';
 
 /// Helper para configurar y limpiar la base de datos en tests.
 ///
@@ -42,6 +44,21 @@ class DatabaseTestHelper {
     await DatabaseHelper.instance.deleteAllMedications();
     await DatabaseHelper.instance.deleteAllDoseHistory();
     await DatabaseHelper.resetDatabase();
+  }
+
+  /// Ensures a default person exists in the database (required for v19+ tests).
+  /// Call this after database reset to ensure tests can add medications.
+  static Future<void> ensureDefaultPerson() async {
+    final hasDefaultPerson = await DatabaseHelper.instance.hasDefaultPerson();
+
+    if (!hasDefaultPerson) {
+      final defaultPerson = Person(
+        id: const Uuid().v4(),
+        name: 'Test User',
+        isDefault: true,
+      );
+      await DatabaseHelper.instance.insertPerson(defaultPerson);
+    }
   }
 
   /// Configura completamente la base de datos (setUpAll + tearDown).

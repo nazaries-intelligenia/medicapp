@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
 import '../../../services/notification_service.dart';
+import '../../../database/database_helper.dart';
 
 class DebugInfoDialog {
   static Future<void> show({
@@ -11,6 +12,15 @@ class DebugInfoDialog {
     final notificationsEnabled = await NotificationService.instance.areNotificationsEnabled();
     final canScheduleExact = await NotificationService.instance.canScheduleExactAlarms();
     final pendingNotifications = await NotificationService.instance.getPendingNotifications();
+
+    // Get all persons assigned to medications for display
+    final medicationPersonsMap = <String, String>{};
+    for (final medication in medications) {
+      final persons = await DatabaseHelper.instance.getPersonsForMedication(medication.id);
+      if (persons.isNotEmpty) {
+        medicationPersonsMap[medication.id] = persons.map((p) => p.name).join(', ');
+      }
+    }
 
     if (!context.mounted) return;
 
@@ -200,6 +210,16 @@ class DebugInfoDialog {
         }
       }
 
+      // Get the person names for this medication
+      String? personNames;
+      if (notification.payload != null && notification.payload!.isNotEmpty) {
+        final parts = notification.payload!.split('|');
+        if (parts.isNotEmpty) {
+          final medicationId = parts[0];
+          personNames = medicationPersonsMap[medicationId];
+        }
+      }
+
       notificationInfoList.add({
         'notification': notification,
         'medicationName': medicationName,
@@ -207,6 +227,7 @@ class DebugInfoDialog {
         'scheduledDate': scheduledDate,
         'notificationType': notificationType,
         'isPastDue': isPastDue,
+        'personNames': personNames,
       });
     }
 

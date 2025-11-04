@@ -51,16 +51,27 @@ class DoseActionService {
       takenDosesDate: todayString,
     );
 
-    // Update in database
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
+    // Get default person for history entry and updates
+    final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
+
+    // Update in database (V19+: updates person-specific schedule)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    }
 
     // Save to history
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
+
     final historyEntry = DoseHistoryEntry(
       id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
+      personId: personId,
       scheduledDateTime: scheduledDateTime,
       registeredDateTime: DateTime.now(),
       status: DoseStatus.taken,
@@ -69,8 +80,8 @@ class DoseActionService {
 
     await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
-    // Handle notifications
-    await _handleTakenDoseNotifications(updatedMedication, doseTime, DateTime.now());
+    // Handle notifications (V19+: pass personId)
+    await _handleTakenDoseNotifications(updatedMedication, doseTime, DateTime.now(), personId);
 
     return updatedMedication;
   }
@@ -110,16 +121,27 @@ class DoseActionService {
       takenDosesDate: todayString,
     );
 
-    // Update in database
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
+    // Get default person for history entry and updates
+    final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
+
+    // Update in database (V19+: updates person-specific schedule)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    }
 
     // Save to history
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
+
     final historyEntry = DoseHistoryEntry(
       id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
+      personId: personId,
       scheduledDateTime: scheduledDateTime,
       registeredDateTime: DateTime.now(),
       status: DoseStatus.skipped,
@@ -128,8 +150,8 @@ class DoseActionService {
 
     await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
-    // Handle notifications
-    await _handleSkippedDoseNotifications(updatedMedication, doseTime);
+    // Handle notifications (V19+: pass personId)
+    await _handleSkippedDoseNotifications(updatedMedication, doseTime, personId);
 
     return updatedMedication;
   }
@@ -176,16 +198,27 @@ class DoseActionService {
       isSuspended: medication.isSuspended,
     );
 
-    // Update in database
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
-
     // Save to history
     final now = DateTime.now();
+
+    // Get default person for history entry and updates
+    final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
+
+    // Update in database (V19+: updates person-specific schedule)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    }
+
     final historyEntry = DoseHistoryEntry(
       id: '${medication.id}_${now.millisecondsSinceEpoch}',
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
+      personId: personId,
       scheduledDateTime: now,
       registeredDateTime: now,
       status: DoseStatus.taken,
@@ -201,6 +234,7 @@ class DoseActionService {
       await NotificationService.instance.scheduleDynamicFastingNotification(
         medication: updatedMedication,
         actualDoseTime: now,
+        personId: personId, // V19+: Pass personId
       );
     }
 
@@ -268,8 +302,17 @@ class DoseActionService {
       lastDailyConsumption: medication.lastDailyConsumption,
     );
 
-    // Update in database
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
+    // Get default person for history entry and updates
+    final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
+
+    // Update in database (V19+: updates person-specific schedule)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    }
 
     // Save to history with isExtraDose=true
     final historyEntry = DoseHistoryEntry(
@@ -277,6 +320,7 @@ class DoseActionService {
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
+      personId: personId,
       scheduledDateTime: now, // For extra doses, scheduled time = actual time
       registeredDateTime: now,
       status: DoseStatus.taken,
@@ -293,6 +337,7 @@ class DoseActionService {
       await NotificationService.instance.scheduleDynamicFastingNotification(
         medication: updatedMedication,
         actualDoseTime: now,
+        personId: personId, // V19+: Pass personId
       );
     }
 
@@ -320,33 +365,42 @@ class DoseActionService {
     Medication medication,
     String doseTime,
     DateTime actualDoseTime,
+    String personId, // V19+: Add personId parameter
   ) async {
     // Cancel today's notification for this specific dose
+    // V19+: Pass personId to cancel person-specific notification
     await NotificationService.instance.cancelTodaysDoseNotification(
       medication: medication,
       doseTime: doseTime,
+      personId: personId,
     );
 
     // Reschedule medication notifications to restore future notifications
     // Use excludeToday: true to prevent rescheduling for today (dose already taken)
+    // V19+: Pass personId for per-person scheduling
     await NotificationService.instance.scheduleMedicationNotifications(
       medication,
+      personId: personId,
       excludeToday: true,
     );
 
     // Cancel today's fasting notification if needed
+    // V19+: Pass personId to cancel person-specific fasting notification
     await NotificationService.instance.cancelTodaysFastingNotification(
       medication: medication,
       doseTime: doseTime,
+      personId: personId,
     );
 
     // Schedule dynamic fasting notification if required
+    // V19+: Pass personId for per-person scheduling
     if (medication.requiresFasting &&
         medication.fastingType == 'after' &&
         medication.notifyFasting) {
       await NotificationService.instance.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: actualDoseTime,
+        personId: personId,
       );
     }
   }
@@ -354,24 +408,31 @@ class DoseActionService {
   static Future<void> _handleSkippedDoseNotifications(
     Medication medication,
     String doseTime,
+    String personId, // V19+: Add personId parameter
   ) async {
     // Cancel today's notification for this specific dose
+    // V19+: Pass personId to cancel person-specific notification
     await NotificationService.instance.cancelTodaysDoseNotification(
       medication: medication,
       doseTime: doseTime,
+      personId: personId,
     );
 
     // Reschedule medication notifications
     // Use excludeToday: true to prevent rescheduling for today (dose already skipped)
+    // V19+: Pass personId for per-person scheduling
     await NotificationService.instance.scheduleMedicationNotifications(
       medication,
+      personId: personId,
       excludeToday: true,
     );
 
     // Cancel today's fasting notification
+    // V19+: Pass personId to cancel person-specific fasting notification
     await NotificationService.instance.cancelTodaysFastingNotification(
       medication: medication,
       doseTime: doseTime,
+      personId: personId,
     );
   }
 }

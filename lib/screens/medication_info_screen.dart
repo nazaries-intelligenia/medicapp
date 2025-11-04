@@ -101,6 +101,11 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
                       },
                       existingMedications: widget.existingMedications,
                       showDescription: true,
+                      onMedicationSelected: (medication) {
+                        // Callback when user selects existing medication
+                        // Currently only updates the type, but could be extended
+                        // to copy other settings in the future
+                      },
                     ),
                   ),
                 ),

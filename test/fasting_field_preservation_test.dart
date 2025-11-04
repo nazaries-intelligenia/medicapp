@@ -2,18 +2,58 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
+import 'package:medicapp/models/person.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 
 /// Tests to verify that fasting fields are preserved when updating medications
-/// This ensures that the bug where fasting configuration was lost is fixed
+/// V19+ updated to work with person-medication architecture
 void main() {
   DatabaseTestHelper.setup();
+
+  // Test person ID to use across all tests
+  const testPersonId = 'test-person-fasting';
+  Person? testPerson;
+
+  setUp(() async {
+    // Create test person for v19+ architecture
+    testPerson = Person(
+      id: testPersonId,
+      name: 'Test Person',
+      isDefault: true,
+    );
+    await DatabaseHelper.instance.insertPerson(testPerson!);
+  });
+
+  tearDown(() async {
+    // Clean up test person
+    try {
+      await DatabaseHelper.instance.deletePerson(testPersonId);
+    } catch (e) {
+      // Person might not exist, that's ok
+    }
+  });
 
   tearDownAll(() async {
     await DatabaseHelper.instance.close();
   });
+
+  // Helper function to insert and assign medication to person
+  Future<void> insertMedicationWithPerson(Medication medication) async {
+    await DatabaseHelper.instance.insertMedication(medication);
+    await DatabaseHelper.instance.assignMedicationToPerson(
+      personId: testPersonId,
+      medicationId: medication.id,
+      scheduleData: medication,
+    );
+  }
+
+  // Helper function to get medication for person
+  Future<Medication?> getMedicationForTestPerson(String medicationId) async {
+    final medications = await DatabaseHelper.instance.getMedicationsForPerson(testPersonId);
+    return medications.where((m) => m.id == medicationId).firstOrNull;
+  }
 
   group('Fasting Field Preservation - Taking a Dose', () {
     test('should preserve fasting fields when taking a dose', () async {
@@ -27,8 +67,8 @@ void main() {
           .withFasting(type: 'before', duration: 60, notify: true)
           .build();
 
-      // Save to database
-      await DatabaseHelper.instance.insertMedication(medication);
+      // Save to database (v19+: with person)
+      await insertMedicationWithPerson(medication);
 
       // Simulate taking a dose (what happens in medication_list_screen.dart)
       final today = DateTime.now();
@@ -40,10 +80,14 @@ void main() {
           .withSkippedDoses([], todayString)
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      // V19+: Use updateMedicationForPerson
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
       // Retrieve from database and verify fasting fields are preserved
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved');
@@ -65,7 +109,7 @@ void main() {
           .withFastingDisabled()
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final today = DateTime.now();
       final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
@@ -76,9 +120,12 @@ void main() {
           .withSkippedDoses([], todayString)
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, false, reason: 'requiresFasting=false should be preserved');
@@ -98,7 +145,7 @@ void main() {
           .withFasting(type: 'after', duration: 120, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate refilling stock (what happens in medication_list_screen.dart)
       final updatedMedication = MedicationBuilder.from(medication)
@@ -106,9 +153,12 @@ void main() {
           .withLastRefill(30.0)
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved after refill');
@@ -131,7 +181,7 @@ void main() {
           .withFasting(type: 'before', duration: 30, notify: false)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate editing schedule (what happens in edit_schedule_screen.dart)
       final updatedMedication = MedicationBuilder.from(medication)
@@ -139,9 +189,12 @@ void main() {
           .withDoseSchedule({'06:00': 1.0, '12:00': 1.0, '18:00': 1.5}) // Changed
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved when editing schedule');
@@ -165,16 +218,19 @@ void main() {
           .withFasting(type: 'after', duration: 240, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate editing frequency (what happens in edit_frequency_screen.dart)
       final updatedMedication = MedicationBuilder.from(medication)
           .withWeeklyPattern([1, 3, 5]) // Changed - Monday, Wednesday, Friday
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved when editing frequency');
@@ -198,7 +254,7 @@ void main() {
           .withFasting(type: 'before', duration: 480, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate editing duration (what happens in edit_duration_screen.dart)
       final newStartDate = DateTime(2025, 11, 1);
@@ -208,9 +264,12 @@ void main() {
           .withDateRange(newStartDate, newEndDate) // Changed
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved when editing duration');
@@ -235,7 +294,7 @@ void main() {
           .withFasting(type: 'after', duration: 90, notify: false)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate editing quantity (what happens in edit_quantity_screen.dart)
       final updatedMedication = MedicationBuilder.from(medication)
@@ -243,9 +302,12 @@ void main() {
           .withLowStockThreshold(5) // Changed
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved when editing quantity');
@@ -269,7 +331,7 @@ void main() {
           .withFasting(type: 'before', duration: 120, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Simulate editing basic info (what happens in edit_basic_info_screen.dart)
       final updatedMedication = MedicationBuilder.from(medication)
@@ -277,9 +339,12 @@ void main() {
           .withType(MedicationType.capsule) // Changed
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: testPersonId,
+      );
 
-      final retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      final retrieved = await getMedicationForTestPerson(medication.id);
 
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should be preserved when editing basic info');
@@ -307,7 +372,7 @@ void main() {
           .withFasting(type: 'before', duration: 60, notify: true)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Operation 1: Take a dose
       final today = DateTime.now();
@@ -318,10 +383,13 @@ void main() {
           .withTakenDoses(['08:00'], todayString)
           .withSkippedDoses([], todayString)
           .build();
-      await DatabaseHelper.instance.updateMedication(updated);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updated,
+        personId: testPersonId,
+      );
 
       // Verify after dose
-      var retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      var retrieved = await getMedicationForTestPerson(medication.id);
       expect(retrieved!.requiresFasting, true);
       expect(retrieved.fastingType, 'before');
       expect(retrieved.fastingDurationMinutes, 60);
@@ -332,10 +400,13 @@ void main() {
           .withStock(retrieved.stockQuantity + 20.0)
           .withLastRefill(20.0)
           .build();
-      await DatabaseHelper.instance.updateMedication(updated);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updated,
+        personId: testPersonId,
+      );
 
       // Verify after refill
-      retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      retrieved = await getMedicationForTestPerson(medication.id);
       expect(retrieved!.requiresFasting, true);
       expect(retrieved.fastingType, 'before');
       expect(retrieved.fastingDurationMinutes, 60);
@@ -346,10 +417,13 @@ void main() {
           .withDosageInterval(6)
           .withDoseSchedule({'06:00': 1.0, '12:00': 1.0, '18:00': 1.0})
           .build();
-      await DatabaseHelper.instance.updateMedication(updated);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updated,
+        personId: testPersonId,
+      );
 
       // Final verification - fasting should still be intact
-      retrieved = await DatabaseHelper.instance.getMedication(medication.id);
+      retrieved = await getMedicationForTestPerson(medication.id);
       expect(retrieved, isNotNull);
       expect(retrieved!.requiresFasting, true, reason: 'requiresFasting should survive multiple operations');
       expect(retrieved.fastingType, 'before', reason: 'fastingType should survive multiple operations');
