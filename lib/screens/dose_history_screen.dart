@@ -189,7 +189,7 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
             tooltip: 'Filtrar',
           ),
         ],
-        bottom: _tabController == null
+        bottom: _tabController == null || _persons.length <= 1
             ? null
             : TabBar(
                 controller: _tabController,

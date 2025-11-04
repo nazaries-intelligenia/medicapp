@@ -797,7 +797,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                 ),
               ]
             : null,
-        bottom: _tabController != null && _viewModel.persons.isNotEmpty
+        bottom: _tabController != null && _viewModel.persons.length > 1
             ? TabBar(
                 controller: _tabController,
                 isScrollable: _viewModel.persons.length > 3,
