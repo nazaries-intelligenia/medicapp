@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import 'weekly_days_selector/widgets/day_selection_tile.dart';
 import 'weekly_days_selector/widgets/selection_count_info.dart';
-import 'specific_dates_selector/widgets/continue_cancel_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 class WeeklyDaysSelectorScreen extends StatefulWidget {
   final List<int>? initialSelectedDays;
@@ -131,9 +131,13 @@ class _WeeklyDaysSelectorScreenState extends State<WeeklyDaysSelectorScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              ContinueCancelButtons(
-                onContinue: _continue,
-                onCancel: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.specificDatesSelectorContinue,
+                primaryIcon: Icons.arrow_forward,
+                onPrimaryPressed: _continue,
+                secondaryLabel: l10n.btnCancel,
+                secondaryIcon: Icons.cancel,
+                onSecondaryPressed: () => Navigator.pop(context),
               ),
             ],
           ),

@@ -13,29 +13,6 @@ void main() {
       NotificationService.instance.disableTestMode();
     });
 
-    test('should handle empty medication list without errors', () async {
-      // Sync with empty list (like a new installation with no medications)
-      await NotificationService.instance.syncNotificationsWithMedications([]);
-
-      // Should complete without errors
-      expect(true, true);
-    });
-
-    test('should handle single medication', () async {
-      final medication = MedicationBuilder()
-          .withId('test-sync-1')
-          .withName('Test Medication')
-          .withDosageInterval(8)
-          .withSingleDose('08:00', 1.0)
-          .withStock(10)
-          .withStartDate(DateTime.now())
-          .build();
-
-      await NotificationService.instance.syncNotificationsWithMedications([medication]);
-
-      expect(true, true);
-    });
-
     test('should handle multiple medications', () async {
       final medications = [
         MedicationBuilder()

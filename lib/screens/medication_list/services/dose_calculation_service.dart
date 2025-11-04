@@ -4,6 +4,7 @@ import '../../../models/medication.dart';
 import '../../../models/treatment_duration_type.dart';
 import '../../../models/dose_history_entry.dart';
 import '../../../database/database_helper.dart';
+import '../../../utils/datetime_extensions.dart';
 
 /// Service for calculating dose-related information
 class DoseCalculationService {
@@ -239,7 +240,7 @@ class DoseCalculationService {
     final Map<String, DateTime> actualTimes = {};
     for (final dose in takenDosesToday) {
       // Extract time (HH:mm) from scheduledDateTime
-      final scheduledTime = '${dose.scheduledDateTime.hour.toString().padLeft(2, '0')}:${dose.scheduledDateTime.minute.toString().padLeft(2, '0')}';
+      final scheduledTime = dose.scheduledDateTime.toTimeString();
       actualTimes[scheduledTime] = dose.registeredDateTime;
     }
 

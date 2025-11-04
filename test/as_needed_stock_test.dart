@@ -3,6 +3,7 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/test_constants.dart';
 
 void main() {
   group('As-Needed Medications - Stock Management', () {
@@ -11,7 +12,7 @@ void main() {
           .withId('test_1')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(10.0)
+          .withStock(SMALL_STOCK)
           .build();
 
       expect(medication.isStockLow, isFalse);
@@ -22,8 +23,8 @@ void main() {
           .withId('test_2')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(10.0)
-          .withLastDailyConsumption(0.0)
+          .withStock(SMALL_STOCK)
+          .withLastDailyConsumption(NO_STOCK)
           .build();
 
       expect(medication.isStockLow, isFalse);
@@ -39,7 +40,7 @@ void main() {
           .withId('test_3')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(10.0)
+          .withStock(SMALL_STOCK)
           .withLastDailyConsumption(4.0)
           .build();
 
@@ -63,13 +64,14 @@ void main() {
       expect(medication.isStockLow, isFalse);
     });
 
-    test('isStockLow should handle exactly at threshold boundary', () {
+    test('should correctly handle stock threshold boundaries', () {
+      // Test exactly at threshold boundary
       // Stock: 9 pills
       // Last day consumption: 3 pills
       // Days remaining: 9 / 3 = 3.0 days exactly
       // Threshold: 3 days
       // Should NOT be low since 3.0 >= 3
-      final medication = MedicationBuilder()
+      final medicationAtThreshold = MedicationBuilder()
           .withId('test_5')
           .withName('Ibuprofeno')
           .withAsNeeded()
@@ -77,16 +79,15 @@ void main() {
           .withLastDailyConsumption(3.0)
           .build();
 
-      expect(medication.isStockLow, isFalse);
-    });
+      expect(medicationAtThreshold.isStockLow, isFalse);
 
-    test('isStockLow should handle just below threshold boundary', () {
+      // Test just below threshold boundary
       // Stock: 8.9 pills
       // Last day consumption: 3 pills
       // Days remaining: 8.9 / 3 = 2.97 days
       // Threshold: 3 days
       // Should be LOW since 2.97 < 3
-      final medication = MedicationBuilder()
+      final medicationBelowThreshold = MedicationBuilder()
           .withId('test_6')
           .withName('Ibuprofeno')
           .withAsNeeded()
@@ -94,7 +95,7 @@ void main() {
           .withLastDailyConsumption(3.0)
           .build();
 
-      expect(medication.isStockLow, isTrue);
+      expect(medicationBelowThreshold.isStockLow, isTrue);
     });
 
     test('isStockLow should respect custom threshold days', () {
@@ -138,8 +139,8 @@ void main() {
           .withId('test_9')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(0.0)
-          .withLastDailyConsumption(2.0)
+          .withStock(NO_STOCK)
+          .withLastDailyConsumption(DOUBLE_DOSE)
           .build();
 
       // Stock is 0, so it's empty, not "low"

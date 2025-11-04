@@ -28,12 +28,21 @@ void main() {
             .withFasting(type: 'before', duration: 60) // 1 hour before
             .build();
 
-        // Schedule medication notifications (should include automatic "before" fasting notification)
-        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
+        // Verify medication has correct fasting configuration
+        expect(medication.requiresFasting, isTrue, reason: 'Medication should require fasting');
+        expect(medication.fastingType, 'before', reason: 'Fasting type should be "before"');
+        expect(medication.fastingDurationMinutes, 60, reason: 'Fasting duration should be 60 minutes');
 
-        // In test mode, this should complete without errors
-        // The notification would be scheduled for 07:00 (1 hour before 08:00)
-        expect(true, true);
+        // Schedule medication notifications (should include automatic "before" fasting notification)
+        // In test mode, this completes without actually scheduling platform notifications
+        await expectLater(
+          service.scheduleMedicationNotifications(medication, personId: 'test-person-id'),
+          completes,
+          reason: 'Scheduling should complete without throwing exceptions',
+        );
+
+        // Verify test mode is active (prevents actual notification scheduling)
+        expect(service.isTestMode, isTrue, reason: 'Test mode should be enabled');
       });
 
       test('should schedule "before" fasting for multiple dose times', () async {
@@ -49,11 +58,16 @@ void main() {
             .withFasting(type: 'before', duration: 30) // 30 min before each dose
             .build();
 
-        // Should schedule fasting notifications for all three doses
-        // 07:30, 15:30, 23:30
-        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
+        // Verify multiple doses are configured
+        expect(medication.doseSchedule.length, 3, reason: 'Should have 3 dose times');
+        expect(medication.fastingType, 'before');
 
-        expect(true, true);
+        // Should schedule fasting notifications for all three doses (07:30, 15:30, 23:30)
+        await expectLater(
+          service.scheduleMedicationNotifications(medication, personId: 'test-person-id'),
+          completes,
+          reason: 'Should schedule fasting notifications for all dose times without errors',
+        );
       });
 
       test('should handle different fasting durations for "before" type', () async {
@@ -68,10 +82,16 @@ void main() {
               .withFasting(type: 'before', duration: duration)
               .build();
 
-          await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
-        }
+          // Verify the duration is correctly set
+          expect(medication.fastingDurationMinutes, duration,
+              reason: 'Medication should have fasting duration of $duration minutes');
 
-        expect(true, true);
+          await expectLater(
+            service.scheduleMedicationNotifications(medication, personId: 'test-person-id'),
+            completes,
+            reason: 'Should handle $duration minute fasting duration without errors',
+          );
+        }
       });
 
       test('should reschedule "before" fasting when medication is updated', () async {
@@ -83,7 +103,11 @@ void main() {
             .withFasting(type: 'before', duration: 60)
             .build();
 
-        await service.scheduleMedicationNotifications(original, personId: 'test-person-id');
+        await expectLater(
+          service.scheduleMedicationNotifications(original, personId: 'test-person-id'),
+          completes,
+          reason: 'Initial scheduling should complete without errors',
+        );
 
         // Update to different time and duration
         final updated = MedicationBuilder()
@@ -94,10 +118,19 @@ void main() {
             .withFasting(type: 'before', duration: 90) // Different duration
             .build();
 
-        // Reschedule should cancel old and create new notifications
-        await service.scheduleMedicationNotifications(updated, personId: 'test-person-id');
+        // Verify the medications have same ID but different configurations
+        expect(original.id, updated.id, reason: 'Should have same medication ID');
+        expect(original.doseSchedule.keys.first, isNot(updated.doseSchedule.keys.first),
+            reason: 'Dose times should be different');
+        expect(original.fastingDurationMinutes, isNot(updated.fastingDurationMinutes),
+            reason: 'Fasting durations should be different');
 
-        expect(true, true);
+        // Reschedule should cancel old and create new notifications
+        await expectLater(
+          service.scheduleMedicationNotifications(updated, personId: 'test-person-id'),
+          completes,
+          reason: 'Rescheduling with updated medication should complete without errors',
+        );
       });
 
       test('should handle edge case: "before" fasting that overlaps with previous dose', () async {
@@ -114,10 +147,16 @@ void main() {
             .withFasting(type: 'before', duration: 180) // 3 hours before (longer than dose interval!)
             .build();
 
-        // Should handle overlapping fasting periods gracefully
-        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
+        // Verify the edge case: fasting duration (180 min) > dose interval (4 hours = 240 min between some doses)
+        expect(medication.fastingDurationMinutes, 180);
+        expect(medication.dosageIntervalHours, 4);
 
-        expect(true, true);
+        // Should handle overlapping fasting periods gracefully without throwing
+        await expectLater(
+          service.scheduleMedicationNotifications(medication, personId: 'test-person-id'),
+          completes,
+          reason: 'Should handle overlapping fasting periods without errors',
+        );
       });
     });
 

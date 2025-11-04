@@ -6,7 +6,7 @@ import '../widgets/forms/frequency_option_card.dart';
 import 'weekly_days_selector_screen.dart';
 import 'medication_dosage_screen.dart';
 import 'medication_frequency/widgets/weekly_days_selector_card.dart';
-import 'medication_frequency/widgets/continue_back_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 /// Pantalla 3: Frecuencia (cada cuántos días tomar el medicamento)
 /// Se salta si se seleccionaron fechas específicas
@@ -268,9 +268,13 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
               ],
 
               const SizedBox(height: 24),
-              ContinueBackButtons(
-                onContinue: _continueToNextStep,
-                onBack: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.btnContinue,
+                primaryIcon: Icons.arrow_forward,
+                onPrimaryPressed: _continueToNextStep,
+                secondaryLabel: l10n.btnBack,
+                secondaryIcon: Icons.arrow_back,
+                onSecondaryPressed: () => Navigator.pop(context),
               ),
             ],
           ),

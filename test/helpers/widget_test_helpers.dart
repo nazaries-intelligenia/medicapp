@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import 'package:medicapp/database/database_helper.dart';
+import 'package:medicapp/services/notification_service.dart';
 import 'database_test_helper.dart';
 
 /// Helper function to get localized strings in tests.
@@ -45,6 +48,29 @@ Future<void> waitForDatabase(WidgetTester tester) async {
   // Wait for _checkNotificationPermissions and other async timers in MedicationListScreen
   // This prevents "pending timers" warnings in tests
   await tester.pump(const Duration(seconds: 2));
+}
+
+/// Helper function to actively wait for a widget to appear in the UI.
+/// Uses polling to check if the widget exists and pumps frames until it appears.
+///
+/// This is useful after ViewModel updates or database operations where the UI
+/// needs time to rebuild with new data.
+///
+/// Throws an exception if the widget doesn't appear within the timeout.
+Future<void> waitForWidget(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 10),
+  Duration pollInterval = const Duration(milliseconds: 100),
+}) async {
+  final endTime = DateTime.now().add(timeout);
+  while (DateTime.now().isBefore(endTime)) {
+    await tester.pump(pollInterval);
+    if (finder.evaluate().isNotEmpty) {
+      return;
+    }
+  }
+  throw Exception('Widget not found after ${timeout.inSeconds} seconds: $finder');
 }
 
 /// Helper function to scroll to a widget if needed.
@@ -322,4 +348,68 @@ Future<void> tapTextMultipleTimes(
   await waitForDatabase(tester);
   await tester.pump();
   await tester.pump();
+}
+
+/// Helper function to wait for complex async operations with multiple pump cycles.
+///
+/// This is commonly used after database operations, dialog closes, or other async
+/// operations that require time to complete followed by multiple UI frame pumps.
+///
+/// Examples:
+/// - After registering a dose: dialog closes, database saves, UI reloads
+/// - After saving edits: navigation completes, database updates, list reloads
+///
+/// [asyncDelay]: How long to wait for async operations (database, network, etc.)
+/// [pumpCount]: Number of frames to pump after the async delay
+/// [pumpDuration]: Duration between each pump
+Future<void> waitForComplexAsyncOperation(
+  WidgetTester tester, {
+  Duration asyncDelay = const Duration(milliseconds: 1000),
+  int pumpCount = 20,
+  Duration pumpDuration = const Duration(milliseconds: 100),
+}) async {
+  await tester.runAsync(() => Future.delayed(asyncDelay));
+  for (int i = 0; i < pumpCount; i++) {
+    await tester.pump(pumpDuration);
+  }
+}
+
+/// Helper function to wait for a dialog to close and the main screen to reload.
+///
+/// This is useful after:
+/// - Closing modals or dialogs
+/// - Completing form submissions
+/// - Waiting for UI state to stabilize after async operations
+///
+/// [pumpCount]: Number of frames to pump
+/// [pumpDuration]: Duration between each pump
+Future<void> waitForDialogCloseAndReload(
+  WidgetTester tester, {
+  int pumpCount = 30,
+  Duration pumpDuration = const Duration(milliseconds: 100),
+}) async {
+  for (int i = 0; i < pumpCount; i++) {
+    await tester.pump(pumpDuration);
+  }
+}
+
+/// Helper function to set up integration tests with common configuration.
+/// This should be called in setUp() for integration tests.
+Future<void> setupIntegrationTest() async {
+  final binding = TestWidgetsFlutterBinding.instance;
+  binding.platformDispatcher.implicitView!.physicalSize = const Size(1200, 1800);
+  binding.platformDispatcher.implicitView!.devicePixelRatio = 1.0;
+  SharedPreferences.setMockInitialValues({});
+  await DatabaseHelper.resetDatabase();
+  DatabaseHelper.setInMemoryDatabase(true);
+  NotificationService.instance.enableTestMode();
+  await DatabaseTestHelper.ensureDefaultPerson();
+}
+
+/// Helper function to tear down integration tests with common cleanup.
+/// This should be called in tearDown() for integration tests.
+Future<void> tearDownIntegrationTest() async {
+  final binding = TestWidgetsFlutterBinding.instance;
+  binding.platformDispatcher.clearAllTestValues();
+  await DatabaseHelper.resetDatabase();
 }

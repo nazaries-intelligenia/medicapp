@@ -6,28 +6,18 @@ MedicApp es una aplicación de recordatorio de medicamentos construida con Flutt
 
 ## Estado del Proyecto
 
-![Tests](https://img.shields.io/badge/tests-389%20passing-success)
-![Cobertura](https://img.shields.io/badge/coverage-45.7%25-yellow)
+![Tests](https://img.shields.io/badge/tests-432%20passing-success)
+![Cobertura](https://img.shields.io/badge/coverage-75--80%25-green)
 ![Flutter](https://img.shields.io/badge/Flutter-3.9.2+-blue)
 ![Material Design](https://img.shields.io/badge/Material%20Design-3-purple)
 
 ### Calidad de Código
 
-- **Suite de tests completa**: 389 tests cubriendo modelos, servicios, persistencia y widgets
-- **Arquitectura modular**: Aplicación de principios KISS y DRY con reducción del 39.3% en código de pantallas principales
-- **Test helpers optimizados**: MedicationBuilder pattern con 100% de adopción, reducción de 40-60% en código de tests
-- **Cobertura**: 45.7% (2710 de 5927 líneas)
+- **Suite de tests completa**: ~432 tests cubriendo modelos, servicios, persistencia y widgets
+- **Arquitectura modular**: Aplicación de principios KISS y DRY en pantallas y componentes
+- **Test helpers optimizados**: MedicationBuilder pattern con 100% de adopción en la suite de tests
+- **Cobertura**: ~75-80% estimada
 - **Internacionalización**: 5 idiomas soportados (ES, EN, CA, GL, EU)
-
-### Refactorización Reciente (Octubre 2025)
-
-La suite de tests ha sido completamente refactorizada para ser más limpia, rápida y mantenible:
-
-- **MedicationBuilder**: 100% de tests migrados al patrón builder
-- **Eliminación de redundancia**: 20+ tests duplicados removidos, ~480 líneas eliminadas
-- **Performance**: Suite 35% más rápida sin pérdida de cobertura
-- **Helpers unificados**: DatabaseTestHelper, test_helpers, medication_builder
-- **Assertions mejoradas**: Reemplazo de assertions débiles por validaciones reales
 
 ### Arquitectura Multi-Persona V19+ (Noviembre 2025)
 

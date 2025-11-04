@@ -7,34 +7,7 @@ import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/dose_history_service.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
-
-/// Helper to insert medication and assign to default person (V19+ requirement)
-Future<void> insertMedicationWithPerson(Medication medication) async {
-  await DatabaseHelper.instance.insertMedication(medication);
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson != null) {
-    await DatabaseHelper.instance.assignMedicationToPerson(
-      personId: defaultPerson.id,
-      medicationId: medication.id,
-      scheduleData: medication,
-    );
-  }
-}
-
-/// Helper to get medication for default person (V19+ requirement)
-Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson == null) return null;
-  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
-  return medications.where((m) => m.id == medicationId).firstOrNull;
-}
-
-/// Helper to get default person ID (V19+ requirement)
-Future<String> getDefaultPersonId() async {
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson == null) throw Exception('No default person found');
-  return defaultPerson.id;
-}
+import 'helpers/person_test_helper.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +62,34 @@ void main() {
       expect(updatedMed, isNotNull);
       expect(updatedMed!.stockQuantity, 10.0); // Stock restored
       expect(updatedMed.takenDosesToday, isEmpty); // Removed from taken list
+
+      // Also test fractional dose quantities
+      final medicationFractional = MedicationBuilder()
+          .withId('med1_frac')
+          .withSingleDose('08:00', 0.5)
+          .withStock(9.5)
+          .withTakenDoses(['08:00'], todayString)
+          .build();
+
+      await insertMedicationWithPerson(medicationFractional);
+
+      final historyEntryFractional = DoseHistoryEntry(
+        id: 'entry1_frac',
+        medicationId: 'med1_frac',
+        medicationName: 'Test Med Fractional',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: scheduledTime,
+        status: DoseStatus.taken,
+        quantity: 0.5,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(historyEntryFractional);
+      await DoseHistoryService.deleteHistoryEntry(historyEntryFractional);
+
+      final updatedMedFractional = await getMedicationForDefaultPerson('med1_frac');
+      expect(updatedMedFractional!.stockQuantity, 10.0); // 9.5 + 0.5 = 10.0
     });
 
     test('should delete history entry from today and NOT restore stock for skipped dose', () async {
@@ -227,40 +228,6 @@ void main() {
       expect(updatedMed!.stockQuantity, 8.0);
       expect(updatedMed.takenDosesToday, ['08:00', '22:00']); // Only 16:00 removed
       expect(updatedMed.takenDosesToday.length, 2);
-    });
-
-    test('should handle fractional dose quantities when restoring stock', () async {
-      final today = DateTime.now();
-      final todayString = '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
-
-      final medication = MedicationBuilder()
-          .withId('med6')
-          .withSingleDose('08:00', 0.5)
-          .withStock(9.5)
-          .withTakenDoses(['08:00'], todayString)
-          .build();
-
-      await insertMedicationWithPerson(medication);
-
-      final scheduledTime = DateTime(today.year, today.month, today.day, 8, 0);
-      final personId = await getDefaultPersonId();
-      final historyEntry = DoseHistoryEntry(
-        id: 'entry6',
-        medicationId: 'med6',
-        medicationName: 'Test Med',
-        medicationType: MedicationType.pill,
-        personId: personId,
-        scheduledDateTime: scheduledTime,
-        registeredDateTime: scheduledTime,
-        status: DoseStatus.taken,
-        quantity: 0.5,
-      );
-
-      await DatabaseHelper.instance.insertDoseHistory(historyEntry);
-      await DoseHistoryService.deleteHistoryEntry(historyEntry);
-
-      final updatedMed = await getMedicationForDefaultPerson('med6');
-      expect(updatedMed!.stockQuantity, 10.0); // 9.5 + 0.5 = 10.0
     });
   });
 

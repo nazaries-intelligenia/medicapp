@@ -634,5 +634,6 @@
   "takenTodaySingle": "Taken today: {quantity} {unit} at {time}",
   "takenTodayMultiple": "Taken today: {count} times ({quantity} {unit})",
   "done": "Done",
-  "suspended": "Suspended"
+  "suspended": "Suspended",
+  "activeFastingPeriodsTitle": "Active Fasting Periods"
 }

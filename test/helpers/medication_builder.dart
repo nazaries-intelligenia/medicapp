@@ -206,6 +206,40 @@ class MedicationBuilder {
     return this;
   }
 
+  // ===== Factory Methods =====
+
+  /// Configura un medicamento con valores por defecto para tests comunes
+  MedicationBuilder withDefaultTestConfig() {
+    return this
+        .withId('test-medication-${DateTime.now().millisecondsSinceEpoch}')
+        .withStock(30.0);
+  }
+
+  /// Configura múltiples dosis al día con horarios automáticos
+  /// Genera horarios comenzando a las 8:00 y espaciados cada 4 horas
+  MedicationBuilder withMultipleDosesPerDay(int count) {
+    final times = List.generate(count, (i) => '${8 + i * 4}:00');
+    return withMultipleDoses(times, 1.0);
+  }
+
+  /// Configura ayuno con valores comunes para tests
+  MedicationBuilder withFastingEnabled({
+    String type = 'before',
+    int durationMinutes = 60,
+  }) {
+    return withFasting(type: type, duration: durationMinutes);
+  }
+
+  /// Configura el medicamento con stock bajo (5 unidades)
+  MedicationBuilder withLowStock() {
+    return withStock(5.0);
+  }
+
+  /// Configura el medicamento sin stock (0 unidades)
+  MedicationBuilder withNoStock() {
+    return withStock(0.0);
+  }
+
   /// Crea una copia del builder a partir de un medicamento existente
   MedicationBuilder.from(Medication medication) {
     _id = medication.id;

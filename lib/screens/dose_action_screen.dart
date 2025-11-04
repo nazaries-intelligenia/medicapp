@@ -6,7 +6,8 @@ import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/dose_action_service.dart';
-import 'dose_action/widgets/medication_header_card.dart';
+import '../utils/datetime_extensions.dart';
+import '../widgets/medication_header_card.dart';
 import 'dose_action/widgets/take_dose_button.dart';
 import 'dose_action/widgets/skip_dose_button.dart';
 import 'dose_action/widgets/postpone_buttons.dart';
@@ -143,7 +144,8 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     if (newTime == null) return;
 
     // Format the new time
-    final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+    final newDateTime = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, newTime.hour, newTime.minute);
+    final newTimeString = newDateTime.toTimeString();
 
     // Schedule a one-time notification for this dose (V19+: includes personId)
     await NotificationService.instance.schedulePostponedDoseNotification(
@@ -177,7 +179,7 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     final newTime = TimeOfDay(hour: newDateTime.hour, minute: newDateTime.minute);
 
     // Format the new time
-    final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
+    final newTimeString = newDateTime.toTimeString();
 
     // Schedule a one-time notification for this dose (V19+: includes personId)
     await NotificationService.instance.schedulePostponedDoseNotification(

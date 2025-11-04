@@ -2107,4 +2107,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get suspended => 'Etenda';
+
+  @override
+  String get activeFastingPeriodsTitle => 'Ayunos Activos';
 }

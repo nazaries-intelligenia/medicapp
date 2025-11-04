@@ -2,6 +2,7 @@ import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
+import '../utils/datetime_extensions.dart';
 
 /// Service for handling dose registration actions (taken, skipped, manual)
 /// This centralizes the logic to avoid duplication across multiple screens
@@ -38,13 +39,7 @@ class DoseActionService {
     }
 
     // Create updated medication
-    final updatedMedication = Medication(
-      id: medication.id,
-      name: medication.name,
-      type: medication.type,
-      dosageIntervalHours: medication.dosageIntervalHours,
-      durationType: medication.durationType,
-      doseSchedule: medication.doseSchedule,
+    final updatedMedication = medication.copyWith(
       stockQuantity: medication.stockQuantity - doseQuantity,
       takenDosesToday: updatedTakenDoses,
       skippedDosesToday: updatedSkippedDoses,
@@ -108,14 +103,7 @@ class DoseActionService {
     }
 
     // Create updated medication
-    final updatedMedication = Medication(
-      id: medication.id,
-      name: medication.name,
-      type: medication.type,
-      dosageIntervalHours: medication.dosageIntervalHours,
-      durationType: medication.durationType,
-      doseSchedule: medication.doseSchedule,
-      stockQuantity: medication.stockQuantity,
+    final updatedMedication = medication.copyWith(
       takenDosesToday: updatedTakenDoses,
       skippedDosesToday: updatedSkippedDoses,
       takenDosesDate: todayString,
@@ -172,30 +160,9 @@ class DoseActionService {
     }
 
     // Create updated medication with reduced stock
-    final updatedMedication = Medication(
-      id: medication.id,
-      name: medication.name,
-      type: medication.type,
-      dosageIntervalHours: medication.dosageIntervalHours,
-      durationType: medication.durationType,
-      doseSchedule: medication.doseSchedule,
+    final updatedMedication = medication.copyWith(
       stockQuantity: medication.stockQuantity - quantity,
-      takenDosesToday: medication.takenDosesToday,
-      skippedDosesToday: medication.skippedDosesToday,
-      takenDosesDate: medication.takenDosesDate,
       lastDailyConsumption: lastDailyConsumption,
-      lastRefillAmount: medication.lastRefillAmount,
-      lowStockThresholdDays: medication.lowStockThresholdDays,
-      selectedDates: medication.selectedDates,
-      weeklyDays: medication.weeklyDays,
-      dayInterval: medication.dayInterval,
-      startDate: medication.startDate,
-      endDate: medication.endDate,
-      requiresFasting: medication.requiresFasting,
-      fastingType: medication.fastingType,
-      fastingDurationMinutes: medication.fastingDurationMinutes,
-      notifyFasting: medication.notifyFasting,
-      isSuspended: medication.isSuspended,
     );
 
     // Save to history
@@ -257,7 +224,7 @@ class DoseActionService {
 
     final now = DateTime.now();
     final todayString = _getTodayString(now);
-    final currentTime = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+    final currentTime = now.toTimeString();
 
     // Update extra doses for today
     List<String> updatedExtraDoses;
@@ -275,31 +242,12 @@ class DoseActionService {
     }
 
     // Create updated medication with reduced stock
-    final updatedMedication = Medication(
-      id: medication.id,
-      name: medication.name,
-      type: medication.type,
-      dosageIntervalHours: medication.dosageIntervalHours,
-      durationType: medication.durationType,
-      doseSchedule: medication.doseSchedule,
+    final updatedMedication = medication.copyWith(
       stockQuantity: medication.stockQuantity - quantity,
       takenDosesToday: updatedTakenDoses,
       skippedDosesToday: updatedSkippedDoses,
       extraDosesToday: updatedExtraDoses,
       takenDosesDate: todayString,
-      lastRefillAmount: medication.lastRefillAmount,
-      lowStockThresholdDays: medication.lowStockThresholdDays,
-      selectedDates: medication.selectedDates,
-      weeklyDays: medication.weeklyDays,
-      dayInterval: medication.dayInterval,
-      startDate: medication.startDate,
-      endDate: medication.endDate,
-      requiresFasting: medication.requiresFasting,
-      fastingType: medication.fastingType,
-      fastingDurationMinutes: medication.fastingDurationMinutes,
-      notifyFasting: medication.notifyFasting,
-      isSuspended: medication.isSuspended,
-      lastDailyConsumption: medication.lastDailyConsumption,
     );
 
     // Get default person for history entry and updates
@@ -347,7 +295,7 @@ class DoseActionService {
   // Private helper methods
 
   static String _getTodayString(DateTime date) {
-    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+    return date.toDateString();
   }
 
   static DateTime _parseDoseDateTime(DateTime date, String timeString) {

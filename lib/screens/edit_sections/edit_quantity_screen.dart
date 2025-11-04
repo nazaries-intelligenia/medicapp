@@ -3,7 +3,7 @@ import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../database/database_helper.dart';
 import 'edit_quantity/widgets/quantity_form_card.dart';
-import 'edit_duration/widgets/save_cancel_buttons.dart';
+import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar la cantidad disponible y umbral de bajo stock
 class EditQuantityScreen extends StatefulWidget {
@@ -132,10 +132,15 @@ class _EditQuantityScreenState extends State<EditQuantityScreen> {
                   medicationType: widget.medication.type,
                 ),
                 const SizedBox(height: 24),
-                SaveCancelButtons(
-                  isSaving: _isSaving,
-                  onSave: _saveChanges,
-                  onCancel: () => Navigator.pop(context),
+                ActionButtons(
+                  primaryLabel: l10n.editBasicInfoSaveChanges,
+                  primaryIcon: Icons.check,
+                  onPrimaryPressed: _saveChanges,
+                  secondaryLabel: l10n.btnCancel,
+                  secondaryIcon: Icons.cancel,
+                  onSecondaryPressed: () => Navigator.pop(context),
+                  isLoading: _isSaving,
+                  loadingLabel: l10n.editBasicInfoSaving,
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication_type.dart';
+import '../../utils/datetime_extensions.dart';
 
 /// Helper class to hold time and quantity for each dose
 class DoseEntry {
@@ -166,9 +167,8 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
   }
 
   String _formatTime(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    final dateTime = DateTime(2000, 1, 1, time.hour, time.minute);
+    return dateTime.toTimeString();
   }
 
   bool _isTimeDuplicated(int currentIndex) {

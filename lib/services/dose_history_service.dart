@@ -44,23 +44,10 @@ class DoseHistoryService {
       }
 
       // Update medication
-      final updatedMedication = Medication(
-        id: medication.id,
-        name: medication.name,
-        type: medication.type,
-        dosageIntervalHours: medication.dosageIntervalHours,
-        durationType: medication.durationType,
-        doseSchedule: medication.doseSchedule,
+      final updatedMedication = medication.copyWith(
         stockQuantity: newStock,
         takenDosesToday: takenDoses,
         skippedDosesToday: skippedDoses,
-        takenDosesDate: medication.takenDosesDate,
-        lastRefillAmount: medication.lastRefillAmount,
-        lowStockThresholdDays: medication.lowStockThresholdDays,
-        selectedDates: medication.selectedDates,
-        weeklyDays: medication.weeklyDays,
-        startDate: medication.startDate,
-        endDate: medication.endDate,
       );
 
       await DatabaseHelper.instance.updateMedicationForPerson(

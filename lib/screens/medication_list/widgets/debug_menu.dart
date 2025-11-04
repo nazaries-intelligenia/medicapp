@@ -1,7 +1,7 @@
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/notification_service.dart';
+import '../../../utils/platform_helper.dart';
 
 class DebugMenu extends StatelessWidget {
   final VoidCallback onTestNotification;
@@ -89,7 +89,7 @@ class DebugMenu extends StatelessWidget {
           ),
         ),
         // Battery optimization is only available on Android
-        if (Platform.isAndroid)
+        if (PlatformHelper.isAndroid)
           PopupMenuItem(
             value: 'open_battery',
             child: Row(

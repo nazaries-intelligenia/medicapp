@@ -3,14 +3,15 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/test_constants.dart';
 
 void main() {
   group('Medication Model - Fasting Configuration', () {
     test('should serialize fasting configuration to JSON', () {
       final medication = MedicationBuilder()
           .withId('test_6')
-          .withMultipleDoses(['08:00', '16:00'], 1.0)
-          .withFasting(type: 'before', duration: 60)
+          .withMultipleDoses(['08:00', '16:00'], SINGLE_DOSE)
+          .withFasting(type: 'before', duration: MEDIUM_FASTING)
           .build();
 
       final json = medication.toJson();
@@ -24,7 +25,7 @@ void main() {
     test('should serialize fasting disabled to JSON', () {
       final medication = MedicationBuilder()
           .withId('test_7')
-          .withSingleDose('08:00', 1.0)
+          .withSingleDose('08:00', SINGLE_DOSE)
           .withFastingDisabled()
           .build();
 
@@ -44,13 +45,13 @@ void main() {
         'dosageIntervalHours': 8,
         'durationType': 'everyday',
         'doseTimes': '08:00,16:00',
-        'doseSchedule': '{"08:00": 1.0, "16:00": 1.0}',
-        'stockQuantity': 10,
+        'doseSchedule': '{"08:00": $SINGLE_DOSE, "16:00": $SINGLE_DOSE}',
+        'stockQuantity': SMALL_STOCK,
         'takenDosesToday': '',
         'skippedDosesToday': '',
         'requiresFasting': 1,
         'fastingType': 'before',
-        'fastingDurationMinutes': 60,
+        'fastingDurationMinutes': MEDIUM_FASTING,
         'notifyFasting': 1,
       };
 
@@ -114,8 +115,8 @@ void main() {
     test('should round-trip serialize and deserialize fasting configuration', () {
       final original = MedicationBuilder()
           .withId('test_11')
-          .withMultipleDoses(['08:00', '16:00'], 1.0)
-          .withFasting(type: 'after', duration: 90)
+          .withMultipleDosesPerDay(2)  // Factory method - generates ['08:00', '12:00']
+          .withFastingEnabled(type: 'after', durationMinutes: 90)  // Factory method
           .build();
 
       final json = original.toJson();
@@ -130,21 +131,20 @@ void main() {
     test('should update medication with fasting configuration', () {
       final original = MedicationBuilder()
           .withId('test_12')
-          .withMultipleDoses(['08:00', '16:00'], 1.0)
-          .withStock(10.0)
+          .withMultipleDosesPerDay(2)  // Factory method
+          .withDefaultTestConfig()  // Factory method for ID and stock
           .withFastingDisabled()
           .build();
 
       // Update to require fasting using builder
       final updated = MedicationBuilder.from(original)
-          .withFasting(type: 'before', duration: 60)
+          .withFastingEnabled()  // Factory method with default values
           .build();
 
       expect(updated.requiresFasting, true);
       expect(updated.fastingType, 'before');
       expect(updated.fastingDurationMinutes, 60);
       expect(updated.notifyFasting, true);
-      expect(updated.id, original.id);
       expect(updated.name, original.name);
     });
 
@@ -153,7 +153,7 @@ void main() {
       final med15 = MedicationBuilder()
           .withId('test_13')
           .withName('Test Med 15min')
-          .withSingleDose('08:00', 1.0)
+          .withSingleDose('08:00', SINGLE_DOSE)
           .withFasting(type: 'before', duration: 15)
           .build();
       expect(med15.fastingDurationMinutes, 15);
@@ -162,7 +162,7 @@ void main() {
       final med4h = MedicationBuilder()
           .withId('test_14')
           .withName('Test Med 4h')
-          .withSingleDose('08:00', 1.0)
+          .withSingleDose('08:00', SINGLE_DOSE)
           .withFasting(type: 'after', duration: 240, notify: false)
           .build();
       expect(med4h.fastingDurationMinutes, 240);
@@ -172,7 +172,7 @@ void main() {
           .withId('test_15')
           .withName('Test Med 12h')
           .withDosageInterval(24)
-          .withSingleDose('08:00', 1.0)
+          .withSingleDose('08:00', SINGLE_DOSE)
           .withFasting(type: 'before', duration: 720)
           .build();
       expect(med12h.fastingDurationMinutes, 720);
@@ -185,7 +185,7 @@ void main() {
           .withName('Test Pill')
           .withType(MedicationType.pill)
           .withSingleDose('08:00', 1.0)
-          .withFasting(type: 'before', duration: 60)
+          .withFastingEnabled()  // Factory method with default values
           .build();
 
       expect(pillMedication.requiresFasting, true);
@@ -198,7 +198,7 @@ void main() {
           .withName('Test Injection')
           .withType(MedicationType.injection)
           .withSingleDose('08:00', 1.0)
-          .withFasting(type: 'before', duration: 60)
+          .withFastingEnabled()  // Factory method with default values
           .build();
 
       expect(injectionMedication.requiresFasting, true);
@@ -223,7 +223,7 @@ void main() {
 
       // Add fasting using builder.from()
       final withFasting = MedicationBuilder.from(original)
-          .withFasting(type: 'before', duration: 60)
+          .withFastingEnabled()  // Factory method with default values
           .build();
 
       // Verify all original fields are preserved

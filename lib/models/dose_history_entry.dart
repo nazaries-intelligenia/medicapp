@@ -1,4 +1,5 @@
 import '../models/medication_type.dart';
+import '../utils/datetime_extensions.dart';
 
 /// Represents a single dose history entry
 class DoseHistoryEntry {
@@ -99,7 +100,7 @@ class DoseHistoryEntry {
 
   /// Format scheduled time as HH:mm
   String get scheduledTimeFormatted {
-    return '${scheduledDateTime.hour.toString().padLeft(2, '0')}:${scheduledDateTime.minute.toString().padLeft(2, '0')}';
+    return scheduledDateTime.toTimeString();
   }
 
   /// Format scheduled date as dd/MM/yyyy
@@ -109,7 +110,7 @@ class DoseHistoryEntry {
 
   /// Format registered time as HH:mm
   String get registeredTimeFormatted {
-    return '${registeredDateTime.hour.toString().padLeft(2, '0')}:${registeredDateTime.minute.toString().padLeft(2, '0')}';
+    return registeredDateTime.toTimeString();
   }
 
   /// Get delay between scheduled and registered (in minutes)

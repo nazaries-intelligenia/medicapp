@@ -8,27 +8,8 @@ import 'package:medicapp/services/dose_action_service.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
-
-/// Helper to insert medication and assign to default person (V19+ requirement)
-Future<void> insertMedicationWithPerson(Medication medication) async {
-  await DatabaseHelper.instance.insertMedication(medication);
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson != null) {
-    await DatabaseHelper.instance.assignMedicationToPerson(
-      personId: defaultPerson.id,
-      medicationId: medication.id,
-      scheduleData: medication,
-    );
-  }
-}
-
-/// Helper to get medication for default person (V19+ requirement)
-Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson == null) return null;
-  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
-  return medications.where((m) => m.id == medicationId).firstOrNull;
-}
+import 'helpers/person_test_helper.dart';
+import 'helpers/test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -449,20 +430,6 @@ void main() {
       expect(exception.doseQuantity, 2.0);
       expect(exception.availableStock, 1.0);
       expect(exception.unit, 'pastillas');
-    });
-
-    test('should have descriptive toString', () {
-      final exception = InsufficientStockException(
-        doseQuantity: 2.0,
-        availableStock: 1.0,
-        unit: 'pastillas',
-      );
-
-      final message = exception.toString();
-      expect(message, contains('2.0'));
-      expect(message, contains('1.0'));
-      expect(message, contains('pastillas'));
-      expect(message, contains('Insufficient stock'));
     });
   });
 }

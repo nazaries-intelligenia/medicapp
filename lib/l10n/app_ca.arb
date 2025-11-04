@@ -989,5 +989,6 @@
     }
   },
   "done": "Fet",
-  "suspended": "Suspès"
+  "suspended": "Suspès",
+  "activeFastingPeriodsTitle": "Dejunis Actius"
 }

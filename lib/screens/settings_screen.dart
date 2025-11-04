@@ -1,9 +1,9 @@
-import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
 import 'settings/widgets/setting_option_card.dart';
 import 'settings/widgets/setting_switch_card.dart';
@@ -308,7 +308,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
           // Show Fasting Notification Switch (only on Android and if countdown is enabled)
-          if (Platform.isAndroid && _showFastingCountdown)
+          if (PlatformHelper.isAndroid && _showFastingCountdown)
             SettingSwitchCard(
               icon: Icons.notifications_active,
               iconColor: Colors.orange,

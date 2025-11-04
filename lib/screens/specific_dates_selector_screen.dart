@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import '../utils/datetime_extensions.dart';
 import 'specific_dates_selector/widgets/instructions_card.dart';
 import 'specific_dates_selector/widgets/selected_dates_list_card.dart';
-import 'specific_dates_selector/widgets/continue_cancel_buttons.dart';
+import '../widgets/action_buttons.dart';
 
 class SpecificDatesSelectorScreen extends StatefulWidget {
   final List<String>? initialSelectedDates;
@@ -55,7 +56,7 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
     );
 
     if (picked != null) {
-      final dateString = '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      final dateString = picked.toDateString();
       setState(() {
         if (_selectedDates.contains(dateString)) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -139,9 +140,13 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
                 ),
               ],
               const SizedBox(height: 16),
-              ContinueCancelButtons(
-                onContinue: _continue,
-                onCancel: () => Navigator.pop(context),
+              ActionButtons(
+                primaryLabel: l10n.specificDatesSelectorContinue,
+                primaryIcon: Icons.arrow_forward,
+                onPrimaryPressed: _continue,
+                secondaryLabel: l10n.btnCancel,
+                secondaryIcon: Icons.cancel,
+                onSecondaryPressed: () => Navigator.pop(context),
               ),
             ],
           ),
