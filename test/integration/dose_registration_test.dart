@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -47,9 +49,17 @@ void main() {
     await addMedicationWithDuration(tester, 'Paracetamol', stockQuantity: '10');
     await waitForDatabase(tester);
 
+    // V19+: Wait for medication list to load
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Tap on the medication to open modal
     await tester.tap(find.text('Paracetamol'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Verify "Registrar toma" button is shown
     expect(find.text(getL10n(tester).medicineCabinetRegisterDose), findsWidgets);
@@ -66,29 +76,51 @@ void main() {
     await addMedicationWithDuration(tester, 'Vitamina C', stockQuantity: '30', dosageIntervalHours: 24);
     await waitForDatabase(tester);
 
+    // V19+: Wait for medication list to fully load
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Verify initial stock is shown in the list (30 pastillas)
     expect(find.text('Vitamina C'), findsOneWidget);
 
     // Tap on the medication to open modal
     await tester.tap(find.text('Vitamina C'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Tap "Registrar toma"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
+    await tester.pump(); // Start closing modal
+    await tester.pump(); // Complete modal close
 
-    // Wait for the dialog to appear
+    // Wait for async operations: modal close, database query, dialog show
     await tester.runAsync(() async {
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(seconds: 3));
     });
-    await tester.pumpAndSettle();
 
-    // With the new extra dose feature, the dialog is now shown even with 1 dose
-    // (to allow registering an extra dose)
-    expect(find.text('¿Qué toma has tomado?'), findsOneWidget);
+    // Multiple pumps to ensure dialog renders
+    for (int i = 0; i < 5; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
-    // Select the scheduled dose (08:00)
+    // The medication has one dose available (08:00), so the DoseSelectionDialog should appear
+    // The dialog shows the available dose and an option to register an extra dose
+    expect(find.text('Registrar toma de Vitamina C'), findsOneWidget);
+    expect(find.text('08:00'), findsOneWidget);
+
+    // Select the available dose time (08:00) to register it
     await tester.tap(find.text('08:00'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+
+    // Wait for dose registration to complete
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    });
+    await tester.pump();
+    await tester.pump();
 
     // The medication list should have reloaded - verify the medication is still there
     expect(find.text('Vitamina C'), findsOneWidget);

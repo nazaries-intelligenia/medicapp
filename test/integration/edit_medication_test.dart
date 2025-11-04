@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -130,15 +132,45 @@ void main() {
     // Additional pump to ensure navigation is complete
     await tester.pumpAndSettle();
 
+    // Check for confirmation message EARLY (before it disappears after 2 seconds)
+    expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
+
     // Wait for main screen to complete its async operations (reload from DB)
     await waitForDatabase(tester);
+
+    // Additional pumps to ensure all UI updates are complete
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    // Wait actively for the new medication name to appear in the UI
+    // This polls until the UI is updated with the new name
+    bool foundNewName = false;
+    for (int attempt = 0; attempt < 30 && !foundNewName; attempt++) {
+      await tester.runAsync(() async {
+        await Future.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+
+      // Check if the new name is visible
+      if (find.text('Rosuvastatina').evaluate().isNotEmpty) {
+        foundNewName = true;
+        break;
+      }
+    }
+
+    // Final pump to ensure everything is settled
+    await tester.pumpAndSettle();
 
     // Verify old name is gone and new name is in the list
     expect(find.text('Simvastatina'), findsNothing);
     expect(find.text('Rosuvastatina'), findsOneWidget);
 
-    // Verify confirmation message
-    expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
+    // Wait for any background tasks (like notification rescheduling) to complete
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
   });
 
   testWidgets('Should update medication type when editing', (WidgetTester tester) async {
@@ -180,11 +212,43 @@ void main() {
     // Additional pump to ensure navigation is complete
     await tester.pumpAndSettle();
 
+    // Check for confirmation message EARLY (before it disappears after 2 seconds)
+    expect(find.text(getL10n(tester).editBasicInfoUpdated), findsWidgets);
+
     // Wait for main screen to complete its async operations (reload from DB)
     await waitForDatabase(tester);
 
+    // Additional pumps to ensure all UI updates are complete
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    // Wait actively for the medication type to appear in the UI
+    bool foundNewType = false;
+    for (int attempt = 0; attempt < 30 && !foundNewType; attempt++) {
+      await tester.runAsync(() async {
+        await Future.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+
+      // Check if the new type is visible
+      if (find.text(getL10n(tester).medicationTypeCapsule).evaluate().isNotEmpty) {
+        foundNewType = true;
+        break;
+      }
+    }
+
+    // Final pump to ensure everything is settled
+    await tester.pumpAndSettle();
+
     // Verify type was updated - should now show Cápsula
     expect(find.text(getL10n(tester).medicationTypeCapsule), findsWidgets);
+
+    // Wait for any background tasks (like notification rescheduling) to complete
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
   });
 
   testWidgets('Should update medication frequency when editing', (WidgetTester tester) async {
@@ -229,11 +293,43 @@ void main() {
     // Additional pump to ensure navigation is complete
     await tester.pumpAndSettle();
 
+    // Check for confirmation message EARLY (before it disappears after 2 seconds)
+    expect(find.text(getL10n(tester).editFrequencyUpdated), findsWidgets);
+
     // Wait for main screen to complete its async operations (reload from DB)
     await waitForDatabase(tester);
 
+    // Additional pumps to ensure all UI updates are complete
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    // Wait actively for the frequency text to appear in the UI
+    bool foundNewFrequency = false;
+    for (int attempt = 0; attempt < 30 && !foundNewFrequency; attempt++) {
+      await tester.runAsync(() async {
+        await Future.delayed(const Duration(milliseconds: 200));
+      });
+      await tester.pump();
+
+      // Check if the new frequency is visible
+      if (find.text(getL10n(tester).editFrequencyUntilFinished).evaluate().isNotEmpty) {
+        foundNewFrequency = true;
+        break;
+      }
+    }
+
+    // Final pump to ensure everything is settled
+    await tester.pumpAndSettle();
+
     // Verify frequency was updated (short version "Hasta acabar")
     expect(find.text(getL10n(tester).editFrequencyUntilFinished), findsWidgets);
+
+    // Wait for any background tasks (like notification rescheduling) to complete
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
   });
 
   testWidgets('Should not save when edit is cancelled', (WidgetTester tester) async {

@@ -10,6 +10,7 @@ import '../../edit_medication_menu_screen.dart';
 import 'medication_options_modal.dart';
 import '../../medication_list/dialogs/refill_input_dialog.dart';
 import '../../medication_list/dialogs/manual_dose_input_dialog.dart';
+import '../medication_person_assignment_screen.dart';
 
 class MedicationCard extends StatefulWidget {
   final Medication medication;
@@ -37,8 +38,22 @@ class _MedicationCardState extends State<MedicationCard> {
           : null,
       onRefill: _refillMedication,
       onEdit: _editMedication,
+      onAssignPersons: _assignPersons,
       onDelete: _deleteMedication,
     );
+  }
+
+  void _assignPersons() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MedicationPersonAssignmentScreen(
+          medication: widget.medication,
+        ),
+      ),
+    );
+    // Reload medications after assignment
+    widget.onMedicationUpdated();
   }
 
   void _refillMedication() async {
@@ -286,8 +301,14 @@ class _MedicationCardState extends State<MedicationCard> {
     // Update in database
     await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-    // Reschedule notifications for this medication
-    await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+    // V19+: Reschedule notifications for all persons assigned to this medication
+    final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+    for (final person in persons) {
+      await NotificationService.instance.scheduleMedicationNotifications(
+        updatedMedication,
+        personId: person.id,
+      );
+    }
 
     // Reload medications
     widget.onMedicationUpdated();

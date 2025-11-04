@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -79,8 +81,9 @@ void main() {
     // Verify the debug menu is visible
     expect(find.byType(PopupMenuButton<String>), findsOneWidget);
 
-    // Wait for the SnackBar to disappear
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    // Wait for the SnackBar to disappear (avoid pumpAndSettle due to periodic timers)
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
 
     // Tap the title 5 more times to hide the debug menu
     await tapTextMultipleTimes(tester, getL10n(tester).mainScreenTitle);

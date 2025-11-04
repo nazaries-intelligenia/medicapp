@@ -113,8 +113,14 @@ class _EditDurationScreenState extends State<EditDurationScreen> {
 
       await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-      // Reschedule notifications
-      await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+      // V19+: Reschedule notifications for all assigned persons
+      final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+      for (final person in persons) {
+        await NotificationService.instance.scheduleMedicationNotifications(
+          updatedMedication,
+          personId: person.id,
+        );
+      }
 
       if (!mounted) return;
 

@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -80,7 +82,7 @@ void main() {
     expect(find.text(getL10n(tester).medicationTypeSyrup), findsWidgets);
   });
 
-  testWidgets('Should show error when adding duplicate medication', (WidgetTester tester) async {
+  testWidgets('Should allow reusing medication for same person (V19+)', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
@@ -90,23 +92,38 @@ void main() {
     await waitForDatabase(tester);
 
     // Wait for all animations and overlays (like SnackBars) to complete
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
-    // Try to add the same medication again
+    // V19+: In the multi-person architecture, medications can be reused.
+    // Try to add the same medication again (should proceed, not error)
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1500));
+    });
+    await tester.pump();
+    await tester.pump();
 
+    // Verify TextFormField exists before using .first
+    expect(find.byType(TextFormField), findsWidgets, reason: 'Navigation to add screen may have failed');
     await tester.enterText(find.byType(TextFormField).first, 'Paracetamol');
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
-    // Verify error message is shown
-    expect(find.text(getL10n(tester).validationDuplicateMedication), findsWidgets);
-    expect(find.text(getL10n(tester).addMedicationTitle), findsWidgets);
+    // V19+: Should proceed to duration screen instead of showing duplicate error
+    expect(find.text(getL10n(tester).medicationDurationTitle), findsWidgets);
   });
 
-  testWidgets('Duplicate validation should be case-insensitive', (WidgetTester tester) async {
+  testWidgets('Should allow reusing medication with different case (V19+)', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
@@ -116,18 +133,40 @@ void main() {
     await waitForDatabase(tester);
 
     // Wait for all animations and overlays (like SnackBars) to complete
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
+
+    // V19+: In the multi-person architecture, medications can be reused across people.
+    // The same medication for the same person is now allowed (they are assigned, not duplicated).
+    // This test needs to be updated to match the new behavior where duplicate checking
+    // is handled at the person-medication assignment level, not at the medication name level.
 
     // Try to add the same medication with different case
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 1500));
+    });
+    await tester.pump();
+    await tester.pump();
 
+    // Verify TextFormField exists before using .first
+    expect(find.byType(TextFormField), findsWidgets, reason: 'Navigation to add screen may have failed');
     await tester.enterText(find.byType(TextFormField).first, 'IBUPROFENO');
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
-    // Verify error message is shown
-    expect(find.text(getL10n(tester).validationDuplicateMedication), findsWidgets);
+    // V19+: The behavior has changed - medications can be reused and assigned to people.
+    // Instead of showing a duplicate error, the system proceeds to the duration screen.
+    // Verify we navigated to duration screen (not blocked by duplicate error)
+    expect(find.text(getL10n(tester).medicationDurationTitle), findsWidgets);
   });
 }

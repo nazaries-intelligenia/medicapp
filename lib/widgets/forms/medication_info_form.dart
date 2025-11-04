@@ -12,6 +12,8 @@ class MedicationInfoForm extends StatelessWidget {
   final List<Medication> existingMedications;
   final String? existingMedicationId;
   final bool showDescription;
+  final ValueChanged<Medication?>? onMedicationSelected;
+  final bool validateDuplicates;
 
   const MedicationInfoForm({
     super.key,
@@ -21,14 +23,32 @@ class MedicationInfoForm extends StatelessWidget {
     required this.existingMedications,
     this.existingMedicationId,
     this.showDescription = true,
+    this.onMedicationSelected,
+    this.validateDuplicates = false,
   });
 
-  bool _medicationExists(String name) {
-    return existingMedications.any(
-      (medication) =>
-          medication.id != existingMedicationId &&
-          medication.name.toLowerCase() == name.toLowerCase(),
-    );
+  /// Get unique medication names (ignoring current medication being edited)
+  List<String> _getUniqueMedicationNames() {
+    final names = <String>{};
+    for (final medication in existingMedications) {
+      if (medication.id != existingMedicationId) {
+        names.add(medication.name);
+      }
+    }
+    return names.toList()..sort();
+  }
+
+  /// Get a medication by name (returns first match)
+  Medication? _getMedicationByName(String name) {
+    try {
+      return existingMedications.firstWhere(
+        (medication) =>
+            medication.id != existingMedicationId &&
+            medication.name.toLowerCase() == name.toLowerCase(),
+      );
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -56,7 +76,7 @@ class MedicationInfoForm extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // Campo de nombre
+        // Campo de nombre con autocompletado
         if (!showDescription)
           Text(
             l10n.medicationNameLabel,
@@ -65,28 +85,133 @@ class MedicationInfoForm extends StatelessWidget {
                 ),
           ),
         if (!showDescription) const SizedBox(height: 16),
-        TextFormField(
-          controller: nameController,
-          decoration: InputDecoration(
-            labelText: l10n.medicationNameLabel,
-            hintText: l10n.medicationNameHint,
-            prefixIcon: const Icon(Icons.medication),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            filled: showDescription,
-          ),
-          textCapitalization: TextCapitalization.words,
-          validator: (value) {
-            if (value == null || value.trim().isEmpty) {
-              return l10n.validationMedicationName;
+        Autocomplete<String>(
+          optionsBuilder: (TextEditingValue textEditingValue) {
+            if (textEditingValue.text.isEmpty) {
+              return const Iterable<String>.empty();
+            }
+            final uniqueNames = _getUniqueMedicationNames();
+            return uniqueNames.where((String name) {
+              return name.toLowerCase().contains(textEditingValue.text.toLowerCase());
+            });
+          },
+          onSelected: (String selectedName) {
+            nameController.text = selectedName;
+            // Notify parent that a medication was selected
+            final medication = _getMedicationByName(selectedName);
+            if (onMedicationSelected != null && medication != null) {
+              onMedicationSelected!(medication);
+              // Also update the type
+              onTypeChanged(medication.type);
+            }
+          },
+          fieldViewBuilder: (
+            BuildContext context,
+            TextEditingController fieldController,
+            FocusNode focusNode,
+            VoidCallback onFieldSubmitted,
+          ) {
+            // Sync with the external controller
+            if (nameController.text.isNotEmpty && fieldController.text.isEmpty) {
+              fieldController.text = nameController.text;
             }
 
-            if (_medicationExists(value.trim())) {
-              return l10n.validationDuplicateMedication;
-            }
+            // Keep both controllers in sync
+            fieldController.addListener(() {
+              if (fieldController.text != nameController.text) {
+                nameController.text = fieldController.text;
+              }
+            });
 
-            return null;
+            return TextFormField(
+              controller: fieldController,
+              focusNode: focusNode,
+              decoration: InputDecoration(
+                labelText: l10n.medicationNameLabel,
+                hintText: l10n.medicationNameHint,
+                prefixIcon: const Icon(Icons.medication),
+                suffixIcon: fieldController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          fieldController.clear();
+                          nameController.clear();
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: showDescription,
+              ),
+              textCapitalization: TextCapitalization.words,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return l10n.validationMedicationName;
+                }
+
+                // Check for duplicate medication names (case-insensitive)
+                // Only validate duplicates in edit mode (not when adding new medications)
+                if (validateDuplicates) {
+                  final trimmedValue = value.trim();
+                  final isDuplicate = existingMedications.any((medication) =>
+                    medication.id != existingMedicationId &&
+                    medication.name.toLowerCase() == trimmedValue.toLowerCase()
+                  );
+
+                  if (isDuplicate) {
+                    return l10n.validationDuplicateMedication;
+                  }
+                }
+
+                return null;
+              },
+              onFieldSubmitted: (value) => onFieldSubmitted(),
+            );
+          },
+          optionsViewBuilder: (
+            BuildContext context,
+            AutocompleteOnSelected<String> onSelected,
+            Iterable<String> options,
+          ) {
+            return Align(
+              alignment: Alignment.topLeft,
+              child: Material(
+                elevation: 4.0,
+                borderRadius: BorderRadius.circular(12),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 200,
+                    maxWidth: 400,
+                  ),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      final String option = options.elementAt(index);
+                      final medication = _getMedicationByName(option);
+                      return ListTile(
+                        leading: Icon(
+                          medication?.type.icon ?? Icons.medication,
+                          color: medication?.type.getColor(context),
+                        ),
+                        title: Text(option),
+                        subtitle: medication != null
+                            ? Text(
+                                medication.type.displayName,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              )
+                            : null,
+                        onTap: () {
+                          onSelected(option);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            );
           },
         ),
         SizedBox(height: showDescription ? 32 : 24),

@@ -29,7 +29,7 @@ void main() {
             .build();
 
         // Schedule medication notifications (should include automatic "before" fasting notification)
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // In test mode, this should complete without errors
         // The notification would be scheduled for 07:00 (1 hour before 08:00)
@@ -51,7 +51,7 @@ void main() {
 
         // Should schedule fasting notifications for all three doses
         // 07:30, 15:30, 23:30
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         expect(true, true);
       });
@@ -68,7 +68,7 @@ void main() {
               .withFasting(type: 'before', duration: duration)
               .build();
 
-          await service.scheduleMedicationNotifications(medication);
+          await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
         }
 
         expect(true, true);
@@ -83,7 +83,7 @@ void main() {
             .withFasting(type: 'before', duration: 60)
             .build();
 
-        await service.scheduleMedicationNotifications(original);
+        await service.scheduleMedicationNotifications(original, personId: 'test-person-id');
 
         // Update to different time and duration
         final updated = MedicationBuilder()
@@ -95,7 +95,7 @@ void main() {
             .build();
 
         // Reschedule should cancel old and create new notifications
-        await service.scheduleMedicationNotifications(updated);
+        await service.scheduleMedicationNotifications(updated, personId: 'test-person-id');
 
         expect(true, true);
       });
@@ -115,7 +115,7 @@ void main() {
             .build();
 
         // Should handle overlapping fasting periods gracefully
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         expect(true, true);
       });
@@ -133,7 +133,7 @@ void main() {
 
         // Schedule medication notifications
         // Should NOT schedule any fasting notification for "after" type
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Should complete without errors
         expect(true, true);
@@ -149,7 +149,7 @@ void main() {
             .build();
 
         // Schedule regular medication notifications (no fasting notification yet)
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Now register a dose at a specific time
         final actualDoseTime = DateTime(2025, 10, 16, 10, 30); // Took at 10:30
@@ -159,6 +159,7 @@ void main() {
           service.scheduleDynamicFastingNotification(
             medication: medication,
             actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
           ),
           completes,
         );
@@ -179,6 +180,7 @@ void main() {
           service.scheduleDynamicFastingNotification(
             medication: medication,
             actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
           ),
           completes,
         );
@@ -200,6 +202,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         // Notification should be scheduled for 12:30 (10:30 + 2 hours)
@@ -227,6 +230,7 @@ void main() {
             service.scheduleDynamicFastingNotification(
               medication: medication,
               actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
             ),
             completes,
           );
@@ -249,6 +253,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         expect(true, true);
@@ -270,6 +275,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         expect(true, true);
@@ -290,6 +296,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         expect(true, true);
@@ -305,7 +312,7 @@ void main() {
             .build();
 
         // Only schedule regular notifications
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Don't call scheduleDynamicFastingNotification
         // Therefore, no "after" fasting notification should exist
@@ -332,6 +339,7 @@ void main() {
           service.scheduleDynamicFastingNotification(
             medication: medication,
             actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
           ),
           completes,
         );
@@ -354,6 +362,7 @@ void main() {
           service.scheduleDynamicFastingNotification(
             medication: medication,
             actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
           ),
           completes,
         );
@@ -372,6 +381,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         expect(true, true);
@@ -390,6 +400,7 @@ void main() {
         await service.scheduleDynamicFastingNotification(
           medication: medication,
           actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
         );
 
         expect(true, true);
@@ -404,7 +415,7 @@ void main() {
             .withFasting(type: 'before', duration: 60, notify: false) // Notifications disabled
             .build();
 
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Should not schedule fasting notification
         expect(true, true);
@@ -419,7 +430,7 @@ void main() {
             .withFastingDisabled() // No fasting required
             .build();
 
-        await service.scheduleMedicationNotifications(medication);
+        await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
         // Should not schedule fasting notification
         expect(true, true);
@@ -449,6 +460,7 @@ void main() {
           await service.scheduleDynamicFastingNotification(
             medication: medication,
             actualDoseTime: actualDoseTime,
+        personId: 'test-person-id',
           );
         }
 
@@ -477,8 +489,8 @@ void main() {
             .build();
 
         // Schedule both
-        await service.scheduleMedicationNotifications(beforeMed);
-        await service.scheduleMedicationNotifications(afterMed);
+        await service.scheduleMedicationNotifications(beforeMed, personId: 'test-person-id');
+        await service.scheduleMedicationNotifications(afterMed, personId: 'test-person-id');
 
         // Only "before" should have automatic notification
         expect(true, true);

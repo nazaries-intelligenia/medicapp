@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -43,9 +45,24 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
+    // V19+: Wait for app to fully load (person initialization)
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Tap FAB to navigate directly to add medication
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump(); // Start navigation
+    await tester.pump(const Duration(milliseconds: 300)); // Allow route animation
+
+    // Wait for navigation and form to load
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
 
     // Enter name (use .first to get the name field, not the frequency field)
     await tester.enterText(find.byType(TextFormField).first, 'Ibuprofeno');
@@ -53,7 +70,11 @@ void main() {
     // Scroll to and tap continue
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
     // Verify we're on the treatment duration screen
     expect(find.text(getL10n(tester).medicationDurationTitle), findsWidgets);
@@ -68,14 +89,31 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
+    // V19+: Wait for app to fully load (person initialization)
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Start adding a medication
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
 
     await tester.enterText(find.byType(TextFormField).first, 'TestMed');
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
     // Verify we're on the duration/treatment type screen
     expect(find.text(getL10n(tester).medicationDurationTitle), findsWidgets);
@@ -83,7 +121,11 @@ void main() {
     // Go back from duration screen
     await scrollToWidget(tester, find.text(getL10n(tester).btnBack));
     await tester.tap(find.text(getL10n(tester).btnBack));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
 
     // Verify we're back on the add medication screen (step 1)
     expect(find.text(getL10n(tester).addMedicationTitle), findsWidgets);
@@ -95,9 +137,22 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
+    // V19+: Wait for app to fully load (person initialization)
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Tap the floating action button
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
 
     // Verify we're directly on the add medication screen (no modal)
     // Navigation to other sections (Pastillero, Botiquín, Historial) is now via BottomNavigationBar
@@ -110,9 +165,22 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
+    // V19+: Wait for app to fully load (person initialization)
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
+    await tester.pump();
+
     // Tap FAB to navigate to add medication
     await tester.tap(find.byIcon(Icons.add));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 1));
+    });
+    await tester.pump();
+    await tester.pump();
 
     // Verify we're on the add medication screen
     expect(find.text(getL10n(tester).addMedicationTitle), findsWidgets);
@@ -141,6 +209,13 @@ void main() {
     // Build our app
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
+
+    // V19+: Wait for app to fully load (person initialization)
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(seconds: 2));
+    });
+    await tester.pump();
+    await tester.pump();
 
     // Verify the navigation sections are present with short labels
     expect(find.text(getL10n(tester).navMedicationShort), findsWidgets);

@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test
@@ -71,8 +73,8 @@ void main() {
     // Note: The deletion success SnackBar is shown in MedicineCabinetScreen
     // and disappears when we navigate back, so we can't verify it here
 
-    // Verify empty state is shown
-    expect(find.text(getL10n(tester).mainScreenEmptyTitle), findsWidgets);
+    // V19+: Verify empty state is shown (using noMedicationsRegistered)
+    expect(find.text(getL10n(tester).noMedicationsRegistered), findsWidgets);
   });
 
   testWidgets('Should cancel deletion when cancel button is pressed', (WidgetTester tester) async {
