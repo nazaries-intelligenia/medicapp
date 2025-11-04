@@ -2108,5 +2108,5 @@ class AppLocalizationsGl extends AppLocalizations {
   String get suspended => 'Suspendido';
 
   @override
-  String get activeFastingPeriodsTitle => 'Ayunos Activos';
+  String get activeFastingPeriodsTitle => 'Xaxúns Activos';
 }

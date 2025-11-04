@@ -2107,5 +2107,5 @@ class AppLocalizationsCa extends AppLocalizations {
   String get suspended => 'Suspès';
 
   @override
-  String get activeFastingPeriodsTitle => 'Ayunos Activos';
+  String get activeFastingPeriodsTitle => 'Dejunis Actius';
 }
