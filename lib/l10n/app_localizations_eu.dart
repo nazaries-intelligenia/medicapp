@@ -2109,5 +2109,5 @@ class AppLocalizationsEu extends AppLocalizations {
   String get suspended => 'Etenda';
 
   @override
-  String get activeFastingPeriodsTitle => 'Ayunos Activos';
+  String get activeFastingPeriodsTitle => 'Barau Aldia Aktiboak';
 }
