@@ -30,12 +30,13 @@ void main() {
           .build();
 
       // Schedule initial notifications normally
-      await notificationService.scheduleMedicationNotifications(medication);
+      await notificationService.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Simulate the scenario after taking dose early at 13:45 (before scheduled time of 14:00)
       // When rescheduling after taking a dose, excludeToday should be true
       await notificationService.scheduleMedicationNotifications(
         medication,
+        personId: 'test-person-id',
         excludeToday: true,
       );
 
@@ -63,6 +64,7 @@ void main() {
       // Schedule with excludeToday=true (simulating post-dose rescheduling)
       await notificationService.scheduleMedicationNotifications(
         medication,
+        personId: 'test-person-id',
         excludeToday: true,
       );
 
@@ -88,6 +90,7 @@ void main() {
       // Schedule with excludeToday=true
       await notificationService.scheduleMedicationNotifications(
         medication,
+        personId: 'test-person-id',
         excludeToday: true,
       );
 
@@ -108,6 +111,7 @@ void main() {
       // Schedule with excludeToday=true
       await notificationService.scheduleMedicationNotifications(
         medication,
+        personId: 'test-person-id',
         excludeToday: true,
       );
 
@@ -138,6 +142,7 @@ void main() {
       // After fix: with excludeToday=true parameter, it always schedules for tomorrow
       await notificationService.scheduleMedicationNotifications(
         medication,
+        personId: 'test-person-id',
         excludeToday: true,
       );
 

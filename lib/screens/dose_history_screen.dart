@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/dose_history_entry.dart';
 import '../models/medication.dart';
+import '../models/person.dart';
 import '../database/database_helper.dart';
 import '../services/dose_history_service.dart';
 import 'dose_history/widgets/dose_history_card.dart';
@@ -19,11 +20,16 @@ class DoseHistoryScreen extends StatefulWidget {
   State<DoseHistoryScreen> createState() => _DoseHistoryScreenState();
 }
 
-class _DoseHistoryScreenState extends State<DoseHistoryScreen> {
+class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerProviderStateMixin {
   List<DoseHistoryEntry> _historyEntries = [];
   List<Medication> _medications = [];
+  List<Person> _persons = [];
   bool _isLoading = true;
   bool _hasChanges = false; // Track if any changes were made
+
+  // Tab controller for person tabs
+  TabController? _tabController;
+  String? _selectedPersonId; // null means "All"
 
   // Filter state
   String? _selectedMedicationId;
@@ -44,40 +50,87 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> {
     _loadData();
   }
 
+  @override
+  void dispose() {
+    _tabController?.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
+
+    // Load persons for tabs
+    var persons = await DatabaseHelper.instance.getAllPersons();
+
+    // Sort persons: default person first, then alphabetically by name
+    persons.sort((a, b) {
+      if (a.isDefault && !b.isDefault) return -1;
+      if (!a.isDefault && b.isDefault) return 1;
+      return a.name.compareTo(b.name);
+    });
+
+    // Initialize tab controller if not already done or if person count changed
+    if (_tabController == null || _tabController!.length != persons.length + 1) {
+      _tabController?.dispose();
+      _tabController = TabController(
+        length: persons.length + 1, // +1 for "All" tab
+        vsync: this,
+      );
+      _tabController!.addListener(_onTabChanged);
+      _selectedPersonId = null; // Start with "All" tab
+    }
 
     // Load medications for filter dropdown
     final medications = await DatabaseHelper.instance.getAllMedications();
 
-    // Load history entries
-    List<DoseHistoryEntry> entries;
+    // Load history entries - filter by selected person
+    List<DoseHistoryEntry> allEntries;
     if (_startDate != null && _endDate != null) {
-      entries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+      allEntries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
         startDate: _startDate!,
         endDate: _endDate!,
         medicationId: _selectedMedicationId,
       );
     } else if (_selectedMedicationId != null) {
-      entries = await DatabaseHelper.instance.getDoseHistoryForMedication(_selectedMedicationId!);
+      allEntries = await DatabaseHelper.instance.getDoseHistoryForMedication(_selectedMedicationId!);
     } else {
-      entries = await DatabaseHelper.instance.getAllDoseHistory();
+      allEntries = await DatabaseHelper.instance.getAllDoseHistory();
     }
 
-    // Load statistics
+    // Filter entries by selected person (if not "All")
+    final entries = _selectedPersonId == null
+        ? allEntries
+        : allEntries.where((e) => e.personId == _selectedPersonId).toList();
+
+    // Load statistics - filter by selected person
     final stats = await DatabaseHelper.instance.getDoseStatistics(
       medicationId: _selectedMedicationId,
       startDate: _startDate,
       endDate: _endDate,
+      personId: _selectedPersonId, // Filter stats by person
     );
 
     if (mounted) {
       setState(() {
+        _persons = persons;
         _medications = medications;
         _historyEntries = entries;
         _statistics = stats;
         _isLoading = false;
       });
+    }
+  }
+
+  void _onTabChanged() {
+    if (!_tabController!.indexIsChanging) {
+      // Tab index 0 = "All", Tab index 1+ = specific person
+      final newPersonId = _tabController!.index == 0 ? null : _persons[_tabController!.index - 1].id;
+      if (newPersonId != _selectedPersonId) {
+        setState(() {
+          _selectedPersonId = newPersonId;
+        });
+        _loadData();
+      }
     }
   }
 
@@ -136,6 +189,28 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> {
             tooltip: 'Filtrar',
           ),
         ],
+        bottom: _tabController == null
+            ? null
+            : TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabs: [
+                  Tab(text: 'Todos'), // "All" tab
+                  ..._persons.map((person) => Tab(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (person.isDefault)
+                              const Padding(
+                                padding: EdgeInsets.only(right: 4),
+                                child: Icon(Icons.person, size: 16),
+                              ),
+                            Text(person.name),
+                          ],
+                        ),
+                      )),
+                ],
+              ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import 'database_test_helper.dart';
 
 /// Helper function to get localized strings in tests.
 /// This must be called after the widget tree is built (after pumpWidget).
@@ -26,9 +27,13 @@ AppLocalizations getL10n(WidgetTester tester) {
 }
 
 /// Helper function to wait for database operations to complete.
+/// Also ensures a default person exists (required for v19+ tests).
 Future<void> waitForDatabase(WidgetTester tester) async {
   // Use runAsync to allow async operations to complete
   await tester.runAsync(() async {
+    // Ensure default person exists (v19+ requirement)
+    await DatabaseTestHelper.ensureDefaultPerson();
+
     // Give time for database operations (increased for additional async queries)
     await Future.delayed(const Duration(milliseconds: 2000));
   });
@@ -109,14 +114,36 @@ Future<void> addMedicationWithDuration(
   int dosageIntervalHours = 8, // Default to 8 hours
   String stockQuantity = '0', // Default stock quantity
 }) async {
+  // Wait for the FAB to be available (after persons load)
+  // Use runAsync to allow async operations (like loading persons) to complete
+  await tester.runAsync(() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+  });
+  await tester.pump();
+  await tester.pump();
+
+  // Verify FAB exists before tapping
+  expect(find.byIcon(Icons.add), findsOneWidget, reason: 'FAB not found - UI may not be ready');
+
   // Tap the floating action button to go directly to add medication screen
   await tester.tap(find.byIcon(Icons.add));
   await tester.pump(); // Start navigation
-  await tester.pump(const Duration(milliseconds: 300)); // Allow navigation
-  await tester.pump(); // Complete frame
+
+  // Use runAsync to allow navigation and async database operations to complete
+  await tester.runAsync(() async {
+    await Future.delayed(const Duration(milliseconds: 1500));
+  });
+  await tester.pump(); // Rebuild after async operations
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 300));
+  await tester.pump();
+
+  // Verify we're on the add medication screen
+  final textFields = find.byType(TextFormField);
+  expect(textFields, findsWidgets, reason: 'No TextFormField found - navigation may have failed');
 
   // Enter medication name (field 0)
-  await tester.enterText(find.byType(TextFormField).first, name);
+  await tester.enterText(textFields.first, name);
   await tester.pumpAndSettle();
 
   // Select type if specified
@@ -245,10 +272,33 @@ Future<void> addMedicationWithDuration(
   await tester.pump(const Duration(milliseconds: 100));
 
   // Wait for main screen to reload medications from database
+  // The _loadMedications() method does multiple async operations:
+  // 1. Database query to get medications
+  // 2. Notification sync
+  // 3. Another database query for doses today
+  // 4. Filter and setState
+  // We need to wait for all of this to complete and the UI to rebuild
   await tester.runAsync(() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 2000));
   });
   await tester.pump();
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 1000));
+  await tester.pump();
+
+  // Wait specifically for the medication to appear in the UI
+  // This is more robust than blind delays
+  final medicationFinder = find.text(name);
+  for (int i = 0; i < 10; i++) {
+    if (medicationFinder.evaluate().isNotEmpty) {
+      break;
+    }
+    // Use runAsync to allow database queries and other async operations to complete
+    await tester.runAsync(() async {
+      await Future.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pump();
+  }
 
   // Wait for SnackBar to disappear (default duration is 4 seconds)
   // This ensures that the FAB is not blocked when this helper returns

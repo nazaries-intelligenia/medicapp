@@ -28,6 +28,8 @@ void main() {
     DatabaseHelper.setInMemoryDatabase(true);
     // Enable test mode for notifications (disables actual notifications)
     NotificationService.instance.enableTestMode();
+    // Ensure default person exists (V19+ requirement) BEFORE starting the app
+    await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   // Clean up after each test

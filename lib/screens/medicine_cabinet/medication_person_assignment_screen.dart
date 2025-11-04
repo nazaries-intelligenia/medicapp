@@ -62,9 +62,11 @@ class _MedicationPersonAssignmentScreenState
 
   Future<void> _assignPerson(Person person) async {
     try {
+      // V19+: When assigning medication to person, use medication's current schedule as template
       await DatabaseHelper.instance.assignMedicationToPerson(
         personId: person.id,
         medicationId: widget.medication.id,
+        scheduleData: widget.medication, // Use current medication schedule as template
       );
 
       await _loadData();

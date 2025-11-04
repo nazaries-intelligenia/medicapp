@@ -14,8 +14,9 @@ class DoseHistoryService {
   ///
   /// Throws [MedicationNotFoundException] if medication doesn't exist
   static Future<void> deleteHistoryEntry(DoseHistoryEntry entry) async {
-    // Get the medication
-    final medication = await DatabaseHelper.instance.getMedication(entry.medicationId);
+    // Get the medication for the person (v19+ person-specific lookup)
+    final medications = await DatabaseHelper.instance.getMedicationsForPerson(entry.personId);
+    final medication = medications.where((m) => m.id == entry.medicationId).firstOrNull;
 
     if (medication == null) {
       throw MedicationNotFoundException(entry.medicationId);
@@ -62,7 +63,10 @@ class DoseHistoryService {
         endDate: medication.endDate,
       );
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: entry.personId,
+      );
     }
 
     // Delete history entry

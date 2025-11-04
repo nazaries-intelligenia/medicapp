@@ -97,8 +97,14 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
       // Save to database
       await DatabaseHelper.instance.insertMedication(newMedication);
 
-      // Schedule notifications
-      await NotificationService.instance.scheduleMedicationNotifications(newMedication);
+      // V19+: Schedule notifications for all persons assigned to this medication
+      final persons = await DatabaseHelper.instance.getPersonsForMedication(newMedication.id);
+      for (final person in persons) {
+        await NotificationService.instance.scheduleMedicationNotifications(
+          newMedication,
+          personId: person.id,
+        );
+      }
 
       if (!mounted) return;
 

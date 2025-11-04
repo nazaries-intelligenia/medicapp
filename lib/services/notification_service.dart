@@ -38,6 +38,7 @@ class NotificationService {
   // Store pending notification data when context is not available
   String? _pendingMedicationId;
   String? _pendingDoseTime;
+  String? _pendingPersonId; // V19+: Store pending personId
 
   NotificationService._init();
 
@@ -266,15 +267,16 @@ class NotificationService {
       return;
     }
 
-    // Parse payload: "medicationId|doseIndex"
+    // Parse payload: "medicationId|doseIndex|personId" (V19+)
     final parts = response.payload!.split('|');
-    if (parts.length != 2) {
-      print('Invalid payload format: ${response.payload}');
+    if (parts.length != 3) {
+      print('Invalid payload format (expected 3 parts): ${response.payload}');
       return;
     }
 
     final medicationId = parts[0];
     final doseIndexStr = parts[1];
+    final personId = parts[2];
 
     // For postponed notifications, the format is "medicationId|doseTime"
     // where doseTime is the actual time string (HH:mm)
@@ -290,9 +292,10 @@ class NotificationService {
         return;
       }
 
-      // Load medication to get the dose time
+      // Load medication to get the dose time (v19+ person-specific lookup)
       try {
-        final medication = await DatabaseHelper.instance.getMedication(medicationId);
+        final medications = await DatabaseHelper.instance.getMedicationsForPerson(personId);
+        final medication = medications.where((m) => m.id == medicationId).firstOrNull;
 
         if (medication == null) {
           print('⚠️ Medication not found for notification ID ${response.id}');
@@ -321,12 +324,13 @@ class NotificationService {
       }
     }
 
-    // Try to navigate with retry logic
-    await _navigateWithRetry(medicationId, doseTime);
+    // Try to navigate with retry logic (V19+: now includes personId)
+    await _navigateWithRetry(medicationId, doseTime, personId);
   }
 
   /// Navigate to DoseActionScreen with retry logic for when app is starting
-  Future<void> _navigateWithRetry(String medicationId, String doseTime, {int attempt = 1}) async {
+  /// V19+: Now includes personId parameter
+  Future<void> _navigateWithRetry(String medicationId, String doseTime, String personId, {int attempt = 1}) async {
     print('📱 Attempting navigation (attempt $attempt) for medication $medicationId at $doseTime');
 
     final context = navigatorKey.currentContext;
@@ -339,12 +343,14 @@ class NotificationService {
             builder: (context) => DoseActionScreen(
               medicationId: medicationId,
               doseTime: doseTime,
+              personId: personId, // V19+: Pass personId to screen
             ),
           ),
         );
         // Clear pending notification since we successfully navigated
         _pendingMedicationId = null;
         _pendingDoseTime = null;
+        _pendingPersonId = null; // V19+: Clear pending personId
         print('✅ Navigation successful, screen was shown');
         return;
       } catch (e) {
@@ -360,27 +366,31 @@ class NotificationService {
       final delayMs = 200 * attempt; // Increased delay: 200ms, 400ms, 600ms, ...
       print('⏳ Will retry in ${delayMs}ms (attempt ${attempt + 1} of 10)');
       await Future.delayed(Duration(milliseconds: delayMs));
-      await _navigateWithRetry(medicationId, doseTime, attempt: attempt + 1);
+      await _navigateWithRetry(medicationId, doseTime, personId, attempt: attempt + 1); // V19+: Pass personId in retry
     } else {
       // After 10 attempts, store as pending notification
       print('⚠️ Failed to navigate after 10 attempts, storing as pending notification');
       _pendingMedicationId = medicationId;
       _pendingDoseTime = doseTime;
+      _pendingPersonId = personId; // V19+: Store pending personId
     }
   }
 
   /// Process pending notification if any exists
   /// Should be called after the app is fully initialized
+  /// V19+: Now includes personId handling
   Future<void> processPendingNotification() async {
-    if (_pendingMedicationId != null && _pendingDoseTime != null) {
-      print('🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime');
+    if (_pendingMedicationId != null && _pendingDoseTime != null && _pendingPersonId != null) {
+      print('🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime | $_pendingPersonId');
 
       final medicationId = _pendingMedicationId!;
       final doseTime = _pendingDoseTime!;
+      final personId = _pendingPersonId!;
 
       // Clear pending state before attempting navigation
       _pendingMedicationId = null;
       _pendingDoseTime = null;
+      _pendingPersonId = null; // V19+: Clear pending personId
 
       // Wait a bit longer to ensure the app is fully ready
       await Future.delayed(const Duration(milliseconds: 1000));
@@ -395,6 +405,7 @@ class NotificationService {
               builder: (context) => DoseActionScreen(
                 medicationId: medicationId,
                 doseTime: doseTime,
+                personId: personId, // V19+: Pass personId to screen
               ),
             ),
           );
@@ -407,7 +418,7 @@ class NotificationService {
         print('❌ Context still not available for pending notification (context: $context, mounted: ${context?.mounted})');
         // Try one more time with retry logic
         print('🔄 Attempting to navigate with retry logic...');
-        await _navigateWithRetry(medicationId, doseTime, attempt: 1);
+        await _navigateWithRetry(medicationId, doseTime, personId, attempt: 1);
       }
     } else {
       print('ℹ️ No pending notifications to process');
@@ -415,8 +426,12 @@ class NotificationService {
   }
 
   /// Schedule notifications for a medication based on its dose times
+  /// V19+: Now requires personId to schedule notifications for specific person
   /// If [excludeToday] is true, notifications will not be scheduled for today (useful when a dose was already taken)
-  Future<void> scheduleMedicationNotifications(Medication medication, {bool excludeToday = false}) async {
+  Future<void> scheduleMedicationNotifications(
+    Medication medication,
+    {required String personId, bool excludeToday = false}
+  ) async {
     // Skip in test mode
     if (_isTestMode) return;
 
@@ -471,20 +486,20 @@ class NotificationService {
     // Different scheduling logic based on duration type
     switch (medication.durationType) {
       case TreatmentDurationType.specificDates:
-        await _scheduleSpecificDatesNotifications(medication);
+        await _scheduleSpecificDatesNotifications(medication, personId);
         break;
       case TreatmentDurationType.weeklyPattern:
-        await _scheduleWeeklyPatternNotifications(medication);
+        await _scheduleWeeklyPatternNotifications(medication, personId);
         break;
       default:
         // For everyday and untilFinished: use daily recurring notifications
-        await _scheduleDailyNotifications(medication, excludeToday: excludeToday);
+        await _scheduleDailyNotifications(medication, personId, excludeToday: excludeToday);
         break;
     }
 
     // Schedule fasting notifications if required
     if (medication.requiresFasting && medication.notifyFasting) {
-      await _scheduleFastingNotifications(medication);
+      await _scheduleFastingNotifications(medication, personId);
     }
 
     // Verify notifications were scheduled
@@ -492,9 +507,27 @@ class NotificationService {
     print('Total pending notifications after scheduling: ${pending.length}');
   }
 
+  /// Helper method to generate notification title based on person
+  /// V19+: Only shows person name in title if person is not the default user
+  String buildNotificationTitle(String? personName, bool isDefault, {String suffix = ''}) {
+    if (isDefault) {
+      // Default user: don't show name
+      return suffix.isEmpty ? '💊 Hora de tomar medicamento' : '💊 Hora de tomar medicamento $suffix';
+    } else {
+      // Other users: show name in title
+      final name = personName ?? 'Usuario';
+      return suffix.isEmpty ? '💊 $name - Hora de tomar medicamento' : '💊 $name - Hora de tomar medicamento $suffix';
+    }
+  }
+
   /// Schedule daily recurring notifications (for everyday and untilFinished)
-  Future<void> _scheduleDailyNotifications(Medication medication, {bool excludeToday = false}) async {
+  /// V19+: Now requires personId for per-person notification scheduling
+  Future<void> _scheduleDailyNotifications(Medication medication, String personId, {bool excludeToday = false}) async {
     final now = tz.TZDateTime.now(tz.local);
+
+    // V19+: Get person for notification title logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final isDefault = person?.isDefault ?? false;
 
     // Phase 2: If treatment has an end date, schedule individual notifications for each day
     // Otherwise, use recurring daily notifications
@@ -541,16 +574,16 @@ class NotificationService {
 
           print('✅ Scheduling notification for: ${scheduledDate} (${doseTime})');
 
-          // Generate unique ID for this specific date and dose
+          // Generate unique ID for this specific date and dose (V19+: includes personId)
           final dateString = '${targetDate.year}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}';
-          final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i);
+          final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i, personId);
 
           await _scheduleOneTimeNotification(
             id: notificationId,
-            title: '💊 Hora de tomar tu medicamento',
+            title: buildNotificationTitle(person?.name, isDefault), // V19+: Conditional person name
             body: '${medication.name} - ${medication.type.displayName}',
             scheduledDate: scheduledDate,
-            payload: '${medication.id}|$i',
+            payload: '${medication.id}|$i|$personId', // V19+: Now includes personId
           );
         }
       }
@@ -564,18 +597,18 @@ class NotificationService {
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
 
-        // Generate unique ID for this dose
-        final notificationId = _generateNotificationId(medication.id, i);
+        // Generate unique ID for this dose (V19+: includes personId)
+        final notificationId = _generateNotificationId(medication.id, i, personId);
 
         print('Scheduling recurring notification ID $notificationId for ${medication.name} at $hour:$minute daily');
 
         await _scheduleNotification(
           id: notificationId,
-          title: '💊 Hora de tomar tu medicamento',
+          title: buildNotificationTitle(person?.name, isDefault), // V19+: Conditional person name
           body: '${medication.name} - ${medication.type.displayName}',
           hour: hour,
           minute: minute,
-          payload: '${medication.id}|$i',
+          payload: '${medication.id}|$i|$personId', // V19+: Now includes personId
           excludeToday: excludeToday,
         );
       }
@@ -583,13 +616,18 @@ class NotificationService {
   }
 
   /// Schedule notifications for specific dates
-  Future<void> _scheduleSpecificDatesNotifications(Medication medication) async {
+  /// V19+: Now requires personId for per-person notification scheduling
+  Future<void> _scheduleSpecificDatesNotifications(Medication medication, String personId) async {
     if (medication.selectedDates == null || medication.selectedDates!.isEmpty) {
       print('No specific dates selected for ${medication.name}');
       return;
     }
 
     final now = tz.TZDateTime.now(tz.local);
+
+    // V19+: Get person for notification title logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final isDefault = person?.isDefault ?? false;
 
     for (final dateString in medication.selectedDates!) {
       // Parse date (format: yyyy-MM-dd)
@@ -629,30 +667,35 @@ class NotificationService {
           continue;
         }
 
-        // Generate unique ID for this specific date and dose
-        final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i);
+        // Generate unique ID for this specific date and dose (V19+: includes personId)
+        final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i, personId);
 
         print('Scheduling specific date notification ID $notificationId for ${medication.name} on $dateString at $hour:$minute');
 
         await _scheduleOneTimeNotification(
           id: notificationId,
-          title: '💊 Hora de tomar tu medicamento',
+          title: buildNotificationTitle(person?.name, isDefault), // V19+: Conditional person name
           body: '${medication.name} - ${medication.type.displayName}',
           scheduledDate: scheduledDate,
-          payload: '${medication.id}|$i',
+          payload: '${medication.id}|$i|$personId', // V19+: Now includes personId
         );
       }
     }
   }
 
   /// Schedule notifications for weekly pattern
-  Future<void> _scheduleWeeklyPatternNotifications(Medication medication) async {
+  /// V19+: Now requires personId for per-person notification scheduling
+  Future<void> _scheduleWeeklyPatternNotifications(Medication medication, String personId) async{
     if (medication.weeklyDays == null || medication.weeklyDays!.isEmpty) {
       print('No weekly days selected for ${medication.name}');
       return;
     }
 
     final now = tz.TZDateTime.now(tz.local);
+
+    // V19+: Get person for notification title logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final isDefault = person?.isDefault ?? false;
 
     // Phase 2: If treatment has an end date, schedule individual occurrences until end date
     // Otherwise, use recurring weekly notifications
@@ -691,16 +734,16 @@ class NotificationService {
               continue;
             }
 
-            // Generate unique ID for this specific date and dose
+            // Generate unique ID for this specific date and dose (V19+: includes personId)
             final dateString = '${targetDate.year}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}';
-            final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i);
+            final notificationId = _generateSpecificDateNotificationId(medication.id, dateString, i, personId);
 
             await _scheduleOneTimeNotification(
               id: notificationId,
-              title: '💊 Hora de tomar tu medicamento',
+              title: buildNotificationTitle(person?.name, isDefault), // V19+: Conditional person name
               body: '${medication.name} - ${medication.type.displayName}',
               scheduledDate: scheduledDate,
-              payload: '${medication.id}|$i',
+              payload: '${medication.id}|$i|$personId', // V19+: Now includes personId
             );
           }
         }
@@ -735,17 +778,17 @@ class NotificationService {
             scheduledDate = scheduledDate.add(const Duration(days: 7));
           }
 
-          // Generate unique ID for this weekday and dose
-          final notificationId = _generateWeeklyNotificationId(medication.id, weekday, i);
+          // Generate unique ID for this weekday and dose (V19+: includes personId)
+          final notificationId = _generateWeeklyNotificationId(medication.id, weekday, i, personId);
 
           print('Scheduling weekly recurring notification ID $notificationId for ${medication.name} on weekday $weekday at $hour:$minute');
 
           await _scheduleWeeklyNotification(
             id: notificationId,
-            title: '💊 Hora de tomar tu medicamento',
+            title: buildNotificationTitle(person?.name, isDefault), // V19+: Conditional person name
             body: '${medication.name} - ${medication.type.displayName}',
             scheduledDate: scheduledDate,
-            payload: '${medication.id}|$i',
+            payload: '${medication.id}|$i|$personId', // V19+: Now includes personId
           );
         }
       }
@@ -753,7 +796,8 @@ class NotificationService {
   }
 
   /// Schedule fasting notifications for a medication
-  Future<void> _scheduleFastingNotifications(Medication medication) async {
+  /// V19+: Now requires personId for per-person notification scheduling
+  Future<void> _scheduleFastingNotifications(Medication medication, String personId) async {
     if (!medication.requiresFasting || !medication.notifyFasting) {
       return;
     }
@@ -775,6 +819,11 @@ class NotificationService {
     print('========================================');
 
     final now = tz.TZDateTime.now(tz.local);
+
+    // V19+: Get person for notification body logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final personName = person?.name ?? 'Usuario';
+    final isDefault = person?.isDefault ?? false;
 
     // Calculate fasting periods for each dose
     final fastingPeriods = <_FastingPeriod>[];
@@ -839,11 +888,14 @@ class NotificationService {
       if (period.isBefore) {
         // Notify when to stop eating (before taking the medication)
         final title = '🍽️ Comenzar ayuno';
-        final body = 'Es hora de dejar de comer para ${medication.name}';
+        // V19+: Only include person name for non-default users
+        final body = isDefault
+          ? 'Es hora de dejar de comer para ${medication.name}'
+          : '$personName: Es hora de dejar de comer para ${medication.name}';
         final notificationTime = period.start;
 
-        // Generate unique notification ID for fasting
-        final notificationId = _generateFastingNotificationId(medication.id, period.start, period.isBefore);
+        // Generate unique notification ID for fasting (V19+: includes personId)
+        final notificationId = _generateFastingNotificationId(medication.id, period.start, period.isBefore, personId);
 
         print('Scheduling "before" fasting notification ID $notificationId for ${medication.name} at $notificationTime');
 
@@ -852,7 +904,7 @@ class NotificationService {
           title: title,
           body: body,
           scheduledDate: notificationTime,
-          payload: '${medication.id}|fasting',
+          payload: '${medication.id}|fasting|$personId', // V19+: Now includes personId
         );
       } else {
         // For "after" fasting: notification will be scheduled dynamically when dose is registered
@@ -900,10 +952,11 @@ class NotificationService {
   }
 
   /// Generate a unique notification ID for fasting reminders
-  int _generateFastingNotificationId(String medicationId, tz.TZDateTime fastingTime, bool isBefore) {
-    // Create a combined hash of medication ID, fasting time, and type
+  /// V19+: Now includes personId to ensure each person gets their own notification
+  int _generateFastingNotificationId(String medicationId, tz.TZDateTime fastingTime, bool isBefore, String personId) {
+    // Create a combined hash of medication ID, fasting time, type, and person ID
     final timeString = '${fastingTime.year}-${fastingTime.month}-${fastingTime.day}-${fastingTime.hour}-${fastingTime.minute}';
-    final combinedString = '$medicationId-fasting-$timeString-${isBefore ? "before" : "after"}';
+    final combinedString = '$medicationId-fasting-$timeString-${isBefore ? "before" : "after"}-$personId';
     final hash = combinedString.hashCode.abs();
     // Use range 5000000+ for fasting notifications
     return 5000000 + (hash % 1000000);
@@ -1016,22 +1069,31 @@ class NotificationService {
   /// Cancel all notifications for a specific medication
   /// If [medication] is provided, uses smart cancellation based on actual dose count and type
   /// Otherwise, uses brute-force cancellation for safety
+  /// V19+: Cancels notifications for ALL persons assigned to this medication
   Future<void> cancelMedicationNotifications(String medicationId, {Medication? medication}) async {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('Cancelling all notifications for medication $medicationId');
+    print('Cancelling all notifications for medication $medicationId (all persons)');
 
     // Determine the number of doses to cancel
     final maxDoses = medication?.doseTimes.length ?? 24;
 
-    // Cancel recurring daily notifications
-    for (int i = 0; i < maxDoses; i++) {
-      final notificationId = _generateNotificationId(medicationId, i);
-      await _notificationsPlugin.cancel(notificationId);
+    // V19+: Since personHash % 10 generates values 0-9, we iterate over 10 possible person variations
+    // This ensures we cancel notifications for all persons who might have this medication assigned
+    for (int personVariant = 0; personVariant < 10; personVariant++) {
+      // Generate a dummy personId that will hash to this variant
+      final dummyPersonId = 'person-$personVariant';
+
+      // Cancel recurring daily notifications
+      for (int i = 0; i < maxDoses; i++) {
+        final notificationId = _generateNotificationId(medicationId, i, dummyPersonId);
+        await _notificationsPlugin.cancel(notificationId);
+      }
     }
 
     // Cancel any specific date notifications (for medications with end dates or specific dates)
+    // V19+: Cancel for all possible person variants (0-9 based on personId hash modulo)
     if (medication == null || medication.endDate != null || medication.durationType == TreatmentDurationType.specificDates) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -1039,33 +1101,47 @@ class NotificationService {
           ? medication!.endDate!.difference(today).inDays + 7 // Check a week after end date
           : 365; // If we don't know, check a year ahead
 
-      for (int day = 0; day < daysToCheck; day++) {
-        final targetDate = today.add(Duration(days: day));
-        final dateString = '${targetDate.year}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}';
+      for (int personVariant = 0; personVariant < 10; personVariant++) {
+        final dummyPersonId = 'person-$personVariant';
 
-        for (int i = 0; i < maxDoses; i++) {
-          final notificationId = _generateSpecificDateNotificationId(medicationId, dateString, i);
-          await _notificationsPlugin.cancel(notificationId);
+        for (int day = 0; day < daysToCheck; day++) {
+          final targetDate = today.add(Duration(days: day));
+          final dateString = '${targetDate.year}-${targetDate.month.toString().padLeft(2, '0')}-${targetDate.day.toString().padLeft(2, '0')}';
+
+          for (int i = 0; i < maxDoses; i++) {
+            final notificationId = _generateSpecificDateNotificationId(medicationId, dateString, i, dummyPersonId);
+            await _notificationsPlugin.cancel(notificationId);
+          }
         }
       }
     }
 
     // Cancel any weekly pattern notifications
+    // V19+: Cancel for all possible person variants
     if (medication == null || medication.durationType == TreatmentDurationType.weeklyPattern) {
-      for (int weekday = 1; weekday <= 7; weekday++) {
-        for (int i = 0; i < maxDoses; i++) {
-          final notificationId = _generateWeeklyNotificationId(medicationId, weekday, i);
-          await _notificationsPlugin.cancel(notificationId);
+      for (int personVariant = 0; personVariant < 10; personVariant++) {
+        final dummyPersonId = 'person-$personVariant';
+
+        for (int weekday = 1; weekday <= 7; weekday++) {
+          for (int i = 0; i < maxDoses; i++) {
+            final notificationId = _generateWeeklyNotificationId(medicationId, weekday, i, dummyPersonId);
+            await _notificationsPlugin.cancel(notificationId);
+          }
         }
       }
     }
 
     // Cancel any postponed notifications (always check these, they're rare)
-    for (int i = 0; i < maxDoses; i++) {
-      for (int hour = 0; hour < 24; hour++) {
-        final timeString = '${hour.toString().padLeft(2, '0')}:00';
-        final notificationId = _generatePostponedNotificationId(medicationId, timeString);
-        await _notificationsPlugin.cancel(notificationId);
+    // V19+: Cancel for all possible person variants
+    for (int personVariant = 0; personVariant < 10; personVariant++) {
+      final dummyPersonId = 'person-$personVariant';
+
+      for (int i = 0; i < maxDoses; i++) {
+        for (int hour = 0; hour < 24; hour++) {
+          final timeString = '${hour.toString().padLeft(2, '0')}:00';
+          final notificationId = _generatePostponedNotificationId(medicationId, timeString, dummyPersonId);
+          await _notificationsPlugin.cancel(notificationId);
+        }
       }
     }
 
@@ -1081,70 +1157,23 @@ class NotificationService {
           : 365; // Default to checking a year ahead
 
       // If we have medication info with dose times, calculate exact fasting notification times
+      // V19+: Cancel for all possible person variants
       if (medication != null && medication.doseTimes.isNotEmpty && medication.fastingDurationMinutes != null) {
         print('Using exact fasting times from medication data');
 
-        for (int day = 0; day < daysToCheck; day++) {
-          final targetDate = today.add(Duration(days: day));
+        for (int personVariant = 0; personVariant < 10; personVariant++) {
+          final dummyPersonId = 'person-$personVariant';
 
-          // For each dose time, calculate the exact fasting notification time
-          for (final doseTime in medication.doseTimes) {
-            final parts = doseTime.split(':');
-            final hour = int.parse(parts[0]);
-            final minute = int.parse(parts[1]);
+          for (int day = 0; day < daysToCheck; day++) {
+            final targetDate = today.add(Duration(days: day));
 
-            final doseDateTime = tz.TZDateTime(
-              tz.local,
-              targetDate.year,
-              targetDate.month,
-              targetDate.day,
-              hour,
-              minute,
-            );
+            // For each dose time, calculate the exact fasting notification time
+            for (final doseTime in medication.doseTimes) {
+              final parts = doseTime.split(':');
+              final hour = int.parse(parts[0]);
+              final minute = int.parse(parts[1]);
 
-            // Cancel "before" fasting notification
-            if (medication.fastingType == 'before' || medication.fastingType == null) {
-              final fastingStartTime = doseDateTime.subtract(
-                Duration(minutes: medication.fastingDurationMinutes!),
-              );
-              final beforeId = _generateFastingNotificationId(medicationId, fastingStartTime, true);
-              await _notificationsPlugin.cancel(beforeId);
-            }
-
-            // Cancel "after" fasting notification (for the dose time itself)
-            if (medication.fastingType == 'after' || medication.fastingType == null) {
-              final afterId = _generateFastingNotificationId(medicationId, doseDateTime, false);
-              await _notificationsPlugin.cancel(afterId);
-            }
-
-            // Cancel dynamic fasting notifications (these can be at any minute when dose was taken)
-            // Check a window around the dose time (e.g., ±30 minutes)
-            for (int minuteOffset = -30; minuteOffset <= 30; minuteOffset++) {
-              final actualDoseTime = DateTime(
-                targetDate.year,
-                targetDate.month,
-                targetDate.day,
-                hour,
-                minute,
-              ).add(Duration(minutes: minuteOffset));
-
-              final dynamicId = _generateDynamicFastingNotificationId(medicationId, actualDoseTime);
-              await _notificationsPlugin.cancel(dynamicId);
-            }
-          }
-        }
-      } else {
-        // No medication info or no dose times: use broader cancellation
-        print('Using broad cancellation approach for fasting notifications');
-
-        // Check common intervals throughout the day (every hour)
-        for (int day = -1; day < daysToCheck; day++) { // Include yesterday for edge cases
-          final targetDate = today.add(Duration(days: day));
-
-          for (int hour = 0; hour < 24; hour++) {
-            // Check every 5 minutes (compromise between thoroughness and performance)
-            for (int minute = 0; minute < 60; minute += 5) {
-              final fastingTime = tz.TZDateTime(
+              final doseDateTime = tz.TZDateTime(
                 tz.local,
                 targetDate.year,
                 targetDate.month,
@@ -1153,22 +1182,79 @@ class NotificationService {
                 minute,
               );
 
-              // Cancel both "before" and "after" fasting notification IDs
-              final beforeId = _generateFastingNotificationId(medicationId, fastingTime, true);
-              final afterId = _generateFastingNotificationId(medicationId, fastingTime, false);
-              await _notificationsPlugin.cancel(beforeId);
-              await _notificationsPlugin.cancel(afterId);
+              // Cancel "before" fasting notification
+              if (medication.fastingType == 'before' || medication.fastingType == null) {
+                final fastingStartTime = doseDateTime.subtract(
+                  Duration(minutes: medication.fastingDurationMinutes!),
+                );
+                final beforeId = _generateFastingNotificationId(medicationId, fastingStartTime, true, dummyPersonId);
+                await _notificationsPlugin.cancel(beforeId);
+              }
 
-              // Cancel dynamic fasting notifications
-              final doseTime = DateTime(
-                targetDate.year,
-                targetDate.month,
-                targetDate.day,
-                hour,
-                minute,
-              );
-              final dynamicId = _generateDynamicFastingNotificationId(medicationId, doseTime);
-              await _notificationsPlugin.cancel(dynamicId);
+              // Cancel "after" fasting notification (for the dose time itself)
+              if (medication.fastingType == 'after' || medication.fastingType == null) {
+                final afterId = _generateFastingNotificationId(medicationId, doseDateTime, false, dummyPersonId);
+                await _notificationsPlugin.cancel(afterId);
+              }
+
+              // Cancel dynamic fasting notifications (these can be at any minute when dose was taken)
+              // Check a window around the dose time (e.g., ±30 minutes)
+              for (int minuteOffset = -30; minuteOffset <= 30; minuteOffset++) {
+                final actualDoseTime = DateTime(
+                  targetDate.year,
+                  targetDate.month,
+                  targetDate.day,
+                  hour,
+                  minute,
+                ).add(Duration(minutes: minuteOffset));
+
+                final dynamicId = _generateDynamicFastingNotificationId(medicationId, actualDoseTime, dummyPersonId);
+                await _notificationsPlugin.cancel(dynamicId);
+              }
+            }
+          }
+        }
+      } else {
+        // No medication info or no dose times: use broader cancellation
+        // V19+: Cancel for all possible person variants
+        print('Using broad cancellation approach for fasting notifications');
+
+        for (int personVariant = 0; personVariant < 10; personVariant++) {
+          final dummyPersonId = 'person-$personVariant';
+
+          // Check common intervals throughout the day (every hour)
+          for (int day = -1; day < daysToCheck; day++) { // Include yesterday for edge cases
+            final targetDate = today.add(Duration(days: day));
+
+            for (int hour = 0; hour < 24; hour++) {
+              // Check every 5 minutes (compromise between thoroughness and performance)
+              for (int minute = 0; minute < 60; minute += 5) {
+                final fastingTime = tz.TZDateTime(
+                  tz.local,
+                  targetDate.year,
+                  targetDate.month,
+                  targetDate.day,
+                  hour,
+                  minute,
+                );
+
+                // Cancel both "before" and "after" fasting notification IDs
+                final beforeId = _generateFastingNotificationId(medicationId, fastingTime, true, dummyPersonId);
+                final afterId = _generateFastingNotificationId(medicationId, fastingTime, false, dummyPersonId);
+                await _notificationsPlugin.cancel(beforeId);
+                await _notificationsPlugin.cancel(afterId);
+
+                // Cancel dynamic fasting notifications
+                final doseTime = DateTime(
+                  targetDate.year,
+                  targetDate.month,
+                  targetDate.day,
+                  hour,
+                  minute,
+                );
+                final dynamicId = _generateDynamicFastingNotificationId(medicationId, doseTime, dummyPersonId);
+                await _notificationsPlugin.cancel(dynamicId);
+              }
             }
           }
         }
@@ -1367,28 +1453,33 @@ class NotificationService {
     }
   }
 
-  /// Generate a unique notification ID based on medication ID and dose index
-  int _generateNotificationId(String medicationId, int doseIndex) {
-    // Use a combination of medication ID hash and dose index
-    // This ensures unique IDs for each dose of each medication
+  /// Generate a unique notification ID based on medication ID, dose index, and person ID
+  /// V19+: Now includes personId to ensure each person gets their own notification
+  int _generateNotificationId(String medicationId, int doseIndex, String personId) {
+    // Use a combination of medication ID hash, person ID hash, and dose index
+    // This ensures unique IDs for each dose of each medication for each person
     final medicationHash = medicationId.hashCode.abs();
-    // Keep the ID within a reasonable range to avoid overflow
-    return (medicationHash % 1000000) * 100 + doseIndex;
+    final personHash = personId.hashCode.abs();
+    // Combine hashes: (medication % 10000) * 1000 + (person % 10) * 100 + doseIndex
+    // This gives us unique IDs while keeping them within reasonable range
+    return ((medicationHash % 10000) * 1000 + (personHash % 10) * 100 + doseIndex);
   }
 
   /// Generate a unique notification ID for specific dates
-  int _generateSpecificDateNotificationId(String medicationId, String dateString, int doseIndex) {
-    // Create a combined hash of medication ID, date, and dose index
-    final combinedString = '$medicationId-$dateString-$doseIndex';
+  /// V19+: Now includes personId to ensure each person gets their own notification
+  int _generateSpecificDateNotificationId(String medicationId, String dateString, int doseIndex, String personId) {
+    // Create a combined hash of medication ID, date, dose index, and person ID
+    final combinedString = '$medicationId-$dateString-$doseIndex-$personId';
     final hash = combinedString.hashCode.abs();
     // Use range 3000000+ for specific date notifications
     return 3000000 + (hash % 1000000);
   }
 
   /// Generate a unique notification ID for weekly patterns
-  int _generateWeeklyNotificationId(String medicationId, int weekday, int doseIndex) {
-    // Create a combined hash of medication ID, weekday, and dose index
-    final combinedString = '$medicationId-weekday$weekday-$doseIndex';
+  /// V19+: Now includes personId to ensure each person gets their own notification
+  int _generateWeeklyNotificationId(String medicationId, int weekday, int doseIndex, String personId) {
+    // Create a combined hash of medication ID, weekday, dose index, and person ID
+    final combinedString = '$medicationId-weekday$weekday-$doseIndex-$personId';
     final hash = combinedString.hashCode.abs();
     // Use range 4000000+ for weekly pattern notifications
     return 4000000 + (hash % 1000000);
@@ -1471,13 +1562,19 @@ class NotificationService {
   }
 
   /// Schedule a postponed dose notification (one-time, not recurring)
+  /// V19+: Now requires personId for per-person notification scheduling
   Future<void> schedulePostponedDoseNotification({
     required Medication medication,
     required String originalDoseTime,
     required TimeOfDay newTime,
+    required String personId,
   }) async {
     // Skip in test mode
     if (_isTestMode) return;
+
+    // V19+: Get person for notification title logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final isDefault = person?.isDefault ?? false;
 
     // Get the current time
     final now = tz.TZDateTime.now(tz.local);
@@ -1497,9 +1594,9 @@ class NotificationService {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    // Generate a unique notification ID for postponed doses
+    // Generate a unique notification ID for postponed doses (V19+: includes personId)
     // Using a different range to avoid conflicts with regular notifications
-    final notificationId = _generatePostponedNotificationId(medication.id, originalDoseTime);
+    final notificationId = _generatePostponedNotificationId(medication.id, originalDoseTime, personId);
 
     final newTimeString = '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}';
 
@@ -1534,13 +1631,13 @@ class NotificationService {
     try {
       await _notificationsPlugin.zonedSchedule(
         notificationId,
-        '💊 Hora de tomar tu medicamento (pospuesto)',
+        buildNotificationTitle(person?.name, isDefault, suffix: '(pospuesto)'), // V19+: Conditional person name
         '${medication.name} - ${medication.type.displayName}',
         scheduledDate,
         notificationDetails,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
         // No matchDateTimeComponents - this is a one-time notification
-        payload: '${medication.id}|$originalDoseTime', // Use original dose time for action screen
+        payload: '${medication.id}|$originalDoseTime|$personId', // V19+: Now includes personId
       );
       print('Successfully scheduled postponed notification ID $notificationId');
     } catch (e) {
@@ -1549,10 +1646,11 @@ class NotificationService {
   }
 
   /// Generate a unique notification ID for postponed doses
+  /// V19+: Now includes personId to ensure each person gets their own notification
   /// Uses a different range (2000000+) to avoid conflicts with regular notifications
-  int _generatePostponedNotificationId(String medicationId, String doseTime) {
-    // Create a combined hash of medication ID and dose time
-    final combinedString = '$medicationId-$doseTime';
+  int _generatePostponedNotificationId(String medicationId, String doseTime, String personId) {
+    // Create a combined hash of medication ID, dose time, and person ID
+    final combinedString = '$medicationId-$doseTime-$personId';
     final hash = combinedString.hashCode.abs();
     // Use range 2000000+ for postponed notifications
     return 2000000 + (hash % 1000000);
@@ -1560,27 +1658,30 @@ class NotificationService {
 
   /// Cancel a specific postponed notification
   /// Call this when the user registers the dose or explicitly cancels the postponed reminder
-  Future<void> cancelPostponedNotification(String medicationId, String doseTime) async {
+  /// V19+: Now requires personId to cancel person-specific postponed notification
+  Future<void> cancelPostponedNotification(String medicationId, String doseTime, String personId) async {
     // Skip in test mode
     if (_isTestMode) return;
 
-    final notificationId = _generatePostponedNotificationId(medicationId, doseTime);
+    final notificationId = _generatePostponedNotificationId(medicationId, doseTime, personId);
     await _notificationsPlugin.cancel(notificationId);
 
-    print('Cancelled postponed notification ID $notificationId for medication $medicationId at $doseTime');
+    print('Cancelled postponed notification ID $notificationId for medication $medicationId at $doseTime (person: $personId)');
   }
 
   /// Cancel a specific dose notification for today
   /// This cancels the notification for a specific dose time on the current date
   /// Call this when the user registers a dose (taken or skipped) to prevent the notification from firing
+  /// V19+: Now requires personId to cancel the correct person-specific notification
   Future<void> cancelTodaysDoseNotification({
     required Medication medication,
     required String doseTime,
+    required String personId,
   }) async {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('Cancelling today\'s dose notification for ${medication.name} at $doseTime');
+    print('Cancelling today\'s dose notification for ${medication.name} at $doseTime (person: $personId)');
 
     // Find the dose index for this time
     final doseIndex = medication.doseTimes.indexOf(doseTime);
@@ -1597,7 +1698,7 @@ class NotificationService {
       case TreatmentDurationType.specificDates:
         // For specific dates, cancel the specific date notification for today if today is a selected date
         if (medication.selectedDates?.contains(todayString) ?? false) {
-          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex);
+          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex, personId);
           await _notificationsPlugin.cancel(notificationId);
           print('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
         }
@@ -1607,12 +1708,12 @@ class NotificationService {
         // For weekly patterns, check if medication has an end date
         if (medication.endDate != null) {
           // Individual occurrences scheduled, cancel today's specific date notification
-          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex);
+          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex, personId);
           await _notificationsPlugin.cancel(notificationId);
           print('Cancelled weekly pattern notification ID $notificationId for $todayString at $doseTime');
         } else {
           // Recurring weekly notifications, cancel by weekday
-          final notificationId = _generateWeeklyNotificationId(medication.id, now.weekday, doseIndex);
+          final notificationId = _generateWeeklyNotificationId(medication.id, now.weekday, doseIndex, personId);
           await _notificationsPlugin.cancel(notificationId);
           print('Cancelled recurring weekly notification ID $notificationId for weekday ${now.weekday} at $doseTime');
         }
@@ -1622,12 +1723,12 @@ class NotificationService {
         // For everyday and untilFinished
         if (medication.endDate != null) {
           // Individual occurrences scheduled, cancel today's specific date notification
-          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex);
+          final notificationId = _generateSpecificDateNotificationId(medication.id, todayString, doseIndex, personId);
           await _notificationsPlugin.cancel(notificationId);
           print('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
         } else {
           // Recurring daily notifications, cancel the recurring notification
-          final notificationId = _generateNotificationId(medication.id, doseIndex);
+          final notificationId = _generateNotificationId(medication.id, doseIndex, personId);
           await _notificationsPlugin.cancel(notificationId);
           print('Cancelled recurring daily notification ID $notificationId for $doseTime');
         }
@@ -1635,16 +1736,19 @@ class NotificationService {
     }
 
     // Also cancel any postponed notification for this dose
-    await cancelPostponedNotification(medication.id, doseTime);
+    // V19+: Pass personId to cancel person-specific postponed notification
+    await cancelPostponedNotification(medication.id, doseTime, personId);
   }
 
   /// Schedule a dynamic fasting notification based on actual dose time
   /// This is called when a dose is registered (for "after" fasting type only)
+  /// V19+: Now requires personId for per-person notification scheduling
   /// The notification will be scheduled for: actual time taken + fasting duration
   Future<void> scheduleDynamicFastingNotification({
     required Medication medication,
     required DateTime actualDoseTime,
-  }) async {
+    required String personId,
+  }) async{
     // Skip in test mode
     if (_isTestMode) return;
 
@@ -1669,6 +1773,11 @@ class NotificationService {
     print('Fasting duration: ${medication.fastingDurationMinutes} minutes');
     print('========================================');
 
+    // V19+: Get person for notification body logic
+    final person = await DatabaseHelper.instance.getPerson(personId);
+    final personName = person?.name ?? 'Usuario';
+    final isDefault = person?.isDefault ?? false;
+
     // Calculate when fasting ends (actual time + fasting duration)
     final fastingEndTime = actualDoseTime.add(Duration(minutes: medication.fastingDurationMinutes!));
 
@@ -1689,21 +1798,27 @@ class NotificationService {
       return;
     }
 
-    // Generate unique notification ID for dynamic fasting
+    // Generate unique notification ID for dynamic fasting (V19+: includes personId)
     final notificationId = _generateDynamicFastingNotificationId(
       medication.id,
       actualDoseTime,
+      personId,
     );
 
     print('Scheduling dynamic fasting notification ID $notificationId for ${medication.name} at $scheduledDate');
 
     // Schedule the "you can eat now" notification
+    // V19+: Only include person name for non-default users
+    final body = isDefault
+      ? 'Ya puedes volver a comer después de ${medication.name}'
+      : '$personName: Ya puedes volver a comer después de ${medication.name}';
+
     await _scheduleOneTimeNotification(
       id: notificationId,
       title: '🍴 Fin del ayuno',
-      body: 'Ya puedes volver a comer después de ${medication.name}',
+      body: body,
       scheduledDate: scheduledDate,
-      payload: '${medication.id}|fasting-dynamic',
+      payload: '${medication.id}|fasting-dynamic|$personId', // V19+: Now includes personId
     );
 
     print('Successfully scheduled dynamic fasting notification');
@@ -1711,9 +1826,11 @@ class NotificationService {
 
   /// Cancel today's fasting notification for a "before" fasting type medication
   /// This should be called when a dose is registered to prevent the fasting notification from firing
+  /// V19+: Now requires personId to cancel the correct person-specific fasting notification
   Future<void> cancelTodaysFastingNotification({
     required Medication medication,
     required String doseTime,
+    required String personId,
   }) async {
     // Skip in test mode
     if (_isTestMode) return;
@@ -1733,7 +1850,7 @@ class NotificationService {
       return;
     }
 
-    print('Cancelling today\'s fasting notification for ${medication.name} at $doseTime');
+    print('Cancelling today\'s fasting notification for ${medication.name} at $doseTime (person: $personId)');
 
     // Parse dose time
     final parts = doseTime.split(':');
@@ -1756,11 +1873,12 @@ class NotificationService {
       Duration(minutes: medication.fastingDurationMinutes!),
     );
 
-    // Generate the notification ID using the same method used when scheduling
+    // Generate the notification ID using the same method used when scheduling (V19+: includes personId)
     final notificationId = _generateFastingNotificationId(
       medication.id,
       fastingStartTime,
       true, // isBefore = true
+      personId,
     );
 
     // Cancel the notification
@@ -1769,11 +1887,12 @@ class NotificationService {
   }
 
   /// Generate a unique notification ID for dynamic fasting reminders
+  /// V19+: Now includes personId to ensure each person gets their own notification
   /// Uses a different range (6000000+) to avoid conflicts with scheduled fasting notifications
-  int _generateDynamicFastingNotificationId(String medicationId, DateTime actualDoseTime) {
-    // Create a combined hash of medication ID and actual dose time
+  int _generateDynamicFastingNotificationId(String medicationId, DateTime actualDoseTime, String personId) {
+    // Create a combined hash of medication ID, actual dose time, and person ID
     final timeString = '${actualDoseTime.year}-${actualDoseTime.month}-${actualDoseTime.day}-${actualDoseTime.hour}-${actualDoseTime.minute}';
-    final combinedString = '$medicationId-dynamic-fasting-$timeString';
+    final combinedString = '$medicationId-dynamic-fasting-$timeString-$personId';
     final hash = combinedString.hashCode.abs();
     // Use range 6000000+ for dynamic fasting notifications
     return 6000000 + (hash % 1000000);

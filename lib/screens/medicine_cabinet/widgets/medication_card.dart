@@ -301,8 +301,14 @@ class _MedicationCardState extends State<MedicationCard> {
     // Update in database
     await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-    // Reschedule notifications for this medication
-    await NotificationService.instance.scheduleMedicationNotifications(updatedMedication);
+    // V19+: Reschedule notifications for all persons assigned to this medication
+    final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+    for (final person in persons) {
+      await NotificationService.instance.scheduleMedicationNotifications(
+        updatedMedication,
+        personId: person.id,
+      );
+    }
 
     // Reload medications
     widget.onMedicationUpdated();

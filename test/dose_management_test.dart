@@ -8,9 +8,46 @@ import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/test_helpers.dart';
 
+/// Helper to insert medication and assign to default person (V19+ requirement)
+Future<void> insertMedicationWithPerson(Medication medication) async {
+  await DatabaseHelper.instance.insertMedication(medication);
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson != null) {
+    await DatabaseHelper.instance.assignMedicationToPerson(
+      personId: defaultPerson.id,
+      medicationId: medication.id,
+      scheduleData: medication,
+    );
+  }
+}
+
+/// Helper to get medication for default person (V19+ requirement)
+Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson == null) return null;
+  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
+  return medications.where((m) => m.id == medicationId).firstOrNull;
+}
+
+/// Helper to update medication for default person (V19+ requirement)
+Future<void> updateMedicationForDefaultPerson(Medication medication) async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson != null) {
+    await DatabaseHelper.instance.updateMedicationForPerson(
+      medication: medication,
+      personId: defaultPerson.id,
+    );
+  }
+}
+
 void main() {
   // Setup database simplificado con helper
   DatabaseTestHelper.setup();
+
+  setUp(() async {
+    // Ensure default person exists (V19+ requirement)
+    await DatabaseTestHelper.ensureDefaultPerson();
+  });
 
   group('Dose History Management Tests', () {
     test('Delete history entry restores dose availability', () async {
@@ -23,7 +60,7 @@ void main() {
           .withTakenDoses(['10:00'])
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Create a history entry for the taken dose
       final historyEntry = DoseHistoryEntry(
@@ -51,10 +88,10 @@ void main() {
           .withTakenDoses([]) // Remove from taken doses
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await updateMedicationForDefaultPerson(updatedMedication);
 
       // Verify dose is now available
-      final reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      final reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed, isNotNull);
       expect(reloadedMed!.getAvailableDosesToday().length, 1);
       expect(reloadedMed.getAvailableDosesToday().first, '10:00');
@@ -73,7 +110,7 @@ void main() {
           .withSkippedDoses(['20:00'])
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Test deleting taken dose (should restore stock)
       final afterDeleteTaken = MedicationBuilder.from(medication)
@@ -82,9 +119,9 @@ void main() {
           .withSkippedDoses(['20:00']) // Keep skipped
           .build();
 
-      await DatabaseHelper.instance.updateMedication(afterDeleteTaken);
+      await updateMedicationForDefaultPerson(afterDeleteTaken);
 
-      var reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      var reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.stockQuantity, 12.0); // 10 + 2 restored
 
       // Test deleting skipped dose (should NOT restore stock)
@@ -92,9 +129,9 @@ void main() {
           .withSkippedDoses([]) // Remove '20:00' from skipped
           .build();
 
-      await DatabaseHelper.instance.updateMedication(afterDeleteSkipped);
+      await updateMedicationForDefaultPerson(afterDeleteSkipped);
 
-      reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.stockQuantity, 12.0); // No change from skipped
     });
 
@@ -108,7 +145,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Create a history entry from yesterday
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
@@ -154,7 +191,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final now = DateTime.now();
       final scheduledDateTime = DateTime(now.year, now.month, now.day, 10, 0);
@@ -199,7 +236,7 @@ void main() {
           .withTakenDoses(['10:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Toggle from taken to skipped
       final updatedMedication = MedicationBuilder.from(medication)
@@ -208,10 +245,10 @@ void main() {
           .withSkippedDoses(['10:00'])
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await updateMedicationForDefaultPerson(updatedMedication);
 
       // Verify changes
-      final reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      final reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.takenDosesToday.length, 0);
       expect(reloadedMed.skippedDosesToday.length, 1);
       expect(reloadedMed.skippedDosesToday.first, '10:00');
@@ -230,7 +267,7 @@ void main() {
           .withSkippedDoses(['10:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Toggle from skipped to taken
       final updatedMedication = MedicationBuilder.from(medication)
@@ -239,10 +276,10 @@ void main() {
           .withTakenDoses(['10:00'])
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await updateMedicationForDefaultPerson(updatedMedication);
 
       // Verify changes
-      final reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      final reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.takenDosesToday.length, 1);
       expect(reloadedMed.takenDosesToday.first, '10:00');
       expect(reloadedMed.skippedDosesToday.length, 0);
@@ -261,7 +298,7 @@ void main() {
           .withSkippedDoses(['10:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Try to toggle from skipped to taken (should fail validation)
       final doseQuantity = medication.getDoseQuantity('10:00');
@@ -269,7 +306,7 @@ void main() {
 
       // In real scenario, UI should prevent this and show error
       // The stock should remain unchanged
-      final reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      final reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.stockQuantity, 2.0);
     });
 
@@ -285,7 +322,7 @@ void main() {
           .withTakenDoses(['10:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final now = DateTime.now();
       final scheduledDateTime = DateTime(now.year, now.month, now.day, 10, 0);
@@ -339,7 +376,7 @@ void main() {
           .withTakenDoses(['08:00', '16:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Verify available doses
       expect(medication.getAvailableDosesToday().length, 1);
@@ -374,7 +411,7 @@ void main() {
           .withTakenDoses(['08:00', '16:00', '00:00'], today)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Delete middle dose (16:00)
       final updatedMedication = MedicationBuilder.from(medication)
@@ -382,10 +419,10 @@ void main() {
           .withTakenDoses(['08:00', '00:00'])
           .build();
 
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await updateMedicationForDefaultPerson(updatedMedication);
 
       // Verify
-      final reloadedMed = await DatabaseHelper.instance.getMedication(medication.id);
+      final reloadedMed = await getMedicationForDefaultPerson(medication.id);
       expect(reloadedMed!.takenDosesToday.length, 2);
       expect(reloadedMed.takenDosesToday.contains('16:00'), false);
       expect(reloadedMed.takenDosesToday.contains('08:00'), true);
@@ -407,7 +444,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
@@ -463,7 +500,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final now = DateTime.now();
 

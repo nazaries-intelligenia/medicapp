@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
+import 'package:medicapp/models/person.dart';
 import 'package:path/path.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
@@ -166,6 +167,8 @@ void main() {
   group('Database Import', () {
     late Directory testDbDir;
     late String testDbPath;
+    const testPersonId = 'test-person-export-import';
+    Person? testPerson;
 
     setUp(() async {
       // Crear directorio temporal para base de datos de prueba
@@ -180,10 +183,23 @@ void main() {
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
 
+      // Crear persona de prueba
+      testPerson = Person(
+        id: testPersonId,
+        name: 'Test Person Export/Import',
+        isDefault: true,
+      );
+      await DatabaseHelper.instance.insertPerson(testPerson!);
+
       databaseFactory = databaseFactoryFfi;
     });
 
     tearDown(() async {
+      // Limpiar persona de prueba
+      if (testPerson != null) {
+        await DatabaseHelper.instance.deletePerson(testPersonId);
+      }
+
       // Limpiar datos antes de resetear
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
@@ -215,9 +231,20 @@ void main() {
           .withFasting(type: 'after', duration: 120)
           .build();
 
-      // Insertar medicaciones
+      // Insertar medicaciones y asignarlas a persona (v19+)
       await DatabaseHelper.instance.insertMedication(med1);
+      await DatabaseHelper.instance.assignMedicationToPerson(
+        personId: testPersonId,
+        medicationId: med1.id,
+        scheduleData: med1,
+      );
+
       await DatabaseHelper.instance.insertMedication(med2);
+      await DatabaseHelper.instance.assignMedicationToPerson(
+        personId: testPersonId,
+        medicationId: med2.id,
+        scheduleData: med2,
+      );
 
       // Exportar base de datos
       final exportPath = await DatabaseHelper.instance.exportDatabase();
@@ -234,13 +261,18 @@ void main() {
       final medsAfterImport = await DatabaseHelper.instance.getAllMedications();
       expect(medsAfterImport.length, 2);
 
-      final imported1 = medsAfterImport.firstWhere((m) => m.id == 'import_test_1');
-      expect(imported1.name, 'Medicine 1');
-      expect(imported1.type, MedicationType.pill);
-      expect(imported1.stockQuantity, 30.0);
-      expect(imported1.lastRefillAmount, 50.0);
+      // Verificar datos básicos (disponibles en medications table)
+      final imported1Basic = medsAfterImport.firstWhere((m) => m.id == 'import_test_1');
+      expect(imported1Basic.name, 'Medicine 1');
+      expect(imported1Basic.type, MedicationType.pill);
+      expect(imported1Basic.stockQuantity, 30.0);
+      expect(imported1Basic.lastRefillAmount, 50.0);
 
-      final imported2 = medsAfterImport.firstWhere((m) => m.id == 'import_test_2');
+      // Verificar datos de persona (incluyendo fasting fields)
+      final medsForPerson = await DatabaseHelper.instance.getMedicationsForPerson(testPersonId);
+      expect(medsForPerson.length, 2);
+
+      final imported2 = medsForPerson.firstWhere((m) => m.id == 'import_test_2');
       expect(imported2.name, 'Medicine 2');
       expect(imported2.type, MedicationType.syrup);
       expect(imported2.stockQuantity, 100.0);
@@ -387,6 +419,8 @@ void main() {
 
   group('Database Export/Import - Integration', () {
     late Directory testDbDir;
+    const testPersonId = 'test-person-integration';
+    Person? testPerson;
 
     setUp(() async {
       testDbDir = await Directory.systemTemp.createTemp('medicapp_test_db_');
@@ -397,10 +431,23 @@ void main() {
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
 
+      // Crear persona de prueba
+      testPerson = Person(
+        id: testPersonId,
+        name: 'Test Person Integration',
+        isDefault: true,
+      );
+      await DatabaseHelper.instance.insertPerson(testPerson!);
+
       databaseFactory = databaseFactoryFfi;
     });
 
     tearDown(() async {
+      // Limpiar persona de prueba
+      if (testPerson != null) {
+        await DatabaseHelper.instance.deletePerson(testPersonId);
+      }
+
       // Limpiar datos antes de resetear
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
@@ -456,27 +503,37 @@ void main() {
           .build();
 
       await DatabaseHelper.instance.insertMedication(complexMed);
+      await DatabaseHelper.instance.assignMedicationToPerson(
+        personId: testPersonId,
+        medicationId: complexMed.id,
+        scheduleData: complexMed,
+      );
 
       // Exportar e importar
       final exportPath = await DatabaseHelper.instance.exportDatabase();
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.importDatabase(exportPath);
 
-      // Verificar todos los campos
+      // Verificar datos básicos (disponibles en medications table)
       final imported = await DatabaseHelper.instance.getMedication('complex_test_1');
       expect(imported, isNotNull);
       expect(imported!.name, 'Complex Medicine');
       expect(imported.type, MedicationType.injection);
-      expect(imported.doseSchedule.length, 3);
-      expect(imported.doseSchedule['08:00'], 2.5);
-      expect(imported.doseSchedule['14:00'], 2.5);
-      expect(imported.doseSchedule['20:00'], 2.5);
       expect(imported.stockQuantity, 45.5);
       expect(imported.lastRefillAmount, 75.25);
-      expect(imported.requiresFasting, isTrue);
-      expect(imported.fastingType, 'before');
-      expect(imported.fastingDurationMinutes, 30);
       expect(imported.lowStockThresholdDays, 7);
+
+      // Verificar datos de persona (incluyendo schedule y fasting fields)
+      final medsForPerson = await DatabaseHelper.instance.getMedicationsForPerson(testPersonId);
+      expect(medsForPerson.length, 1);
+      final importedWithSchedule = medsForPerson.first;
+      expect(importedWithSchedule.doseSchedule.length, 3);
+      expect(importedWithSchedule.doseSchedule['08:00'], 2.5);
+      expect(importedWithSchedule.doseSchedule['14:00'], 2.5);
+      expect(importedWithSchedule.doseSchedule['20:00'], 2.5);
+      expect(importedWithSchedule.requiresFasting, isTrue);
+      expect(importedWithSchedule.fastingType, 'before');
+      expect(importedWithSchedule.fastingDurationMinutes, 30);
 
       // Limpiar
       await File(exportPath).delete();

@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/models/medication.dart';
 import 'helpers/medication_builder.dart';
 
 void main() {
@@ -151,8 +150,8 @@ void main() {
           .withStartDate(DateTime.now())
           .build();
 
-      // Schedule notifications first
-      await NotificationService.instance.scheduleMedicationNotifications(medication);
+      // Schedule notifications first (V19+: requires personId)
+      await NotificationService.instance.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Then sync (should not cause issues)
       await NotificationService.instance.syncNotificationsWithMedications([medication]);

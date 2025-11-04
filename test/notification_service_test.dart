@@ -112,7 +112,7 @@ void main() {
           .build();
 
       // Should not throw in test mode
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       // Verify no notifications were scheduled (in test mode)
       final pending = await service.getPendingNotifications();
@@ -131,7 +131,7 @@ void main() {
           .build();
 
       // Should handle suspended medication gracefully
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final pending = await service.getPendingNotifications();
       expect(pending, isEmpty);
@@ -147,7 +147,7 @@ void main() {
           .build();
 
       // Should handle medications without doses gracefully
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final pending = await service.getPendingNotifications();
       expect(pending, isEmpty);
@@ -166,7 +166,7 @@ void main() {
           .build();
 
       // Should skip pending medications
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final pending = await service.getPendingNotifications();
       expect(pending, isEmpty);
@@ -186,7 +186,7 @@ void main() {
           .build();
 
       // Should skip finished medications
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
 
       final pending = await service.getPendingNotifications();
       expect(pending, isEmpty);
@@ -208,7 +208,7 @@ void main() {
       await service.cancelMedicationNotifications('test-med-id');
     });
 
-    test('should cancel today\'s dose notification in test mode', () async {
+    test("should cancel today's dose notification in test mode", () async {
       service.enableTestMode();
 
       final medication = MedicationBuilder()
@@ -224,6 +224,7 @@ void main() {
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '08:00',
+        personId: 'test-person-id',
       );
     });
 
@@ -231,7 +232,7 @@ void main() {
       service.enableTestMode();
 
       // Should not throw
-      await service.cancelPostponedNotification('test-med-id', '08:00');
+      await service.cancelPostponedNotification('test-med-id', '08:00', 'test-person-id');
     });
   });
 
@@ -286,6 +287,7 @@ void main() {
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: DateTime.now(),
+        personId: 'test-person-id',
       );
     });
 
@@ -306,6 +308,7 @@ void main() {
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: DateTime.now(),
+        personId: 'test-person-id',
       );
     });
 
@@ -326,6 +329,7 @@ void main() {
       await service.scheduleDynamicFastingNotification(
         medication: medication,
         actualDoseTime: DateTime.now(),
+        personId: 'test-person-id',
       );
     });
   });
@@ -348,6 +352,7 @@ void main() {
         medication: medication,
         originalDoseTime: '08:00',
         newTime: const TimeOfDay(hour: 10, minute: 0),
+        personId: 'test-person-id',
       );
     });
   });
@@ -389,7 +394,7 @@ void main() {
           .build();
 
       // Should handle medications without end date
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
     });
 
     test('should handle medication with specific dates', () async {
@@ -407,7 +412,7 @@ void main() {
           .build();
 
       // Should handle specific dates
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
     });
 
     test('should handle medication with weekly pattern', () async {
@@ -422,7 +427,7 @@ void main() {
           .build();
 
       // Should handle weekly patterns
-      await service.scheduleMedicationNotifications(medication);
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
     });
 
     test('should handle medication with multiple doses', () async {
@@ -435,8 +440,8 @@ void main() {
           .withStartDate(DateTime.now())
           .build();
 
-      // Should handle multiple doses
-      await service.scheduleMedicationNotifications(medication);
+      // Should handle multiple doses (V19+: requires personId)
+      await service.scheduleMedicationNotifications(medication, personId: 'test-person-id');
     });
 
     test('should handle cancellation for non-existent dose time', () async {
@@ -453,6 +458,7 @@ void main() {
       await service.cancelTodaysDoseNotification(
         medication: medication,
         doseTime: '12:00', // Doesn't exist in doseSchedule
+        personId: 'test-person-id',
       );
     });
   });
