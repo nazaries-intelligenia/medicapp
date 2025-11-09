@@ -251,8 +251,20 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
                           itemCount: _historyEntries.length,
                           itemBuilder: (context, index) {
                             final entry = _historyEntries[index];
+
+                            // In mixed view (no tabs), find and show person name
+                            String? personName;
+                            if (!_showPersonTabs || _persons.length <= 1) {
+                              final person = _persons.firstWhere(
+                                (p) => p.id == entry.personId,
+                                orElse: () => _persons.first,
+                              );
+                              personName = person.name;
+                            }
+
                             return DoseHistoryCard(
                               entry: entry,
+                              personName: personName,
                               onTap: () => _showEditEntryDialog(entry),
                             );
                           },

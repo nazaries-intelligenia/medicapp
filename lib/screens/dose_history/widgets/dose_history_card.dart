@@ -5,11 +5,13 @@ import '../../../models/dose_history_entry.dart';
 class DoseHistoryCard extends StatelessWidget {
   final DoseHistoryEntry entry;
   final VoidCallback onTap;
+  final String? personName; // Optional: person name for mixed view
 
   const DoseHistoryCard({
     super.key,
     required this.entry,
     required this.onTap,
+    this.personName,
   });
 
   @override
@@ -57,6 +59,28 @@ class DoseHistoryCard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // Person chip in mixed view
+                      if (personName != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            personName!,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                      ],
                       // Extra dose badge
                       if (entry.isExtraDose) ...[
                         const SizedBox(width: 8),
