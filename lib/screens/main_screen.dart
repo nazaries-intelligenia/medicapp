@@ -50,10 +50,11 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    print('🔄 MainScreen._onItemTapped: from $_previousIndex to $index');
+    print('🔄 MainScreen._onItemTapped: from $_selectedIndex to $index');
 
     // If returning to medication screen (0) from settings (3), trigger reload
-    if (index == 0 && _previousIndex == 3) {
+    // Use _selectedIndex (current) instead of _previousIndex
+    if (index == 0 && _selectedIndex == 3) {
       print('✅ Returning from Settings to Medications, triggering reload');
       // Reload preferences in medication screen after returning from settings
       WidgetsBinding.instance.addPostFrameCallback((_) {
