@@ -992,7 +992,17 @@ class _MedicationListScreenState extends State<MedicationListScreen>
 
   String _getTodayDate() {
     final l10n = AppLocalizations.of(context)!;
-    return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+    // Si es hoy, mostrar "Hoy, día/mes/año"
+    if (selectedDay == today) {
+      return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
+    }
+
+    // Para otros días, mostrar solo la fecha
+    return '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
   }
 
   @override
