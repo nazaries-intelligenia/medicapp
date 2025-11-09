@@ -900,6 +900,12 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  String _getTodayDate() {
+    final now = DateTime.now();
+    final l10n = AppLocalizations.of(context)!;
+    return l10n.today(now.day, now.month, now.year);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -908,7 +914,20 @@ class _MedicationListScreenState extends State<MedicationListScreen>
       appBar: AppBar(
         title: GestureDetector(
           onTap: _onTitleTap,
-          child: Text(l10n.mainScreenTitle),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.mainScreenTitle),
+              Text(
+                _getTodayDate(),
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
         actions: _debugMenuVisible
             ? [
