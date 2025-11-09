@@ -61,6 +61,14 @@ void main() {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
       final yesterdayNormalized = DateTime(yesterday.year, yesterday.month, yesterday.day);
 
+      // Get default person
+      final person = await db.getDefaultPerson();
+      expect(person, isNotNull);
+
+      // Create a ViewModel
+      final viewModel = MedicationListViewModel();
+      await viewModel.initialize(isTestMode: true);
+
       // Create a medication
       final medication = MedicationBuilder()
           .withId('med1')
@@ -72,7 +80,7 @@ void main() {
 
       await db.createMedicationForPerson(
         medication: medication,
-        personId: 'person1',
+        personId: person!.id,
       );
 
       // Create history entries for yesterday
@@ -81,7 +89,7 @@ void main() {
         medicationId: 'med1',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'person1',
+        personId: person.id,
         scheduledDateTime: yesterdayNormalized.add(const Duration(hours: 8)),
         registeredDateTime: yesterdayNormalized.add(const Duration(hours: 8, minutes: 5)),
         status: DoseStatus.taken,
@@ -93,7 +101,7 @@ void main() {
         medicationId: 'med1',
         medicationName: 'Test Med',
         medicationType: MedicationType.pill,
-        personId: 'person1',
+        personId: person.id,
         scheduledDateTime: yesterdayNormalized.add(const Duration(hours: 20)),
         registeredDateTime: yesterdayNormalized.add(const Duration(hours: 20, minutes: 5)),
         status: DoseStatus.skipped,
@@ -113,11 +121,21 @@ void main() {
       expect(loadedMed.takenDosesToday.contains('08:00'), isTrue);
       expect(loadedMed.skippedDosesToday.contains('20:00'), isTrue);
       expect(loadedMed.takenDosesDate, yesterdayNormalized.toDateString());
+
+      viewModel.dispose();
     });
 
     test('loadMedicationsForDate shows as-needed meds only if taken on that day', () async {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
       final yesterdayNormalized = DateTime(yesterday.year, yesterday.month, yesterday.day);
+
+      // Get default person
+      final person = await db.getDefaultPerson();
+      expect(person, isNotNull);
+
+      // Create a ViewModel
+      final viewModel = MedicationListViewModel();
+      await viewModel.initialize(isTestMode: true);
 
       // Create an as-needed medication
       final medication = MedicationBuilder()
@@ -129,7 +147,7 @@ void main() {
 
       await db.createMedicationForPerson(
         medication: medication,
-        personId: 'person1',
+        personId: person!.id,
       );
 
       // Create history entry for yesterday
@@ -138,7 +156,7 @@ void main() {
         medicationId: 'med1',
         medicationName: 'As Needed Med',
         medicationType: MedicationType.pill,
-        personId: 'person1',
+        personId: person.id,
         scheduledDateTime: yesterdayNormalized.add(const Duration(hours: 10)),
         registeredDateTime: yesterdayNormalized.add(const Duration(hours: 10, minutes: 5)),
         status: DoseStatus.taken,
@@ -155,10 +173,20 @@ void main() {
       // Load medications for today - should NOT show the as-needed med (not taken today)
       await viewModel.loadMedicationsForDate(DateTime.now());
       expect(viewModel.medications.where((m) => m.name == 'As Needed Med').length, 0);
+
+      viewModel.dispose();
     });
 
     test('loadMedicationsForDate shows scheduled meds even without history', () async {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
+
+      // Get default person
+      final person = await db.getDefaultPerson();
+      expect(person, isNotNull);
+
+      // Create a ViewModel
+      final viewModel = MedicationListViewModel();
+      await viewModel.initialize(isTestMode: true);
 
       // Create a scheduled medication
       final medication = MedicationBuilder()
@@ -171,7 +199,7 @@ void main() {
 
       await db.createMedicationForPerson(
         medication: medication,
-        personId: 'person1',
+        personId: person!.id,
       );
 
       // Load medications for yesterday - should show even without history
@@ -182,11 +210,17 @@ void main() {
       // Should have empty dose lists (no history for that day)
       expect(viewModel.medications.first.takenDosesToday.isEmpty, isTrue);
       expect(viewModel.medications.first.skippedDosesToday.isEmpty, isTrue);
+
+      viewModel.dispose();
     });
 
     test('loadMedicationsForDate filters by person', () async {
       final yesterday = DateTime.now().subtract(const Duration(days: 1));
       final yesterdayNormalized = DateTime(yesterday.year, yesterday.month, yesterday.day);
+
+      // Get default person
+      final person1 = await db.getDefaultPerson();
+      expect(person1, isNotNull);
 
       // Create another person
       final person2 = Person(
@@ -195,6 +229,10 @@ void main() {
         isDefault: false,
       );
       await db.insertPerson(person2);
+
+      // Create a ViewModel
+      final viewModel = MedicationListViewModel();
+      await viewModel.initialize(isTestMode: true);
 
       // Create medications for different persons
       final med1 = MedicationBuilder()
@@ -213,8 +251,8 @@ void main() {
           .withDurationType(TreatmentDurationType.everyday)
           .build();
 
-      await db.createMedicationForPerson(medication: med1, personId: 'person1');
-      await db.createMedicationForPerson(medication: med2, personId: 'person2');
+      await db.createMedicationForPerson(medication: med1, personId: person1!.id);
+      await db.createMedicationForPerson(medication: med2, personId: person2.id);
 
       // Create history for both
       await db.insertDoseHistory(DoseHistoryEntry(
@@ -222,7 +260,7 @@ void main() {
         medicationId: 'med1',
         medicationName: 'Med for Person 1',
         medicationType: MedicationType.pill,
-        personId: 'person1',
+        personId: person1.id,
         scheduledDateTime: yesterdayNormalized.add(const Duration(hours: 8)),
         registeredDateTime: yesterdayNormalized.add(const Duration(hours: 8)),
         status: DoseStatus.taken,
@@ -234,7 +272,7 @@ void main() {
         medicationId: 'med2',
         medicationName: 'Med for Person 2',
         medicationType: MedicationType.pill,
-        personId: 'person2',
+        personId: person2.id,
         scheduledDateTime: yesterdayNormalized.add(const Duration(hours: 8)),
         registeredDateTime: yesterdayNormalized.add(const Duration(hours: 8)),
         status: DoseStatus.taken,
@@ -245,6 +283,8 @@ void main() {
       await viewModel.loadMedicationsForDate(yesterday);
       expect(viewModel.medications.length, 1);
       expect(viewModel.medications.first.name, 'Med for Person 1');
+
+      viewModel.dispose();
     });
   });
 }
