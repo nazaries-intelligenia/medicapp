@@ -922,7 +922,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
               Text(
                 _getTodayDate(),
                 style: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 18,
                   fontWeight: FontWeight.normal,
                 ),
               ),
