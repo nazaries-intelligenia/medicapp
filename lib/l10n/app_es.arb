@@ -247,6 +247,21 @@
       }
     }
   },
+  "changeRegisteredTime": "Cambiar hora de registro",
+  "selectRegisteredTime": "Seleccionar hora de registro",
+  "registeredTimeLabel": "Hora de registro:",
+  "registeredTimeUpdated": "Hora de registro actualizada",
+  "errorUpdatingTime": "Error al actualizar la hora: {error}",
+  "@errorUpdatingTime": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFindingDoseEntry": "No se encontró la entrada de la dosis",
+  "registeredTimeCannotBeFuture": "La hora de registro no puede ser en el futuro",
+  "errorLabel": "Error",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",

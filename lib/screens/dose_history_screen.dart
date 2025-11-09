@@ -269,6 +269,9 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
       case EditEntryAction.delete:
         _confirmDeleteEntry(entry);
         break;
+      case EditEntryAction.changeRegisteredTime:
+        _changeEntryRegisteredTime(entry);
+        break;
     }
   }
 
@@ -292,6 +295,91 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  Future<void> _changeEntryRegisteredTime(DoseHistoryEntry entry) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      // Show time picker with validation loop
+      final now = DateTime.now();
+      late DateTime newRegisteredTime;
+      TimeOfDay initialTime = TimeOfDay.fromDateTime(entry.registeredDateTime);
+
+      while (true) {
+        final TimeOfDay? picked = await showTimePicker(
+          context: context,
+          initialTime: initialTime,
+          helpText: l10n.selectRegisteredTime,
+        );
+
+        if (picked == null) return; // User cancelled
+
+        // Create new DateTime with picked time but keeping the same date
+        newRegisteredTime = DateTime(
+          entry.registeredDateTime.year,
+          entry.registeredDateTime.month,
+          entry.registeredDateTime.day,
+          picked.hour,
+          picked.minute,
+        );
+
+        // Validate: registered time cannot be in the future
+        if (newRegisteredTime.isAfter(now)) {
+          if (!mounted) return;
+
+          // Show error dialog
+          await showDialog<void>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(l10n.errorLabel),
+              content: Text(l10n.registeredTimeCannotBeFuture),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(l10n.btnAccept),
+                ),
+              ],
+            ),
+          );
+
+          // Keep the selected time for next iteration
+          initialTime = picked;
+          continue; // Show time picker again
+        }
+
+        // Valid time, exit loop
+        break;
+      }
+
+      // Update the entry
+      await DoseHistoryService.changeRegisteredTime(entry, newRegisteredTime);
+
+      // Reload data
+      await _loadData();
+      setState(() {
+        _hasChanges = true;
+      });
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.registeredTimeUpdated),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorUpdatingTime(e.toString())),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _confirmDeleteEntry(DoseHistoryEntry entry) async {

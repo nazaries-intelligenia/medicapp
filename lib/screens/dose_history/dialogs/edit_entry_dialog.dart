@@ -32,6 +32,11 @@ class EditEntryDialog {
               '${l10n.scheduledTimeLabel} ${entry.scheduledTimeFormatted}',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+            const SizedBox(height: 4),
+            Text(
+              '${l10n.registeredTimeLabel} ${entry.registeredTimeFormatted}',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
             const SizedBox(height: 16),
             Text(
               '${l10n.currentStatusLabel} ${entry.status.displayName}',
@@ -58,9 +63,13 @@ class EditEntryDialog {
                 foregroundColor: Colors.red,
               ),
             ),
-          // Spacer - push other buttons to the right
-          if (isToday)
-            const SizedBox(width: 8),
+          // Change registered time button
+          TextButton.icon(
+            onPressed: () => Navigator.pop(context, EditEntryAction.changeRegisteredTime),
+            icon: const Icon(Icons.schedule),
+            label: Text(l10n.changeRegisteredTime),
+          ),
+          const SizedBox(width: 8),
           TextButton(
             onPressed: () => Navigator.pop(context, null),
             child: Text(l10n.btnCancel),
@@ -93,4 +102,5 @@ enum EditEntryAction {
   markAsTaken,
   markAsSkipped,
   delete,
+  changeRegisteredTime,
 }

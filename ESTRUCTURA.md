@@ -28,10 +28,11 @@ lib/
 │   │       │   ├── manual_dose_input_dialog.dart
 │   │       │   ├── refill_input_dialog.dart
 │   │       │   ├── edit_today_dose_dialog.dart
-│   │       │   ├── notification_permission_dialog.dart
-│   │       │   └── debug_info_dialog.dart
+│   │       │   └── notification_permission_dialog.dart
 │   │       └── services/               # Servicios específicos
 │   │           └── dose_calculation_service.dart
+│   │
+│   ├── debug_notifications_screen.dart # Pantalla de depuración de notificaciones con tabs por persona
 │   │
 │   ├── medicine_cabinet_screen.dart    # Pantalla de Botiquín (151 líneas)
 │   │   └── medicine_cabinet/           # Módulos de medicine_cabinet

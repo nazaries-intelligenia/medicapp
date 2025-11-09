@@ -7,6 +7,7 @@ class EditTodayDoseDialog {
     required String medicationName,
     required String doseTime,
     required bool isTaken,
+    bool showChangeTimeOption = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -27,7 +28,7 @@ class EditTodayDoseDialog {
             const SizedBox(height: 8),
             Text(
               l10n.whatDoYouWantToDo,
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
@@ -40,6 +41,13 @@ class EditTodayDoseDialog {
               foregroundColor: Colors.red,
             ),
           ),
+          // Show change time option only if requested and dose is taken
+          if (showChangeTimeOption && isTaken)
+            TextButton.icon(
+              onPressed: () => Navigator.pop(context, 'changeTime'),
+              icon: const Icon(Icons.schedule),
+              label: Text(l10n.changeRegisteredTime),
+            ),
           const SizedBox(width: 8),
           TextButton(
             onPressed: () => Navigator.pop(context),
