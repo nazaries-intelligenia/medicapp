@@ -1005,28 +1005,69 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     return '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
   }
 
+  Future<void> _showDatePickerDialog() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final pickedNormalized = DateTime(picked.year, picked.month, picked.day);
+
+      // Calcular offset desde hoy
+      final dayOffset = pickedNormalized.difference(today).inDays;
+      final targetPage = _centerPageIndex + dayOffset;
+
+      // Navegar a la página
+      await _pageController.animateToPage(
+        targetPage,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+
+      // Actualizar estado (onPageChanged se llamará automáticamente)
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: _onTitleTap,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.mainScreenTitle),
-              Text(
-                _getTodayDate(),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            GestureDetector(
+              onTap: _onTitleTap,
+              child: Text(l10n.mainScreenTitle),
+            ),
+            GestureDetector(
+              onTap: _showDatePickerDialog,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _getTodayDate(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         actions: _debugMenuVisible
             ? [
