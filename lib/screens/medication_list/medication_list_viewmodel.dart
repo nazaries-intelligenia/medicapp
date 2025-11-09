@@ -877,9 +877,14 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Reschedule all notifications (debug function)
+  /// Reprograms notifications for ALL users, not just the selected one
   Future<int> rescheduleAllNotifications() async {
-    for (final medication in _medications) {
-      if (medication.doseTimes.isNotEmpty) {
+    // Get all medications (not filtered by selected person)
+    final allMedications = await DatabaseHelper.instance.getAllMedications();
+
+    // Reschedule notifications for each medication and each person assigned to it
+    for (final medication in allMedications) {
+      if (medication.doseTimes.isNotEmpty && !medication.isSuspended) {
         final persons = await DatabaseHelper.instance
             .getPersonsForMedication(medication.id);
         for (final person in persons) {
