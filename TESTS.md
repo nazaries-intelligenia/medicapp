@@ -33,20 +33,24 @@ flutter test
 - **test/dose_history_service_test.dart** (18): Servicio de historial, eliminación de entradas, restauración de stock, cambio de estado, cambio de hora de registro, validación de fechas, excepciones
 - **test/dose_action_service_test.dart** (28): Registro de dosis tomadas/omitidas/manuales, validación de stock, persistencia, reset diario, cantidades fraccionarias, fasting notifications
 - **test/settings_screen_test.dart** (19): Pantalla de configuración, preferencias de visualización (hora real, cuenta atrás de ayuno, notificación fija), export/import de base de datos, navegación, estado de UI
+- **test/day_navigation_test.dart** (5): Navegación por días en ViewModel, carga de datos históricos, filtrado por persona, medicamentos programados y ocasionales
+- **test/day_navigation_ui_test.dart** (22): Lógica de navegación por días, formato de fecha ("Hoy" vs fecha simple), cálculo de offsets entre días, conversión página ↔ fecha, validación de límites (años bisiestos, cambios de mes/año), casos edge
 
-**Total**: ~438 tests cubriendo modelo, servicios (incluidos dose_history y dose_action), preferencias, persistencia, historial, funcionalidad de ayuno (incluida cuenta atrás visual y notificación ongoing), tomas extra, notificaciones, stock, pantallas principales (settings_screen), pantallas de edición, backup/restore y widgets de integración
+**Total**: ~465 tests cubriendo modelo, servicios (incluidos dose_history y dose_action), preferencias, persistencia, historial, funcionalidad de ayuno (incluida cuenta atrás visual y notificación ongoing), tomas extra, notificaciones, stock, navegación por días (UI y ViewModel), pantallas principales (settings_screen), pantallas de edición, backup/restore y widgets de integración
 
 **Cobertura global**: ~75-80% estimada (suite optimizada)
 
 **Nota sobre el Botiquín**: La funcionalidad del Botiquín (vista de inventario) está implementada y funcional, pero no tiene tests dedicados ya que utiliza los mismos componentes y datos que el resto de la aplicación (lectura de base de datos, UI de lista, búsqueda). La funcionalidad es verificada manualmente.
 
-### Archivos de test actuales (33 archivos)
+### Archivos de test actuales (35 archivos)
 
 **Tests unitarios:**
 - as_needed_main_screen_display_test.dart
 - as_needed_stock_test.dart
 - database_export_import_test.dart
 - database_refill_test.dart
+- day_navigation_test.dart
+- day_navigation_ui_test.dart
 - dose_action_service_test.dart
 - dose_history_service_test.dart
 - dose_management_test.dart
@@ -81,6 +85,7 @@ flutter test
 
 ### Mejoras recientes
 
+- **Tests de navegación por días** (noviembre 2025): 27 tests nuevos para funcionalidad de navegación temporal, day_navigation_test.dart (5 tests ViewModel: carga de datos históricos, filtrado por persona, medicamentos programados/ocasionales), day_navigation_ui_test.dart (22 tests UI: formato de fecha "Hoy" vs fecha simple, cálculo de offsets día ↔ página, validación de límites de fecha, años bisiestos, cambios de mes/año, casos edge), cobertura completa de lógica de calendario y selector de fechas
 - **Optimización y corrección de suite de tests** (enero 2025):
   - **Corrección de tests de integración**: 4 tests con errores `database_closed` corregidos, añadidas esperas para operaciones asíncronas del ViewModel
   - **Optimización de tests redundantes**: 18 tests eliminados o fusionados, ~277 líneas removidas
