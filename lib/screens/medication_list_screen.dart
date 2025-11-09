@@ -72,8 +72,8 @@ class _MedicationListScreenState extends State<MedicationListScreen>
       isTestMode: NotificationService.instance.isTestMode,
     );
 
-    // Initialize tab controller after persons are loaded
-    if (mounted && _viewModel.persons.isNotEmpty) {
+    // Initialize tab controller after persons are loaded (only if tabs are enabled)
+    if (mounted && _viewModel.persons.isNotEmpty && _viewModel.showPersonTabs) {
       setState(() {
         _tabController = TabController(
           length: _viewModel.persons.length,
@@ -191,6 +191,39 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   }
 
   void _navigateToAddMedication() async {
+    String? selectedPersonId;
+
+    // If person tabs are disabled, ask which person first
+    if (!_viewModel.showPersonTabs && _viewModel.persons.length > 1) {
+      final l10n = AppLocalizations.of(context)!;
+      selectedPersonId = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(l10n.selectPerson),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _viewModel.persons.map((person) {
+                return ListTile(
+                  leading: Icon(
+                    person.isDefault ? Icons.person : Icons.person_outline,
+                  ),
+                  title: Text(person.name),
+                  onTap: () => Navigator.pop(context, person.id),
+                );
+              }).toList(),
+            ),
+          );
+        },
+      );
+
+      // User cancelled
+      if (selectedPersonId == null) return;
+    } else if (!_viewModel.showPersonTabs && _viewModel.persons.length == 1) {
+      // Only one person, use it
+      selectedPersonId = _viewModel.persons.first.id;
+    }
+
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
     final newMedication = await Navigator.push<Medication>(
@@ -203,7 +236,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     );
 
     if (newMedication != null) {
-      await _viewModel.createMedication(newMedication);
+      await _viewModel.createMedication(newMedication, personId: selectedPersonId);
     }
   }
 
@@ -1079,7 +1112,9 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                 ),
               ]
             : null,
-        bottom: _tabController != null && _viewModel.persons.length > 1
+        bottom: _viewModel.showPersonTabs &&
+                _tabController != null &&
+                _viewModel.persons.length > 1
             ? TabBar(
                 controller: _tabController,
                 isScrollable: _viewModel.persons.length > 3,
@@ -1134,6 +1169,14 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                                     ? _buildTodayDosesSection(medication)
                                     : null;
 
+                                // Get person names if in mixed view
+                                final personNames = !_viewModel.showPersonTabs
+                                    ? _viewModel
+                                        .getPersonsForMedication(medication.id)
+                                        .map((p) => p.name)
+                                        .toList()
+                                    : null;
+
                                 return MedicationCard(
                                   medication: medication,
                                   nextDoseInfo: nextDoseInfo,
@@ -1141,6 +1184,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                                   asNeededDoseInfo: asNeededDoseInfo,
                                   fastingPeriod: null,
                                   todayDosesWidget: todayDosesWidget,
+                                  personNames: personNames,
                                   onTap: () => _showDeleteModal(medication),
                                 );
                               },

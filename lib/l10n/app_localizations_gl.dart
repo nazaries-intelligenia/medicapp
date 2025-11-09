@@ -1573,6 +1573,17 @@ class AppLocalizationsGl extends AppLocalizations {
       'Mostra unha notificación fixa co tempo restante de xaxún (só Android)';
 
   @override
+  String get settingsShowPersonTabsTitle =>
+      'Ver personas separadas por pestañas';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas';
+
+  @override
+  String get selectPerson => 'Seleccionar persona';
+
+  @override
   String get fastingNotificationTitle => 'Xaxún en curso';
 
   @override

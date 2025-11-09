@@ -1550,6 +1550,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Show a fixed notification with remaining fasting time (Android only)';
 
   @override
+  String get settingsShowPersonTabsTitle => 'Show persons in separate tabs';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Display each person in a separate tab. When disabled, all persons are mixed in a single list with labels';
+
+  @override
+  String get selectPerson => 'Select person';
+
+  @override
   String get fastingNotificationTitle => 'Fasting in progress';
 
   @override

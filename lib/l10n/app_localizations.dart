@@ -2774,6 +2774,24 @@ abstract class AppLocalizations {
   /// **'Muestra una notificación fija con el tiempo restante de ayuno (solo Android)'**
   String get settingsShowFastingNotificationSubtitle;
 
+  /// No description provided for @settingsShowPersonTabsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver personas separadas por pestañas'**
+  String get settingsShowPersonTabsTitle;
+
+  /// No description provided for @settingsShowPersonTabsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas'**
+  String get settingsShowPersonTabsSubtitle;
+
+  /// No description provided for @selectPerson.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar persona'**
+  String get selectPerson;
+
   /// No description provided for @fastingNotificationTitle.
   ///
   /// In es, this message translates to:

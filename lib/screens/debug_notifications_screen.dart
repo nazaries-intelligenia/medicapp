@@ -3,6 +3,7 @@ import '../l10n/app_localizations.dart';
 import '../models/medication.dart';
 import '../models/person.dart';
 import '../services/notification_service.dart';
+import '../services/preferences_service.dart';
 import '../database/database_helper.dart';
 
 class DebugNotificationsScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
   bool _isLoading = true;
   bool _notificationsEnabled = false;
   bool _canScheduleExact = false;
+  bool _showPersonTabs = true; // User preference for showing person tabs
   List<dynamic> _pendingNotifications = [];
   Map<String, List<Map<String, dynamic>>> _notificationsByPerson = {};
   final Map<String, String> _medicationPersonsMap = {};
@@ -32,18 +34,27 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: widget.persons.length, vsync: this);
     _loadNotificationData();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    if (_showPersonTabs && widget.persons.length > 1) {
+      _tabController.dispose();
+    }
     super.dispose();
   }
 
   Future<void> _loadNotificationData() async {
     setState(() => _isLoading = true);
+
+    // Load preference
+    _showPersonTabs = await PreferencesService.getShowPersonTabs();
+
+    // Initialize tab controller only if tabs are enabled
+    if (_showPersonTabs && widget.persons.length > 1) {
+      _tabController = TabController(length: widget.persons.length, vsync: this);
+    }
 
     _notificationsEnabled = await NotificationService.instance.areNotificationsEnabled();
     _canScheduleExact = await NotificationService.instance.canScheduleExactAlarms();
@@ -292,7 +303,7 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.notificationDebugTitle),
-        bottom: widget.persons.isNotEmpty
+        bottom: _showPersonTabs && widget.persons.length > 1
             ? TabBar(
                 controller: _tabController,
                 isScrollable: widget.persons.length > 3,
@@ -426,20 +437,71 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                   ),
                   const Divider(height: 1),
                 ],
-                // Tabs content
+                // Tabs content or mixed view
                 Expanded(
                   child: widget.persons.isEmpty
                       ? Center(child: Text(l10n.noScheduledNotifications))
-                      : TabBarView(
-                          controller: _tabController,
-                          children: widget.persons.map((person) {
-                            final notifications = _notificationsByPerson[person.id] ?? [];
-                            return _buildNotificationsList(notifications, person);
-                          }).toList(),
-                        ),
+                      : _showPersonTabs && widget.persons.length > 1
+                          ? TabBarView(
+                              controller: _tabController,
+                              children: widget.persons.map((person) {
+                                final notifications = _notificationsByPerson[person.id] ?? [];
+                                return _buildNotificationsList(notifications, person);
+                              }).toList(),
+                            )
+                          : _buildMixedNotificationsList(),
                 ),
               ],
             ),
+    );
+  }
+
+  /// Build mixed view with all persons' notifications together
+  Widget _buildMixedNotificationsList() {
+    final l10n = AppLocalizations.of(context)!;
+
+    // Collect all notifications with person info
+    final allNotifications = <Map<String, dynamic>>[];
+    for (final person in widget.persons) {
+      final personNotifications = _notificationsByPerson[person.id] ?? [];
+      for (final notification in personNotifications) {
+        allNotifications.add({
+          ...notification,
+          'personName': person.name,
+          'isDefault': person.isDefault,
+        });
+      }
+    }
+
+    // Get all medications for this view
+    final allMedications = widget.medications;
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          l10n.scheduledNotifications,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+        if (allNotifications.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text(
+              l10n.noScheduledNotifications,
+              style: const TextStyle(color: Colors.orange),
+            ),
+          )
+        else
+          ...allNotifications.map((info) => _buildNotificationCard(info)),
+        const SizedBox(height: 24),
+        Text(
+          l10n.medicationsAndSchedules,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        const SizedBox(height: 8),
+        ...allMedications.map((medication) => _buildMedicationCard(medication)),
+      ],
     );
   }
 
@@ -499,6 +561,8 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
     final scheduledDate = info['scheduledDate'] as String?;
     final notificationType = info['notificationType'] as String?;
     final isPastDue = info['isPastDue'] as bool;
+    final personName = info['personName'] as String?;
+    final isDefault = info['isDefault'] as bool?;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -546,9 +610,44 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
               ),
               if (medicationName != null) ...[
                 const SizedBox(height: 8),
-                Text(
-                  l10n.medicationInfo(medicationName),
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.medicationInfo(medicationName),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                    if (personName != null) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isDefault == true ? Icons.person : Icons.person_outline,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              personName,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ],
               if (scheduledDate != null) ...[

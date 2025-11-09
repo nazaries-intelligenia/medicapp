@@ -1574,6 +1574,17 @@ class AppLocalizationsEu extends AppLocalizations {
       'Barauaren gainerako denborarekin jakinarazpen finko bat erakusten du (Android bakarrik)';
 
   @override
+  String get settingsShowPersonTabsTitle =>
+      'Ver personas separadas por pestañas';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas';
+
+  @override
+  String get selectPerson => 'Seleccionar persona';
+
+  @override
   String get fastingNotificationTitle => 'Baraua abian';
 
   @override

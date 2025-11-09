@@ -11,6 +11,7 @@ class MedicationCard extends StatelessWidget {
   final Map<String, dynamic>? fastingPeriod;
   final Widget? todayDosesWidget;
   final VoidCallback onTap;
+  final List<String>? personNames; // Optional: person names for mixed view
 
   const MedicationCard({
     super.key,
@@ -21,6 +22,7 @@ class MedicationCard extends StatelessWidget {
     this.fastingPeriod,
     this.todayDosesWidget,
     required this.onTap,
+    this.personNames,
   });
 
   @override
@@ -56,9 +58,42 @@ class MedicationCard extends StatelessWidget {
                   color: medication.type.getColor(context),
                 ),
               ),
-              title: Text(
-                medication.name,
-                style: Theme.of(context).textTheme.titleMedium,
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      medication.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  // Show person chips in mixed view
+                  if (personNames != null && personNames!.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    Wrap(
+                      spacing: 4,
+                      children: personNames!.map((name) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ],
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

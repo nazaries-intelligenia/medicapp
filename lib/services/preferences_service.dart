@@ -5,6 +5,7 @@ class PreferencesService {
   static const String _keyShowActualTime = 'show_actual_time_for_taken_doses';
   static const String _keyShowFastingCountdown = 'show_fasting_countdown';
   static const String _keyShowFastingNotification = 'show_fasting_notification';
+  static const String _keyShowPersonTabs = 'show_person_tabs';
 
   /// Get the preference for showing actual time for taken doses
   /// Returns true if the user wants to see the actual time when a dose was taken
@@ -47,5 +48,19 @@ class PreferencesService {
   static Future<void> setShowFastingNotification(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyShowFastingNotification, value);
+  }
+
+  /// Get the preference for showing persons in separate tabs
+  /// Returns true (default) if the user wants to see persons in separate tabs
+  /// Returns false to show all persons mixed in a single list with person labels
+  static Future<bool> getShowPersonTabs() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyShowPersonTabs) ?? true; // Default: true (tabs enabled)
+  }
+
+  /// Set the preference for showing persons in separate tabs
+  static Future<void> setShowPersonTabs(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyShowPersonTabs, value);
   }
 }

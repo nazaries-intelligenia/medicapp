@@ -24,6 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _showActualTime = false;
   bool _showFastingCountdown = false;
   bool _showFastingNotification = false;
+  bool _showPersonTabs = true;
 
   @override
   void initState() {
@@ -36,11 +37,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final showActualTime = await PreferencesService.getShowActualTimeForTakenDoses();
     final showFastingCountdown = await PreferencesService.getShowFastingCountdown();
     final showFastingNotification = await PreferencesService.getShowFastingNotification();
+    final showPersonTabs = await PreferencesService.getShowPersonTabs();
     if (mounted) {
       setState(() {
         _showActualTime = showActualTime;
         _showFastingCountdown = showFastingCountdown;
         _showFastingNotification = showFastingNotification;
+        _showPersonTabs = showPersonTabs;
       });
     }
   }
@@ -76,6 +79,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) {
       setState(() {
         _showFastingNotification = value;
+      });
+    }
+  }
+
+  /// Handle show person tabs toggle
+  Future<void> _handleShowPersonTabsChanged(bool value) async {
+    await PreferencesService.setShowPersonTabs(value);
+    if (mounted) {
+      setState(() {
+        _showPersonTabs = value;
       });
     }
   }
@@ -317,6 +330,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               value: _showFastingNotification,
               onChanged: _handleShowFastingNotificationChanged,
             ),
+
+          // Show Person Tabs Switch
+          SettingSwitchCard(
+            icon: Icons.tab,
+            iconColor: theme.colorScheme.tertiary,
+            title: l10n.settingsShowPersonTabsTitle,
+            subtitle: l10n.settingsShowPersonTabsSubtitle,
+            value: _showPersonTabs,
+            onChanged: _handleShowPersonTabsChanged,
+          ),
 
           const SizedBox(height: 16),
 

@@ -41,6 +41,10 @@ class MedicationListViewModel extends ChangeNotifier {
   bool _showActualTime = false;
   bool _showFastingCountdown = false;
   bool _showFastingNotification = false;
+  bool _showPersonTabs = true;
+
+  // Map to associate medications with their assigned persons (for mixed view)
+  final Map<String, List<Person>> _medicationPersons = {};
 
   // Getters
   List<Medication> get medications => List.unmodifiable(_medications);
@@ -50,8 +54,14 @@ class MedicationListViewModel extends ChangeNotifier {
   bool get showActualTime => _showActualTime;
   bool get showFastingCountdown => _showFastingCountdown;
   bool get showFastingNotification => _showFastingNotification;
+  bool get showPersonTabs => _showPersonTabs;
   List<Map<String, dynamic>> get activeFastingPeriods =>
       _fastingManager.activeFastingPeriods;
+
+  /// Get persons assigned to a medication (useful when showPersonTabs = false)
+  List<Person> getPersonsForMedication(String medicationId) {
+    return _medicationPersons[medicationId] ?? [];
+  }
 
   // Cache getters
   Map<String, dynamic>? getAsNeededDosesInfo(String medicationId) =>
@@ -92,6 +102,7 @@ class MedicationListViewModel extends ChangeNotifier {
     _showFastingCountdown = await PreferencesService.getShowFastingCountdown();
     _showFastingNotification =
         await PreferencesService.getShowFastingNotification();
+    _showPersonTabs = await PreferencesService.getShowPersonTabs();
   }
 
   /// Initialize persons and select the first one
@@ -146,12 +157,26 @@ class MedicationListViewModel extends ChangeNotifier {
     _safeNotify();
 
     try{
-      // Load medications for selected person
+      // Load medications based on view mode
       List<Medication> allMedications;
-      if (_selectedPerson != null) {
+
+      if (!_showPersonTabs) {
+        // Mixed view: load all medications from all persons
+        allMedications = await DatabaseHelper.instance.getAllMedications();
+
+        // Build map of medication -> persons
+        _medicationPersons.clear();
+        for (final medication in allMedications) {
+          final persons = await DatabaseHelper.instance
+              .getPersonsForMedication(medication.id);
+          _medicationPersons[medication.id] = persons;
+        }
+      } else if (_selectedPerson != null) {
+        // Tab view: load medications for selected person only
         allMedications = await DatabaseHelper.instance
             .getMedicationsForPerson(_selectedPerson!.id);
       } else {
+        // Fallback: load all medications
         allMedications = await DatabaseHelper.instance.getAllMedications();
       }
 
@@ -825,9 +850,15 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Create a new medication for the current person
-  Future<void> createMedication(Medication medication) async {
-    Person? targetPerson = _selectedPerson;
-    if (targetPerson == null) {
+  Future<void> createMedication(Medication medication, {String? personId}) async {
+    Person? targetPerson;
+
+    // Use provided personId, or selected person, or default person
+    if (personId != null) {
+      targetPerson = await DatabaseHelper.instance.getPerson(personId);
+    } else if (_selectedPerson != null) {
+      targetPerson = _selectedPerson;
+    } else {
       targetPerson = await DatabaseHelper.instance.getDefaultPerson();
     }
 

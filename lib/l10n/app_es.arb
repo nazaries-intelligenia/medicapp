@@ -893,6 +893,9 @@
   "settingsShowFastingCountdownSubtitle": "Muestra el tiempo restante de ayuno en la pantalla principal",
   "settingsShowFastingNotificationTitle": "Notificación fija de cuenta atrás",
   "settingsShowFastingNotificationSubtitle": "Muestra una notificación fija con el tiempo restante de ayuno (solo Android)",
+  "settingsShowPersonTabsTitle": "Ver personas separadas por pestañas",
+  "settingsShowPersonTabsSubtitle": "Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas",
+  "selectPerson": "Seleccionar persona",
   "fastingNotificationTitle": "Ayuno en curso",
   "fastingNotificationBody": "{medication} • {timeRemaining} restantes (hasta {endTime})",
   "@fastingNotificationBody": {

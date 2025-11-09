@@ -5,6 +5,7 @@ import '../models/medication.dart';
 import '../models/person.dart';
 import '../database/database_helper.dart';
 import '../services/dose_history_service.dart';
+import '../services/preferences_service.dart';
 import 'dose_history/widgets/dose_history_card.dart';
 import 'dose_history/widgets/filter_dialog.dart';
 import 'dose_history/widgets/statistics_card.dart';
@@ -26,6 +27,7 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
   List<Person> _persons = [];
   bool _isLoading = true;
   bool _hasChanges = false; // Track if any changes were made
+  bool _showPersonTabs = true; // User preference for showing person tabs
 
   // Tab controller for person tabs
   TabController? _tabController;
@@ -59,6 +61,9 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
+    // Load preference
+    _showPersonTabs = await PreferencesService.getShowPersonTabs();
+
     // Load persons for tabs
     var persons = await DatabaseHelper.instance.getAllPersons();
 
@@ -69,15 +74,22 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
       return a.name.compareTo(b.name);
     });
 
-    // Initialize tab controller if not already done or if person count changed
-    if (_tabController == null || _tabController!.length != persons.length + 1) {
+    // Initialize tab controller only if tabs are enabled
+    if (_showPersonTabs && persons.length > 1) {
+      if (_tabController == null || _tabController!.length != persons.length + 1) {
+        _tabController?.dispose();
+        _tabController = TabController(
+          length: persons.length + 1, // +1 for "All" tab
+          vsync: this,
+        );
+        _tabController!.addListener(_onTabChanged);
+        _selectedPersonId = null; // Start with "All" tab
+      }
+    } else {
+      // No tabs: always show all persons (like "All" tab)
       _tabController?.dispose();
-      _tabController = TabController(
-        length: persons.length + 1, // +1 for "All" tab
-        vsync: this,
-      );
-      _tabController!.addListener(_onTabChanged);
-      _selectedPersonId = null; // Start with "All" tab
+      _tabController = null;
+      _selectedPersonId = null;
     }
 
     // Load medications for filter dropdown
@@ -189,7 +201,7 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
             tooltip: 'Filtrar',
           ),
         ],
-        bottom: _tabController == null || _persons.length <= 1
+        bottom: !_showPersonTabs || _tabController == null || _persons.length <= 1
             ? null
             : TabBar(
                 controller: _tabController,

@@ -1573,6 +1573,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Muestra una notificación fija con el tiempo restante de ayuno (solo Android)';
 
   @override
+  String get settingsShowPersonTabsTitle =>
+      'Ver personas separadas por pestañas';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas';
+
+  @override
+  String get selectPerson => 'Seleccionar persona';
+
+  @override
   String get fastingNotificationTitle => 'Ayuno en curso';
 
   @override
