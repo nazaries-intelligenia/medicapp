@@ -856,6 +856,12 @@ abstract class AppLocalizations {
   /// **'No se encontró la entrada de la dosis'**
   String get errorFindingDoseEntry;
 
+  /// No description provided for @registeredTimeCannotBeFuture.
+  ///
+  /// In es, this message translates to:
+  /// **'La hora de registro no puede ser en el futuro'**
+  String get registeredTimeCannotBeFuture;
+
   /// No description provided for @addMedicationTitle.
   ///
   /// In es, this message translates to:

@@ -425,6 +425,10 @@ class AppLocalizationsGl extends AppLocalizations {
   String get errorFindingDoseEntry => 'Non se atopou a entrada da dose';
 
   @override
+  String get registeredTimeCannotBeFuture =>
+      'A hora de rexistro non pode ser no futuro';
+
+  @override
   String get addMedicationTitle => 'Añadir Medicamento';
 
   @override

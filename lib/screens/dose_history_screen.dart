@@ -319,6 +319,21 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
         picked.minute,
       );
 
+      // Validate: registered time cannot be in the future
+      final now = DateTime.now();
+      if (newRegisteredTime.isAfter(now)) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.registeredTimeCannotBeFuture),
+            backgroundColor: Colors.orange,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+
       // Update the entry
       await DoseHistoryService.changeRegisteredTime(entry, newRegisteredTime);
 

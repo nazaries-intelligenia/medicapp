@@ -145,6 +145,7 @@
   "registeredTimeUpdated": "Registered time updated",
   "errorUpdatingTime": "Error updating time: {error}",
   "errorFindingDoseEntry": "Dose entry not found",
+  "registeredTimeCannotBeFuture": "Registered time cannot be in the future",
 
   "addMedicationTitle": "Add Medication",
   "stepIndicator": "Step {current} of {total}",

@@ -260,6 +260,7 @@
     }
   },
   "errorFindingDoseEntry": "No s'ha trobat l'entrada de la dosi",
+  "registeredTimeCannotBeFuture": "L'hora de registre no pot ser al futur",
 
   "addMedicationTitle": "Afegir medicament",
   "stepIndicator": "Pas {current} de {total}",

@@ -426,6 +426,10 @@ class AppLocalizationsEu extends AppLocalizations {
   String get errorFindingDoseEntry => 'Ez da aurkitu dosien sarrera';
 
   @override
+  String get registeredTimeCannotBeFuture =>
+      'Erregistro ordua ezin da etorkizunean izan';
+
+  @override
   String get addMedicationTitle => 'Añadir Medicamento';
 
   @override

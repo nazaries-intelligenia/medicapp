@@ -426,6 +426,10 @@ class AppLocalizationsCa extends AppLocalizations {
   String get errorFindingDoseEntry => 'No s\'ha trobat l\'entrada de la dosi';
 
   @override
+  String get registeredTimeCannotBeFuture =>
+      'L\'hora de registre no pot ser al futur';
+
+  @override
   String get addMedicationTitle => 'Afegir medicament';
 
   @override
