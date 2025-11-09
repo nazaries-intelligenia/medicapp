@@ -45,10 +45,17 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   bool _batteryBannerDismissed = false;
   TabController? _tabController;
 
+  // Day navigation
+  static const int _centerPageIndex = 10000; // Centro para navegación "ilimitada"
+  late final PageController _pageController;
+  late DateTime _selectedDate;
+
   @override
   void initState() {
     super.initState();
     _viewModel = MedicationListViewModel();
+    _pageController = PageController(initialPage: _centerPageIndex);
+    _selectedDate = DateTime.now();
     WidgetsBinding.instance.addObserver(this);
     _loadBatteryBannerPreference();
 
@@ -99,6 +106,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     _viewModel.removeListener(_onViewModelChanged);
     _viewModel.dispose();
     _tabController?.dispose();
+    _pageController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -718,11 +726,22 @@ class _MedicationListScreenState extends State<MedicationListScreen>
       Medication medication, String doseTime, bool wasTaken) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      await _viewModel.deleteTodayDose(
-        medication: medication,
-        doseTime: doseTime,
-        wasTaken: wasTaken,
-      );
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+      if (selectedDay == today) {
+        // For today, use the ViewModel method which updates medication state
+        await _viewModel.deleteTodayDose(
+          medication: medication,
+          doseTime: doseTime,
+          wasTaken: wasTaken,
+        );
+      } else {
+        // For historical dates, only delete from history
+        await _deleteHistoricalDose(medication, doseTime);
+        await _viewModel.loadMedicationsForDate(_selectedDate);
+      }
 
       if (!mounted) return;
 
@@ -745,15 +764,47 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  Future<void> _deleteHistoricalDose(Medication medication, String doseTime) async {
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final nextDay = selectedDay.add(const Duration(days: 1));
+
+    final entries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+      startDate: selectedDay,
+      endDate: nextDay,
+      medicationId: medication.id,
+    );
+
+    final selectedPerson = _viewModel.selectedPerson;
+    final entry = entries.where((e) {
+      return e.scheduledTimeFormatted == doseTime &&
+             (selectedPerson == null || e.personId == selectedPerson.id);
+    }).firstOrNull;
+
+    if (entry != null) {
+      await DatabaseHelper.instance.deleteDoseHistory(entry.id);
+    }
+  }
+
   Future<void> _toggleTodayDoseStatus(
       Medication medication, String doseTime, bool wasTaken) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      await _viewModel.toggleTodayDoseStatus(
-        medication: medication,
-        doseTime: doseTime,
-        wasTaken: wasTaken,
-      );
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+
+      if (selectedDay == today) {
+        // For today, use the ViewModel method which updates medication state
+        await _viewModel.toggleTodayDoseStatus(
+          medication: medication,
+          doseTime: doseTime,
+          wasTaken: wasTaken,
+        );
+      } else {
+        // For historical dates, only update history
+        await _toggleHistoricalDoseStatus(medication, doseTime, wasTaken);
+        await _viewModel.loadMedicationsForDate(_selectedDate);
+      }
 
       if (!mounted) return;
 
@@ -787,18 +838,44 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  Future<void> _toggleHistoricalDoseStatus(
+      Medication medication, String doseTime, bool wasTaken) async {
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final nextDay = selectedDay.add(const Duration(days: 1));
+
+    final entries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+      startDate: selectedDay,
+      endDate: nextDay,
+      medicationId: medication.id,
+    );
+
+    final selectedPerson = _viewModel.selectedPerson;
+    final entry = entries.where((e) {
+      return e.scheduledTimeFormatted == doseTime &&
+             (selectedPerson == null || e.personId == selectedPerson.id);
+    }).firstOrNull;
+
+    if (entry != null) {
+      final updatedEntry = entry.copyWith(
+        status: wasTaken ? DoseStatus.skipped : DoseStatus.taken,
+        registeredDateTime: DateTime.now(),
+      );
+      await DatabaseHelper.instance.insertDoseHistory(updatedEntry);
+    }
+  }
+
   Future<void> _changeRegisteredTime(Medication medication, String doseTime) async {
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      // Find the history entry for this dose
+      // Find the history entry for this dose on the selected date
       final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final tomorrow = today.add(const Duration(days: 1));
+      final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+      final nextDay = selectedDay.add(const Duration(days: 1));
 
       final entries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
-        startDate: today,
-        endDate: tomorrow,
+        startDate: selectedDay,
+        endDate: nextDay,
         medicationId: medication.id,
       );
 
@@ -876,8 +953,8 @@ class _MedicationListScreenState extends State<MedicationListScreen>
       // Update the entry
       await DoseHistoryService.changeRegisteredTime(entry, newRegisteredTime);
 
-      // Reload data
-      await _viewModel.loadMedications();
+      // Reload data for the selected date
+      await _viewModel.loadMedicationsForDate(_selectedDate);
 
       if (!mounted) return;
 
@@ -900,10 +977,22 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  void _onPageChanged(int page) {
+    final dayOffset = page - _centerPageIndex;
+    final newDate = DateTime.now().add(Duration(days: dayOffset));
+    final normalizedDate = DateTime(newDate.year, newDate.month, newDate.day);
+
+    setState(() {
+      _selectedDate = normalizedDate;
+    });
+
+    // Reload data for the new date
+    _viewModel.loadMedicationsForDate(_selectedDate);
+  }
+
   String _getTodayDate() {
-    final now = DateTime.now();
     final l10n = AppLocalizations.of(context)!;
-    return l10n.today(now.day, now.month, now.year);
+    return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
   }
 
   @override
@@ -954,57 +1043,63 @@ class _MedicationListScreenState extends State<MedicationListScreen>
               )
             : null,
       ),
-      body: _viewModel.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : _viewModel.medications.isEmpty
-              ? EmptyMedicationsView(onRefresh: _viewModel.loadMedications)
-              : Column(
-                  children: [
-                    if (PlatformHelper.isAndroid && !_batteryBannerDismissed)
-                      BatteryOptimizationBanner(onDismiss: _dismissBatteryBanner),
-                    if (_viewModel.activeFastingPeriods.isNotEmpty)
-                      _buildAllFastingCountdowns(),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: _viewModel.loadMedications,
-                        child: ListView.builder(
-                          padding:
-                              const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                          itemCount: _viewModel.medications.length,
-                          itemBuilder: (context, index) {
-                            final medication = _viewModel.medications[index];
-                            final nextDoseInfo =
-                                DoseCalculationService.getNextDoseInfo(medication);
-                            final nextDoseText = nextDoseInfo != null
-                                ? DoseCalculationService.formatNextDose(
-                                    nextDoseInfo, context)
-                                : null;
-                            final asNeededDoseInfo =
-                                _viewModel.getAsNeededDosesInfo(medication.id);
-                            final todayDosesWidget = (medication
-                                        .isTakenDosesDateToday &&
-                                    (medication.takenDosesToday.isNotEmpty ||
-                                        medication.skippedDosesToday.isNotEmpty))
-                                ? _buildTodayDosesSection(medication)
-                                : null;
+      body: PageView.builder(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        itemBuilder: (context, index) {
+          return _viewModel.isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : _viewModel.medications.isEmpty
+                  ? EmptyMedicationsView(onRefresh: _viewModel.loadMedications)
+                  : Column(
+                      children: [
+                        if (PlatformHelper.isAndroid && !_batteryBannerDismissed)
+                          BatteryOptimizationBanner(onDismiss: _dismissBatteryBanner),
+                        if (_viewModel.activeFastingPeriods.isNotEmpty)
+                          _buildAllFastingCountdowns(),
+                        Expanded(
+                          child: RefreshIndicator(
+                            onRefresh: _viewModel.loadMedications,
+                            child: ListView.builder(
+                              padding:
+                                  const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                              itemCount: _viewModel.medications.length,
+                              itemBuilder: (context, index) {
+                                final medication = _viewModel.medications[index];
+                                final nextDoseInfo =
+                                    DoseCalculationService.getNextDoseInfo(medication);
+                                final nextDoseText = nextDoseInfo != null
+                                    ? DoseCalculationService.formatNextDose(
+                                        nextDoseInfo, context)
+                                    : null;
+                                final asNeededDoseInfo =
+                                    _viewModel.getAsNeededDosesInfo(medication.id);
+                                final todayDosesWidget = (medication
+                                            .isTakenDosesDateToday &&
+                                        (medication.takenDosesToday.isNotEmpty ||
+                                            medication.skippedDosesToday.isNotEmpty))
+                                    ? _buildTodayDosesSection(medication)
+                                    : null;
 
-                            return MedicationCard(
-                              medication: medication,
-                              nextDoseInfo: nextDoseInfo,
-                              nextDoseText: nextDoseText,
-                              asNeededDoseInfo: asNeededDoseInfo,
-                              fastingPeriod: null,
-                              todayDosesWidget: todayDosesWidget,
-                              onTap: () => _showDeleteModal(medication),
-                            );
-                          },
+                                return MedicationCard(
+                                  medication: medication,
+                                  nextDoseInfo: nextDoseInfo,
+                                  nextDoseText: nextDoseText,
+                                  asNeededDoseInfo: asNeededDoseInfo,
+                                  fastingPeriod: null,
+                                  todayDosesWidget: todayDosesWidget,
+                                  onTap: () => _showDeleteModal(medication),
+                                );
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
+                      ],
+                    );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToAddMedication,
         child: const Icon(Icons.add),
