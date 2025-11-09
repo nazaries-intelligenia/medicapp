@@ -261,6 +261,7 @@
   },
   "errorFindingDoseEntry": "Non se atopou a entrada da dose",
   "registeredTimeCannotBeFuture": "A hora de rexistro non pode ser no futuro",
+  "errorLabel": "Erro",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",

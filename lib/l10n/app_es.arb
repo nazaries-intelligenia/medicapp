@@ -261,6 +261,7 @@
   },
   "errorFindingDoseEntry": "No se encontró la entrada de la dosis",
   "registeredTimeCannotBeFuture": "La hora de registro no puede ser en el futuro",
+  "errorLabel": "Error",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",

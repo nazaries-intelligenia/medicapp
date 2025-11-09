@@ -261,6 +261,7 @@
   },
   "errorFindingDoseEntry": "Ez da aurkitu dosien sarrera",
   "registeredTimeCannotBeFuture": "Erregistro ordua ezin da etorkizunean izan",
+  "errorLabel": "Errorea",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",
