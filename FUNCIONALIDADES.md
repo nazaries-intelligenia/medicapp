@@ -34,7 +34,7 @@
 - **Validación inteligente**: Prevención de duplicados (case-insensitive), validación de fechas/días/frecuencias, alertas de horarios duplicados, validación de cantidades no negativas
 - **Interfaz responsiva**: Material Design 3, layout adaptable (3 medicamentos por fila), scroll optimizado. Navegación adaptativa con 4 secciones (Inicio, Medicinas, Historial, Ajustes), pestañas Material 3 para Pastillero/Botiquín, etiquetas adaptativas según dispositivo, NavigationBar (móviles ≤600px) o NavigationRail (tablets/horizontal), pull-to-refresh
 - **Indicadores visuales de stock**: Códigos de color en pantalla principal (rojo: agotado, naranja: bajo, sin indicador: suficiente), detalles al tocar (cantidad exacta y duración estimada)
-- **Soporte multiidioma**: 5 idiomas (Español, Inglés, Catalán, Gallego, Euskera), detección automática según sistema, traducciones completas, sistema extensible con archivos ARB
+- **Soporte multiidioma**: 8 idiomas (Español, Inglés, Catalán, Gallego, Euskera, Alemán, Francés, Italiano), detección automática según sistema, traducciones completas, sistema extensible con archivos ARB
 - **Exportación e importación de base de datos**: Backup completo con timestamp, compartir mediante cualquier app, importación con validación de integridad, backup automático antes de importar, restauración automática si falla, accesible desde ajustes
 
 ## Herramientas de Depuración

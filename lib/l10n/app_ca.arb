@@ -1005,5 +1005,483 @@
   },
   "done": "Fet",
   "suspended": "Suspès",
-  "activeFastingPeriodsTitle": "Dejunis Actius"
+  "activeFastingPeriodsTitle": "Dejunis Actius",
+
+  "@_MEDICATION_LIST_SCREEN": {},
+  "notificationsWillNotWork": "Les notificacions NO funcionaran sense aquest permís.",
+  "debugMenuActivated": "Menú de depuració activat",
+  "debugMenuDeactivated": "Menú de depuració desactivat",
+  "nextDoseAt": "Propera presa: {time}",
+  "@nextDoseAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingDose": "⚠️ Dosi pendent: {time}",
+  "@pendingDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseTomorrow": "Propera presa: demà a les {time}",
+  "@nextDoseTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseOnDay": "Propera presa: {dayName} {day}/{month} a les {time}",
+  "@nextDoseOnDay": {
+    "placeholders": {
+      "dayName": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dayNameMon": "Dll",
+  "dayNameTue": "Dmt",
+  "dayNameWed": "Dmc",
+  "dayNameThu": "Dij",
+  "dayNameFri": "Div",
+  "dayNameSat": "Dss",
+  "dayNameSun": "Diu",
+  "whichDoseDidYouTake": "Quina presa has pres?",
+  "insufficientStockForThisDose": "Estoc insuficient per aquesta presa\nNecessites: {needed} {unit}\nDisponible: {available}",
+  "@insufficientStockForThisDose": {
+    "placeholders": {
+      "needed": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "doseRegisteredAtTime": "Presa de {name} registrada a les {time}\nEstoc restant: {stock}",
+  "@doseRegisteredAtTime": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "allDosesCompletedToday": "✓ Totes les preses d'avui completades",
+  "remainingDosesToday": "Preses restants avui: {count}",
+  "@remainingDosesToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "manualDoseRegistered": "Presa manual de {name} registrada\nQuantitat: {quantity} {unit}\nEstoc restant: {stock}",
+  "@manualDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationSuspended": "{name} suspès\nNo es programaran més notificacions",
+  "@medicationSuspended": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationReactivated": "{name} reactivat\nNotificacions reprogramades",
+  "@medicationReactivated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStock": "Estoc actual: {stock}",
+  "@currentStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityToAdd": "Quantitat a agregar",
+  "example": "Ex: {example}",
+  "@example": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "lastRefill": "Última recàrrega: {amount} {unit}",
+  "@lastRefill": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "refillButton": "Recarregar",
+  "stockRefilled": "Estoc de {name} recarregat\nAfegit: {amount} {unit}\nNou estoc: {newStock}",
+  "@stockRefilled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "newStock": {
+        "type": "String"
+      }
+    }
+  },
+  "availableStock": "Estoc disponible: {stock}",
+  "@availableStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityTaken": "Quantitat presa",
+  "registerButton": "Registrar",
+  "registerManualDose": "Registrar presa manual",
+  "refillMedication": "Recarregar medicament",
+  "resumeMedication": "Reactivar medicament",
+  "suspendMedication": "Suspendre medicament",
+  "editMedicationButton": "Editar medicament",
+  "deleteMedicationButton": "Eliminar medicament",
+  "medicationDeletedShort": "{name} eliminat",
+  "@medicationDeletedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noMedicationsRegistered": "No hi ha medicaments registrats",
+  "addMedicationHint": "Prem el botó + per afegir-ne un",
+  "pullToRefresh": "Arrossega cap avall per recarregar",
+  "batteryOptimizationWarning": "Perquè les notificacions funcionin, desactiva les restriccions de bateria:",
+  "batteryOptimizationInstructions": "Configuració → Aplicacions → MedicApp → Bateria → \"Sense restriccions\"",
+  "openSettings": "Obrir configuració",
+  "todayDosesLabel": "Preses d'avui:",
+  "doseOfMedicationAt": "Presa de {name} a les {time}",
+  "@doseOfMedicationAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStatus": "Estat actual: {status}",
+  "@currentStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "whatDoYouWantToDo": "Què vols fer?",
+  "deleteButton": "Eliminar",
+  "markAsSkipped": "Marcar com a omesa",
+  "markAsTaken": "Marcar com a presa",
+  "doseDeletedAt": "Presa de les {time} eliminada",
+  "@doseDeletedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Error en eliminar: {error}",
+  "@errorDeleting": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "doseMarkedAs": "Presa de les {time} marcada com {status}",
+  "@doseMarkedAs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errorChangingStatus": "Error en canviar estat: {error}",
+  "@errorChangingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationUpdatedShort": "{name} actualitzat",
+  "@medicationUpdatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "activateAlarmsPermission": "Activar \"Alarmes i recordatoris\"",
+  "alarmsPermissionDescription": "Aquest permís permet que les notificacions saltin exactament a l'hora configurada.",
+  "notificationDebugTitle": "Debug de notificacions",
+  "notificationPermissions": "✓ Permisos de notificacions: {enabled}",
+  "@notificationPermissions": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "exactAlarmsAndroid12": "⏰ Alarmes exactes (Android 12+): {enabled}",
+  "@exactAlarmsAndroid12": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "importantWarning": "⚠️ IMPORTANT",
+  "withoutPermissionNoNotifications": "Sense aquest permís les notificacions NO saltaran.",
+  "alarmsSettings": "Configuració → Aplicacions → MedicApp → Alarmes i recordatoris",
+  "pendingNotificationsCount": "📊 Notificacions pendents: {count}",
+  "@pendingNotificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedules": "💊 Medicaments amb horaris: {withSchedules}/{total}",
+  "@medicationsWithSchedules": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduledNotifications": "Notificacions programades:",
+  "noScheduledNotifications": "⚠️ No hi ha notificacions programades",
+  "notificationHistory": "Historial de notificacions",
+  "last24Hours": "Últimes 24 hores",
+  "noTitle": "Sense títol",
+  "medicationsAndSchedules": "Medicaments i horaris:",
+  "noSchedulesConfigured": "⚠️ Sense horaris configurats",
+  "closeButton": "Tancar",
+  "testNotification": "Provar notificació",
+  "testNotificationSent": "Notificació de prova enviada",
+  "testScheduledNotification": "Provar programada (1 min)",
+  "scheduledNotificationInOneMin": "Notificació programada per 1 minut",
+  "rescheduleNotifications": "Reprogramar notificacions",
+  "notificationsInfo": "Info de notificacions",
+  "notificationsRescheduled": "Notificacions reprogramades: {count}",
+  "@notificationsRescheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yesText": "Sí",
+  "noText": "No",
+  "notificationTypeDynamicFasting": "Dejuni dinàmic",
+  "notificationTypeScheduledFasting": "Dejuni programat",
+  "notificationTypeWeeklyPattern": "Patró setmanal",
+  "notificationTypeSpecificDate": "Data específica",
+  "notificationTypePostponed": "Posposada",
+  "notificationTypeDailyRecurring": "Diària recurrent",
+  "beforeTaking": "Abans de prendre",
+  "afterTaking": "Després de prendre",
+  "basedOnActualDose": "Basat en presa real",
+  "basedOnSchedule": "Basat en horari",
+  "today": "Avui {day}/{month}/{year}",
+  "@today": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "returnToToday": "Tornar a avui",
+  "tomorrow": "Demà {day}/{month}/{year}",
+  "@tomorrow": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "todayOrLater": "Avui o posterior",
+  "pastDueWarning": "⚠️ PASSADA",
+  "batteryOptimizationMenu": "⚙️ Optimització de bateria",
+  "alarmsAndReminders": "⚙️ Alarmes i recordatoris",
+  "notificationTypeScheduledFastingShort": "Dejuni programat",
+  "basedOnActualDoseShort": "Basat en presa real",
+  "basedOnScheduleShort": "Basat en horari",
+  "pendingNotifications": "📊 Notificacions pendents: {count}",
+  "@pendingNotifications": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedulesInfo": "💊 Medicaments amb horaris: {withSchedules}/{total}",
+  "@medicationsWithSchedulesInfo": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noSchedulesConfiguredWarning": "⚠️ Sense horaris configurats",
+  "medicationInfo": "💊 {name}",
+  "@medicationInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationType": "📋 Tipus: {type}",
+  "@notificationType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDate": "📅 Data: {date}",
+  "@scheduleDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTime": "⏰ Hora: {time}",
+  "@scheduleTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationId": "ID: {id}",
+  "@notificationId": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "takenStatus": "Presa",
+  "skippedStatus": "Omesa",
+  "durationEstimate": "{name}\nEstoc: {stock}\nDurada estimada: {days} dies",
+  "@durationEstimate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "errorChanging": "Error en canviar estat: {error}",
+  "@errorChanging": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "testScheduled1Min": "Provar programada (1 min)",
+  "alarmsAndRemindersMenu": "⚙️ Alarmes i recordatoris",
+  "medicationStockInfo": "{name}\nEstoc: {stock}",
+  "@medicationStockInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShowPersonTabsTitle": "Veure persones separades per pestanyes",
+  "settingsShowPersonTabsSubtitle": "Mostra cada persona en una pestanya separada. Si es desactiva, totes les persones es barregen en una sola llista amb etiquetes",
+  "selectPerson": "Seleccionar persona"
 }

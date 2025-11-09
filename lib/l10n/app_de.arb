@@ -1,0 +1,1501 @@
+{
+  "@@locale": "de",
+
+  "@_NAVIGATION": {},
+  "appTitle": "MedicApp",
+  "navMedication": "Medikation",
+  "navPillOrganizer": "Tablettendose",
+  "navMedicineCabinet": "Hausapotheke",
+  "navHistory": "Verlauf",
+  "navSettings": "Einstellungen",
+  "navInventory": "Inventar",
+  "navMedicationShort": "Start",
+  "navPillOrganizerShort": "Vorrat",
+  "navMedicineCabinetShort": "Apotheke",
+  "navHistoryShort": "Verlauf",
+  "navSettingsShort": "Einst.",
+  "navInventoryShort": "Medikamente",
+
+  "@_COMMON_BUTTONS": {},
+  "btnContinue": "Weiter",
+  "btnBack": "Zurück",
+  "btnSave": "Speichern",
+  "btnCancel": "Abbrechen",
+  "btnDelete": "Löschen",
+  "btnEdit": "Bearbeiten",
+  "btnClose": "Schließen",
+  "btnConfirm": "Bestätigen",
+  "btnAccept": "Akzeptieren",
+
+  "@_MEDICATION_TYPES": {},
+  "medicationTypePill": "Tablette",
+  "medicationTypeCapsule": "Kapsel",
+  "medicationTypeTablet": "Tablette",
+  "medicationTypeSyrup": "Sirup",
+  "medicationTypeDrops": "Tropfen",
+  "medicationTypeInjection": "Injektion",
+  "medicationTypePatch": "Pflaster",
+  "medicationTypeInhaler": "Inhalator",
+  "medicationTypeCream": "Creme",
+  "medicationTypeOther": "Andere",
+
+  "@_DOSE_STATUS": {},
+  "doseStatusTaken": "Eingenommen",
+  "doseStatusSkipped": "Ausgelassen",
+  "doseStatusPending": "Ausstehend",
+
+  "@_TREATMENT_DURATION": {},
+  "durationContinuous": "Kontinuierlich",
+  "durationSpecificDates": "Bestimmte Daten",
+  "durationAsNeeded": "Nach Bedarf",
+
+  "@_MAIN_SCREEN": {},
+  "mainScreenTitle": "Meine Medikamente",
+  "mainScreenEmptyTitle": "Keine Medikamente registriert",
+  "mainScreenEmptySubtitle": "Fügen Sie Medikamente über die Schaltfläche + hinzu",
+  "mainScreenTodayDoses": "Heutige Einnahmen",
+  "mainScreenNoMedications": "Sie haben keine aktiven Medikamente",
+
+  "@_COMMON_MESSAGES": {},
+  "msgMedicationAdded": "Medikament erfolgreich hinzugefügt",
+  "msgMedicationUpdated": "Medikament erfolgreich aktualisiert",
+  "msgMedicationDeleted": "{name} erfolgreich gelöscht",
+  "@msgMedicationDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@_VALIDATION": {},
+  "validationRequired": "Dieses Feld ist erforderlich",
+  "validationDuplicateMedication": "Dieses Medikament ist bereits in Ihrer Liste vorhanden",
+  "validationInvalidNumber": "Geben Sie eine gültige Zahl ein",
+  "validationMinValue": "Der Wert muss größer als {min} sein",
+  "@validationMinValue": {
+    "placeholders": {
+      "min": {
+        "type": "num"
+      }
+    }
+  },
+
+  "@_PILL_ORGANIZER_SCREEN": {},
+  "pillOrganizerTitle": "Tablettendose",
+  "pillOrganizerTotal": "Gesamt",
+  "pillOrganizerLowStock": "Niedriger Vorrat",
+  "pillOrganizerNoStock": "Kein Vorrat",
+  "pillOrganizerAvailableStock": "Verfügbarer Vorrat",
+  "pillOrganizerMedicationsTitle": "Medikamente",
+  "pillOrganizerEmptyTitle": "Keine Medikamente registriert",
+  "pillOrganizerEmptySubtitle": "Fügen Sie Medikamente hinzu, um Ihre Tablettendose zu sehen",
+  "pillOrganizerCurrentStock": "Aktueller Vorrat",
+  "pillOrganizerEstimatedDuration": "Geschätzte Dauer",
+  "pillOrganizerDays": "Tage",
+
+  "@_MEDICINE_CABINET_SCREEN": {},
+  "medicineCabinetTitle": "Hausapotheke",
+  "medicineCabinetSearchHint": "Medikament suchen...",
+  "medicineCabinetEmptyTitle": "Keine Medikamente registriert",
+  "medicineCabinetEmptySubtitle": "Fügen Sie Medikamente hinzu, um Ihre Hausapotheke zu sehen",
+  "medicineCabinetPullToRefresh": "Ziehen Sie nach unten, um zu aktualisieren",
+  "medicineCabinetNoResults": "Keine Medikamente gefunden",
+  "medicineCabinetNoResultsHint": "Versuchen Sie einen anderen Suchbegriff",
+  "medicineCabinetStock": "Vorrat:",
+  "medicineCabinetSuspended": "Ausgesetzt",
+  "medicineCabinetTapToRegister": "Tippen Sie, um zu registrieren",
+  "medicineCabinetResumeMedication": "Medikation fortsetzen",
+  "medicineCabinetRegisterDose": "Einnahme registrieren",
+  "medicineCabinetRefillMedication": "Medikament auffüllen",
+  "medicineCabinetEditMedication": "Medikament bearbeiten",
+  "medicineCabinetDeleteMedication": "Medikament löschen",
+  "medicineCabinetRefillTitle": "{name} auffüllen",
+  "@medicineCabinetRefillTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetRegisterDoseTitle": "Einnahme von {name} registrieren",
+  "@medicineCabinetRegisterDoseTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetCurrentStock": "Aktueller Vorrat:",
+  "medicineCabinetAddQuantity": "Hinzuzufügende Menge:",
+  "medicineCabinetAddQuantityLabel": "Hinzuzufügende Menge",
+  "medicineCabinetExample": "Bsp.:",
+  "medicineCabinetLastRefill": "Letzte Auffüllung:",
+  "medicineCabinetRefillButton": "Auffüllen",
+  "medicineCabinetAvailableStock": "Verfügbarer Vorrat:",
+  "medicineCabinetDoseTaken": "Eingenommene Menge",
+  "medicineCabinetRegisterButton": "Registrieren",
+  "medicineCabinetNewStock": "Neuer Vorrat:",
+  "medicineCabinetDeleteConfirmTitle": "Medikament löschen",
+  "medicineCabinetDeleteConfirmMessage": "Sind Sie sicher, dass Sie \"{name}\" löschen möchten?\n\nDiese Aktion kann nicht rückgängig gemacht werden und der gesamte Verlauf dieses Medikaments geht verloren.",
+  "@medicineCabinetDeleteConfirmMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetNoStockAvailable": "Von diesem Medikament ist kein Vorrat verfügbar",
+  "medicineCabinetInsufficientStock": "Unzureichender Vorrat für diese Einnahme\nBenötigt: {needed} {unit}\nVerfügbar: {available}",
+  "@medicineCabinetInsufficientStock": {
+    "placeholders": {
+      "needed": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetRefillSuccess": "Vorrat von {name} aufgefüllt\nHinzugefügt: {amount} {unit}\nNeuer Vorrat: {newStock}",
+  "@medicineCabinetRefillSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "newStock": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetDoseRegistered": "Einnahme von {name} registriert\nMenge: {amount} {unit}\nVerbleibender Vorrat: {remaining}",
+  "@medicineCabinetDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetDeleteSuccess": "{name} erfolgreich gelöscht",
+  "@medicineCabinetDeleteSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicineCabinetResumeSuccess": "{name} erfolgreich fortgesetzt\nBenachrichtigungen neu geplant",
+  "@medicineCabinetResumeSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "@_DOSE_HISTORY_SCREEN": {},
+  "doseHistoryTitle": "Einnahmeverlauf",
+  "doseHistoryFilterTitle": "Verlauf filtern",
+  "doseHistoryMedicationLabel": "Medikament:",
+  "doseHistoryAllMedications": "Alle Medikamente",
+  "doseHistoryDateRangeLabel": "Datumsbereich:",
+  "doseHistoryClearDates": "Daten löschen",
+  "doseHistoryApply": "Anwenden",
+  "doseHistoryTotal": "Gesamt",
+  "doseHistoryTaken": "Eingenommen",
+  "doseHistorySkipped": "Ausgelassen",
+  "doseHistoryClear": "Löschen",
+  "doseHistoryEditEntry": "Eintrag von {name} bearbeiten",
+  "@doseHistoryEditEntry": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doseHistoryScheduledTime": "Geplante Zeit:",
+  "doseHistoryActualTime": "Tatsächliche Zeit:",
+  "doseHistoryStatus": "Status:",
+  "doseHistoryMarkAsSkipped": "Als ausgelassen markieren",
+  "doseHistoryMarkAsTaken": "Als eingenommen markieren",
+  "doseHistoryConfirmDelete": "Löschen bestätigen",
+  "doseHistoryConfirmDeleteMessage": "Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?",
+  "doseHistoryRecordDeleted": "Eintrag erfolgreich gelöscht",
+  "doseHistoryDeleteError": "Fehler beim Löschen: {error}",
+  "@doseHistoryDeleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "changeRegisteredTime": "Registrierungszeit ändern",
+  "selectRegisteredTime": "Registrierungszeit auswählen",
+  "registeredTimeLabel": "Registrierungszeit:",
+  "registeredTimeUpdated": "Registrierungszeit aktualisiert",
+  "errorUpdatingTime": "Fehler beim Aktualisieren der Zeit: {error}",
+  "@errorUpdatingTime": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFindingDoseEntry": "Dosiseintrag wurde nicht gefunden",
+  "registeredTimeCannotBeFuture": "Die Registrierungszeit kann nicht in der Zukunft liegen",
+  "errorLabel": "Fehler",
+
+  "addMedicationTitle": "Medikament hinzufügen",
+  "stepIndicator": "Schritt {current} von {total}",
+  "@stepIndicator": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+
+  "medicationInfoTitle": "Medikamenteninformation",
+  "medicationInfoSubtitle": "Beginnen Sie mit der Angabe des Namens und der Art des Medikaments",
+  "medicationNameLabel": "Medikamentenname",
+  "medicationNameHint": "z.B.: Paracetamol",
+  "medicationTypeLabel": "Medikamententyp",
+  "validationMedicationName": "Bitte geben Sie den Medikamentennamen ein",
+
+  "medicationDurationTitle": "Behandlungsart",
+  "medicationDurationSubtitle": "Wie werden Sie dieses Medikament einnehmen?",
+  "durationContinuousTitle": "Kontinuierliche Behandlung",
+  "durationContinuousDesc": "Jeden Tag, mit regelmäßigem Muster",
+  "durationUntilEmptyTitle": "Bis Medikament aufgebraucht",
+  "durationUntilEmptyDesc": "Endet, wenn der Vorrat aufgebraucht ist",
+  "durationSpecificDatesTitle": "Bestimmte Daten",
+  "durationSpecificDatesDesc": "Nur ausgewählte konkrete Tage",
+  "durationAsNeededTitle": "Gelegentliches Medikament",
+  "durationAsNeededDesc": "Nur bei Bedarf, ohne Zeitplan",
+  "selectDatesButton": "Daten auswählen",
+  "selectDatesTitle": "Daten auswählen",
+  "selectDatesSubtitle": "Wählen Sie die genauen Tage, an denen Sie das Medikament einnehmen werden",
+  "dateSelected": "{count, plural, =1{1 Datum ausgewählt} other{{count} Daten ausgewählt}}",
+  "@dateSelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "validationSelectDates": "Bitte wählen Sie mindestens ein Datum aus",
+
+  "medicationDatesTitle": "Behandlungsdaten",
+  "medicationDatesSubtitle": "Wann beginnen und enden Sie diese Behandlung?",
+  "medicationDatesHelp": "Beide Daten sind optional. Wenn Sie sie nicht festlegen, beginnt die Behandlung heute und hat kein Enddatum.",
+  "startDateLabel": "Startdatum",
+  "startDateOptional": "Optional",
+  "startDateDefault": "Beginnt heute",
+  "endDateLabel": "Enddatum",
+  "endDateDefault": "Kein Enddatum",
+  "startDatePickerTitle": "Startdatum der Behandlung",
+  "endDatePickerTitle": "Enddatum der Behandlung",
+  "startTodayButton": "Heute beginnen",
+  "noEndDateButton": "Kein Enddatum",
+  "treatmentDuration": "Behandlung von {days} Tagen",
+  "@treatmentDuration": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+
+  "medicationFrequencyTitle": "Medikationshäufigkeit",
+  "medicationFrequencySubtitle": "Alle wie viele Tage müssen Sie dieses Medikament einnehmen",
+  "frequencyDailyTitle": "Jeden Tag",
+  "frequencyDailyDesc": "Tägliche kontinuierliche Medikation",
+  "frequencyAlternateTitle": "Jeden zweiten Tag",
+  "frequencyAlternateDesc": "Alle 2 Tage ab Behandlungsbeginn",
+  "frequencyWeeklyTitle": "Bestimmte Wochentage",
+  "frequencyWeeklyDesc": "Wählen Sie aus, an welchen Tagen Sie das Medikament einnehmen",
+  "selectWeeklyDaysButton": "Tage auswählen",
+  "selectWeeklyDaysTitle": "Wochentage",
+  "selectWeeklyDaysSubtitle": "Wählen Sie die spezifischen Tage aus, an denen Sie das Medikament einnehmen werden",
+  "daySelected": "{count, plural, =1{1 Tag ausgewählt} other{{count} Tage ausgewählt}}",
+  "@daySelected": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "validationSelectWeekdays": "Bitte wählen Sie die Wochentage aus",
+
+  "medicationDosageTitle": "Dosierungskonfiguration",
+  "medicationDosageSubtitle": "Wie möchten Sie die täglichen Dosen konfigurieren?",
+  "dosageFixedTitle": "Jeden Tag gleich",
+  "dosageFixedDesc": "Geben Sie an, alle wie viele Stunden Sie das Medikament einnehmen",
+  "dosageCustomTitle": "Benutzerdefiniert",
+  "dosageCustomDesc": "Legen Sie die Anzahl der Einnahmen pro Tag fest",
+  "dosageIntervalLabel": "Intervall zwischen Einnahmen",
+  "dosageIntervalHelp": "Das Intervall muss 24 genau teilen",
+  "dosageIntervalFieldLabel": "Alle wie viele Stunden",
+  "dosageIntervalHint": "z.B.: 8",
+  "dosageIntervalUnit": "Stunden",
+  "dosageIntervalValidValues": "Gültige Werte: 1, 2, 3, 4, 6, 8, 12, 24",
+  "dosageTimesLabel": "Anzahl der Einnahmen pro Tag",
+  "dosageTimesHelp": "Legen Sie fest, wie oft am Tag Sie das Medikament einnehmen werden",
+  "dosageTimesFieldLabel": "Einnahmen pro Tag",
+  "dosageTimesHint": "z.B.: 3",
+  "dosageTimesUnit": "Einnahmen",
+  "dosageTimesDescription": "Gesamtzahl der täglichen Einnahmen",
+  "dosesPerDay": "Einnahmen pro Tag",
+  "doseCount": "{count, plural, =1{1 Einnahme} other{{count} Einnahmen}}",
+  "@doseCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "validationInvalidInterval": "Bitte geben Sie ein gültiges Intervall ein",
+  "validationIntervalTooLarge": "Das Intervall darf nicht größer als 24 Stunden sein",
+  "validationIntervalNotDivisor": "Das Intervall muss 24 genau teilen (1, 2, 3, 4, 6, 8, 12, 24)",
+  "validationInvalidDoseCount": "Bitte geben Sie eine gültige Anzahl von Einnahmen ein",
+  "validationTooManyDoses": "Sie können nicht mehr als 24 Dosen pro Tag einnehmen",
+
+  "medicationTimesTitle": "Einnahmeplan",
+  "dosesPerDayLabel": "Einnahmen pro Tag: {count}",
+  "@dosesPerDayLabel": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "frequencyEveryHours": "Häufigkeit: Alle {hours} Stunden",
+  "@frequencyEveryHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "selectTimeAndAmount": "Wählen Sie die Zeit und Menge jeder Einnahme",
+  "doseNumber": "Einnahme {number}",
+  "@doseNumber": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "selectTimeButton": "Zeit auswählen",
+  "amountPerDose": "Menge pro Einnahme",
+  "amountHint": "z.B.: 1, 0.5, 2",
+  "removeDoseButton": "Einnahme entfernen",
+  "validationSelectAllTimes": "Bitte wählen Sie alle Zeiten der Einnahmen aus",
+  "validationEnterValidAmounts": "Bitte geben Sie gültige Mengen ein (größer als 0)",
+  "validationDuplicateTimes": "Die Zeiten der Einnahmen dürfen sich nicht wiederholen",
+  "validationAtLeastOneDose": "Es muss mindestens eine Einnahme pro Tag geben",
+
+  "medicationFastingTitle": "Nüchternheitskonfiguration",
+  "fastingLabel": "Nüchternheit",
+  "fastingHelp": "Einige Medikamente erfordern Nüchternheit vor oder nach der Einnahme",
+  "requiresFastingQuestion": "Erfordert dieses Medikament Nüchternheit?",
+  "fastingNo": "Nein",
+  "fastingYes": "Ja",
+  "fastingWhenQuestion": "Wann ist die Nüchternheit?",
+  "fastingBefore": "Vor der Einnahme",
+  "fastingAfter": "Nach der Einnahme",
+  "fastingDurationQuestion": "Wie lange soll die Nüchternheit dauern?",
+  "fastingHours": "Stunden",
+  "fastingMinutes": "Minuten",
+  "fastingNotificationsQuestion": "Möchten Sie Nüchternheitsbenachrichtigungen erhalten?",
+  "fastingNotificationBeforeHelp": "Wir benachrichtigen Sie, wann Sie vor der Einnahme aufhören müssen zu essen",
+  "fastingNotificationAfterHelp": "Wir benachrichtigen Sie, wann Sie nach der Einnahme wieder essen können",
+  "fastingNotificationsOn": "Benachrichtigungen aktiviert",
+  "fastingNotificationsOff": "Benachrichtigungen deaktiviert",
+  "validationCompleteAllFields": "Bitte füllen Sie alle Felder aus",
+  "validationSelectFastingWhen": "Bitte wählen Sie aus, wann die Nüchternheit ist",
+  "validationFastingDuration": "Die Nüchternheitsdauer muss mindestens 1 Minute betragen",
+
+  "medicationQuantityTitle": "Medikamentenmenge",
+  "medicationQuantitySubtitle": "Legen Sie die verfügbare Menge fest und wann Sie Warnungen erhalten möchten",
+  "availableQuantityLabel": "Verfügbare Menge",
+  "availableQuantityHint": "z.B.: 30",
+  "availableQuantityHelp": "Menge an {unit}, die Sie derzeit haben",
+  "@availableQuantityHelp": {
+    "placeholders": {
+      "unit": {"type": "String"}
+    }
+  },
+  "lowStockAlertLabel": "Warnen, wenn nur noch",
+  "lowStockAlertHint": "z.B.: 3",
+  "lowStockAlertUnit": "Tage",
+  "lowStockAlertHelp": "Tage im Voraus, um die Warnung über niedrigen Vorrat zu erhalten",
+  "validationEnterQuantity": "Bitte geben Sie die verfügbare Menge ein",
+  "validationQuantityNonNegative": "Die Menge muss größer oder gleich 0 sein",
+  "validationEnterAlertDays": "Bitte geben Sie die Tage im Voraus ein",
+  "validationAlertMinDays": "Es muss mindestens 1 Tag sein",
+  "validationAlertMaxDays": "Es darf nicht mehr als 30 Tage sein",
+  "summaryTitle": "Zusammenfassung",
+  "summaryMedication": "Medikament",
+  "summaryType": "Typ",
+  "summaryDosesPerDay": "Einnahmen pro Tag",
+  "summarySchedules": "Zeitpläne",
+  "summaryFrequency": "Häufigkeit",
+  "summaryFrequencyDaily": "Jeden Tag",
+  "summaryFrequencyUntilEmpty": "Bis Medikament aufgebraucht",
+  "summaryFrequencySpecificDates": "{count} bestimmte Daten",
+  "@summaryFrequencySpecificDates": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "summaryFrequencyWeekdays": "{count} Wochentage",
+  "@summaryFrequencyWeekdays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "summaryFrequencyEveryNDays": "Alle {days} Tage",
+  "@summaryFrequencyEveryNDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "summaryFrequencyAsNeeded": "Nach Bedarf",
+  "msgMedicationAddedSuccess": "{name} erfolgreich hinzugefügt",
+  "@msgMedicationAddedSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "msgMedicationAddError": "Fehler beim Speichern des Medikaments: {error}",
+  "@msgMedicationAddError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "saveMedicationButton": "Medikament speichern",
+  "savingButton": "Wird gespeichert...",
+
+  "@_DOSE_ACTION_SCREEN": {},
+  "doseActionTitle": "Einnahmeaktion",
+  "doseActionLoading": "Wird geladen...",
+  "doseActionError": "Fehler",
+  "doseActionMedicationNotFound": "Medikament nicht gefunden",
+  "doseActionBack": "Zurück",
+  "doseActionScheduledTime": "Geplante Zeit: {time}",
+  "@doseActionScheduledTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "doseActionThisDoseQuantity": "Menge dieser Einnahme",
+  "doseActionWhatToDo": "Was möchten Sie tun?",
+  "doseActionRegisterTaken": "Einnahme registrieren",
+  "doseActionWillDeductStock": "Wird vom Vorrat abgezogen",
+  "doseActionMarkAsNotTaken": "Als nicht eingenommen markieren",
+  "doseActionWillNotDeductStock": "Wird nicht vom Vorrat abgezogen",
+  "doseActionPostpone15Min": "15 Minuten verschieben",
+  "doseActionQuickReminder": "Schnelle Erinnerung",
+  "doseActionPostponeCustom": "Verschieben (Zeit wählen)",
+  "doseActionInsufficientStock": "Unzureichender Vorrat für diese Einnahme\nBenötigt: {needed} {unit}\nVerfügbar: {available}",
+  "@doseActionInsufficientStock": {
+    "placeholders": {
+      "needed": {"type": "String"},
+      "unit": {"type": "String"},
+      "available": {"type": "String"}
+    }
+  },
+  "doseActionTakenRegistered": "Einnahme von {name} um {time} registriert\nVerbleibender Vorrat: {stock}",
+  "@doseActionTakenRegistered": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"},
+      "stock": {"type": "String"}
+    }
+  },
+  "doseActionSkippedRegistered": "Einnahme von {name} um {time} als nicht eingenommen markiert\nVorrat: {stock} (keine Änderung)",
+  "@doseActionSkippedRegistered": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"},
+      "stock": {"type": "String"}
+    }
+  },
+  "doseActionPostponed": "Einnahme von {name} verschoben\nNeue Zeit: {time}",
+  "@doseActionPostponed": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+  "doseActionPostponed15": "Einnahme von {name} um 15 Minuten verschoben\nNeue Zeit: {time}",
+  "@doseActionPostponed15": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "time": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_MEDICATION_MENU": {},
+  "editMedicationMenuTitle": "Medikament bearbeiten",
+  "editMedicationMenuWhatToEdit": "Was möchten Sie bearbeiten?",
+  "editMedicationMenuSelectSection": "Wählen Sie den Abschnitt aus, den Sie ändern möchten",
+  "editMedicationMenuBasicInfo": "Grundinformationen",
+  "editMedicationMenuBasicInfoDesc": "Name und Art des Medikaments",
+  "editMedicationMenuDuration": "Behandlungsdauer",
+  "editMedicationMenuFrequency": "Häufigkeit",
+  "editMedicationMenuSchedules": "Zeitpläne und Mengen",
+  "editMedicationMenuSchedulesDesc": "{count} Einnahmen pro Tag",
+  "@editMedicationMenuSchedulesDesc": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editMedicationMenuFasting": "Nüchternheitskonfiguration",
+  "editMedicationMenuQuantity": "Verfügbare Menge",
+  "editMedicationMenuQuantityDesc": "{quantity} {unit}",
+  "@editMedicationMenuQuantityDesc": {
+    "placeholders": {
+      "quantity": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "editMedicationMenuFreqEveryday": "Jeden Tag",
+  "editMedicationMenuFreqUntilFinished": "Bis Medikament aufgebraucht",
+  "editMedicationMenuFreqSpecificDates": "{count} bestimmte Daten",
+  "@editMedicationMenuFreqSpecificDates": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editMedicationMenuFreqWeeklyDays": "{count} Wochentage",
+  "@editMedicationMenuFreqWeeklyDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editMedicationMenuFreqInterval": "Alle {interval} Tage",
+  "@editMedicationMenuFreqInterval": {
+    "placeholders": {
+      "interval": {"type": "int"}
+    }
+  },
+  "editMedicationMenuFreqNotDefined": "Häufigkeit nicht definiert",
+  "editMedicationMenuFastingNone": "Keine Nüchternheit",
+  "editMedicationMenuFastingDuration": "Nüchternheit {duration} {type}",
+  "@editMedicationMenuFastingDuration": {
+    "placeholders": {
+      "duration": {"type": "String"},
+      "type": {"type": "String"}
+    }
+  },
+  "editMedicationMenuFastingBefore": "vorher",
+  "editMedicationMenuFastingAfter": "nachher",
+
+  "@_EDIT_BASIC_INFO": {},
+  "editBasicInfoTitle": "Grundinformationen bearbeiten",
+  "editBasicInfoUpdated": "Informationen erfolgreich aktualisiert",
+  "editBasicInfoSaving": "Wird gespeichert...",
+  "editBasicInfoSaveChanges": "Änderungen speichern",
+  "editBasicInfoError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editBasicInfoError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_DURATION": {},
+  "editDurationTitle": "Dauer bearbeiten",
+  "editDurationTypeLabel": "Dauertyp",
+  "editDurationCurrentType": "Aktueller Typ: {type}",
+  "@editDurationCurrentType": {
+    "placeholders": {
+      "type": {"type": "String"}
+    }
+  },
+  "editDurationChangeTypeInfo": "Um den Dauertyp zu ändern, bearbeiten Sie den Abschnitt \"Häufigkeit\"",
+  "editDurationTreatmentDates": "Behandlungsdaten",
+  "editDurationStartDate": "Startdatum",
+  "editDurationEndDate": "Enddatum",
+  "editDurationNotSelected": "Nicht ausgewählt",
+  "editDurationDays": "Dauer: {days} Tage",
+  "@editDurationDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "editDurationSelectDates": "Bitte wählen Sie Start- und Enddatum aus",
+  "editDurationUpdated": "Dauer erfolgreich aktualisiert",
+  "editDurationError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editDurationError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_FASTING": {},
+  "editFastingTitle": "Nüchternheitskonfiguration bearbeiten",
+  "editFastingCompleteFields": "Bitte füllen Sie alle Felder aus",
+  "editFastingSelectWhen": "Bitte wählen Sie aus, wann die Nüchternheit ist",
+  "editFastingMinDuration": "Die Nüchternheitsdauer muss mindestens 1 Minute betragen",
+  "editFastingUpdated": "Nüchternheitskonfiguration erfolgreich aktualisiert",
+  "editFastingError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editFastingError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_FREQUENCY": {},
+  "editFrequencyTitle": "Häufigkeit bearbeiten",
+  "editFrequencyPattern": "Häufigkeitsmuster",
+  "editFrequencyQuestion": "Wie oft werden Sie dieses Medikament einnehmen?",
+  "editFrequencyEveryday": "Jeden Tag",
+  "editFrequencyEverydayDesc": "Medikament täglich einnehmen",
+  "editFrequencyUntilFinished": "Bis aufgebraucht",
+  "editFrequencyUntilFinishedDesc": "Bis das Medikament aufgebraucht ist",
+  "editFrequencySpecificDates": "Bestimmte Daten",
+  "editFrequencySpecificDatesDesc": "Konkrete Daten auswählen",
+  "editFrequencyWeeklyDays": "Wochentage",
+  "editFrequencyWeeklyDaysDesc": "Bestimmte Tage jede Woche auswählen",
+  "editFrequencyAlternateDays": "Jeden zweiten Tag",
+  "editFrequencyAlternateDaysDesc": "Alle 2 Tage ab Behandlungsbeginn",
+  "editFrequencyCustomInterval": "Benutzerdefiniertes Intervall",
+  "editFrequencyCustomIntervalDesc": "Alle N Tage ab Beginn",
+  "editFrequencySelectedDates": "Ausgewählte Daten",
+  "editFrequencyDatesCount": "{count} Daten ausgewählt",
+  "@editFrequencyDatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editFrequencyNoDatesSelected": "Kein Datum ausgewählt",
+  "editFrequencySelectDatesButton": "Daten auswählen",
+  "editFrequencyWeeklyDaysLabel": "Wochentage",
+  "editFrequencyWeeklyDaysCount": "{count} Tage ausgewählt",
+  "@editFrequencyWeeklyDaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editFrequencyNoDaysSelected": "Kein Tag ausgewählt",
+  "editFrequencySelectDaysButton": "Tage auswählen",
+  "editFrequencyIntervalLabel": "Tagesintervall",
+  "editFrequencyIntervalField": "Alle wie viele Tage",
+  "editFrequencyIntervalHint": "z.B.: 3",
+  "editFrequencyIntervalHelp": "Muss mindestens 2 Tage sein",
+  "editFrequencySelectAtLeastOneDate": "Bitte wählen Sie mindestens ein Datum aus",
+  "editFrequencySelectAtLeastOneDay": "Bitte wählen Sie mindestens einen Wochentag aus",
+  "editFrequencyIntervalMin": "Das Intervall muss mindestens 2 Tage betragen",
+  "editFrequencyUpdated": "Häufigkeit erfolgreich aktualisiert",
+  "editFrequencyError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editFrequencyError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_QUANTITY": {},
+  "editQuantityTitle": "Menge bearbeiten",
+  "editQuantityMedicationLabel": "Medikamentenmenge",
+  "editQuantityDescription": "Legen Sie die verfügbare Menge fest und wann Sie Warnungen erhalten möchten",
+  "editQuantityAvailableLabel": "Verfügbare Menge",
+  "editQuantityAvailableHelp": "Menge an {unit}, die Sie derzeit haben",
+  "@editQuantityAvailableHelp": {
+    "placeholders": {
+      "unit": {"type": "String"}
+    }
+  },
+  "editQuantityValidationRequired": "Bitte geben Sie die verfügbare Menge ein",
+  "editQuantityValidationMin": "Die Menge muss größer oder gleich 0 sein",
+  "editQuantityThresholdLabel": "Warnen, wenn nur noch",
+  "editQuantityThresholdHelp": "Tage im Voraus, um die Warnung über niedrigen Vorrat zu erhalten",
+  "editQuantityThresholdValidationRequired": "Bitte geben Sie die Tage im Voraus ein",
+  "editQuantityThresholdValidationMin": "Es muss mindestens 1 Tag sein",
+  "editQuantityThresholdValidationMax": "Es darf nicht mehr als 30 Tage sein",
+  "editQuantityUpdated": "Menge erfolgreich aktualisiert",
+  "editQuantityError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editQuantityError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+
+  "@_EDIT_SCHEDULE": {},
+  "editScheduleTitle": "Zeitpläne bearbeiten",
+  "editScheduleAddDose": "Einnahme hinzufügen",
+  "editScheduleValidationQuantities": "Bitte geben Sie gültige Mengen ein (größer als 0)",
+  "editScheduleValidationDuplicates": "Die Zeiten der Einnahmen dürfen sich nicht wiederholen",
+  "editScheduleUpdated": "Zeitpläne erfolgreich aktualisiert",
+  "editScheduleError": "Fehler beim Speichern der Änderungen: {error}",
+  "@editScheduleError": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "editScheduleDosesPerDay": "Einnahmen pro Tag: {count}",
+  "@editScheduleDosesPerDay": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "editScheduleAdjustTimeAndQuantity": "Passen Sie die Zeit und Menge jeder Einnahme an",
+
+  "@_SPECIFIC_DATES_SELECTOR": {},
+  "specificDatesSelectorTitle": "Bestimmte Daten",
+  "specificDatesSelectorSelectDates": "Daten auswählen",
+  "specificDatesSelectorDescription": "Wählen Sie die spezifischen Daten aus, an denen Sie dieses Medikament einnehmen werden",
+  "specificDatesSelectorAddDate": "Datum hinzufügen",
+  "specificDatesSelectorSelectedDates": "Ausgewählte Daten ({count})",
+  "@specificDatesSelectorSelectedDates": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "specificDatesSelectorToday": "HEUTE",
+  "specificDatesSelectorContinue": "Weiter",
+  "specificDatesSelectorAlreadySelected": "Dieses Datum ist bereits ausgewählt",
+  "specificDatesSelectorSelectAtLeastOne": "Wählen Sie mindestens ein Datum aus",
+  "specificDatesSelectorPickerHelp": "Wählen Sie ein Datum aus",
+  "specificDatesSelectorPickerCancel": "Abbrechen",
+  "specificDatesSelectorPickerConfirm": "Akzeptieren",
+
+  "@_WEEKLY_DAYS_SELECTOR": {},
+  "weeklyDaysSelectorTitle": "Wochentage",
+  "weeklyDaysSelectorSelectDays": "Tage auswählen",
+  "weeklyDaysSelectorDescription": "Wählen Sie aus, an welchen Wochentagen Sie dieses Medikament einnehmen werden",
+  "weeklyDaysSelectorSelectedCount": "{count} Tag{plural} ausgewählt",
+  "@weeklyDaysSelectorSelectedCount": {
+    "placeholders": {
+      "count": {"type": "int"},
+      "plural": {"type": "String"}
+    }
+  },
+  "weeklyDaysSelectorContinue": "Weiter",
+  "weeklyDaysSelectorSelectAtLeastOne": "Wählen Sie mindestens einen Wochentag aus",
+  "weeklyDayMonday": "Montag",
+  "weeklyDayTuesday": "Dienstag",
+  "weeklyDayWednesday": "Mittwoch",
+  "weeklyDayThursday": "Donnerstag",
+  "weeklyDayFriday": "Freitag",
+  "weeklyDaySaturday": "Samstag",
+  "weeklyDaySunday": "Sonntag",
+
+  "@_ADDITIONAL_LABELS": {},
+  "dateFromLabel": "Von",
+  "dateToLabel": "Bis",
+  "statisticsTitle": "Statistiken",
+  "adherenceLabel": "Therapietreue",
+  "emptyDosesWithFilters": "Keine Einnahmen mit diesen Filtern",
+  "emptyDoses": "Keine Einnahmen registriert",
+  "permissionRequired": "Berechtigung erforderlich",
+  "notNowButton": "Nicht jetzt",
+  "openSettingsButton": "Einstellungen öffnen",
+  "medicationUpdatedMsg": "{name} aktualisiert",
+  "@medicationUpdatedMsg": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noScheduledTimes": "Dieses Medikament hat keine konfigurierten Zeitpläne",
+  "allDosesTakenToday": "Sie haben bereits alle heutigen Dosen eingenommen",
+  "extraDoseOption": "Zusätzliche Einnahme",
+  "extraDoseConfirmationMessage": "Sie haben bereits alle geplanten Einnahmen von heute registriert. Möchten Sie eine zusätzliche Einnahme von {name} registrieren?",
+  "@extraDoseConfirmationMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "extraDoseConfirm": "Zusätzliche Einnahme registrieren",
+  "extraDoseRegistered": "Zusätzliche Einnahme von {name} um {time} registriert ({stock} verfügbar)",
+  "@extraDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "registerDoseOfMedication": "Einnahme von {name} registrieren",
+  "@registerDoseOfMedication": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "refillMedicationTitle": "{name} auffüllen",
+  "@refillMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "doseRegisteredAt": "Registriert um {time}",
+  "@doseRegisteredAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "statusUpdatedTo": "Status aktualisiert auf: {status}",
+  "@statusUpdatedTo": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "dateLabel": "Datum:",
+  "scheduledTimeLabel": "Geplante Zeit:",
+  "currentStatusLabel": "Aktueller Status:",
+  "changeStatusToQuestion": "Status ändern zu:",
+  "filterApplied": "Filter angewendet",
+  "filterFrom": "Von {date}",
+  "@filterFrom": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTo": "Bis {date}",
+  "@filterTo": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "insufficientStockForDose": "Nicht genügend Vorrat, um als eingenommen zu markieren",
+
+  "@_SETTINGS_SCREEN": {},
+  "settingsTitle": "Einstellungen",
+  "settingsDisplaySection": "Anzeige",
+  "settingsShowActualTimeTitle": "Tatsächliche Einnahmezeit anzeigen",
+  "settingsShowActualTimeSubtitle": "Zeigt die tatsächliche Zeit an, zu der die Dosen eingenommen wurden, anstelle der geplanten Zeit",
+  "settingsShowFastingCountdownTitle": "Nüchternheits-Countdown anzeigen",
+  "settingsShowFastingCountdownSubtitle": "Zeigt die verbleibende Nüchternheitszeit auf dem Hauptbildschirm an",
+  "settingsShowFastingNotificationTitle": "Feste Countdown-Benachrichtigung",
+  "settingsShowFastingNotificationSubtitle": "Zeigt eine feste Benachrichtigung mit der verbleibenden Nüchternheitszeit (nur Android)",
+  "settingsShowPersonTabsTitle": "Personen in separaten Registerkarten anzeigen",
+  "settingsShowPersonTabsSubtitle": "Zeigt jede Person in einer separaten Registerkarte an. Wenn deaktiviert, werden alle Personen in einer einzigen Liste mit Tags gemischt",
+  "selectPerson": "Person auswählen",
+  "fastingNotificationTitle": "Nüchternheit im Gange",
+  "fastingNotificationBody": "{medication} • {timeRemaining} verbleibend (bis {endTime})",
+  "@fastingNotificationBody": {
+    "placeholders": {
+      "medication": {
+        "type": "String"
+      },
+      "timeRemaining": {
+        "type": "String"
+      },
+      "endTime": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingRemainingMinutes": "{minutes} Min.",
+  "@fastingRemainingMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fastingRemainingHours": "{hours}h",
+  "@fastingRemainingHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "fastingRemainingHoursMinutes": "{hours}h {minutes}m",
+  "@fastingRemainingHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "fastingActive": "Nüchternheit: {time} verbleibend (bis {endTime})",
+  "@fastingActive": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "endTime": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingUpcoming": "Nächste Nüchternheit: {time} (bis {endTime})",
+  "@fastingUpcoming": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "endTime": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsBackupSection": "Datensicherung",
+  "settingsExportTitle": "Datenbank exportieren",
+  "settingsExportSubtitle": "Speichern Sie eine Kopie aller Ihrer Medikamente und Ihres Verlaufs",
+  "settingsImportTitle": "Datenbank importieren",
+  "settingsImportSubtitle": "Stellen Sie eine zuvor exportierte Sicherung wieder her",
+  "settingsInfoTitle": "Information",
+  "settingsInfoContent": "• Beim Exportieren wird eine Sicherungsdatei erstellt, die Sie auf Ihrem Gerät speichern oder teilen können.\n\n• Beim Importieren werden alle aktuellen Daten durch die Daten der ausgewählten Datei ersetzt.\n\n• Es wird empfohlen, regelmäßig Sicherungen zu erstellen.",
+  "settingsShareText": "Datensicherung von MedicApp",
+  "settingsExportSuccess": "Datenbank erfolgreich exportiert",
+  "settingsImportSuccess": "Datenbank erfolgreich importiert",
+  "settingsExportError": "Fehler beim Exportieren: {error}",
+  "@settingsExportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsImportError": "Fehler beim Importieren: {error}",
+  "@settingsImportError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsFilePathError": "Dateipfad konnte nicht abgerufen werden",
+  "settingsImportDialogTitle": "Datenbank importieren",
+  "settingsImportDialogMessage": "Diese Aktion ersetzt alle Ihre aktuellen Daten durch die Daten der importierten Datei.\n\nSind Sie sicher, dass Sie fortfahren möchten?",
+  "settingsRestartDialogTitle": "Import abgeschlossen",
+  "settingsRestartDialogMessage": "Die Datenbank wurde erfolgreich importiert.\n\nBitte starten Sie die Anwendung neu, um die Änderungen zu sehen.",
+  "settingsRestartDialogButton": "Verstanden",
+
+  "@_MEDICATION_LIST_SCREEN": {},
+  "notificationsWillNotWork": "Benachrichtigungen funktionieren NICHT ohne diese Berechtigung.",
+  "debugMenuActivated": "Debug-Menü aktiviert",
+  "debugMenuDeactivated": "Debug-Menü deaktiviert",
+  "nextDoseAt": "Nächste Einnahme: {time}",
+  "@nextDoseAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingDose": "⚠️ Ausstehende Dosis: {time}",
+  "@pendingDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseTomorrow": "Nächste Einnahme: morgen um {time}",
+  "@nextDoseTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseOnDay": "Nächste Einnahme: {dayName} {day}/{month} um {time}",
+  "@nextDoseOnDay": {
+    "placeholders": {
+      "dayName": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dayNameMon": "Mo",
+  "dayNameTue": "Di",
+  "dayNameWed": "Mi",
+  "dayNameThu": "Do",
+  "dayNameFri": "Fr",
+  "dayNameSat": "Sa",
+  "dayNameSun": "So",
+  "whichDoseDidYouTake": "Welche Einnahme haben Sie eingenommen?",
+  "insufficientStockForThisDose": "Unzureichender Vorrat für diese Einnahme\nBenötigt: {needed} {unit}\nVerfügbar: {available}",
+  "@insufficientStockForThisDose": {
+    "placeholders": {
+      "needed": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "doseRegisteredAtTime": "Einnahme von {name} um {time} registriert\nVerbleibender Vorrat: {stock}",
+  "@doseRegisteredAtTime": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "allDosesCompletedToday": "✓ Alle heutigen Einnahmen abgeschlossen",
+  "remainingDosesToday": "Verbleibende Einnahmen heute: {count}",
+  "@remainingDosesToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "manualDoseRegistered": "Manuelle Einnahme von {name} registriert\nMenge: {quantity} {unit}\nVerbleibender Vorrat: {stock}",
+  "@manualDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationSuspended": "{name} ausgesetzt\nEs werden keine weiteren Benachrichtigungen geplant",
+  "@medicationSuspended": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationReactivated": "{name} reaktiviert\nBenachrichtigungen neu geplant",
+  "@medicationReactivated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStock": "Aktueller Vorrat: {stock}",
+  "@currentStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityToAdd": "Hinzuzufügende Menge",
+  "example": "Bsp.: {example}",
+  "@example": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "lastRefill": "Letzte Auffüllung: {amount} {unit}",
+  "@lastRefill": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "refillButton": "Auffüllen",
+  "stockRefilled": "Vorrat von {name} aufgefüllt\nHinzugefügt: {amount} {unit}\nNeuer Vorrat: {newStock}",
+  "@stockRefilled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "newStock": {
+        "type": "String"
+      }
+    }
+  },
+  "availableStock": "Verfügbarer Vorrat: {stock}",
+  "@availableStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityTaken": "Eingenommene Menge",
+  "registerButton": "Registrieren",
+  "registerManualDose": "Manuelle Einnahme registrieren",
+  "refillMedication": "Medikament auffüllen",
+  "resumeMedication": "Medikament reaktivieren",
+  "suspendMedication": "Medikament aussetzen",
+  "editMedicationButton": "Medikament bearbeiten",
+  "deleteMedicationButton": "Medikament löschen",
+  "medicationDeletedShort": "{name} gelöscht",
+  "@medicationDeletedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noMedicationsRegistered": "Keine Medikamente registriert",
+  "addMedicationHint": "Drücken Sie die Schaltfläche +, um eines hinzuzufügen",
+  "pullToRefresh": "Ziehen Sie nach unten, um zu aktualisieren",
+  "batteryOptimizationWarning": "Damit Benachrichtigungen funktionieren, deaktivieren Sie die Batteriebeschränkungen:",
+  "batteryOptimizationInstructions": "Einstellungen → Apps → MedicApp → Batterie → \"Keine Einschränkungen\"",
+  "openSettings": "Einstellungen öffnen",
+  "todayDosesLabel": "Heutige Einnahmen:",
+  "doseOfMedicationAt": "Einnahme von {name} um {time}",
+  "@doseOfMedicationAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStatus": "Aktueller Status: {status}",
+  "@currentStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "whatDoYouWantToDo": "Was möchten Sie tun?",
+  "deleteButton": "Löschen",
+  "markAsSkipped": "Als ausgelassen markieren",
+  "markAsTaken": "Als eingenommen markieren",
+  "doseDeletedAt": "Einnahme um {time} gelöscht",
+  "@doseDeletedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Fehler beim Löschen: {error}",
+  "@errorDeleting": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "doseMarkedAs": "Einnahme um {time} als {status} markiert",
+  "@doseMarkedAs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errorChangingStatus": "Fehler beim Ändern des Status: {error}",
+  "@errorChangingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationUpdatedShort": "{name} aktualisiert",
+  "@medicationUpdatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "activateAlarmsPermission": "\"Alarme und Erinnerungen\" aktivieren",
+  "alarmsPermissionDescription": "Diese Berechtigung ermöglicht es, dass Benachrichtigungen genau zur konfigurierten Zeit erscheinen.",
+  "notificationDebugTitle": "Benachrichtigungs-Debug",
+  "notificationPermissions": "✓ Benachrichtigungsberechtigungen: {enabled}",
+  "@notificationPermissions": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "exactAlarmsAndroid12": "⏰ Genaue Alarme (Android 12+): {enabled}",
+  "@exactAlarmsAndroid12": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "importantWarning": "⚠️ WICHTIG",
+  "withoutPermissionNoNotifications": "Ohne diese Berechtigung werden Benachrichtigungen NICHT erscheinen.",
+  "alarmsSettings": "Einstellungen → Apps → MedicApp → Alarme und Erinnerungen",
+  "pendingNotificationsCount": "📊 Ausstehende Benachrichtigungen: {count}",
+  "@pendingNotificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedules": "💊 Medikamente mit Zeitplänen: {withSchedules}/{total}",
+  "@medicationsWithSchedules": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduledNotifications": "Geplante Benachrichtigungen:",
+  "noScheduledNotifications": "⚠️ Keine geplanten Benachrichtigungen",
+  "notificationHistory": "Benachrichtigungsverlauf",
+  "last24Hours": "Letzte 24 Stunden",
+  "noTitle": "Kein Titel",
+  "medicationsAndSchedules": "Medikamente und Zeitpläne:",
+  "noSchedulesConfigured": "⚠️ Keine Zeitpläne konfiguriert",
+  "closeButton": "Schließen",
+  "testNotification": "Benachrichtigung testen",
+  "testNotificationSent": "Testbenachrichtigung gesendet",
+  "testScheduledNotification": "Geplante testen (1 Min.)",
+  "scheduledNotificationInOneMin": "Benachrichtigung für 1 Minute geplant",
+  "rescheduleNotifications": "Benachrichtigungen neu planen",
+  "notificationsInfo": "Benachrichtigungsinformationen",
+  "notificationsRescheduled": "Benachrichtigungen neu geplant: {count}",
+  "@notificationsRescheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yesText": "Ja",
+  "noText": "Nein",
+  "notificationTypeDynamicFasting": "Dynamische Nüchternheit",
+  "notificationTypeScheduledFasting": "Geplante Nüchternheit",
+  "notificationTypeWeeklyPattern": "Wöchentliches Muster",
+  "notificationTypeSpecificDate": "Bestimmtes Datum",
+  "notificationTypePostponed": "Verschoben",
+  "notificationTypeDailyRecurring": "Täglich wiederkehrend",
+  "beforeTaking": "Vor der Einnahme",
+  "afterTaking": "Nach der Einnahme",
+  "basedOnActualDose": "Basierend auf tatsächlicher Einnahme",
+  "basedOnSchedule": "Basierend auf Zeitplan",
+  "today": "Heute {day}/{month}/{year}",
+  "@today": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "returnToToday": "Zurück zu heute",
+  "tomorrow": "Morgen {day}/{month}/{year}",
+  "@tomorrow": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "todayOrLater": "Heute oder später",
+  "pastDueWarning": "⚠️ ÜBERFÄLLIG",
+  "batteryOptimizationMenu": "⚙️ Batterieoptimierung",
+  "alarmsAndReminders": "⚙️ Alarme und Erinnerungen",
+  "notificationTypeScheduledFastingShort": "Geplante Nüchternheit",
+  "basedOnActualDoseShort": "Basierend auf tatsächlicher Einnahme",
+  "basedOnScheduleShort": "Basierend auf Zeitplan",
+  "pendingNotifications": "📊 Ausstehende Benachrichtigungen: {count}",
+  "@pendingNotifications": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedulesInfo": "💊 Medikamente mit Zeitplänen: {withSchedules}/{total}",
+  "@medicationsWithSchedulesInfo": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noSchedulesConfiguredWarning": "⚠️ Keine Zeitpläne konfiguriert",
+  "medicationInfo": "💊 {name}",
+  "@medicationInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationType": "📋 Typ: {type}",
+  "@notificationType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDate": "📅 Datum: {date}",
+  "@scheduleDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTime": "⏰ Zeit: {time}",
+  "@scheduleTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationId": "ID: {id}",
+  "@notificationId": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "takenStatus": "Eingenommen",
+  "skippedStatus": "Ausgelassen",
+  "durationEstimate": "{name}\nVorrat: {stock}\nGeschätzte Dauer: {days} Tage",
+  "@durationEstimate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "errorChanging": "Fehler beim Ändern des Status: {error}",
+  "@errorChanging": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "testScheduled1Min": "Geplante testen (1 Min.)",
+  "alarmsAndRemindersMenu": "⚙️ Alarme und Erinnerungen",
+  "medicationStockInfo": "{name}\nVorrat: {stock}",
+  "@medicationStockInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "takenTodaySingle": "Heute eingenommen: {quantity} {unit} um {time}",
+  "@takenTodaySingle": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "takenTodayMultiple": "Heute eingenommen: {count} Mal ({quantity} {unit})",
+  "@takenTodayMultiple": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "done": "Erledigt",
+  "suspended": "Ausgesetzt",
+  "activeFastingPeriodsTitle": "Aktive Nüchternheit"
+}

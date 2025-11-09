@@ -114,7 +114,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get doseStatusPending => 'Zain';
 
   @override
-  String get durationContinuous => 'Continuo';
+  String get durationContinuous => 'Etengabea';
 
   @override
   String get durationSpecificDates => 'Fechas zehatzak';
@@ -402,7 +402,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String doseHistoryDeleteError(String error) {
-    return 'Error al eliminar: $error';
+    return 'Errorea ezabatzean: $error';
   }
 
   @override
@@ -468,10 +468,10 @@ class AppLocalizationsEu extends AppLocalizations {
       '¿Cómo vas a tomar este medicamento?';
 
   @override
-  String get durationContinuousTitle => 'Tratamiento continuo';
+  String get durationContinuousTitle => 'Tratamendu etengabea';
 
   @override
-  String get durationContinuousDesc => 'Todos los días, con patrón regular';
+  String get durationContinuousDesc => 'Egunero, eredu erregularra duela';
 
   @override
   String get durationUntilEmptyTitle => 'Hasta acabar medicación';
@@ -915,7 +915,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String msgMedicationAddError(String error) {
-    return 'Error al guardar el medicamento: $error';
+    return 'Errorea medikamentua gordetzean: $error';
   }
 
   @override
@@ -931,7 +931,7 @@ class AppLocalizationsEu extends AppLocalizations {
   String get doseActionLoading => 'Cargando...';
 
   @override
-  String get doseActionError => 'Error';
+  String get doseActionError => 'Errorea';
 
   @override
   String get doseActionMedicationNotFound => 'Medicamento no encontrado';
@@ -1093,7 +1093,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editBasicInfoError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1137,7 +1137,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editDurationError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1161,7 +1161,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editFastingError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1270,7 +1270,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editFrequencyError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1322,7 +1322,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editQuantityError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1344,7 +1344,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String editScheduleError(String error) {
-    return 'Error al guardar cambios: $error';
+    return 'Errorea aldaketak gordetzean: $error';
   }
 
   @override
@@ -1574,15 +1574,14 @@ class AppLocalizationsEu extends AppLocalizations {
       'Barauaren gainerako denborarekin jakinarazpen finko bat erakusten du (Android bakarrik)';
 
   @override
-  String get settingsShowPersonTabsTitle =>
-      'Ver personas separadas por pestañas';
+  String get settingsShowPersonTabsTitle => 'Ikusi pertsonak fitxa bereizitan';
 
   @override
   String get settingsShowPersonTabsSubtitle =>
-      'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas';
+      'Pertsona bakoitza fitxa bereizi batean erakusten du. Desaktibatuta badago, pertsona guztiak zerrenda bakarrean nahasten dira etikekin';
 
   @override
-  String get selectPerson => 'Seleccionar persona';
+  String get selectPerson => 'Hautatu pertsona';
 
   @override
   String get fastingNotificationTitle => 'Baraua abian';
@@ -1686,57 +1685,57 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get notificationsWillNotWork =>
-      'Las notificaciones NO funcionarán sin este permiso.';
+      'Jakinarazpenek EZ dute funtzionatuko baimen hau gabe.';
 
   @override
-  String get debugMenuActivated => 'Menú de depuración activado';
+  String get debugMenuActivated => 'Arazketa menua aktibatuta';
 
   @override
-  String get debugMenuDeactivated => 'Menú de depuración desactivado';
+  String get debugMenuDeactivated => 'Arazketa menua desaktibatuta';
 
   @override
   String nextDoseAt(String time) {
-    return 'Próxima toma: $time';
+    return 'Hurrengo hartzea: $time';
   }
 
   @override
   String pendingDose(String time) {
-    return '⚠️ Dosis pendiente: $time';
+    return '⚠️ Dosi zain: $time';
   }
 
   @override
   String nextDoseTomorrow(String time) {
-    return 'Próxima toma: mañana a las $time';
+    return 'Hurrengo hartzea: bihar ${time}etan';
   }
 
   @override
   String nextDoseOnDay(String dayName, int day, int month, String time) {
-    return 'Próxima toma: $dayName $day/$month a las $time';
+    return 'Hurrengo hartzea: $dayName $day/$month ${time}etan';
   }
 
   @override
-  String get dayNameMon => 'Lun';
+  String get dayNameMon => 'Al';
 
   @override
-  String get dayNameTue => 'Mar';
+  String get dayNameTue => 'As';
 
   @override
-  String get dayNameWed => 'Mié';
+  String get dayNameWed => 'Az';
 
   @override
-  String get dayNameThu => 'Jue';
+  String get dayNameThu => 'Og';
 
   @override
-  String get dayNameFri => 'Vie';
+  String get dayNameFri => 'Or';
 
   @override
-  String get dayNameSat => 'Sáb';
+  String get dayNameSat => 'La';
 
   @override
-  String get dayNameSun => 'Dom';
+  String get dayNameSun => 'Ig';
 
   @override
-  String get whichDoseDidYouTake => '¿Qué toma has tomado?';
+  String get whichDoseDidYouTake => 'Zein hartze hartu duzu?';
 
   @override
   String insufficientStockForThisDose(
@@ -1744,20 +1743,20 @@ class AppLocalizationsEu extends AppLocalizations {
     String unit,
     String available,
   ) {
-    return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDisponible: $available';
+    return 'Stock nahikoa ez hartze honetarako\nBehar duzu: $needed $unit\nEskuragarri: $available';
   }
 
   @override
   String doseRegisteredAtTime(String name, String time, String stock) {
-    return 'Toma de $name registrada a las $time\nStock restante: $stock';
+    return '$name hartzea erregistratua ${time}etan\nGeratzen den stock-a: $stock';
   }
 
   @override
-  String get allDosesCompletedToday => '✓ Todas las tomas de hoy completadas';
+  String get allDosesCompletedToday => '✓ Gaurko hartze guztiak osatuta';
 
   @override
   String remainingDosesToday(int count) {
-    return 'Tomas restantes hoy: $count';
+    return 'Gaur geratzen diren hartzeak: $count';
   }
 
   @override
@@ -1767,39 +1766,39 @@ class AppLocalizationsEu extends AppLocalizations {
     String unit,
     String stock,
   ) {
-    return 'Toma manual de $name registrada\nCantidad: $quantity $unit\nStock restante: $stock';
+    return '$name eskuzko hartzea erregistratua\nKantitatea: $quantity $unit\nGeratzen den stock-a: $stock';
   }
 
   @override
   String medicationSuspended(String name) {
-    return '$name suspendido\nNo se programarán más notificaciones';
+    return '$name etenda\nEz dira jakinarazpen gehiago programatuko';
   }
 
   @override
   String medicationReactivated(String name) {
-    return '$name reactivado\nNotificaciones reprogramadas';
+    return '$name berraktibatua\nJakinarazpenak berriz programatuta';
   }
 
   @override
   String currentStock(String stock) {
-    return 'Stock actual: $stock';
+    return 'Egungo stock-a: $stock';
   }
 
   @override
-  String get quantityToAdd => 'Cantidad a agregar';
+  String get quantityToAdd => 'Gehitzeko kantitatea';
 
   @override
   String example(String example) {
-    return 'Ej: $example';
+    return 'Ad: $example';
   }
 
   @override
   String lastRefill(String amount, String unit) {
-    return 'Última recarga: $amount $unit';
+    return 'Azken karga: $amount $unit';
   }
 
   @override
-  String get refillButton => 'Recargar';
+  String get refillButton => 'Kargatu';
 
   @override
   String stockRefilled(
@@ -1808,284 +1807,286 @@ class AppLocalizationsEu extends AppLocalizations {
     String unit,
     String newStock,
   ) {
-    return 'Stock de $name recargado\nAgregado: $amount $unit\nNuevo stock: $newStock';
+    return '$name stock-a kargatua\nGehitua: $amount $unit\nStock berria: $newStock';
   }
 
   @override
   String availableStock(String stock) {
-    return 'Stock disponible: $stock';
+    return 'Stock eskuragarria: $stock';
   }
 
   @override
-  String get quantityTaken => 'Cantidad tomada';
+  String get quantityTaken => 'Hartutako kantitatea';
 
   @override
-  String get registerButton => 'Registrar';
+  String get registerButton => 'Erregistratu';
 
   @override
-  String get registerManualDose => 'Registrar toma manual';
+  String get registerManualDose => 'Erregistratu eskuzko hartzea';
 
   @override
-  String get refillMedication => 'Recargar medicamento';
+  String get refillMedication => 'Kargatu botika';
 
   @override
-  String get resumeMedication => 'Reactivar medicamento';
+  String get resumeMedication => 'Berraktibatu botika';
 
   @override
-  String get suspendMedication => 'Suspender medicamento';
+  String get suspendMedication => 'Eten botika';
 
   @override
-  String get editMedicationButton => 'Editar medicamento';
+  String get editMedicationButton => 'Editatu botika';
 
   @override
-  String get deleteMedicationButton => 'Eliminar medicamento';
+  String get deleteMedicationButton => 'Ezabatu botika';
 
   @override
   String medicationDeletedShort(String name) {
-    return '$name eliminado';
+    return '$name ezabatua';
   }
 
   @override
-  String get noMedicationsRegistered => 'No hay medicamentos registrados';
+  String get noMedicationsRegistered => 'Ez dago botikarik erregistratuta';
 
   @override
-  String get addMedicationHint => 'Pulsa el botón + para añadir uno';
+  String get addMedicationHint => 'Sakatu + botoia bat gehitzeko';
 
   @override
-  String get pullToRefresh => 'Arrastra hacia abajo para recargar';
+  String get pullToRefresh => 'Arrastatu behera kargatzeko';
 
   @override
   String get batteryOptimizationWarning =>
-      'Para que las notificaciones funcionen, desactiva las restricciones de batería:';
+      'Jakinarazpenek funtzionatzeko, desaktibatu bateria murrizketak:';
 
   @override
   String get batteryOptimizationInstructions =>
-      'Ajustes → Aplicaciones → MedicApp → Batería → \"Sin restricciones\"';
+      'Ezarpenak → Aplikazioak → MedicApp → Bateria → \"Murrizketa gabe\"';
 
   @override
-  String get openSettings => 'Abrir ajustes';
+  String get openSettings => 'Ireki ezarpenak';
 
   @override
-  String get todayDosesLabel => 'Tomas de hoy:';
+  String get todayDosesLabel => 'Gaurko hartzeak:';
 
   @override
   String doseOfMedicationAt(String name, String time) {
-    return 'Toma de $name a las $time';
+    return '$name hartzea ${time}etan';
   }
 
   @override
   String currentStatus(String status) {
-    return 'Estado actual: $status';
+    return 'Egungo egoera: $status';
   }
 
   @override
-  String get whatDoYouWantToDo => '¿Qué deseas hacer?';
+  String get whatDoYouWantToDo => 'Zer egin nahi duzu?';
 
   @override
-  String get deleteButton => 'Eliminar';
+  String get deleteButton => 'Ezabatu';
 
   @override
-  String get markAsSkipped => 'Marcar Omitida';
+  String get markAsSkipped => 'Markatu omititu bezala';
 
   @override
-  String get markAsTaken => 'Marcar Tomada';
+  String get markAsTaken => 'Markatu hartu bezala';
 
   @override
   String doseDeletedAt(String time) {
-    return 'Toma de las $time eliminada';
+    return '${time}etako hartzea ezabatua';
   }
 
   @override
   String errorDeleting(String error) {
-    return 'Error al eliminar: $error';
+    return 'Errorea ezabatzean: $error';
   }
 
   @override
   String doseMarkedAs(String time, String status) {
-    return 'Toma de las $time marcada como $status';
+    return '${time}etako hartzea $status bezala markatua';
   }
 
   @override
   String errorChangingStatus(String error) {
-    return 'Error al cambiar estado: $error';
+    return 'Errorea egoera aldatzean: $error';
   }
 
   @override
   String medicationUpdatedShort(String name) {
-    return '$name actualizado';
+    return '$name eguneratua';
   }
 
   @override
-  String get activateAlarmsPermission => 'Activar \"Alarmas y recordatorios\"';
+  String get activateAlarmsPermission => 'Aktibatu \"Alarmak eta oroigarriak\"';
 
   @override
   String get alarmsPermissionDescription =>
-      'Este permiso permite que las notificaciones salten exactamente a la hora configurada.';
+      'Baimen honek jakinarazpenak konfiguratu den ordu zehatza ateratzea ahalbidetzen du.';
 
   @override
-  String get notificationDebugTitle => 'Debug de Notificaciones';
+  String get notificationDebugTitle => 'Jakinarazpenen arazgaketa';
 
   @override
   String notificationPermissions(String enabled) {
-    return '✓ Permisos de notificaciones: $enabled';
+    return '✓ Jakinarazpen baimenak: $enabled';
   }
 
   @override
   String exactAlarmsAndroid12(String enabled) {
-    return '⏰ Alarmas exactas (Android 12+): $enabled';
+    return '⏰ Alarma zehatzak (Android 12+): $enabled';
   }
 
   @override
-  String get importantWarning => '⚠️ IMPORTANTE';
+  String get importantWarning => '⚠️ GARRANTZITSUA';
 
   @override
   String get withoutPermissionNoNotifications =>
-      'Sin este permiso las notificaciones NO saltarán.';
+      'Baimen hau gabe jakinarazpenek EZ dute funtzionatuko.';
 
   @override
   String get alarmsSettings =>
-      'Ajustes → Aplicaciones → MedicApp → Alarmas y recordatorios';
+      'Ezarpenak → Aplikazioak → MedicApp → Alarmak eta oroigarriak';
 
   @override
   String pendingNotificationsCount(int count) {
-    return '📊 Notificaciones pendientes: $count';
+    return '📊 Jakinarazpen zain: $count';
   }
 
   @override
   String medicationsWithSchedules(int withSchedules, int total) {
-    return '💊 Medicamentos con horarios: $withSchedules/$total';
+    return '💊 Ordutegiekin botikak: $withSchedules/$total';
   }
 
   @override
-  String get scheduledNotifications => 'Notificaciones programadas:';
+  String get scheduledNotifications => 'Programatutako jakinarazpenak:';
 
   @override
-  String get noScheduledNotifications => '⚠️ No hay notificaciones programadas';
+  String get noScheduledNotifications =>
+      '⚠️ Ez dago jakinarazpen programaturik';
 
   @override
-  String get notificationHistory => 'Historial de Notificaciones';
+  String get notificationHistory => 'Jakinarazpenen historia';
 
   @override
-  String get last24Hours => 'Últimas 24 horas';
+  String get last24Hours => 'Azken 24 orduak';
 
   @override
-  String get noTitle => 'Sin título';
+  String get noTitle => 'Titulurik gabe';
 
   @override
-  String get medicationsAndSchedules => 'Medicamentos y horarios:';
+  String get medicationsAndSchedules => 'Botikak eta ordutegiak:';
 
   @override
-  String get noSchedulesConfigured => '⚠️ Sin horarios configurados';
+  String get noSchedulesConfigured => '⚠️ Ez dago ordutegirik konfiguratuta';
 
   @override
-  String get closeButton => 'Cerrar';
+  String get closeButton => 'Itxi';
 
   @override
-  String get testNotification => 'Probar notificación';
+  String get testNotification => 'Probatu jakinarazpena';
 
   @override
-  String get testNotificationSent => 'Notificación de prueba enviada';
+  String get testNotificationSent => 'Proba jakinarazpena bidalita';
 
   @override
-  String get testScheduledNotification => 'Probar programada (1 min)';
+  String get testScheduledNotification => 'Probatu programatua (1 min)';
 
   @override
   String get scheduledNotificationInOneMin =>
-      'Notificación programada para 1 minuto';
+      'Jakinarazpena minutu baterako programatuta';
 
   @override
-  String get rescheduleNotifications => 'Reprogramar notificaciones';
+  String get rescheduleNotifications => 'Berriz programatu jakinarazpenak';
 
   @override
-  String get notificationsInfo => 'Info de notificaciones';
+  String get notificationsInfo => 'Jakinarazpenen informazioa';
 
   @override
   String notificationsRescheduled(int count) {
-    return 'Notificaciones reprogramadas: $count';
+    return 'Jakinarazpenak berriz programatuta: $count';
   }
 
   @override
-  String get yesText => 'Sí';
+  String get yesText => 'Bai';
 
   @override
-  String get noText => 'No';
+  String get noText => 'Ez';
 
   @override
-  String get notificationTypeDynamicFasting => 'Ayuno dinámico';
+  String get notificationTypeDynamicFasting => 'Barau dinamikoa';
 
   @override
-  String get notificationTypeScheduledFasting => 'Ayuno programado';
+  String get notificationTypeScheduledFasting => 'Barau programatua';
 
   @override
-  String get notificationTypeWeeklyPattern => 'Patrón semanal';
+  String get notificationTypeWeeklyPattern => 'Asteko patroia';
 
   @override
-  String get notificationTypeSpecificDate => 'Fecha específica';
+  String get notificationTypeSpecificDate => 'Data zehatza';
 
   @override
-  String get notificationTypePostponed => 'Pospuesta';
+  String get notificationTypePostponed => 'Atzeratua';
 
   @override
-  String get notificationTypeDailyRecurring => 'Diaria recurrente';
+  String get notificationTypeDailyRecurring => 'Eguneroko errekurrentea';
 
   @override
-  String get beforeTaking => 'Antes de tomar';
+  String get beforeTaking => 'Hartu aurretik';
 
   @override
-  String get afterTaking => 'Después de tomar';
+  String get afterTaking => 'Hartu ondoren';
 
   @override
-  String get basedOnActualDose => 'Basado en toma real';
+  String get basedOnActualDose => 'Benetako dosiaren arabera';
 
   @override
-  String get basedOnSchedule => 'Basado en horario';
+  String get basedOnSchedule => 'Ordutegiaren arabera';
 
   @override
   String today(int day, int month, int year) {
-    return 'Hoy $day/$month/$year';
+    return 'Gaur $day/$month/$year';
   }
 
   @override
-  String get returnToToday => 'Volver a hoy';
+  String get returnToToday => 'Itzuli gaurrera';
 
   @override
   String tomorrow(int day, int month, int year) {
-    return 'Mañana $day/$month/$year';
+    return 'Bihar $day/$month/$year';
   }
 
   @override
-  String get todayOrLater => 'Hoy o posterior';
+  String get todayOrLater => 'Gaur edo geroago';
 
   @override
-  String get pastDueWarning => '⚠️ PASADA';
+  String get pastDueWarning => '⚠️ IGAROTA';
 
   @override
-  String get batteryOptimizationMenu => '⚙️ Optimización de batería';
+  String get batteryOptimizationMenu => '⚙️ Bateria optimizazioa';
 
   @override
-  String get alarmsAndReminders => '⚙️ Alarmas y recordatorios';
+  String get alarmsAndReminders => '⚙️ Alarmak eta oroigarriak';
 
   @override
-  String get notificationTypeScheduledFastingShort => 'Ayuno programado';
+  String get notificationTypeScheduledFastingShort => 'Barau programatua';
 
   @override
-  String get basedOnActualDoseShort => 'Basado en toma real';
+  String get basedOnActualDoseShort => 'Benetako dosiaren arabera';
 
   @override
-  String get basedOnScheduleShort => 'Basado en horario';
+  String get basedOnScheduleShort => 'Ordutegiaren arabera';
 
   @override
   String pendingNotifications(int count) {
-    return '📊 Notificaciones pendientes: $count';
+    return '📊 Jakinarazpen zain: $count';
   }
 
   @override
   String medicationsWithSchedulesInfo(int withSchedules, int total) {
-    return '💊 Medicamentos con horarios: $withSchedules/$total';
+    return '💊 Ordutegiekin botikak: $withSchedules/$total';
   }
 
   @override
-  String get noSchedulesConfiguredWarning => '⚠️ Sin horarios configurados';
+  String get noSchedulesConfiguredWarning =>
+      '⚠️ Ez dago ordutegirik konfiguratuta';
 
   @override
   String medicationInfo(String name) {
@@ -2094,17 +2095,17 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String notificationType(String type) {
-    return '📋 Tipo: $type';
+    return '📋 Mota: $type';
   }
 
   @override
   String scheduleDate(String date) {
-    return '📅 Fecha: $date';
+    return '📅 Data: $date';
   }
 
   @override
   String scheduleTime(String time) {
-    return '⏰ Hora: $time';
+    return '⏰ Ordua: $time';
   }
 
   @override
@@ -2113,26 +2114,26 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get takenStatus => 'Tomada';
+  String get takenStatus => 'Hartua';
 
   @override
-  String get skippedStatus => 'Omitida';
+  String get skippedStatus => 'Omitua';
 
   @override
   String durationEstimate(String name, String stock, int days) {
-    return '$name\nStock: $stock\nDuración estimada: $days días';
+    return '$name\nStock: $stock\nIraupena estimatua: $days egun';
   }
 
   @override
   String errorChanging(String error) {
-    return 'Error al cambiar estado: $error';
+    return 'Errorea egoera aldatzean: $error';
   }
 
   @override
-  String get testScheduled1Min => 'Probar programada (1 min)';
+  String get testScheduled1Min => 'Probatu programatua (1 min)';
 
   @override
-  String get alarmsAndRemindersMenu => '⚙️ Alarmas y recordatorios';
+  String get alarmsAndRemindersMenu => '⚙️ Alarmak eta oroigarriak';
 
   @override
   String medicationStockInfo(String name, String stock) {
