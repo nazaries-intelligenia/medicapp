@@ -219,6 +219,7 @@ class MedicationListViewModel extends ChangeNotifier {
       // Get medication IDs that have doses registered today
       final medicationIdsWithDosesToday =
           await DatabaseHelper.instance.getMedicationIdsWithDosesToday();
+      print('📊 Medication IDs with doses today: $medicationIdsWithDosesToday');
 
       // Filter medications for display
       final medications = allMedications.where((m) {
@@ -226,21 +227,31 @@ class MedicationListViewModel extends ChangeNotifier {
         if (m.durationType != TreatmentDurationType.asNeeded) return true;
         return medicationIdsWithDosesToday.contains(m.id);
       }).toList();
+      print('✅ After filtering: ${medications.length} medications to display');
 
       // Load cache data
+      print('💾 Loading cache data...');
       await _loadCacheData(medications);
+      print('✅ Cache data loaded');
 
       // Load fasting periods
+      print('⏱️ Loading fasting periods...');
       await _fastingManager.loadFastingPeriods();
+      print('✅ Fasting periods loaded');
 
       // Sort medications by next dose proximity
+      print('🔄 Sorting medications...');
       MedicationSorter.sortByNextDose(medications);
+      print('✅ Medications sorted');
 
       // Update state
+      print('📝 Updating state...');
       _medications.clear();
       _medications.addAll(medications);
       _isLoading = false;
+      print('✅ State updated, calling _safeNotify()');
       _safeNotify();
+      print('✅ _safeNotify() completed');
 
       // Update fasting notification
       await _fastingManager.updateNotification();
