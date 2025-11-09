@@ -120,6 +120,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
   }
 
   Future<void> reloadAfterSettingsChange() async {
+    print('🔄 reloadAfterSettingsChange called in MedicationListScreen');
+
     // Check if showPersonTabs preference changed
     final oldShowPersonTabs = _viewModel.showPersonTabs;
     await _viewModel.reloadPreferences();

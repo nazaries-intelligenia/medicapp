@@ -110,8 +110,11 @@ class MedicationListViewModel extends ChangeNotifier {
     final oldShowPersonTabs = _showPersonTabs;
     await _loadPreferences();
 
+    print('🔄 reloadPreferences: old=$oldShowPersonTabs, new=$_showPersonTabs');
+
     // If showPersonTabs preference changed, reinitialize persons and tabs
     if (oldShowPersonTabs != _showPersonTabs) {
+      print('📱 showPersonTabs changed! Reinitializing...');
       await initializePersonsAndTabs();
     }
   }
@@ -137,8 +140,10 @@ class MedicationListViewModel extends ChangeNotifier {
     // In mixed view mode, we don't need a selected person
     if (_showPersonTabs) {
       _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+      print('👤 Person tabs enabled: selected person = ${_selectedPerson?.name}');
     } else {
       _selectedPerson = null;
+      print('👥 Mixed view: no person selected, will load all medications');
     }
 
     // Now that persons are loaded, load medications
@@ -180,7 +185,9 @@ class MedicationListViewModel extends ChangeNotifier {
 
       if (!_showPersonTabs) {
         // Mixed view: load all medications from all persons
+        print('🔍 Loading ALL medications (mixed view)');
         allMedications = await DatabaseHelper.instance.getAllMedications();
+        print('   Found ${allMedications.length} medications total');
 
         // Build map of medication -> persons
         _medicationPersons.clear();
@@ -188,14 +195,19 @@ class MedicationListViewModel extends ChangeNotifier {
           final persons = await DatabaseHelper.instance
               .getPersonsForMedication(medication.id);
           _medicationPersons[medication.id] = persons;
+          print('   - ${medication.name}: ${persons.map((p) => p.name).join(", ")}');
         }
       } else if (_selectedPerson != null) {
         // Tab view: load medications for selected person only
+        print('🔍 Loading medications for person: ${_selectedPerson!.name}');
         allMedications = await DatabaseHelper.instance
             .getMedicationsForPerson(_selectedPerson!.id);
+        print('   Found ${allMedications.length} medications');
       } else {
         // Fallback: load all medications
+        print('🔍 Fallback: loading all medications');
         allMedications = await DatabaseHelper.instance.getAllMedications();
+        print('   Found ${allMedications.length} medications');
       }
 
       // Synchronize system notifications with database medications
