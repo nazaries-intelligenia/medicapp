@@ -592,6 +592,8 @@
   "medicationsWithSchedules": "💊 Medications with schedules: {withSchedules}/{total}",
   "scheduledNotifications": "Scheduled notifications:",
   "noScheduledNotifications": "⚠️ No scheduled notifications",
+  "notificationHistory": "Notification History",
+  "last24Hours": "Last 24 hours",
   "noTitle": "No title",
   "medicationsAndSchedules": "Medications and schedules:",
   "noSchedulesConfigured": "⚠️ No schedules configured",

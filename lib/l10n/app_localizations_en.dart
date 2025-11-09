@@ -1927,6 +1927,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noScheduledNotifications => '⚠️ No scheduled notifications';
 
   @override
+  String get notificationHistory => 'Notification History';
+
+  @override
+  String get last24Hours => 'Last 24 hours';
+
+  @override
   String get noTitle => 'No title';
 
   @override

@@ -3350,6 +3350,18 @@ abstract class AppLocalizations {
   /// **'⚠️ No hay notificaciones programadas'**
   String get noScheduledNotifications;
 
+  /// No description provided for @notificationHistory.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial de Notificaciones'**
+  String get notificationHistory;
+
+  /// No description provided for @last24Hours.
+  ///
+  /// In es, this message translates to:
+  /// **'Últimas 24 horas'**
+  String get last24Hours;
+
   /// No description provided for @noTitle.
   ///
   /// In es, this message translates to:

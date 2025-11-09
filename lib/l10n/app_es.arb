@@ -1299,6 +1299,8 @@
   },
   "scheduledNotifications": "Notificaciones programadas:",
   "noScheduledNotifications": "⚠️ No hay notificaciones programadas",
+  "notificationHistory": "Historial de Notificaciones",
+  "last24Hours": "Últimas 24 horas",
   "noTitle": "Sin título",
   "medicationsAndSchedules": "Medicamentos y horarios:",
   "noSchedulesConfigured": "⚠️ Sin horarios configurados",

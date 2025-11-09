@@ -1952,6 +1952,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get noScheduledNotifications => '⚠️ No hay notificaciones programadas';
 
   @override
+  String get notificationHistory => 'Historial de Notificaciones';
+
+  @override
+  String get last24Hours => 'Últimas 24 horas';
+
+  @override
   String get noTitle => 'Sin título';
 
   @override
