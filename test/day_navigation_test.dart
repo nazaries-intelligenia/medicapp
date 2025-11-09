@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
 import 'package:medicapp/models/medication_type.dart';
@@ -17,6 +18,10 @@ void main() {
 
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
+
+    // Mock SharedPreferences
+    SharedPreferences.setMockInitialValues({});
+
     db = DatabaseHelper.instance;
     await DatabaseTestHelper.cleanDatabase();
     await DatabaseTestHelper.ensureDefaultPerson();

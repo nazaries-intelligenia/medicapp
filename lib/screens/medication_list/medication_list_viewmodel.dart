@@ -156,8 +156,10 @@ class MedicationListViewModel extends ChangeNotifier {
       }
 
       // Synchronize system notifications with database medications
-      await NotificationService.instance
-          .syncNotificationsWithMedications(allMedications);
+      if (!_isTestMode) {
+        await NotificationService.instance
+            .syncNotificationsWithMedications(allMedications);
+      }
 
       // Get medication IDs that have doses registered today
       final medicationIdsWithDosesToday =
