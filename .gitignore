@@ -110,6 +110,12 @@ coverage/
 # Symbols
 app.*.symbols
 
+# Claude Code local settings
+.claude/settings.local.json
+
+# Translation files
+untranslated_messages.json
+
 # Exceptions to above rules.
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
