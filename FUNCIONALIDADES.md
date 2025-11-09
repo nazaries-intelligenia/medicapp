@@ -33,3 +33,7 @@
 - **Indicadores visuales de stock**: Códigos de color en pantalla principal (rojo: agotado, naranja: bajo, sin indicador: suficiente), detalles al tocar (cantidad exacta y duración estimada)
 - **Soporte multiidioma**: 5 idiomas (Español, Inglés, Catalán, Gallego, Euskera), detección automática según sistema, traducciones completas, sistema extensible con archivos ARB
 - **Exportación e importación de base de datos**: Backup completo con timestamp, compartir mediante cualquier app, importación con validación de integridad, backup automático antes de importar, restauración automática si falla, accesible desde ajustes
+
+## Herramientas de Depuración
+
+- **Pantalla de depuración de notificaciones**: Pantalla completa dedicada con pestañas por persona, información detallada de estado (permisos de notificaciones, permisos de alarmas exactas, contador de notificaciones pendientes), listado de notificaciones agendadas filtrado por persona (tipo de notificación, medicamento, fecha y hora programadas, indicadores de urgencia), visualización de medicamentos y horarios configurados por persona, accesible desde menú de depuración (múltiples toques en título)

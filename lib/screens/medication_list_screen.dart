@@ -20,7 +20,7 @@ import 'medication_list/dialogs/manual_dose_input_dialog.dart';
 import 'medication_list/dialogs/refill_input_dialog.dart';
 import 'medication_list/dialogs/edit_today_dose_dialog.dart';
 import 'medication_list/dialogs/notification_permission_dialog.dart';
-import 'medication_list/dialogs/debug_info_dialog.dart';
+import 'debug_notifications_screen.dart';
 import 'medication_list/services/dose_calculation_service.dart';
 import 'medication_list/medication_list_viewmodel.dart';
 
@@ -632,9 +632,14 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   }
 
   void _showDebugInfo() async {
-    await DebugInfoDialog.show(
-      context: context,
-      medications: _viewModel.medications,
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DebugNotificationsScreen(
+          medications: _viewModel.medications,
+          persons: _viewModel.persons,
+        ),
+      ),
     );
   }
 
