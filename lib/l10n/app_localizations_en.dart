@@ -2020,6 +2020,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get returnToToday => 'Return to today';
+
+  @override
   String tomorrow(int day, int month, int year) {
     return 'Tomorrow $day/$month/$year';
   }

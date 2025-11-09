@@ -621,6 +621,7 @@
   "basedOnActualDose": "Based on actual dose",
   "basedOnSchedule": "Based on schedule",
   "today": "Today {day}/{month}/{year}",
+  "returnToToday": "Return to today",
   "tomorrow": "Tomorrow {day}/{month}/{year}",
   "todayOrLater": "Today or later",
   "pastDueWarning": "⚠️ PAST DUE",

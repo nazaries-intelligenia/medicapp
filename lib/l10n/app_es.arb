@@ -1348,6 +1348,7 @@
       }
     }
   },
+  "returnToToday": "Volver a hoy",
   "tomorrow": "Mañana {day}/{month}/{year}",
   "@tomorrow": {
     "placeholders": {

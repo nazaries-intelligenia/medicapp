@@ -68,6 +68,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
   }
 
   Future<void> _initializeViewModel() async {
+    // Listen to ViewModel changes FIRST, before initialization
+    _viewModel.addListener(_onViewModelChanged);
+
+    // NOW initialize (this will trigger notifications that will be received)
     await _viewModel.initialize(
       isTestMode: NotificationService.instance.isTestMode,
     );
@@ -82,21 +86,11 @@ class MedicationListScreenState extends State<MedicationListScreen>
         _tabController?.addListener(_onTabChanged);
       });
     }
-
-    // Listen to ViewModel changes
-    print('👂 Adding listener to ViewModel');
-    _viewModel.addListener(_onViewModelChanged);
-    print('✅ Listener added');
   }
 
   void _onViewModelChanged() {
-    print('🔔 _onViewModelChanged called, mounted=$mounted, isLoading=${_viewModel.isLoading}');
     if (mounted) {
-      print('✅ Calling setState()');
       setState(() {});
-      print('✅ setState() completed');
-    } else {
-      print('❌ Widget not mounted, skipping setState()');
     }
   }
 
@@ -127,8 +121,6 @@ class MedicationListScreenState extends State<MedicationListScreen>
   }
 
   Future<void> reloadAfterSettingsChange() async {
-    print('🔄 reloadAfterSettingsChange called in MedicationListScreen');
-
     // Check if showPersonTabs preference changed
     final oldShowPersonTabs = _viewModel.showPersonTabs;
     await _viewModel.reloadPreferences();
@@ -1103,42 +1095,28 @@ class MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  Future<void> _returnToToday() async {
+    // Navegar de vuelta al centro (hoy)
+    await _pageController.animateToPage(
+      _centerPageIndex,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('🎨 build() called, isLoading=${_viewModel.isLoading}, medications=${_viewModel.medications.length}');
     final l10n = AppLocalizations.of(context)!;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final isToday = selectedDay == today;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: _onTitleTap,
-              child: Text(l10n.mainScreenTitle),
-            ),
-            GestureDetector(
-              onTap: _showDatePickerDialog,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _getTodayDate(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        title: GestureDetector(
+          onTap: _onTitleTap,
+          child: Text(l10n.mainScreenTitle),
         ),
         actions: _debugMenuVisible
             ? [
@@ -1150,22 +1128,75 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 ),
               ]
             : null,
-        bottom: _viewModel.showPersonTabs &&
-                _tabController != null &&
-                _viewModel.persons.length > 1
-            ? TabBar(
-                controller: _tabController,
-                isScrollable: _viewModel.persons.length > 3,
-                tabs: _viewModel.persons.map((person) {
-                  return Tab(
-                    text: person.name,
-                    icon: person.isDefault
-                        ? const Icon(Icons.person)
-                        : const Icon(Icons.person_outline),
-                  );
-                }).toList(),
-              )
-            : null,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(
+            (_viewModel.showPersonTabs &&
+                    _tabController != null &&
+                    _viewModel.persons.length > 1)
+                ? 108
+                : 60,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: _showDatePickerDialog,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getTodayDate(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.calendar_today,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!isToday)
+                      FilledButton.icon(
+                        onPressed: _returnToToday,
+                        icon: const Icon(Icons.today, size: 20),
+                        label: Text(
+                          l10n.returnToToday,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (_viewModel.showPersonTabs &&
+                  _tabController != null &&
+                  _viewModel.persons.length > 1)
+                TabBar(
+                  controller: _tabController,
+                  isScrollable: _viewModel.persons.length > 3,
+                  tabs: _viewModel.persons.map((person) {
+                    return Tab(
+                      text: person.name,
+                      icon: person.isDefault
+                          ? const Icon(Icons.person)
+                          : const Icon(Icons.person_outline),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
       ),
       body: PageView.builder(
         controller: _pageController,

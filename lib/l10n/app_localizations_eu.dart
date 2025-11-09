@@ -2046,6 +2046,9 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
+  String get returnToToday => 'Volver a hoy';
+
+  @override
   String tomorrow(int day, int month, int year) {
     return 'Mañana $day/$month/$year';
   }

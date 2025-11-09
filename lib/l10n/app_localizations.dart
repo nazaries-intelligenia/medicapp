@@ -3524,6 +3524,12 @@ abstract class AppLocalizations {
   /// **'Hoy {day}/{month}/{year}'**
   String today(int day, int month, int year);
 
+  /// No description provided for @returnToToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a hoy'**
+  String get returnToToday;
+
   /// No description provided for @tomorrow.
   ///
   /// In es, this message translates to:
