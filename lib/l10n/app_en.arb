@@ -139,6 +139,12 @@
   "doseHistoryConfirmDeleteMessage": "Are you sure you want to delete this record?",
   "doseHistoryRecordDeleted": "Record deleted successfully",
   "doseHistoryDeleteError": "Error deleting: {error}",
+  "changeRegisteredTime": "Change registered time",
+  "selectRegisteredTime": "Select registered time",
+  "registeredTimeLabel": "Registered time:",
+  "registeredTimeUpdated": "Registered time updated",
+  "errorUpdatingTime": "Error updating time: {error}",
+  "errorFindingDoseEntry": "Dose entry not found",
 
   "addMedicationTitle": "Add Medication",
   "stepIndicator": "Step {current} of {total}",

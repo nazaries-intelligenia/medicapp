@@ -269,6 +269,9 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
       case EditEntryAction.delete:
         _confirmDeleteEntry(entry);
         break;
+      case EditEntryAction.changeRegisteredTime:
+        _changeEntryRegisteredTime(entry);
+        break;
     }
   }
 
@@ -292,6 +295,58 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  Future<void> _changeEntryRegisteredTime(DoseHistoryEntry entry) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      // Show time picker with current registered time
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(entry.registeredDateTime),
+        helpText: l10n.selectRegisteredTime,
+      );
+
+      if (picked == null) return;
+
+      // Create new DateTime with picked time but keeping the same date
+      final newRegisteredTime = DateTime(
+        entry.registeredDateTime.year,
+        entry.registeredDateTime.month,
+        entry.registeredDateTime.day,
+        picked.hour,
+        picked.minute,
+      );
+
+      // Update the entry
+      await DoseHistoryService.changeRegisteredTime(entry, newRegisteredTime);
+
+      // Reload data
+      await _loadData();
+      setState(() {
+        _hasChanges = true;
+      });
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.registeredTimeUpdated),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorUpdatingTime(e.toString())),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   void _confirmDeleteEntry(DoseHistoryEntry entry) async {

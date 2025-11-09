@@ -3,8 +3,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/medication.dart';
+import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
+import '../services/dose_history_service.dart';
 import '../utils/platform_helper.dart';
 import 'medication_info_screen.dart';
 import 'edit_medication_menu_screen.dart';
@@ -700,12 +702,15 @@ class _MedicationListScreenState extends State<MedicationListScreen>
       medicationName: medication.name,
       doseTime: doseTime,
       isTaken: isTaken,
+      showChangeTimeOption: _viewModel.showActualTime,
     );
 
     if (result == 'delete') {
       await _deleteTodayDose(medication, doseTime, isTaken);
     } else if (result == 'toggle') {
       await _toggleTodayDoseStatus(medication, doseTime, isTaken);
+    } else if (result == 'changeTime') {
+      await _changeRegisteredTime(medication, doseTime);
     }
   }
 
@@ -779,6 +784,87 @@ class _MedicationListScreenState extends State<MedicationListScreen>
           ),
         );
       }
+    }
+  }
+
+  Future<void> _changeRegisteredTime(Medication medication, String doseTime) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    try {
+      // Find the history entry for this dose
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final tomorrow = today.add(const Duration(days: 1));
+
+      final entries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+        startDate: today,
+        endDate: tomorrow,
+        medicationId: medication.id,
+      );
+
+      // Find entry matching the dose time and person
+      final selectedPerson = _viewModel.selectedPerson;
+      if (selectedPerson == null) return;
+
+      final entry = entries.where((e) {
+        return e.scheduledTimeFormatted == doseTime &&
+               e.personId == selectedPerson.id &&
+               e.status == DoseStatus.taken;
+      }).firstOrNull;
+
+      if (entry == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.errorFindingDoseEntry),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+
+      // Show time picker with current registered time
+      final TimeOfDay? picked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(entry.registeredDateTime),
+        helpText: l10n.selectRegisteredTime,
+      );
+
+      if (picked == null) return;
+
+      // Create new DateTime with picked time but keeping the same date
+      final newRegisteredTime = DateTime(
+        entry.registeredDateTime.year,
+        entry.registeredDateTime.month,
+        entry.registeredDateTime.day,
+        picked.hour,
+        picked.minute,
+      );
+
+      // Update the entry
+      await DoseHistoryService.changeRegisteredTime(entry, newRegisteredTime);
+
+      // Reload data
+      await _viewModel.loadMedications();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.registeredTimeUpdated),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.errorUpdatingTime(e.toString())),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 

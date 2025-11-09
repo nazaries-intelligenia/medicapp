@@ -247,6 +247,19 @@
       }
     }
   },
+  "changeRegisteredTime": "Aldatu erregistro ordua",
+  "selectRegisteredTime": "Hautatu erregistro ordua",
+  "registeredTimeLabel": "Erregistro ordua:",
+  "registeredTimeUpdated": "Erregistro ordua eguneratu da",
+  "errorUpdatingTime": "Errorea ordua eguneratzean: {error}",
+  "@errorUpdatingTime": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFindingDoseEntry": "Ez da aurkitu dosien sarrera",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",

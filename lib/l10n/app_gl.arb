@@ -247,6 +247,19 @@
       }
     }
   },
+  "changeRegisteredTime": "Cambiar hora de rexistro",
+  "selectRegisteredTime": "Seleccionar hora de rexistro",
+  "registeredTimeLabel": "Hora de rexistro:",
+  "registeredTimeUpdated": "Hora de rexistro actualizada",
+  "errorUpdatingTime": "Erro ao actualizar a hora: {error}",
+  "@errorUpdatingTime": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFindingDoseEntry": "Non se atopou a entrada da dose",
 
   "addMedicationTitle": "Añadir Medicamento",
   "stepIndicator": "Paso {current} de {total}",

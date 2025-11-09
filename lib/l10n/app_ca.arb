@@ -247,6 +247,19 @@
       }
     }
   },
+  "changeRegisteredTime": "Canviar hora de registre",
+  "selectRegisteredTime": "Seleccionar hora de registre",
+  "registeredTimeLabel": "Hora de registre:",
+  "registeredTimeUpdated": "Hora de registre actualitzada",
+  "errorUpdatingTime": "Error en actualitzar l'hora: {error}",
+  "@errorUpdatingTime": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFindingDoseEntry": "No s'ha trobat l'entrada de la dosi",
 
   "addMedicationTitle": "Afegir medicament",
   "stepIndicator": "Pas {current} de {total}",

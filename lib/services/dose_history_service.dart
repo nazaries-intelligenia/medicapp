@@ -79,6 +79,25 @@ class DoseHistoryService {
 
     return updatedEntry;
   }
+
+  /// Change the registered time of a dose history entry
+  ///
+  /// Updates only the registered time without changing status or other fields
+  /// Returns the updated entry
+  static Future<DoseHistoryEntry> changeRegisteredTime(
+    DoseHistoryEntry entry,
+    DateTime newRegisteredTime,
+  ) async {
+    // Create updated entry with new registered time
+    final updatedEntry = entry.copyWith(
+      registeredDateTime: newRegisteredTime,
+    );
+
+    // Update in database
+    await DatabaseHelper.instance.insertDoseHistory(updatedEntry);
+
+    return updatedEntry;
+  }
 }
 
 /// Exception thrown when a medication is not found in the database
