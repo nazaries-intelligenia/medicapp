@@ -105,6 +105,17 @@ class MedicationListViewModel extends ChangeNotifier {
     _showPersonTabs = await PreferencesService.getShowPersonTabs();
   }
 
+  /// Reload preferences and reinitialize if showPersonTabs changed
+  Future<void> reloadPreferences() async {
+    final oldShowPersonTabs = _showPersonTabs;
+    await _loadPreferences();
+
+    // If showPersonTabs preference changed, reinitialize persons and tabs
+    if (oldShowPersonTabs != _showPersonTabs) {
+      await initializePersonsAndTabs();
+    }
+  }
+
   /// Initialize persons and select the first one
   Future<void> initializePersonsAndTabs() async {
     // Migrate any unassigned medications to default person

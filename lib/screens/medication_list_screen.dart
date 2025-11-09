@@ -30,10 +30,10 @@ class MedicationListScreen extends StatefulWidget {
   const MedicationListScreen({super.key});
 
   @override
-  State<MedicationListScreen> createState() => _MedicationListScreenState();
+  State<MedicationListScreen> createState() => MedicationListScreenState();
 }
 
-class _MedicationListScreenState extends State<MedicationListScreen>
+class MedicationListScreenState extends State<MedicationListScreen>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   // ViewModel
   late final MedicationListViewModel _viewModel;
@@ -115,7 +115,35 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _viewModel.loadMedications();
+      reloadAfterSettingsChange();
+    }
+  }
+
+  Future<void> reloadAfterSettingsChange() async {
+    // Check if showPersonTabs preference changed
+    final oldShowPersonTabs = _viewModel.showPersonTabs;
+    await _viewModel.reloadPreferences();
+    final newShowPersonTabs = _viewModel.showPersonTabs;
+
+    // If preference changed, rebuild tab controller
+    if (oldShowPersonTabs != newShowPersonTabs) {
+      _tabController?.dispose();
+      _tabController = null;
+
+      if (newShowPersonTabs && _viewModel.persons.isNotEmpty) {
+        setState(() {
+          _tabController = TabController(
+            length: _viewModel.persons.length,
+            vsync: this,
+          );
+          _tabController?.addListener(_onTabChanged);
+        });
+      } else {
+        setState(() {});
+      }
+    } else {
+      // Just reload medications if preference didn't change
+      await _viewModel.loadMedications();
     }
   }
 

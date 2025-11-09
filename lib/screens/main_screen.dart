@@ -22,10 +22,27 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  int _previousIndex = 0;
+
+  // GlobalKey to access MedicationListScreen state
+  final _medicationListKey = GlobalKey<MedicationListScreenState>();
+
+  // Keep screen instances in memory
+  late final Widget _medicationListScreen;
+  late final Widget _medicationInventoryScreen;
+  late final Widget _doseHistoryScreen;
+  late final Widget _settingsScreen;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize screen instances
+    _medicationListScreen = MedicationListScreen(key: _medicationListKey);
+    _medicationInventoryScreen = const MedicationInventoryScreen();
+    _doseHistoryScreen = const DoseHistoryScreen();
+    _settingsScreen = const SettingsScreen();
+
     // Process any pending notifications after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.processPendingNotification();
@@ -33,27 +50,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
+    // If returning to medication screen (0) from settings (3), trigger reload
+    if (index == 0 && _previousIndex == 3) {
+      // Reload preferences in medication screen after returning from settings
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _medicationListKey.currentState?.reloadAfterSettingsChange();
+      });
+    }
+
     setState(() {
+      _previousIndex = _selectedIndex;
       _selectedIndex = index;
     });
-  }
-
-  /// Get the current screen based on selected index
-  /// This approach creates screens on-demand instead of keeping all in memory
-  /// which is more efficient and prevents test issues with pending timers
-  Widget _getCurrentScreen() {
-    switch (_selectedIndex) {
-      case 0:
-        return const MedicationListScreen();
-      case 1:
-        return const MedicationInventoryScreen();
-      case 2:
-        return const DoseHistoryScreen();
-      case 3:
-        return const SettingsScreen();
-      default:
-        return const MedicationListScreen();
-    }
   }
 
   @override
@@ -98,7 +106,15 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const VerticalDivider(thickness: 1, width: 1),
             Expanded(
-              child: _getCurrentScreen(),
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  _medicationListScreen,
+                  _medicationInventoryScreen,
+                  _doseHistoryScreen,
+                  _settingsScreen,
+                ],
+              ),
             ),
           ],
         ),
@@ -107,7 +123,15 @@ class _MainScreenState extends State<MainScreen> {
 
     // Use NavigationBar for mobile/portrait with short labels
     return Scaffold(
-      body: _getCurrentScreen(),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _medicationListScreen,
+          _medicationInventoryScreen,
+          _doseHistoryScreen,
+          _settingsScreen,
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
