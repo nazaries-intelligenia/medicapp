@@ -66,14 +66,14 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Exportar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
       expect(find.text('Exportar Base de Datos'), findsOneWidget);
 
       await tester.dragUntilVisible(
         find.text('Importar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
       expect(find.text('Importar Base de Datos'), findsOneWidget);
     });
@@ -183,6 +183,13 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      // Scroll to export option
+      await tester.dragUntilVisible(
+        find.text('Exportar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Verify export button is visible
       expect(find.text('Exportar Base de Datos'), findsOneWidget);
       expect(find.text('Guarda una copia de todos tus medicamentos e historial'), findsOneWidget);
@@ -202,6 +209,13 @@ void main() {
     testWidgets('export and import buttons should be disabled during operations', (WidgetTester tester) async {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
+
+      // Scroll to export option
+      await tester.dragUntilVisible(
+        find.text('Exportar Base de Datos'),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
 
       // Get initial opacity (enabled state)
       final exportCard = find.ancestor(
@@ -225,8 +239,9 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Importar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
+      await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
       await tester.tap(find.text('Importar Base de Datos'));
@@ -247,8 +262,9 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Importar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
+      await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
       await tester.tap(find.text('Importar Base de Datos'));
@@ -272,8 +288,9 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Importar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
+      await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
       await tester.tap(find.text('Importar Base de Datos'));
@@ -324,7 +341,7 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Exportar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
 
       // Check export
@@ -335,7 +352,7 @@ void main() {
       await tester.dragUntilVisible(
         find.text('Importar Base de Datos'),
         find.byType(ListView),
-        const Offset(0, -100),
+        const Offset(0, -200),
       );
 
       // Check import

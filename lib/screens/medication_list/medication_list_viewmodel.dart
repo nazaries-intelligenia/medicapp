@@ -121,7 +121,14 @@ class MedicationListViewModel extends ChangeNotifier {
     });
 
     _persons = persons;
-    _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+
+    // Only select a person if person tabs are enabled
+    // In mixed view mode, we don't need a selected person
+    if (_showPersonTabs) {
+      _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+    } else {
+      _selectedPerson = null;
+    }
 
     // Now that persons are loaded, load medications
     await loadMedications();
