@@ -75,7 +75,9 @@ class MedicationListViewModel extends ChangeNotifier {
   void _safeNotify() {
     // Always notify immediately - the batching approach doesn't work well with pumpAndSettle
     // The real fix is ensuring we don't have continuous rebuild loops
+    print('📢 _safeNotify: hasListeners=$hasListeners');
     notifyListeners();
+    print('📢 notifyListeners() called');
   }
 
   @override

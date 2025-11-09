@@ -84,12 +84,19 @@ class MedicationListScreenState extends State<MedicationListScreen>
     }
 
     // Listen to ViewModel changes
+    print('👂 Adding listener to ViewModel');
     _viewModel.addListener(_onViewModelChanged);
+    print('✅ Listener added');
   }
 
   void _onViewModelChanged() {
+    print('🔔 _onViewModelChanged called, mounted=$mounted, isLoading=${_viewModel.isLoading}');
     if (mounted) {
+      print('✅ Calling setState()');
       setState(() {});
+      print('✅ setState() completed');
+    } else {
+      print('❌ Widget not mounted, skipping setState()');
     }
   }
 
@@ -1098,6 +1105,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
   @override
   Widget build(BuildContext context) {
+    print('🎨 build() called, isLoading=${_viewModel.isLoading}, medications=${_viewModel.medications.length}');
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
