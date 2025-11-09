@@ -124,6 +124,22 @@ class MedicationListViewModel extends ChangeNotifier {
     await loadMedications();
   }
 
+  /// Load medications for a specific date
+  Future<void> loadMedicationsForDate(DateTime date) async {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(date.year, date.month, date.day);
+
+    // If loading today's data, use the normal load method
+    if (targetDate == today) {
+      await loadMedications();
+      return;
+    }
+
+    // Load historical data for past/future dates
+    await _loadMedicationsForHistoricalDate(targetDate);
+  }
+
   /// Load medications for the selected person
   Future<void> loadMedications() async {
     _isLoading = true;
@@ -140,8 +156,10 @@ class MedicationListViewModel extends ChangeNotifier {
       }
 
       // Synchronize system notifications with database medications
-      await NotificationService.instance
-          .syncNotificationsWithMedications(allMedications);
+      if (!_isTestMode) {
+        await NotificationService.instance
+            .syncNotificationsWithMedications(allMedications);
+      }
 
       // Get medication IDs that have doses registered today
       final medicationIdsWithDosesToday =
@@ -178,6 +196,142 @@ class MedicationListViewModel extends ChangeNotifier {
       _isLoading = false;
       _safeNotify();
       rethrow;
+    }
+  }
+
+  /// Load medications for a historical date (not today)
+  Future<void> _loadMedicationsForHistoricalDate(DateTime targetDate) async {
+    _isLoading = true;
+    _safeNotify();
+
+    try {
+      // Load all medications for selected person
+      List<Medication> allMedications;
+      if (_selectedPerson != null) {
+        allMedications = await DatabaseHelper.instance
+            .getMedicationsForPerson(_selectedPerson!.id);
+      } else {
+        allMedications = await DatabaseHelper.instance.getAllMedications();
+      }
+
+      // Load dose history for the target date
+      final nextDay = targetDate.add(const Duration(days: 1));
+      final historyEntries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+        startDate: targetDate,
+        endDate: nextDay,
+      );
+
+      // Filter by selected person if applicable
+      final personFilteredEntries = _selectedPerson != null
+          ? historyEntries.where((e) => e.personId == _selectedPerson!.id).toList()
+          : historyEntries;
+
+      // Group entries by medication ID
+      final entriesByMedication = <String, List<DoseHistoryEntry>>{};
+      for (final entry in personFilteredEntries) {
+        entriesByMedication.putIfAbsent(entry.medicationId, () => []).add(entry);
+      }
+
+      // Build medications list with historical data
+      final medications = <Medication>[];
+      final dateString = targetDate.toDateString();
+
+      for (final medication in allMedications) {
+        // Skip suspended medications
+        if (medication.isSuspended) continue;
+
+        final entries = entriesByMedication[medication.id] ?? [];
+
+        // For scheduled medications, show if they had any activity or were scheduled for that day
+        if (medication.durationType != TreatmentDurationType.asNeeded) {
+          // Build taken and skipped dose lists
+          final takenDoses = entries
+              .where((e) => e.status == DoseStatus.taken)
+              .map((e) => e.scheduledTimeFormatted)
+              .toList();
+          final skippedDoses = entries
+              .where((e) => e.status == DoseStatus.skipped)
+              .map((e) => e.scheduledTimeFormatted)
+              .toList();
+
+          // Create a copy with the historical dose data
+          final historicalMed = medication.copyWith(
+            takenDosesToday: takenDoses,
+            skippedDosesToday: skippedDoses,
+            takenDosesDate: dateString,
+          );
+
+          medications.add(historicalMed);
+        } else {
+          // For as-needed medications, only show if they were taken that day
+          if (entries.isNotEmpty) {
+            medications.add(medication.copyWith(
+              takenDosesDate: dateString,
+            ));
+          }
+        }
+      }
+
+      // Load cache data for historical date
+      await _loadCacheDataForHistoricalDate(medications, targetDate, entriesByMedication);
+
+      // Sort medications by next dose proximity
+      MedicationSorter.sortByNextDose(medications);
+
+      // Update state
+      _medications.clear();
+      _medications.addAll(medications);
+      _isLoading = false;
+      _safeNotify();
+    } catch (e) {
+      _isLoading = false;
+      _safeNotify();
+      rethrow;
+    }
+  }
+
+  /// Load cache data for medications on a historical date
+  Future<void> _loadCacheDataForHistoricalDate(
+    List<Medication> medications,
+    DateTime targetDate,
+    Map<String, List<DoseHistoryEntry>> entriesByMedication,
+  ) async {
+    _cacheManager.clearAll();
+
+    // Load "as needed" doses information for historical date
+    for (final med in medications) {
+      if (med.durationType == TreatmentDurationType.asNeeded) {
+        final entries = entriesByMedication[med.id] ?? [];
+        if (entries.isNotEmpty) {
+          final totalTaken = entries.length;
+          final totalQuantity = entries.fold<double>(
+            0.0,
+            (sum, entry) => sum + entry.quantity,
+          );
+          _cacheManager.setAsNeededDosesInfo(med.id, {
+            'count': totalTaken,
+            'totalQuantity': totalQuantity,
+          });
+        }
+      }
+    }
+
+    // Load actual dose times if preference is enabled
+    if (_showActualTime) {
+      for (final med in medications) {
+        final entries = entriesByMedication[med.id] ?? [];
+        if (entries.isNotEmpty) {
+          final actualTimes = <String, DateTime>{};
+          for (final entry in entries) {
+            if (entry.status == DoseStatus.taken) {
+              actualTimes[entry.scheduledTimeFormatted] = entry.registeredDateTime;
+            }
+          }
+          if (actualTimes.isNotEmpty) {
+            _cacheManager.setActualDoseTimes(med.id, actualTimes);
+          }
+        }
+      }
     }
   }
 
@@ -723,9 +877,14 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Reschedule all notifications (debug function)
+  /// Reprograms notifications for ALL users, not just the selected one
   Future<int> rescheduleAllNotifications() async {
-    for (final medication in _medications) {
-      if (medication.doseTimes.isNotEmpty) {
+    // Get all medications (not filtered by selected person)
+    final allMedications = await DatabaseHelper.instance.getAllMedications();
+
+    // Reschedule notifications for each medication and each person assigned to it
+    for (final medication in allMedications) {
+      if (medication.doseTimes.isNotEmpty && !medication.isSuspended) {
         final persons = await DatabaseHelper.instance
             .getPersonsForMedication(medication.id);
         for (final person in persons) {

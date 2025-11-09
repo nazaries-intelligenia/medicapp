@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:android_intent_plus/android_intent.dart';
@@ -312,6 +314,9 @@ class NotificationService {
     // For postponed notifications, the format is "medicationId|doseTime"
     // where doseTime is the actual time string (HH:mm)
     String doseTime;
+    String? medicationName;
+    String? personName;
+
     if (doseIndexStr.contains(':')) {
       // This is a postponed notification with the actual time
       doseTime = doseIndexStr;
@@ -341,9 +346,11 @@ class NotificationService {
           await _notificationsPlugin.cancel(response.id ?? 0);
           // Use the first dose time as fallback
           doseTime = medication.doseTimes.isNotEmpty ? medication.doseTimes[0] : '00:00';
+          medicationName = medication.name;
           print('⚠️ Using fallback time $doseTime - DoseActionScreen will handle it');
         } else {
           doseTime = medication.doseTimes[doseIndex];
+          medicationName = medication.name;
         }
       } catch (e) {
         print('❌ Error loading medication: $e');
@@ -353,6 +360,25 @@ class NotificationService {
         doseTime = '00:00';
         print('⚠️ Using dummy time 00:00 due to error - DoseActionScreen will show error');
       }
+    }
+
+    // Get person name for logging
+    try {
+      final person = await DatabaseHelper.instance.getPerson(personId);
+      personName = person?.name;
+    } catch (e) {
+      print('Error getting person name: $e');
+    }
+
+    // Log notification interaction for debugging
+    if (medicationName != null && personName != null) {
+      await logNotificationShown(
+        medicationId: medicationId,
+        medicationName: medicationName,
+        doseTime: doseTime,
+        personId: personId,
+        personName: personName,
+      );
     }
 
     // Try to navigate with retry logic (V19+: now includes personId)
@@ -843,5 +869,97 @@ class NotificationService {
   /// Cancel the ongoing fasting countdown notification
   Future<void> cancelOngoingFastingNotification() async {
     await _fastingScheduler.cancelOngoingFastingNotification();
+  }
+
+  // ========== Notification History (Debug) ==========
+
+  static const String _notificationHistoryKey = 'notification_history';
+  static const int _historyDurationHours = 24;
+  static const int _maxHistoryEntries = 100;
+
+  /// Log a notification when it's shown to the user
+  /// This is used for debugging purposes to track notification delivery
+  Future<void> logNotificationShown({
+    required String medicationId,
+    required String medicationName,
+    required String doseTime,
+    required String personId,
+    required String personName,
+  }) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final history = await getNotificationHistory();
+
+      final entry = {
+        'timestamp': DateTime.now().toIso8601String(),
+        'medicationId': medicationId,
+        'medicationName': medicationName,
+        'doseTime': doseTime,
+        'personId': personId,
+        'personName': personName,
+      };
+
+      history.insert(0, entry);
+
+      // Limit history size
+      if (history.length > _maxHistoryEntries) {
+        history.removeRange(_maxHistoryEntries, history.length);
+      }
+
+      // Clean old entries (older than 24h)
+      _cleanOldHistoryEntries(history);
+
+      // Save back to SharedPreferences
+      final jsonList = history.map((e) => jsonEncode(e)).toList();
+      await prefs.setStringList(_notificationHistoryKey, jsonList);
+    } catch (e) {
+      print('Error logging notification: $e');
+    }
+  }
+
+  /// Get notification history from the last 24 hours
+  /// Returns a list of notification entries sorted by timestamp (newest first)
+  Future<List<Map<String, dynamic>>> getNotificationHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final jsonList = prefs.getStringList(_notificationHistoryKey) ?? [];
+
+      final history = jsonList
+          .map((json) => jsonDecode(json) as Map<String, dynamic>)
+          .toList();
+
+      // Clean old entries
+      _cleanOldHistoryEntries(history);
+
+      return history;
+    } catch (e) {
+      print('Error getting notification history: $e');
+      return [];
+    }
+  }
+
+  /// Clean notification history entries older than 24 hours
+  void _cleanOldHistoryEntries(List<Map<String, dynamic>> history) {
+    final cutoffTime = DateTime.now().subtract(Duration(hours: _historyDurationHours));
+
+    history.removeWhere((entry) {
+      try {
+        final timestamp = DateTime.parse(entry['timestamp'] as String);
+        return timestamp.isBefore(cutoffTime);
+      } catch (e) {
+        // Remove invalid entries
+        return true;
+      }
+    });
+  }
+
+  /// Clear all notification history
+  Future<void> clearNotificationHistory() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_notificationHistoryKey);
+    } catch (e) {
+      print('Error clearing notification history: $e');
+    }
   }
 }

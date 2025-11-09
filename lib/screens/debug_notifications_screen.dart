@@ -27,6 +27,7 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
   List<dynamic> _pendingNotifications = [];
   Map<String, List<Map<String, dynamic>>> _notificationsByPerson = {};
   final Map<String, String> _medicationPersonsMap = {};
+  List<Map<String, dynamic>> _notificationHistory = [];
 
   @override
   void initState() {
@@ -47,6 +48,7 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
     _notificationsEnabled = await NotificationService.instance.areNotificationsEnabled();
     _canScheduleExact = await NotificationService.instance.canScheduleExactAlarms();
     _pendingNotifications = await NotificationService.instance.getPendingNotifications();
+    _notificationHistory = await NotificationService.instance.getNotificationHistory();
 
     // Get all persons assigned to medications for display
     for (final medication in widget.medications) {
@@ -362,6 +364,68 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                   ),
                 ),
                 const Divider(height: 1),
+                // Notification history section (last 24h)
+                if (_notificationHistory.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.history, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n.notificationHistory,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                '${_notificationHistory.length}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          l10n.last24Hours,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          height: 120,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _notificationHistory.length,
+                            itemBuilder: (context, index) {
+                              final entry = _notificationHistory[index];
+                              return _buildHistoryCard(entry);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                ],
                 // Tabs content
                 Expanded(
                   child: widget.persons.isEmpty
@@ -572,6 +636,103 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                       padding: const EdgeInsets.only(left: 8, top: 2),
                       child: Text('• $time', style: const TextStyle(fontSize: 13)),
                     )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHistoryCard(Map<String, dynamic> entry) {
+    final timestamp = DateTime.parse(entry['timestamp'] as String);
+    final medicationName = entry['medicationName'] as String;
+    final doseTime = entry['doseTime'] as String;
+    final personName = entry['personName'] as String;
+
+    final now = DateTime.now();
+    final difference = now.difference(timestamp);
+
+    String timeAgo;
+    if (difference.inMinutes < 1) {
+      timeAgo = 'Hace unos segundos';
+    } else if (difference.inMinutes < 60) {
+      timeAgo = 'Hace ${difference.inMinutes} min';
+    } else if (difference.inHours < 24) {
+      timeAgo = 'Hace ${difference.inHours} h';
+    } else {
+      timeAgo = '${timestamp.day}/${timestamp.month} ${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
+    }
+
+    return Container(
+      width: 200,
+      margin: const EdgeInsets.only(right: 12),
+      child: Card(
+        elevation: 2,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green.shade600, size: 18),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      medicationName,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.schedule, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 4),
+                  Text(
+                    doseTime,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.blue.shade700,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  Icon(Icons.person, size: 14, color: Colors.grey.shade600),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      personName,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(
+                timeAgo,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade500,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
             ],
           ),
         ),
