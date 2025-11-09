@@ -129,7 +129,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get mainScreenEmptyTitle => 'Ez dago medikamenturik registrados';
 
   @override
-  String get mainScreenEmptySubtitle => 'Gehitu medikamentuak usando el botón +';
+  String get mainScreenEmptySubtitle =>
+      'Gehitu medikamentuak usando el botón +';
 
   @override
   String get mainScreenTodayDoses => 'Gaurko hartzeak';
@@ -152,7 +153,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get validationRequired => 'Eremu hau nahitaezkoa da';
 
   @override
-  String get validationDuplicateMedication => 'Este medicamento dagoeneko zure zerrendan dago';
+  String get validationDuplicateMedication =>
+      'Este medicamento dagoeneko zure zerrendan dago';
 
   @override
   String get validationInvalidNumber => 'Sartu zenbaki baliozkoa';
@@ -184,7 +186,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get pillOrganizerEmptyTitle => 'Ez dago medikamenturik registrados';
 
   @override
-  String get pillOrganizerEmptySubtitle => 'Gehitu medikamentuak para ver tu pastillero';
+  String get pillOrganizerEmptySubtitle =>
+      'Gehitu medikamentuak para ver tu pastillero';
 
   @override
   String get pillOrganizerCurrentStock => 'Stock actual';
@@ -205,16 +208,19 @@ class AppLocalizationsEu extends AppLocalizations {
   String get medicineCabinetEmptyTitle => 'Ez dago medikamenturik registrados';
 
   @override
-  String get medicineCabinetEmptySubtitle => 'Gehitu medikamentuak para ver tu botiquín';
+  String get medicineCabinetEmptySubtitle =>
+      'Gehitu medikamentuak para ver tu botiquín';
 
   @override
-  String get medicineCabinetPullToRefresh => 'Arrastra hacia abajo para recargar';
+  String get medicineCabinetPullToRefresh =>
+      'Arrastra hacia abajo para recargar';
 
   @override
   String get medicineCabinetNoResults => 'No se encontraron medicamentos';
 
   @override
-  String get medicineCabinetNoResultsHint => 'Prueba con otro término de búsqueda';
+  String get medicineCabinetNoResultsHint =>
+      'Prueba con otro término de búsqueda';
 
   @override
   String get medicineCabinetStock => 'Stock:';
@@ -289,20 +295,35 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get medicineCabinetNoStockAvailable => 'No hay stock disponible de este medicamento';
+  String get medicineCabinetNoStockAvailable =>
+      'No hay stock disponible de este medicamento';
 
   @override
-  String medicineCabinetInsufficientStock(String needed, String unit, String available) {
+  String medicineCabinetInsufficientStock(
+    String needed,
+    String unit,
+    String available,
+  ) {
     return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDisponible: $available';
   }
 
   @override
-  String medicineCabinetRefillSuccess(String name, String amount, String unit, String newStock) {
+  String medicineCabinetRefillSuccess(
+    String name,
+    String amount,
+    String unit,
+    String newStock,
+  ) {
     return 'Stock de $name recargado\nAgregado: $amount $unit\nNuevo stock: $newStock';
   }
 
   @override
-  String medicineCabinetDoseRegistered(String name, String amount, String unit, String remaining) {
+  String medicineCabinetDoseRegistered(
+    String name,
+    String amount,
+    String unit,
+    String remaining,
+  ) {
     return 'Toma de $name registrada\nKantitatea: $amount $unit\nStock restante: $remaining';
   }
 
@@ -373,7 +394,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get doseHistoryConfirmDelete => 'Baieztatu eliminación';
 
   @override
-  String get doseHistoryConfirmDeleteMessage => '¿Estás seguro de que quieres eliminar este registro?';
+  String get doseHistoryConfirmDeleteMessage =>
+      '¿Estás seguro de que quieres eliminar este registro?';
 
   @override
   String get doseHistoryRecordDeleted => 'Registro ongi ezabatu da';
@@ -415,7 +437,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get medicationInfoTitle => 'Informazioa del medicamento';
 
   @override
-  String get medicationInfoSubtitle => 'Comienza proporcionando el nombre y tipo de medicamento';
+  String get medicationInfoSubtitle =>
+      'Comienza proporcionando el nombre y tipo de medicamento';
 
   @override
   String get medicationNameLabel => 'Izena del medicamento';
@@ -427,13 +450,15 @@ class AppLocalizationsEu extends AppLocalizations {
   String get medicationTypeLabel => 'Mota de medicamento';
 
   @override
-  String get validationMedicationName => 'Por favor, introduce el nombre del medicamento';
+  String get validationMedicationName =>
+      'Por favor, introduce el nombre del medicamento';
 
   @override
   String get medicationDurationTitle => 'Mota de Tratamendua';
 
   @override
-  String get medicationDurationSubtitle => '¿Cómo vas a tomar este medicamento?';
+  String get medicationDurationSubtitle =>
+      '¿Cómo vas a tomar este medicamento?';
 
   @override
   String get durationContinuousTitle => 'Tratamiento continuo';
@@ -466,7 +491,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get selectDatesTitle => 'Selecciona las fechas';
 
   @override
-  String get selectDatesSubtitle => 'Elige los egun exactos en los que tomarás el medicamento';
+  String get selectDatesSubtitle =>
+      'Elige los egun exactos en los que tomarás el medicamento';
 
   @override
   String dateSelected(int count) {
@@ -480,16 +506,19 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get validationSelectDates => 'Por favor, selecciona al menos una fecha';
+  String get validationSelectDates =>
+      'Por favor, selecciona al menos una fecha';
 
   @override
   String get medicationDatesTitle => 'Fechas del Tratamendua';
 
   @override
-  String get medicationDatesSubtitle => '¿Cuándo comenzarás y terminarás este tratamiento?';
+  String get medicationDatesSubtitle =>
+      '¿Cuándo comenzarás y terminarás este tratamiento?';
 
   @override
-  String get medicationDatesHelp => 'Ambas fechas son opcionales. Si no las estableces, el tratamiento comenzará hoy y no tendrá fecha límite.';
+  String get medicationDatesHelp =>
+      'Ambas fechas son opcionales. Si no las estableces, el tratamiento comenzará hoy y no tendrá fecha límite.';
 
   @override
   String get startDateLabel => 'Fecha de inicio';
@@ -527,7 +556,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get medicationFrequencyTitle => 'Maiztasuna de Medikuntza';
 
   @override
-  String get medicationFrequencySubtitle => 'Cada cuántos egun debes tomar este medicamento';
+  String get medicationFrequencySubtitle =>
+      'Cada cuántos egun debes tomar este medicamento';
 
   @override
   String get frequencyDailyTitle => 'Todos los egun';
@@ -539,7 +569,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get frequencyAlternateTitle => 'Días alternos';
 
   @override
-  String get frequencyAlternateDesc => 'Cada 2 egun desde el inicio del tratamiento';
+  String get frequencyAlternateDesc =>
+      'Cada 2 egun desde el inicio del tratamiento';
 
   @override
   String get frequencyWeeklyTitle => 'Días de la semana específicos';
@@ -554,7 +585,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get selectWeeklyDaysTitle => 'Días de la semana';
 
   @override
-  String get selectWeeklyDaysSubtitle => 'Selecciona los egun específicos en los que tomarás el medicamento';
+  String get selectWeeklyDaysSubtitle =>
+      'Selecciona los egun específicos en los que tomarás el medicamento';
 
   @override
   String daySelected(int count) {
@@ -568,19 +600,22 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get validationSelectWeekdays => 'Por favor, selecciona los egun de la semana';
+  String get validationSelectWeekdays =>
+      'Por favor, selecciona los egun de la semana';
 
   @override
   String get medicationDosageTitle => 'Configuración de Dosis';
 
   @override
-  String get medicationDosageSubtitle => '¿Cómo prefieres configurar las dosis diarias?';
+  String get medicationDosageSubtitle =>
+      '¿Cómo prefieres configurar las dosis diarias?';
 
   @override
   String get dosageFixedTitle => 'Todos los egun igual';
 
   @override
-  String get dosageFixedDesc => 'Especifica cada cuántas ordu tomar el medicamento';
+  String get dosageFixedDesc =>
+      'Especifica cada cuántas ordu tomar el medicamento';
 
   @override
   String get dosageCustomTitle => 'Personalizado';
@@ -604,13 +639,15 @@ class AppLocalizationsEu extends AppLocalizations {
   String get dosageIntervalUnit => 'ordu';
 
   @override
-  String get dosageIntervalValidValues => 'Valores válidos: 1, 2, 3, 4, 6, 8, 12, 24';
+  String get dosageIntervalValidValues =>
+      'Valores válidos: 1, 2, 3, 4, 6, 8, 12, 24';
 
   @override
   String get dosageTimesLabel => 'Número de tomas al día';
 
   @override
-  String get dosageTimesHelp => 'Define cuántas veces al día tomarás el medicamento';
+  String get dosageTimesHelp =>
+      'Define cuántas veces al día tomarás el medicamento';
 
   @override
   String get dosageTimesFieldLabel => 'Tomas por día';
@@ -639,16 +676,20 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get validationInvalidInterval => 'Por favor, introduce un intervalo válido';
+  String get validationInvalidInterval =>
+      'Por favor, introduce un intervalo válido';
 
   @override
-  String get validationIntervalTooLarge => 'El intervalo no puede ser mayor a 24 ordu';
+  String get validationIntervalTooLarge =>
+      'El intervalo no puede ser mayor a 24 ordu';
 
   @override
-  String get validationIntervalNotDivisor => 'El intervalo debe dividir 24 exactamente (1, 2, 3, 4, 6, 8, 12, 24)';
+  String get validationIntervalNotDivisor =>
+      'El intervalo debe dividir 24 exactamente (1, 2, 3, 4, 6, 8, 12, 24)';
 
   @override
-  String get validationInvalidDoseCount => 'Por favor, introduce un número de tomas válido';
+  String get validationInvalidDoseCount =>
+      'Por favor, introduce un número de tomas válido';
 
   @override
   String get validationTooManyDoses => 'No puedes tomar más de 24 dosis al día';
@@ -667,7 +708,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get selectTimeAndAmount => 'Selecciona la hora y cantidad de cada toma';
+  String get selectTimeAndAmount =>
+      'Selecciona la hora y cantidad de cada toma';
 
   @override
   String doseNumber(int number) {
@@ -687,13 +729,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get removeDoseButton => 'Ezabatu toma';
 
   @override
-  String get validationSelectAllTimes => 'Por favor, selecciona todas las ordu de las tomas';
+  String get validationSelectAllTimes =>
+      'Por favor, selecciona todas las ordu de las tomas';
 
   @override
-  String get validationEnterValidAmounts => 'Por favor, ingresa cantidades válidas (mayores a 0)';
+  String get validationEnterValidAmounts =>
+      'Por favor, ingresa cantidades válidas (mayores a 0)';
 
   @override
-  String get validationDuplicateTimes => 'Las ordu de las tomas no pueden repetirse';
+  String get validationDuplicateTimes =>
+      'Las ordu de las tomas no pueden repetirse';
 
   @override
   String get validationAtLeastOneDose => 'Debe haber al menos una toma al día';
@@ -705,7 +750,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get fastingLabel => 'Baraualdi';
 
   @override
-  String get fastingHelp => 'Algunos medicamentos requieren baraualdi antes o después de la toma';
+  String get fastingHelp =>
+      'Algunos medicamentos requieren baraualdi antes o después de la toma';
 
   @override
   String get requiresFastingQuestion => '¿Este medicamento requiere baraualdi?';
@@ -735,13 +781,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get fastingMinutes => 'Minutos';
 
   @override
-  String get fastingNotificationsQuestion => '¿Deseas recibir notificaciones de baraualdi?';
+  String get fastingNotificationsQuestion =>
+      '¿Deseas recibir notificaciones de baraualdi?';
 
   @override
-  String get fastingNotificationBeforeHelp => 'Te notificaremos cuándo debes dejar de comer antes de la toma';
+  String get fastingNotificationBeforeHelp =>
+      'Te notificaremos cuándo debes dejar de comer antes de la toma';
 
   @override
-  String get fastingNotificationAfterHelp => 'Te notificaremos cuándo puedes volver a comer después de la toma';
+  String get fastingNotificationAfterHelp =>
+      'Te notificaremos cuándo puedes volver a comer después de la toma';
 
   @override
   String get fastingNotificationsOn => 'Notificaciones activadas';
@@ -750,19 +799,23 @@ class AppLocalizationsEu extends AppLocalizations {
   String get fastingNotificationsOff => 'Notificaciones desactivadas';
 
   @override
-  String get validationCompleteAllFields => 'Por favor, completa todos los campos';
+  String get validationCompleteAllFields =>
+      'Por favor, completa todos los campos';
 
   @override
-  String get validationSelectFastingWhen => 'Por favor, selecciona cuándo es el baraualdi';
+  String get validationSelectFastingWhen =>
+      'Por favor, selecciona cuándo es el baraualdi';
 
   @override
-  String get validationFastingDuration => 'La duración del baraualdi debe ser al menos 1 minuto';
+  String get validationFastingDuration =>
+      'La duración del baraualdi debe ser al menos 1 minuto';
 
   @override
   String get medicationQuantityTitle => 'Kantitatea de Medicamento';
 
   @override
-  String get medicationQuantitySubtitle => 'Establece la cantidad disponible y cuándo deseas recibir alertas';
+  String get medicationQuantitySubtitle =>
+      'Establece la cantidad disponible y cuándo deseas recibir alertas';
 
   @override
   String get availableQuantityLabel => 'Kantitatea disponible';
@@ -785,16 +838,20 @@ class AppLocalizationsEu extends AppLocalizations {
   String get lowStockAlertUnit => 'egun';
 
   @override
-  String get lowStockAlertHelp => 'Días de antelación para recibir la alerta de bajo stock';
+  String get lowStockAlertHelp =>
+      'Días de antelación para recibir la alerta de bajo stock';
 
   @override
-  String get validationEnterQuantity => 'Por favor, introduce la cantidad disponible';
+  String get validationEnterQuantity =>
+      'Por favor, introduce la cantidad disponible';
 
   @override
-  String get validationQuantityNonNegative => 'La cantidad debe ser mayor o igual a 0';
+  String get validationQuantityNonNegative =>
+      'La cantidad debe ser mayor o igual a 0';
 
   @override
-  String get validationEnterAlertDays => 'Por favor, introduce los egun de antelación';
+  String get validationEnterAlertDays =>
+      'Por favor, introduce los egun de antelación';
 
   @override
   String get validationAlertMinDays => 'Debe ser al menos 1 día';
@@ -908,7 +965,11 @@ class AppLocalizationsEu extends AppLocalizations {
   String get doseActionPostponeCustom => 'Posponer (elegir hora)';
 
   @override
-  String doseActionInsufficientStock(String needed, String unit, String available) {
+  String doseActionInsufficientStock(
+    String needed,
+    String unit,
+    String available,
+  ) {
     return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDisponible: $available';
   }
 
@@ -939,7 +1000,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editMedicationMenuWhatToEdit => '¿Qué deseas editar?';
 
   @override
-  String get editMedicationMenuSelectSection => 'Selecciona la sección que deseas modificar';
+  String get editMedicationMenuSelectSection =>
+      'Selecciona la sección que deseas modificar';
 
   @override
   String get editMedicationMenuBasicInfo => 'Informazioa Básica';
@@ -1039,7 +1101,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get editDurationChangeTypeInfo => 'Para cambiar el tipo de duración, edita la sección de \"Maiztasuna\"';
+  String get editDurationChangeTypeInfo =>
+      'Para cambiar el tipo de duración, edita la sección de \"Maiztasuna\"';
 
   @override
   String get editDurationTreatmentDates => 'Fechas del tratamiento';
@@ -1059,7 +1122,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get editDurationSelectDates => 'Por favor, selecciona las fechas de inicio y fin';
+  String get editDurationSelectDates =>
+      'Por favor, selecciona las fechas de inicio y fin';
 
   @override
   String get editDurationUpdated => 'Duración actualizada correctamente';
@@ -1073,16 +1137,20 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editFastingTitle => 'Editatu Configuración de Baraualdi';
 
   @override
-  String get editFastingCompleteFields => 'Por favor, completa todos los campos';
+  String get editFastingCompleteFields =>
+      'Por favor, completa todos los campos';
 
   @override
-  String get editFastingSelectWhen => 'Por favor, selecciona cuándo es el baraualdi';
+  String get editFastingSelectWhen =>
+      'Por favor, selecciona cuándo es el baraualdi';
 
   @override
-  String get editFastingMinDuration => 'La duración del baraualdi debe ser al menos 1 minuto';
+  String get editFastingMinDuration =>
+      'La duración del baraualdi debe ser al menos 1 minuto';
 
   @override
-  String get editFastingUpdated => 'Configuración de baraualdi actualizada correctamente';
+  String get editFastingUpdated =>
+      'Configuración de baraualdi actualizada correctamente';
 
   @override
   String editFastingError(String error) {
@@ -1096,7 +1164,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editFrequencyPattern => 'Patrón de frecuencia';
 
   @override
-  String get editFrequencyQuestion => '¿Con qué frecuencia tomarás este medicamento?';
+  String get editFrequencyQuestion =>
+      '¿Con qué frecuencia tomarás este medicamento?';
 
   @override
   String get editFrequencyEveryday => 'Todos los egun';
@@ -1108,7 +1177,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editFrequencyUntilFinished => 'Hasta acabar';
 
   @override
-  String get editFrequencyUntilFinishedDesc => 'Hasta que se termine el medicamento';
+  String get editFrequencyUntilFinishedDesc =>
+      'Hasta que se termine el medicamento';
 
   @override
   String get editFrequencySpecificDates => 'Fechas zehatzak';
@@ -1120,13 +1190,15 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editFrequencyWeeklyDays => 'Días de la semana';
 
   @override
-  String get editFrequencyWeeklyDaysDesc => 'Seleccionar egun específicos cada semana';
+  String get editFrequencyWeeklyDaysDesc =>
+      'Seleccionar egun específicos cada semana';
 
   @override
   String get editFrequencyAlternateDays => 'Días alternos';
 
   @override
-  String get editFrequencyAlternateDaysDesc => 'Cada 2 egun desde el inicio del tratamiento';
+  String get editFrequencyAlternateDaysDesc =>
+      'Cada 2 egun desde el inicio del tratamiento';
 
   @override
   String get editFrequencyCustomInterval => 'Intervalo personalizado';
@@ -1175,13 +1247,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editFrequencyIntervalHelp => 'Debe ser al menos 2 egun';
 
   @override
-  String get editFrequencySelectAtLeastOneDate => 'Por favor, selecciona al menos una fecha';
+  String get editFrequencySelectAtLeastOneDate =>
+      'Por favor, selecciona al menos una fecha';
 
   @override
-  String get editFrequencySelectAtLeastOneDay => 'Por favor, selecciona al menos un día de la semana';
+  String get editFrequencySelectAtLeastOneDay =>
+      'Por favor, selecciona al menos un día de la semana';
 
   @override
-  String get editFrequencyIntervalMin => 'El intervalo debe ser al menos 2 egun';
+  String get editFrequencyIntervalMin =>
+      'El intervalo debe ser al menos 2 egun';
 
   @override
   String get editFrequencyUpdated => 'Maiztasuna actualizada correctamente';
@@ -1198,7 +1273,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editQuantityMedicationLabel => 'Kantitatea de medicamento';
 
   @override
-  String get editQuantityDescription => 'Establece la cantidad disponible y cuándo deseas recibir alertas';
+  String get editQuantityDescription =>
+      'Establece la cantidad disponible y cuándo deseas recibir alertas';
 
   @override
   String get editQuantityAvailableLabel => 'Kantitatea disponible';
@@ -1209,25 +1285,30 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get editQuantityValidationRequired => 'Por favor, introduce la cantidad disponible';
+  String get editQuantityValidationRequired =>
+      'Por favor, introduce la cantidad disponible';
 
   @override
-  String get editQuantityValidationMin => 'La cantidad debe ser mayor o igual a 0';
+  String get editQuantityValidationMin =>
+      'La cantidad debe ser mayor o igual a 0';
 
   @override
   String get editQuantityThresholdLabel => 'Avisar cuando queden';
 
   @override
-  String get editQuantityThresholdHelp => 'Días de antelación para recibir la alerta de bajo stock';
+  String get editQuantityThresholdHelp =>
+      'Días de antelación para recibir la alerta de bajo stock';
 
   @override
-  String get editQuantityThresholdValidationRequired => 'Por favor, introduce los egun de antelación';
+  String get editQuantityThresholdValidationRequired =>
+      'Por favor, introduce los egun de antelación';
 
   @override
   String get editQuantityThresholdValidationMin => 'Debe ser al menos 1 día';
 
   @override
-  String get editQuantityThresholdValidationMax => 'No puede ser mayor a 30 egun';
+  String get editQuantityThresholdValidationMax =>
+      'No puede ser mayor a 30 egun';
 
   @override
   String get editQuantityUpdated => 'Kantitatea actualizada correctamente';
@@ -1244,10 +1325,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get editScheduleAddDose => 'Añadir toma';
 
   @override
-  String get editScheduleValidationQuantities => 'Por favor, ingresa cantidades válidas (mayores a 0)';
+  String get editScheduleValidationQuantities =>
+      'Por favor, ingresa cantidades válidas (mayores a 0)';
 
   @override
-  String get editScheduleValidationDuplicates => 'Las ordu de las tomas no pueden repetirse';
+  String get editScheduleValidationDuplicates =>
+      'Las ordu de las tomas no pueden repetirse';
 
   @override
   String get editScheduleUpdated => 'Orduarios actualizados correctamente';
@@ -1263,7 +1346,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get editScheduleAdjustTimeAndQuantity => 'Ajusta la hora y cantidad de cada toma';
+  String get editScheduleAdjustTimeAndQuantity =>
+      'Ajusta la hora y cantidad de cada toma';
 
   @override
   String get specificDatesSelectorTitle => 'Fechas zehatzak';
@@ -1272,7 +1356,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get specificDatesSelectorSelectDates => 'Selecciona fechas';
 
   @override
-  String get specificDatesSelectorDescription => 'Elige las fechas zehatzak en las que tomarás este medicamento';
+  String get specificDatesSelectorDescription =>
+      'Elige las fechas zehatzak en las que tomarás este medicamento';
 
   @override
   String get specificDatesSelectorAddDate => 'Añadir fecha';
@@ -1289,10 +1374,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get specificDatesSelectorContinue => 'Jarraitu';
 
   @override
-  String get specificDatesSelectorAlreadySelected => 'Esta fecha ya está seleccionada';
+  String get specificDatesSelectorAlreadySelected =>
+      'Esta fecha ya está seleccionada';
 
   @override
-  String get specificDatesSelectorSelectAtLeastOne => 'Selecciona al menos una fecha';
+  String get specificDatesSelectorSelectAtLeastOne =>
+      'Selecciona al menos una fecha';
 
   @override
   String get specificDatesSelectorPickerHelp => 'Selecciona una fecha';
@@ -1310,7 +1397,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get weeklyDaysSelectorSelectDays => 'Selecciona los egun';
 
   @override
-  String get weeklyDaysSelectorDescription => 'Elige qué egun de la semana tomarás este medicamento';
+  String get weeklyDaysSelectorDescription =>
+      'Elige qué egun de la semana tomarás este medicamento';
 
   @override
   String weeklyDaysSelectorSelectedCount(int count, String plural) {
@@ -1321,7 +1409,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get weeklyDaysSelectorContinue => 'Jarraitu';
 
   @override
-  String get weeklyDaysSelectorSelectAtLeastOne => 'Selecciona al menos un día de la semana';
+  String get weeklyDaysSelectorSelectAtLeastOne =>
+      'Selecciona al menos un día de la semana';
 
   @override
   String get weeklyDayMonday => 'Astelehena';
@@ -1377,7 +1466,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get noScheduledTimes => 'Este medicamento no tiene horarios configurados';
+  String get noScheduledTimes =>
+      'Este medicamento no tiene horarios configurados';
 
   @override
   String get allDosesTakenToday => 'Ya has tomado todas las dosis de hoy';
@@ -1444,7 +1534,8 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String get insufficientStockForDose => 'No hay suficiente stock para marcar como tomada';
+  String get insufficientStockForDose =>
+      'No hay suficiente stock para marcar como tomada';
 
   @override
   String get settingsTitle => 'Ezarpenak';
@@ -1456,25 +1547,34 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsShowActualTimeTitle => 'Erakutsi dosiaren benetako ordua';
 
   @override
-  String get settingsShowActualTimeSubtitle => 'Dosiak hartu ziren benetako ordua erakusten du programatutako orduaren ordez';
+  String get settingsShowActualTimeSubtitle =>
+      'Dosiak hartu ziren benetako ordua erakusten du programatutako orduaren ordez';
 
   @override
-  String get settingsShowFastingCountdownTitle => 'Erakutsi barauaren atzeko kontaketa';
+  String get settingsShowFastingCountdownTitle =>
+      'Erakutsi barauaren atzeko kontaketa';
 
   @override
-  String get settingsShowFastingCountdownSubtitle => 'Pantaila nagusian barauaren gainerako denbora erakusten du';
+  String get settingsShowFastingCountdownSubtitle =>
+      'Pantaila nagusian barauaren gainerako denbora erakusten du';
 
   @override
-  String get settingsShowFastingNotificationTitle => 'Atzeko kontaketa jakinarazpen finkoa';
+  String get settingsShowFastingNotificationTitle =>
+      'Atzeko kontaketa jakinarazpen finkoa';
 
   @override
-  String get settingsShowFastingNotificationSubtitle => 'Barauaren gainerako denborarekin jakinarazpen finko bat erakusten du (Android bakarrik)';
+  String get settingsShowFastingNotificationSubtitle =>
+      'Barauaren gainerako denborarekin jakinarazpen finko bat erakusten du (Android bakarrik)';
 
   @override
   String get fastingNotificationTitle => 'Baraua abian';
 
   @override
-  String fastingNotificationBody(String medication, String timeRemaining, String endTime) {
+  String fastingNotificationBody(
+    String medication,
+    String timeRemaining,
+    String endTime,
+  ) {
     return '$medication • $timeRemaining gelditzen dira (${endTime}ra arte)';
   }
 
@@ -1510,19 +1610,22 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsExportTitle => 'Esportatu Datu Basea';
 
   @override
-  String get settingsExportSubtitle => 'Gorde zure botika eta historia guztien kopia bat';
+  String get settingsExportSubtitle =>
+      'Gorde zure botika eta historia guztien kopia bat';
 
   @override
   String get settingsImportTitle => 'Inportatu Datu Basea';
 
   @override
-  String get settingsImportSubtitle => 'Lehenago esportatutako segurtasun kopia bat berreskuratu';
+  String get settingsImportSubtitle =>
+      'Lehenago esportatutako segurtasun kopia bat berreskuratu';
 
   @override
   String get settingsInfoTitle => 'Informazioa';
 
   @override
-  String get settingsInfoContent => '• Esportatzean, segurtasun kopia fitxategi bat sortuko da, zure gailuan gorde edo partekatu dezakezuna.\n\n• Inportatzean, zure datu guztiak hautatutako fitxategiko datuekin ordezkatuko dira.\n\n• Gomendagarria da aldizka segurtasun kopiak egitea.';
+  String get settingsInfoContent =>
+      '• Esportatzean, segurtasun kopia fitxategi bat sortuko da, zure gailuan gorde edo partekatu dezakezuna.\n\n• Inportatzean, zure datu guztiak hautatutako fitxategiko datuekin ordezkatuko dira.\n\n• Gomendagarria da aldizka segurtasun kopiak egitea.';
 
   @override
   String get settingsShareText => 'MedicApp-eko segurtasun kopia';
@@ -1550,19 +1653,22 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsImportDialogTitle => 'Inportatu Datu Basea';
 
   @override
-  String get settingsImportDialogMessage => 'Ekintza honek zure datu guztiak inportatutako fitxategiko datuekin ordezkatuko ditu.\n\nZiur zaude jarraitu nahi duzula?';
+  String get settingsImportDialogMessage =>
+      'Ekintza honek zure datu guztiak inportatutako fitxategiko datuekin ordezkatuko ditu.\n\nZiur zaude jarraitu nahi duzula?';
 
   @override
   String get settingsRestartDialogTitle => 'Inportazioa Osatuta';
 
   @override
-  String get settingsRestartDialogMessage => 'Datu basea ondo inportatu da.\n\nMesedez, berrabiarazi aplikazioa aldaketak ikusteko.';
+  String get settingsRestartDialogMessage =>
+      'Datu basea ondo inportatu da.\n\nMesedez, berrabiarazi aplikazioa aldaketak ikusteko.';
 
   @override
   String get settingsRestartDialogButton => 'Ulertuta';
 
   @override
-  String get notificationsWillNotWork => 'Las notificaciones NO funcionarán sin este permiso.';
+  String get notificationsWillNotWork =>
+      'Las notificaciones NO funcionarán sin este permiso.';
 
   @override
   String get debugMenuActivated => 'Menú de depuración activado';
@@ -1615,7 +1721,11 @@ class AppLocalizationsEu extends AppLocalizations {
   String get whichDoseDidYouTake => '¿Qué toma has tomado?';
 
   @override
-  String insufficientStockForThisDose(String needed, String unit, String available) {
+  String insufficientStockForThisDose(
+    String needed,
+    String unit,
+    String available,
+  ) {
     return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDisponible: $available';
   }
 
@@ -1633,7 +1743,12 @@ class AppLocalizationsEu extends AppLocalizations {
   }
 
   @override
-  String manualDoseRegistered(String name, String quantity, String unit, String stock) {
+  String manualDoseRegistered(
+    String name,
+    String quantity,
+    String unit,
+    String stock,
+  ) {
     return 'Toma manual de $name registrada\nCantidad: $quantity $unit\nStock restante: $stock';
   }
 
@@ -1669,7 +1784,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get refillButton => 'Recargar';
 
   @override
-  String stockRefilled(String name, String amount, String unit, String newStock) {
+  String stockRefilled(
+    String name,
+    String amount,
+    String unit,
+    String newStock,
+  ) {
     return 'Stock de $name recargado\nAgregado: $amount $unit\nNuevo stock: $newStock';
   }
 
@@ -1717,10 +1837,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get pullToRefresh => 'Arrastra hacia abajo para recargar';
 
   @override
-  String get batteryOptimizationWarning => 'Para que las notificaciones funcionen, desactiva las restricciones de batería:';
+  String get batteryOptimizationWarning =>
+      'Para que las notificaciones funcionen, desactiva las restricciones de batería:';
 
   @override
-  String get batteryOptimizationInstructions => 'Ajustes → Aplicaciones → MedicApp → Batería → \"Sin restricciones\"';
+  String get batteryOptimizationInstructions =>
+      'Ajustes → Aplicaciones → MedicApp → Batería → \"Sin restricciones\"';
 
   @override
   String get openSettings => 'Abrir ajustes';
@@ -1779,7 +1901,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get activateAlarmsPermission => 'Activar \"Alarmas y recordatorios\"';
 
   @override
-  String get alarmsPermissionDescription => 'Este permiso permite que las notificaciones salten exactamente a la hora configurada.';
+  String get alarmsPermissionDescription =>
+      'Este permiso permite que las notificaciones salten exactamente a la hora configurada.';
 
   @override
   String get notificationDebugTitle => 'Debug de Notificaciones';
@@ -1798,10 +1921,12 @@ class AppLocalizationsEu extends AppLocalizations {
   String get importantWarning => '⚠️ IMPORTANTE';
 
   @override
-  String get withoutPermissionNoNotifications => 'Sin este permiso las notificaciones NO saltarán.';
+  String get withoutPermissionNoNotifications =>
+      'Sin este permiso las notificaciones NO saltarán.';
 
   @override
-  String get alarmsSettings => 'Ajustes → Aplicaciones → MedicApp → Alarmas y recordatorios';
+  String get alarmsSettings =>
+      'Ajustes → Aplicaciones → MedicApp → Alarmas y recordatorios';
 
   @override
   String pendingNotificationsCount(int count) {
@@ -1841,7 +1966,8 @@ class AppLocalizationsEu extends AppLocalizations {
   String get testScheduledNotification => 'Probar programada (1 min)';
 
   @override
-  String get scheduledNotificationInOneMin => 'Notificación programada para 1 minuto';
+  String get scheduledNotificationInOneMin =>
+      'Notificación programada para 1 minuto';
 
   @override
   String get rescheduleNotifications => 'Reprogramar notificaciones';

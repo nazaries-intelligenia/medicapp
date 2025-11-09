@@ -65,7 +65,8 @@ import 'app_localizations_gl.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale)
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -73,7 +74,8 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -85,12 +87,13 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
+      <LocalizationsDelegate<dynamic>>[
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
@@ -98,7 +101,7 @@ abstract class AppLocalizations {
     Locale('en'),
     Locale('es'),
     Locale('eu'),
-    Locale('gl')
+    Locale('gl'),
   ];
 
   /// No description provided for @appTitle.
@@ -651,19 +654,33 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'Stock insuficiente para esta toma\nNecesitas: {needed} {unit}\nDisponible: {available}'**
-  String medicineCabinetInsufficientStock(String needed, String unit, String available);
+  String medicineCabinetInsufficientStock(
+    String needed,
+    String unit,
+    String available,
+  );
 
   /// No description provided for @medicineCabinetRefillSuccess.
   ///
   /// In es, this message translates to:
   /// **'Stock de {name} recargado\nAgregado: {amount} {unit}\nNuevo stock: {newStock}'**
-  String medicineCabinetRefillSuccess(String name, String amount, String unit, String newStock);
+  String medicineCabinetRefillSuccess(
+    String name,
+    String amount,
+    String unit,
+    String newStock,
+  );
 
   /// No description provided for @medicineCabinetDoseRegistered.
   ///
   /// In es, this message translates to:
   /// **'Toma de {name} registrada\nCantidad: {amount} {unit}\nStock restante: {remaining}'**
-  String medicineCabinetDoseRegistered(String name, String amount, String unit, String remaining);
+  String medicineCabinetDoseRegistered(
+    String name,
+    String amount,
+    String unit,
+    String remaining,
+  );
 
   /// No description provided for @medicineCabinetDeleteSuccess.
   ///
@@ -1755,7 +1772,11 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'Stock insuficiente para esta toma\nNecesitas: {needed} {unit}\nDisponible: {available}'**
-  String doseActionInsufficientStock(String needed, String unit, String available);
+  String doseActionInsufficientStock(
+    String needed,
+    String unit,
+    String available,
+  );
 
   /// No description provided for @doseActionTakenRegistered.
   ///
@@ -2751,7 +2772,11 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'{medication} • {timeRemaining} restantes (hasta {endTime})'**
-  String fastingNotificationBody(String medication, String timeRemaining, String endTime);
+  String fastingNotificationBody(
+    String medication,
+    String timeRemaining,
+    String endTime,
+  );
 
   /// No description provided for @fastingRemainingMinutes.
   ///
@@ -2985,7 +3010,11 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'Stock insuficiente para esta toma\nNecesitas: {needed} {unit}\nDisponible: {available}'**
-  String insufficientStockForThisDose(String needed, String unit, String available);
+  String insufficientStockForThisDose(
+    String needed,
+    String unit,
+    String available,
+  );
 
   /// No description provided for @doseRegisteredAtTime.
   ///
@@ -3009,7 +3038,12 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'Toma manual de {name} registrada\nCantidad: {quantity} {unit}\nStock restante: {stock}'**
-  String manualDoseRegistered(String name, String quantity, String unit, String stock);
+  String manualDoseRegistered(
+    String name,
+    String quantity,
+    String unit,
+    String stock,
+  );
 
   /// No description provided for @medicationSuspended.
   ///
@@ -3057,7 +3091,12 @@ abstract class AppLocalizations {
   ///
   /// In es, this message translates to:
   /// **'Stock de {name} recargado\nAgregado: {amount} {unit}\nNuevo stock: {newStock}'**
-  String stockRefilled(String name, String amount, String unit, String newStock);
+  String stockRefilled(
+    String name,
+    String amount,
+    String unit,
+    String newStock,
+  );
 
   /// No description provided for @availableStock.
   ///
@@ -3612,7 +3651,8 @@ abstract class AppLocalizations {
   String get activeFastingPeriodsTitle;
 }
 
-class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -3621,28 +3661,32 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['ca', 'en', 'es', 'eu', 'gl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) =>
+      <String>['ca', 'en', 'es', 'eu', 'gl'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
-
-
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ca': return AppLocalizationsCa();
-    case 'en': return AppLocalizationsEn();
-    case 'es': return AppLocalizationsEs();
-    case 'eu': return AppLocalizationsEu();
-    case 'gl': return AppLocalizationsGl();
+    case 'ca':
+      return AppLocalizationsCa();
+    case 'en':
+      return AppLocalizationsEn();
+    case 'es':
+      return AppLocalizationsEs();
+    case 'eu':
+      return AppLocalizationsEu();
+    case 'gl':
+      return AppLocalizationsGl();
   }
 
   throw FlutterError(
     'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
     'an issue with the localizations generation tool. Please file an issue '
     'on GitHub with a reproducible sample app and the gen-l10n configuration '
-    'that was used.'
+    'that was used.',
   );
 }

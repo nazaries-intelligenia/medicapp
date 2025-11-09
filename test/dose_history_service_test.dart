@@ -372,6 +372,212 @@ void main() {
     });
   });
 
+  group('DoseHistoryService - changeRegisteredTime', () {
+    test('should change registered time without changing other fields', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 10));
+      final newRegisteredTime = scheduledTime.add(const Duration(minutes: 30));
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry11',
+        medicationId: 'med11',
+        medicationName: 'Test Med',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 1.0,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      // Change registered time
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      // Verify registered time was updated
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+      expect(updatedEntry.registeredDateTime, isNot(originalRegisteredTime));
+
+      // Verify all other fields remain unchanged
+      expect(updatedEntry.id, originalEntry.id);
+      expect(updatedEntry.medicationId, originalEntry.medicationId);
+      expect(updatedEntry.medicationName, originalEntry.medicationName);
+      expect(updatedEntry.medicationType, originalEntry.medicationType);
+      expect(updatedEntry.personId, originalEntry.personId);
+      expect(updatedEntry.scheduledDateTime, originalEntry.scheduledDateTime);
+      expect(updatedEntry.status, originalEntry.status);
+      expect(updatedEntry.quantity, originalEntry.quantity);
+
+      // Verify it was saved to database
+      final history = await DatabaseHelper.instance.getDoseHistoryForMedication('med11');
+      expect(history.length, 1);
+      expect(history.first.registeredDateTime, newRegisteredTime);
+    });
+
+    test('should preserve status when changing registered time', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 5));
+      final newRegisteredTime = scheduledTime.add(const Duration(minutes: 45));
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry12',
+        medicationId: 'med12',
+        medicationName: 'Test Med',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 1.0,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      expect(updatedEntry.status, DoseStatus.taken); // Status unchanged
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+
+      final history = await DatabaseHelper.instance.getDoseHistoryForMedication('med12');
+      expect(history.first.status, DoseStatus.taken);
+    });
+
+    test('should preserve quantity and notes when changing registered time', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 10));
+      final newRegisteredTime = scheduledTime.add(const Duration(minutes: 25));
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry13',
+        medicationId: 'med13',
+        medicationName: 'Complex Med',
+        medicationType: MedicationType.injection,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 2.5,
+        notes: 'Important test notes',
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      expect(updatedEntry.quantity, 2.5);
+      expect(updatedEntry.notes, 'Important test notes');
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+
+      final history = await DatabaseHelper.instance.getDoseHistoryForMedication('med13');
+      expect(history.first.quantity, 2.5);
+      expect(history.first.notes, 'Important test notes');
+    });
+
+    test('should allow changing registered time to earlier time', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 30));
+      final newRegisteredTime = scheduledTime.add(const Duration(minutes: 5)); // Earlier
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry14',
+        medicationId: 'med14',
+        medicationName: 'Test Med',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 1.0,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+      expect(updatedEntry.registeredDateTime.isBefore(originalRegisteredTime), true);
+    });
+
+    test('should allow changing registered time to later time', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 2));
+      final originalRegisteredTime = scheduledTime.add(const Duration(minutes: 5));
+      final newRegisteredTime = scheduledTime.add(const Duration(hours: 1)); // Later
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry15',
+        medicationId: 'med15',
+        medicationName: 'Test Med',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 1.0,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+      expect(updatedEntry.registeredDateTime.isAfter(originalRegisteredTime), true);
+    });
+
+    test('should work with extra doses', () async {
+      final scheduledTime = DateTime.now().subtract(const Duration(hours: 1));
+      final originalRegisteredTime = scheduledTime;
+      final newRegisteredTime = scheduledTime.add(const Duration(minutes: 15));
+
+      final personId = await getDefaultPersonId();
+      final originalEntry = DoseHistoryEntry(
+        id: 'entry16',
+        medicationId: 'med16',
+        medicationName: 'Test Med',
+        medicationType: MedicationType.pill,
+        personId: personId,
+        scheduledDateTime: scheduledTime,
+        registeredDateTime: originalRegisteredTime,
+        status: DoseStatus.taken,
+        quantity: 1.0,
+        isExtraDose: true,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(originalEntry);
+
+      final updatedEntry = await DoseHistoryService.changeRegisteredTime(
+        originalEntry,
+        newRegisteredTime,
+      );
+
+      expect(updatedEntry.isExtraDose, true); // Extra dose flag preserved
+      expect(updatedEntry.registeredDateTime, newRegisteredTime);
+
+      final history = await DatabaseHelper.instance.getDoseHistoryForMedication('med16');
+      expect(history.first.isExtraDose, true);
+    });
+  });
+
   group('MedicationNotFoundException', () {
     test('should contain medication ID in exception', () {
       final exception = MedicationNotFoundException('test-id-123');

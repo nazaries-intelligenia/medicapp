@@ -30,11 +30,11 @@ flutter test
 - **test/edit_duration_screen_test.dart** (23): EditDurationScreen, validación de fechas, cobertura 82.7%
 - **test/database_export_import_test.dart** (12): Export/import con validación, backup automático, restauración
 - **test/extra_dose_test.dart** (5): Tomas extra/excepcionales, reducción de stock, historial con isExtraDose, ayuno "after" dinámico
-- **test/dose_history_service_test.dart** (12): Servicio de historial, eliminación de entradas, restauración de stock, cambio de estado, validación de fechas, excepciones
+- **test/dose_history_service_test.dart** (18): Servicio de historial, eliminación de entradas, restauración de stock, cambio de estado, cambio de hora de registro, validación de fechas, excepciones
 - **test/dose_action_service_test.dart** (28): Registro de dosis tomadas/omitidas/manuales, validación de stock, persistencia, reset diario, cantidades fraccionarias, fasting notifications
 - **test/settings_screen_test.dart** (19): Pantalla de configuración, preferencias de visualización (hora real, cuenta atrás de ayuno, notificación fija), export/import de base de datos, navegación, estado de UI
 
-**Total**: ~432 tests cubriendo modelo, servicios (incluidos dose_history y dose_action), preferencias, persistencia, historial, funcionalidad de ayuno (incluida cuenta atrás visual y notificación ongoing), tomas extra, notificaciones, stock, pantallas principales (settings_screen), pantallas de edición, backup/restore y widgets de integración
+**Total**: ~438 tests cubriendo modelo, servicios (incluidos dose_history y dose_action), preferencias, persistencia, historial, funcionalidad de ayuno (incluida cuenta atrás visual y notificación ongoing), tomas extra, notificaciones, stock, pantallas principales (settings_screen), pantallas de edición, backup/restore y widgets de integración
 
 **Cobertura global**: ~75-80% estimada (suite optimizada)
 
