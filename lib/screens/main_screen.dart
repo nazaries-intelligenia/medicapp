@@ -23,9 +23,11 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   int _previousIndex = 0;
+  bool _settingsChanged = false; // Flag to track if we just left Settings
 
-  // GlobalKey to access MedicationListScreen state
+  // GlobalKeys to access screen states
   final _medicationListKey = GlobalKey<MedicationListScreenState>();
+  final _doseHistoryKey = GlobalKey<DoseHistoryScreenState>();
 
   // Keep screen instances in memory
   late final Widget _medicationListScreen;
@@ -40,7 +42,7 @@ class _MainScreenState extends State<MainScreen> {
     // Initialize screen instances
     _medicationListScreen = MedicationListScreen(key: _medicationListKey);
     _medicationInventoryScreen = const MedicationInventoryScreen();
-    _doseHistoryScreen = const DoseHistoryScreen();
+    _doseHistoryScreen = DoseHistoryScreen(key: _doseHistoryKey);
     _settingsScreen = const SettingsScreen();
 
     // Process any pending notifications after the first frame is rendered
@@ -50,16 +52,27 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
-    print('🔄 MainScreen._onItemTapped: from $_selectedIndex to $index');
+    // Mark that we're leaving Settings - any screen visited after needs to check for changes
+    if (_selectedIndex == 3 && index != 3) {
+      _settingsChanged = true;
+    }
 
-    // If returning to medication screen (0) from settings (3), trigger reload
-    // Use _selectedIndex (current) instead of _previousIndex
-    if (index == 0 && _selectedIndex == 3) {
-      print('✅ Returning from Settings to Medications, triggering reload');
-      // Reload preferences in medication screen after returning from settings
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _medicationListKey.currentState?.reloadAfterSettingsChange();
-      });
+    // Clear the flag when returning to Settings
+    if (index == 3 && _settingsChanged) {
+      _settingsChanged = false;
+    }
+
+    // If we just left Settings and are entering a screen, trigger reload
+    if (_settingsChanged && index != 3) {
+      if (index == 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _medicationListKey.currentState?.reloadAfterSettingsChange();
+        });
+      } else if (index == 2) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _doseHistoryKey.currentState?.reloadAfterSettingsChange();
+        });
+      }
     }
 
     setState(() {

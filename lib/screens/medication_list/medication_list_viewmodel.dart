@@ -75,9 +75,7 @@ class MedicationListViewModel extends ChangeNotifier {
   void _safeNotify() {
     // Always notify immediately - the batching approach doesn't work well with pumpAndSettle
     // The real fix is ensuring we don't have continuous rebuild loops
-    print('📢 _safeNotify: hasListeners=$hasListeners');
     notifyListeners();
-    print('📢 notifyListeners() called');
   }
 
   @override
@@ -112,11 +110,8 @@ class MedicationListViewModel extends ChangeNotifier {
     final oldShowPersonTabs = _showPersonTabs;
     await _loadPreferences();
 
-    print('🔄 reloadPreferences: old=$oldShowPersonTabs, new=$_showPersonTabs');
-
     // If showPersonTabs preference changed, reinitialize persons and tabs
     if (oldShowPersonTabs != _showPersonTabs) {
-      print('📱 showPersonTabs changed! Reinitializing...');
       await initializePersonsAndTabs();
     }
   }
@@ -142,10 +137,8 @@ class MedicationListViewModel extends ChangeNotifier {
     // In mixed view mode, we don't need a selected person
     if (_showPersonTabs) {
       _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
-      print('👤 Person tabs enabled: selected person = ${_selectedPerson?.name}');
     } else {
       _selectedPerson = null;
-      print('👥 Mixed view: no person selected, will load all medications');
     }
 
     // Now that persons are loaded, load medications
@@ -187,9 +180,7 @@ class MedicationListViewModel extends ChangeNotifier {
 
       if (!_showPersonTabs) {
         // Mixed view: load all medications from all persons
-        print('🔍 Loading ALL medications (mixed view)');
         allMedications = await DatabaseHelper.instance.getAllMedications();
-        print('   Found ${allMedications.length} medications total');
 
         // Build map of medication -> persons
         _medicationPersons.clear();
@@ -197,19 +188,14 @@ class MedicationListViewModel extends ChangeNotifier {
           final persons = await DatabaseHelper.instance
               .getPersonsForMedication(medication.id);
           _medicationPersons[medication.id] = persons;
-          print('   - ${medication.name}: ${persons.map((p) => p.name).join(", ")}');
         }
       } else if (_selectedPerson != null) {
         // Tab view: load medications for selected person only
-        print('🔍 Loading medications for person: ${_selectedPerson!.name}');
         allMedications = await DatabaseHelper.instance
             .getMedicationsForPerson(_selectedPerson!.id);
-        print('   Found ${allMedications.length} medications');
       } else {
         // Fallback: load all medications
-        print('🔍 Fallback: loading all medications');
         allMedications = await DatabaseHelper.instance.getAllMedications();
-        print('   Found ${allMedications.length} medications');
       }
 
       // Synchronize system notifications with database medications
@@ -221,7 +207,6 @@ class MedicationListViewModel extends ChangeNotifier {
       // Get medication IDs that have doses registered today
       final medicationIdsWithDosesToday =
           await DatabaseHelper.instance.getMedicationIdsWithDosesToday();
-      print('📊 Medication IDs with doses today: $medicationIdsWithDosesToday');
 
       // Filter medications for display
       final medications = allMedications.where((m) {
@@ -229,31 +214,21 @@ class MedicationListViewModel extends ChangeNotifier {
         if (m.durationType != TreatmentDurationType.asNeeded) return true;
         return medicationIdsWithDosesToday.contains(m.id);
       }).toList();
-      print('✅ After filtering: ${medications.length} medications to display');
 
       // Load cache data
-      print('💾 Loading cache data...');
       await _loadCacheData(medications);
-      print('✅ Cache data loaded');
 
       // Load fasting periods
-      print('⏱️ Loading fasting periods...');
       await _fastingManager.loadFastingPeriods();
-      print('✅ Fasting periods loaded');
 
       // Sort medications by next dose proximity
-      print('🔄 Sorting medications...');
       MedicationSorter.sortByNextDose(medications);
-      print('✅ Medications sorted');
 
       // Update state
-      print('📝 Updating state...');
       _medications.clear();
       _medications.addAll(medications);
       _isLoading = false;
-      print('✅ State updated, calling _safeNotify()');
       _safeNotify();
-      print('✅ _safeNotify() completed');
 
       // Update fasting notification
       await _fastingManager.updateNotification();
@@ -448,8 +423,7 @@ class MedicationListViewModel extends ChangeNotifier {
             );
           }
         } catch (e) {
-          // Log error but don't block
-          print('Error scheduling notifications for ${medication.name}: $e');
+          // Log error but don't block (silently ignore)
         }
       }
     });
@@ -944,7 +918,7 @@ class MedicationListViewModel extends ChangeNotifier {
             );
           }
         } catch (e) {
-          print('Error rescheduling notifications for ${medication.name}: $e');
+          // Silently ignore errors
         }
       });
     }

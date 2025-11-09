@@ -18,10 +18,10 @@ class DoseHistoryScreen extends StatefulWidget {
   const DoseHistoryScreen({super.key});
 
   @override
-  State<DoseHistoryScreen> createState() => _DoseHistoryScreenState();
+  State<DoseHistoryScreen> createState() => DoseHistoryScreenState();
 }
 
-class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerProviderStateMixin {
+class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   List<DoseHistoryEntry> _historyEntries = [];
   List<Medication> _medications = [];
   List<Person> _persons = [];
@@ -49,13 +49,37 @@ class _DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadData();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Reload when app returns to foreground (e.g., from Settings)
+      reloadAfterSettingsChange();
+    }
+  }
+
+  /// Public method to reload data after settings change
+  /// Called by MainScreen when returning from Settings
+  Future<void> reloadAfterSettingsChange() async {
+    // Check if showPersonTabs preference changed
+    final oldShowPersonTabs = _showPersonTabs;
+    final newShowPersonTabs = await PreferencesService.getShowPersonTabs();
+
+    // If preference changed, reload everything
+    if (oldShowPersonTabs != newShowPersonTabs) {
+      await _loadData();
+    }
   }
 
   Future<void> _loadData() async {

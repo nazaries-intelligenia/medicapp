@@ -20,8 +20,8 @@ class DebugNotificationsScreen extends StatefulWidget {
   State<DebugNotificationsScreen> createState() => _DebugNotificationsScreenState();
 }
 
-class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> with SingleTickerProviderStateMixin, WidgetsBindingObserver {
+  TabController? _tabController;
   bool _isLoading = true;
   bool _notificationsEnabled = false;
   bool _canScheduleExact = false;
@@ -34,15 +34,35 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadNotificationData();
   }
 
   @override
   void dispose() {
-    if (_showPersonTabs && widget.persons.length > 1) {
-      _tabController.dispose();
-    }
+    WidgetsBinding.instance.removeObserver(this);
+    _tabController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // Reload when app returns to foreground (e.g., from Settings)
+      _reloadAfterSettingsChange();
+    }
+  }
+
+  Future<void> _reloadAfterSettingsChange() async {
+    // Check if showPersonTabs preference changed
+    final oldShowPersonTabs = _showPersonTabs;
+    final newShowPersonTabs = await PreferencesService.getShowPersonTabs();
+
+    // If preference changed, reload everything
+    if (oldShowPersonTabs != newShowPersonTabs) {
+      await _loadNotificationData();
+    }
   }
 
   Future<void> _loadNotificationData() async {
@@ -50,6 +70,10 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
 
     // Load preference
     _showPersonTabs = await PreferencesService.getShowPersonTabs();
+
+    // Dispose old tab controller if exists
+    _tabController?.dispose();
+    _tabController = null;
 
     // Initialize tab controller only if tabs are enabled
     if (_showPersonTabs && widget.persons.length > 1) {
@@ -303,9 +327,9 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.notificationDebugTitle),
-        bottom: _showPersonTabs && widget.persons.length > 1
+        bottom: _showPersonTabs && widget.persons.length > 1 && _tabController != null
             ? TabBar(
-                controller: _tabController,
+                controller: _tabController!,
                 isScrollable: widget.persons.length > 3,
                 tabs: widget.persons.map((person) => Tab(text: person.name)).toList(),
               )
@@ -441,9 +465,9 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                 Expanded(
                   child: widget.persons.isEmpty
                       ? Center(child: Text(l10n.noScheduledNotifications))
-                      : _showPersonTabs && widget.persons.length > 1
+                      : _showPersonTabs && widget.persons.length > 1 && _tabController != null
                           ? TabBarView(
-                              controller: _tabController,
+                              controller: _tabController!,
                               children: widget.persons.map((person) {
                                 final notifications = _notificationsByPerson[person.id] ?? [];
                                 return _buildNotificationsList(notifications, person);

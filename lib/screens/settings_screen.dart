@@ -25,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _showFastingCountdown = false;
   bool _showFastingNotification = false;
   bool _showPersonTabs = true;
+  int _personCount = 0;
 
   @override
   void initState() {
@@ -38,12 +39,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final showFastingCountdown = await PreferencesService.getShowFastingCountdown();
     final showFastingNotification = await PreferencesService.getShowFastingNotification();
     final showPersonTabs = await PreferencesService.getShowPersonTabs();
+
+    // Load person count to determine if tabs setting should be shown
+    final persons = await DatabaseHelper.instance.getAllPersons();
+
     if (mounted) {
       setState(() {
         _showActualTime = showActualTime;
         _showFastingCountdown = showFastingCountdown;
         _showFastingNotification = showFastingNotification;
         _showPersonTabs = showPersonTabs;
+        _personCount = persons.length;
       });
     }
   }
@@ -61,13 +67,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Handle show fasting countdown toggle
   Future<void> _handleShowFastingCountdownChanged(bool value) async {
     await PreferencesService.setShowFastingCountdown(value);
+    // If disabling countdown, also disable notification
+    if (!value && _showFastingNotification) {
+      await PreferencesService.setShowFastingNotification(false);
+    }
     if (mounted) {
       setState(() {
         _showFastingCountdown = value;
         // If disabling countdown, also disable notification
         if (!value && _showFastingNotification) {
           _showFastingNotification = false;
-          PreferencesService.setShowFastingNotification(false);
         }
       });
     }
@@ -94,13 +103,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   /// Navigate to persons management screen
-  void _navigateToPersonsManagement() {
-    Navigator.push(
+  void _navigateToPersonsManagement() async {
+    await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => const PersonsManagementScreen(),
       ),
     );
+
+    // Reload preferences when returning, in case person count changed
+    _loadPreferences();
   }
 
   /// Export the database and share it
@@ -331,15 +343,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onChanged: _handleShowFastingNotificationChanged,
             ),
 
-          // Show Person Tabs Switch
-          SettingSwitchCard(
-            icon: Icons.tab,
-            iconColor: theme.colorScheme.tertiary,
-            title: l10n.settingsShowPersonTabsTitle,
-            subtitle: l10n.settingsShowPersonTabsSubtitle,
-            value: _showPersonTabs,
-            onChanged: _handleShowPersonTabsChanged,
-          ),
+          // Show Person Tabs Switch (only when there are 2+ persons)
+          if (_personCount >= 2)
+            SettingSwitchCard(
+              icon: Icons.tab,
+              iconColor: theme.colorScheme.tertiary,
+              title: l10n.settingsShowPersonTabsTitle,
+              subtitle: l10n.settingsShowPersonTabsSubtitle,
+              value: _showPersonTabs,
+              onChanged: _handleShowPersonTabsChanged,
+            ),
 
           const SizedBox(height: 16),
 

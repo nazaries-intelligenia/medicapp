@@ -3,12 +3,14 @@
 ## Gestión Multi-Persona (V19+)
 
 - **Soporte para múltiples personas**: Gestiona medicamentos para toda la familia desde una única aplicación (usuario principal, familiares, pacientes a cargo)
-- **Sistema de tabs por persona**: Navegación rápida entre personas mediante pestañas en la pantalla principal, persona por defecto identificada visualmente
+- **Vista adaptable de personas** (configuración en Ajustes, solo visible con 2+ personas):
+  - **Vista separada por pestañas** (por defecto): Navegación rápida entre personas mediante pestañas en pantalla principal e historial, persona por defecto identificada visualmente con icono
+  - **Vista combinada/mezclada**: Todos los medicamentos y tomas en una sola lista con etiquetas de color por persona (chips distintivos en Material 3), útil para visión global de la familia. Al agregar medicamento muestra modal de selección de persona
 - **Asignación de medicamentos**: Interfaz dedicada para asignar/desasignar medicamentos a personas, visualización clara del estado de asignaciones, gestión desde menú contextual de cada medicamento
 - **Configuración independiente**: Cada persona puede tener sus propios horarios, frecuencias y configuraciones para el mismo medicamento compartido
 - **Stock compartido**: Los medicamentos físicos se comparten (un solo stock), pero cada persona tiene su seguimiento independiente
 - **Notificaciones por persona**: Las notificaciones se envían según la configuración de cada persona, con identificación clara del destinatario
-- **Historial por persona**: Seguimiento independiente de adherencia y tomas para cada persona
+- **Historial por persona**: Seguimiento independiente de adherencia y tomas para cada persona (filtrable por persona en ambas vistas)
 - **Gestión de personas**: Crear, editar y eliminar personas desde Ajustes, una persona siempre marcada como por defecto, protección contra eliminación accidental
 - **Migración automática**: Los datos existentes se migran automáticamente a la persona por defecto al actualizar a V19+
 
