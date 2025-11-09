@@ -85,7 +85,7 @@ flutter test
 
 ### Mejoras recientes
 
-- **Tests de navegación por días** (noviembre 2025): 27 tests nuevos para funcionalidad de navegación temporal, day_navigation_test.dart (5 tests ViewModel: carga de datos históricos, filtrado por persona, medicamentos programados/ocasionales), day_navigation_ui_test.dart (22 tests UI: formato de fecha "Hoy" vs fecha simple, cálculo de offsets día ↔ página, validación de límites de fecha, años bisiestos, cambios de mes/año, casos edge), cobertura completa de lógica de calendario y selector de fechas
+- **Tests de navegación por días** (noviembre 2025): 27 tests nuevos para funcionalidad de navegación temporal, day_navigation_test.dart (5 tests ViewModel: carga de datos históricos, filtrado por persona, medicamentos programados/ocasionales), day_navigation_ui_test.dart (22 tests UI: formato de fecha "Hoy" vs fecha simple, cálculo de offsets día ↔ página, validación de límites de fecha, años bisiestos, cambios de mes/año, casos edge), cobertura completa de lógica de calendario y selector de fechas, **Fix en ViewModel**: proteger syncNotificationsWithMedications con isTestMode para evitar inicialización de plugins nativos en tests, mock de SharedPreferences en tests
 - **Optimización y corrección de suite de tests** (enero 2025):
   - **Corrección de tests de integración**: 4 tests con errores `database_closed` corregidos, añadidas esperas para operaciones asíncronas del ViewModel
   - **Optimización de tests redundantes**: 18 tests eliminados o fusionados, ~277 líneas removidas
