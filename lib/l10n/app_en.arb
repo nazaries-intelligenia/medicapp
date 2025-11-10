@@ -497,6 +497,9 @@
   "settingsShowFastingCountdownSubtitle": "Display remaining fasting time on main screen",
   "settingsShowFastingNotificationTitle": "Fixed countdown notification",
   "settingsShowFastingNotificationSubtitle": "Show a fixed notification with remaining fasting time (Android only)",
+  "settingsShowPersonTabsTitle": "Show persons in separate tabs",
+  "settingsShowPersonTabsSubtitle": "Display each person in a separate tab. When disabled, all persons are mixed in a single list with labels",
+  "selectPerson": "Select person",
   "fastingNotificationTitle": "Fasting in progress",
   "fastingNotificationBody": "{medication} • {timeRemaining} remaining (until {endTime})",
   "fastingRemainingMinutes": "{minutes} min",
@@ -618,6 +621,7 @@
   "basedOnActualDose": "Based on actual dose",
   "basedOnSchedule": "Based on schedule",
   "today": "Today {day}/{month}/{year}",
+  "returnToToday": "Return to today",
   "tomorrow": "Tomorrow {day}/{month}/{year}",
   "todayOrLater": "Today or later",
   "pastDueWarning": "⚠️ PAST DUE",
@@ -645,5 +649,6 @@
   "takenTodayMultiple": "Taken today: {count} times ({quantity} {unit})",
   "done": "Done",
   "suspended": "Suspended",
-  "activeFastingPeriodsTitle": "Active Fasting Periods"
+  "activeFastingPeriodsTitle": "Active Fasting Periods",
+  "fastingCompleted": "Fasting completed! You can eat now"
 }

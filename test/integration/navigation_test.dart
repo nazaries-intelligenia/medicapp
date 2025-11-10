@@ -154,10 +154,14 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    // Verify we're directly on the add medication screen (no modal)
+    // Verify we're directly on the add medication screen (no modal when only 1 person exists)
     // Navigation to other sections (Pastillero, Botiquín, Historial) is now via BottomNavigationBar
     expect(find.text(getL10n(tester).addMedicationTitle), findsWidgets);
     expect(find.text(getL10n(tester).medicationInfoTitle), findsWidgets);
+
+    // Wait for sqflite timers to complete before test ends
+    await tester.pump(const Duration(seconds: 11));
+    await tester.pump();
   });
 
   testWidgets('Should navigate back from add medication screen', (WidgetTester tester) async {
@@ -226,6 +230,10 @@ void main() {
     // Verify NavigationBar is used (bottom navigation)
     expect(find.byType(NavigationBar), findsOneWidget);
     expect(find.byType(NavigationRail), findsNothing);
+
+    // Wait for sqflite timers to complete before test ends
+    await tester.pump(const Duration(seconds: 11));
+    await tester.pump();
   });
 
   testWidgets('Should show NavigationRail on tablet screens', (WidgetTester tester) async {
@@ -252,6 +260,10 @@ void main() {
     // Verify NavigationRail is used (side navigation)
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
+
+    // Wait for sqflite timers to complete before test ends
+    await tester.pump(const Duration(seconds: 11));
+    await tester.pump();
   });
 
   testWidgets('Should show NavigationRail in landscape mode', (WidgetTester tester) async {
@@ -278,5 +290,9 @@ void main() {
     // Verify NavigationRail is used in landscape
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.byType(NavigationBar), findsNothing);
+
+    // Wait for sqflite timers to complete before test ends
+    await tester.pump(const Duration(seconds: 11));
+    await tester.pump();
   });
 }

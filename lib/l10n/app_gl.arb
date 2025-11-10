@@ -1005,5 +1005,484 @@
   },
   "done": "Feito",
   "suspended": "Suspendido",
-  "activeFastingPeriodsTitle": "Xaxúns Activos"
+  "activeFastingPeriodsTitle": "Xaxúns Activos",
+  "fastingCompleted": "Xaxún completado! Xa podes comer",
+
+  "@_MEDICATION_LIST_SCREEN": {},
+  "notificationsWillNotWork": "As notificacións NON funcionarán sen este permiso.",
+  "debugMenuActivated": "Menú de depuración activado",
+  "debugMenuDeactivated": "Menú de depuración desactivado",
+  "nextDoseAt": "Próxima toma: {time}",
+  "@nextDoseAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingDose": "⚠️ Dose pendente: {time}",
+  "@pendingDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseTomorrow": "Próxima toma: mañá ás {time}",
+  "@nextDoseTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseOnDay": "Próxima toma: {dayName} {day}/{month} ás {time}",
+  "@nextDoseOnDay": {
+    "placeholders": {
+      "dayName": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dayNameMon": "Lun",
+  "dayNameTue": "Mar",
+  "dayNameWed": "Mér",
+  "dayNameThu": "Xov",
+  "dayNameFri": "Ven",
+  "dayNameSat": "Sáb",
+  "dayNameSun": "Dom",
+  "whichDoseDidYouTake": "Que toma tomaches?",
+  "insufficientStockForThisDose": "Stock insuficiente para esta toma\nNecesitas: {needed} {unit}\nDispoñible: {available}",
+  "@insufficientStockForThisDose": {
+    "placeholders": {
+      "needed": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "doseRegisteredAtTime": "Toma de {name} rexistrada ás {time}\nStock restante: {stock}",
+  "@doseRegisteredAtTime": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "allDosesCompletedToday": "✓ Todas as tomas de hoxe completadas",
+  "remainingDosesToday": "Tomas restantes hoxe: {count}",
+  "@remainingDosesToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "manualDoseRegistered": "Toma manual de {name} rexistrada\nCantidade: {quantity} {unit}\nStock restante: {stock}",
+  "@manualDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationSuspended": "{name} suspendido\nNon se programarán máis notificacións",
+  "@medicationSuspended": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationReactivated": "{name} reactivado\nNotificacións reprogramadas",
+  "@medicationReactivated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStock": "Stock actual: {stock}",
+  "@currentStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityToAdd": "Cantidade a agregar",
+  "example": "Ex: {example}",
+  "@example": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "lastRefill": "Última recarga: {amount} {unit}",
+  "@lastRefill": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "refillButton": "Recargar",
+  "stockRefilled": "Stock de {name} recargado\nEngadido: {amount} {unit}\nNovo stock: {newStock}",
+  "@stockRefilled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "newStock": {
+        "type": "String"
+      }
+    }
+  },
+  "availableStock": "Stock dispoñible: {stock}",
+  "@availableStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityTaken": "Cantidade tomada",
+  "registerButton": "Rexistrar",
+  "registerManualDose": "Rexistrar toma manual",
+  "refillMedication": "Recargar medicamento",
+  "resumeMedication": "Reactivar medicamento",
+  "suspendMedication": "Suspender medicamento",
+  "editMedicationButton": "Editar medicamento",
+  "deleteMedicationButton": "Eliminar medicamento",
+  "medicationDeletedShort": "{name} eliminado",
+  "@medicationDeletedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noMedicationsRegistered": "Non hai medicamentos rexistrados",
+  "addMedicationHint": "Pulsa o botón + para engadir un",
+  "pullToRefresh": "Arrastra cara abaixo para recargar",
+  "batteryOptimizationWarning": "Para que as notificacións funcionen, desactiva as restricións de batería:",
+  "batteryOptimizationInstructions": "Axustes → Aplicacións → MedicApp → Batería → \"Sen restricións\"",
+  "openSettings": "Abrir axustes",
+  "todayDosesLabel": "Tomas de hoxe:",
+  "doseOfMedicationAt": "Toma de {name} ás {time}",
+  "@doseOfMedicationAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStatus": "Estado actual: {status}",
+  "@currentStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "whatDoYouWantToDo": "Que desexas facer?",
+  "deleteButton": "Eliminar",
+  "markAsSkipped": "Marcar como omitida",
+  "markAsTaken": "Marcar como tomada",
+  "doseDeletedAt": "Toma das {time} eliminada",
+  "@doseDeletedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Erro ao eliminar: {error}",
+  "@errorDeleting": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "doseMarkedAs": "Toma das {time} marcada como {status}",
+  "@doseMarkedAs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errorChangingStatus": "Erro ao cambiar estado: {error}",
+  "@errorChangingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationUpdatedShort": "{name} actualizado",
+  "@medicationUpdatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "activateAlarmsPermission": "Activar \"Alarmas e recordatorios\"",
+  "alarmsPermissionDescription": "Este permiso permite que as notificacións salten exactamente á hora configurada.",
+  "notificationDebugTitle": "Debug de notificacións",
+  "notificationPermissions": "✓ Permisos de notificacións: {enabled}",
+  "@notificationPermissions": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "exactAlarmsAndroid12": "⏰ Alarmas exactas (Android 12+): {enabled}",
+  "@exactAlarmsAndroid12": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "importantWarning": "⚠️ IMPORTANTE",
+  "withoutPermissionNoNotifications": "Sen este permiso as notificacións NON saltarán.",
+  "alarmsSettings": "Axustes → Aplicacións → MedicApp → Alarmas e recordatorios",
+  "pendingNotificationsCount": "📊 Notificacións pendentes: {count}",
+  "@pendingNotificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedules": "💊 Medicamentos con horarios: {withSchedules}/{total}",
+  "@medicationsWithSchedules": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduledNotifications": "Notificacións programadas:",
+  "noScheduledNotifications": "⚠️ Non hai notificacións programadas",
+  "notificationHistory": "Historial de notificacións",
+  "last24Hours": "Últimas 24 horas",
+  "noTitle": "Sen título",
+  "medicationsAndSchedules": "Medicamentos e horarios:",
+  "noSchedulesConfigured": "⚠️ Sen horarios configurados",
+  "closeButton": "Pechar",
+  "testNotification": "Probar notificación",
+  "testNotificationSent": "Notificación de proba enviada",
+  "testScheduledNotification": "Probar programada (1 min)",
+  "scheduledNotificationInOneMin": "Notificación programada para 1 minuto",
+  "rescheduleNotifications": "Reprogramar notificacións",
+  "notificationsInfo": "Info de notificacións",
+  "notificationsRescheduled": "Notificacións reprogramadas: {count}",
+  "@notificationsRescheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yesText": "Si",
+  "noText": "Non",
+  "notificationTypeDynamicFasting": "Xaxún dinámico",
+  "notificationTypeScheduledFasting": "Xaxún programado",
+  "notificationTypeWeeklyPattern": "Patrón semanal",
+  "notificationTypeSpecificDate": "Data específica",
+  "notificationTypePostponed": "Adiada",
+  "notificationTypeDailyRecurring": "Diaria recorrente",
+  "beforeTaking": "Antes de tomar",
+  "afterTaking": "Despois de tomar",
+  "basedOnActualDose": "Baseado en toma real",
+  "basedOnSchedule": "Baseado en horario",
+  "today": "Hoxe {day}/{month}/{year}",
+  "@today": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "returnToToday": "Volver a hoxe",
+  "tomorrow": "Mañá {day}/{month}/{year}",
+  "@tomorrow": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "todayOrLater": "Hoxe ou posterior",
+  "pastDueWarning": "⚠️ PASADA",
+  "batteryOptimizationMenu": "⚙️ Optimización de batería",
+  "alarmsAndReminders": "⚙️ Alarmas e recordatorios",
+  "notificationTypeScheduledFastingShort": "Xaxún programado",
+  "basedOnActualDoseShort": "Baseado en toma real",
+  "basedOnScheduleShort": "Baseado en horario",
+  "pendingNotifications": "📊 Notificacións pendentes: {count}",
+  "@pendingNotifications": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedulesInfo": "💊 Medicamentos con horarios: {withSchedules}/{total}",
+  "@medicationsWithSchedulesInfo": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noSchedulesConfiguredWarning": "⚠️ Sen horarios configurados",
+  "medicationInfo": "💊 {name}",
+  "@medicationInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationType": "📋 Tipo: {type}",
+  "@notificationType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDate": "📅 Data: {date}",
+  "@scheduleDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTime": "⏰ Hora: {time}",
+  "@scheduleTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationId": "ID: {id}",
+  "@notificationId": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "takenStatus": "Tomada",
+  "skippedStatus": "Omitida",
+  "durationEstimate": "{name}\nStock: {stock}\nDuración estimada: {days} días",
+  "@durationEstimate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "errorChanging": "Erro ao cambiar estado: {error}",
+  "@errorChanging": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "testScheduled1Min": "Probar programada (1 min)",
+  "alarmsAndRemindersMenu": "⚙️ Alarmas e recordatorios",
+  "medicationStockInfo": "{name}\nStock: {stock}",
+  "@medicationStockInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShowPersonTabsTitle": "Ver persoas separadas por pestanas",
+  "settingsShowPersonTabsSubtitle": "Mostra cada persoa nunha pestana separada. Se se desactiva, todas as persoas mestúranse nunha soa lista con etiquetas",
+  "selectPerson": "Seleccionar persoa"
 }

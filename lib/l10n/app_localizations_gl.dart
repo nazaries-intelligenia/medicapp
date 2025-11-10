@@ -913,6 +913,16 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
+  String msgMedicationAssignedSuccess(String name) {
+    return '$name asignado correctamente';
+  }
+
+  @override
+  String msgUsingSharedStock(String name) {
+    return 'Usando stock compartido de \'$name\'. Si cambias la cantidad, se actualizará para todos.';
+  }
+
+  @override
   String msgMedicationAddError(String error) {
     return 'Error al guardar el medicamento: $error';
   }
@@ -1573,6 +1583,17 @@ class AppLocalizationsGl extends AppLocalizations {
       'Mostra unha notificación fixa co tempo restante de xaxún (só Android)';
 
   @override
+  String get settingsShowPersonTabsTitle =>
+      'Ver persoas separadas por pestanas';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Mostra cada persoa nunha pestana separada. Se se desactiva, todas as persoas mestúranse nunha soa lista con etiquetas';
+
+  @override
+  String get selectPerson => 'Seleccionar persoa';
+
+  @override
   String get fastingNotificationTitle => 'Xaxún en curso';
 
   @override
@@ -1674,7 +1695,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get notificationsWillNotWork =>
-      'Las notificaciones NO funcionarán sin este permiso.';
+      'As notificacións NON funcionarán sen este permiso.';
 
   @override
   String get debugMenuActivated => 'Menú de depuración activado';
@@ -1689,17 +1710,17 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String pendingDose(String time) {
-    return '⚠️ Dosis pendiente: $time';
+    return '⚠️ Dose pendente: $time';
   }
 
   @override
   String nextDoseTomorrow(String time) {
-    return 'Próxima toma: mañana a las $time';
+    return 'Próxima toma: mañá ás $time';
   }
 
   @override
   String nextDoseOnDay(String dayName, int day, int month, String time) {
-    return 'Próxima toma: $dayName $day/$month a las $time';
+    return 'Próxima toma: $dayName $day/$month ás $time';
   }
 
   @override
@@ -1709,13 +1730,13 @@ class AppLocalizationsGl extends AppLocalizations {
   String get dayNameTue => 'Mar';
 
   @override
-  String get dayNameWed => 'Mié';
+  String get dayNameWed => 'Mér';
 
   @override
-  String get dayNameThu => 'Jue';
+  String get dayNameThu => 'Xov';
 
   @override
-  String get dayNameFri => 'Vie';
+  String get dayNameFri => 'Ven';
 
   @override
   String get dayNameSat => 'Sáb';
@@ -1724,7 +1745,7 @@ class AppLocalizationsGl extends AppLocalizations {
   String get dayNameSun => 'Dom';
 
   @override
-  String get whichDoseDidYouTake => '¿Qué toma has tomado?';
+  String get whichDoseDidYouTake => 'Que toma tomaches?';
 
   @override
   String insufficientStockForThisDose(
@@ -1732,20 +1753,20 @@ class AppLocalizationsGl extends AppLocalizations {
     String unit,
     String available,
   ) {
-    return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDisponible: $available';
+    return 'Stock insuficiente para esta toma\nNecesitas: $needed $unit\nDispoñible: $available';
   }
 
   @override
   String doseRegisteredAtTime(String name, String time, String stock) {
-    return 'Toma de $name registrada a las $time\nStock restante: $stock';
+    return 'Toma de $name rexistrada ás $time\nStock restante: $stock';
   }
 
   @override
-  String get allDosesCompletedToday => '✓ Todas las tomas de hoy completadas';
+  String get allDosesCompletedToday => '✓ Todas as tomas de hoxe completadas';
 
   @override
   String remainingDosesToday(int count) {
-    return 'Tomas restantes hoy: $count';
+    return 'Tomas restantes hoxe: $count';
   }
 
   @override
@@ -1755,17 +1776,17 @@ class AppLocalizationsGl extends AppLocalizations {
     String unit,
     String stock,
   ) {
-    return 'Toma manual de $name registrada\nCantidad: $quantity $unit\nStock restante: $stock';
+    return 'Toma manual de $name rexistrada\nCantidade: $quantity $unit\nStock restante: $stock';
   }
 
   @override
   String medicationSuspended(String name) {
-    return '$name suspendido\nNo se programarán más notificaciones';
+    return '$name suspendido\nNon se programarán máis notificacións';
   }
 
   @override
   String medicationReactivated(String name) {
-    return '$name reactivado\nNotificaciones reprogramadas';
+    return '$name reactivado\nNotificacións reprogramadas';
   }
 
   @override
@@ -1774,11 +1795,11 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get quantityToAdd => 'Cantidad a agregar';
+  String get quantityToAdd => 'Cantidade a agregar';
 
   @override
   String example(String example) {
-    return 'Ej: $example';
+    return 'Ex: $example';
   }
 
   @override
@@ -1796,22 +1817,22 @@ class AppLocalizationsGl extends AppLocalizations {
     String unit,
     String newStock,
   ) {
-    return 'Stock de $name recargado\nAgregado: $amount $unit\nNuevo stock: $newStock';
+    return 'Stock de $name recargado\nEngadido: $amount $unit\nNovo stock: $newStock';
   }
 
   @override
   String availableStock(String stock) {
-    return 'Stock disponible: $stock';
+    return 'Stock dispoñible: $stock';
   }
 
   @override
-  String get quantityTaken => 'Cantidad tomada';
+  String get quantityTaken => 'Cantidade tomada';
 
   @override
-  String get registerButton => 'Registrar';
+  String get registerButton => 'Rexistrar';
 
   @override
-  String get registerManualDose => 'Registrar toma manual';
+  String get registerManualDose => 'Rexistrar toma manual';
 
   @override
   String get refillMedication => 'Recargar medicamento';
@@ -1834,31 +1855,31 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get noMedicationsRegistered => 'No hay medicamentos registrados';
+  String get noMedicationsRegistered => 'Non hai medicamentos rexistrados';
 
   @override
-  String get addMedicationHint => 'Pulsa el botón + para añadir uno';
+  String get addMedicationHint => 'Pulsa o botón + para engadir un';
 
   @override
-  String get pullToRefresh => 'Arrastra hacia abajo para recargar';
+  String get pullToRefresh => 'Arrastra cara abaixo para recargar';
 
   @override
   String get batteryOptimizationWarning =>
-      'Para que las notificaciones funcionen, desactiva las restricciones de batería:';
+      'Para que as notificacións funcionen, desactiva as restricións de batería:';
 
   @override
   String get batteryOptimizationInstructions =>
-      'Ajustes → Aplicaciones → MedicApp → Batería → \"Sin restricciones\"';
+      'Axustes → Aplicacións → MedicApp → Batería → \"Sen restricións\"';
 
   @override
-  String get openSettings => 'Abrir ajustes';
+  String get openSettings => 'Abrir axustes';
 
   @override
-  String get todayDosesLabel => 'Tomas de hoy:';
+  String get todayDosesLabel => 'Tomas de hoxe:';
 
   @override
   String doseOfMedicationAt(String name, String time) {
-    return 'Toma de $name a las $time';
+    return 'Toma de $name ás $time';
   }
 
   @override
@@ -1867,35 +1888,35 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get whatDoYouWantToDo => '¿Qué deseas hacer?';
+  String get whatDoYouWantToDo => 'Que desexas facer?';
 
   @override
   String get deleteButton => 'Eliminar';
 
   @override
-  String get markAsSkipped => 'Marcar Omitida';
+  String get markAsSkipped => 'Marcar como omitida';
 
   @override
-  String get markAsTaken => 'Marcar Tomada';
+  String get markAsTaken => 'Marcar como tomada';
 
   @override
   String doseDeletedAt(String time) {
-    return 'Toma de las $time eliminada';
+    return 'Toma das $time eliminada';
   }
 
   @override
   String errorDeleting(String error) {
-    return 'Error al eliminar: $error';
+    return 'Erro ao eliminar: $error';
   }
 
   @override
   String doseMarkedAs(String time, String status) {
-    return 'Toma de las $time marcada como $status';
+    return 'Toma das $time marcada como $status';
   }
 
   @override
   String errorChangingStatus(String error) {
-    return 'Error al cambiar estado: $error';
+    return 'Erro ao cambiar estado: $error';
   }
 
   @override
@@ -1904,18 +1925,18 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get activateAlarmsPermission => 'Activar \"Alarmas y recordatorios\"';
+  String get activateAlarmsPermission => 'Activar \"Alarmas e recordatorios\"';
 
   @override
   String get alarmsPermissionDescription =>
-      'Este permiso permite que las notificaciones salten exactamente a la hora configurada.';
+      'Este permiso permite que as notificacións salten exactamente á hora configurada.';
 
   @override
-  String get notificationDebugTitle => 'Debug de Notificaciones';
+  String get notificationDebugTitle => 'Debug de notificacións';
 
   @override
   String notificationPermissions(String enabled) {
-    return '✓ Permisos de notificaciones: $enabled';
+    return '✓ Permisos de notificacións: $enabled';
   }
 
   @override
@@ -1928,15 +1949,15 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get withoutPermissionNoNotifications =>
-      'Sin este permiso las notificaciones NO saltarán.';
+      'Sen este permiso as notificacións NON saltarán.';
 
   @override
   String get alarmsSettings =>
-      'Ajustes → Aplicaciones → MedicApp → Alarmas y recordatorios';
+      'Axustes → Aplicacións → MedicApp → Alarmas e recordatorios';
 
   @override
   String pendingNotificationsCount(int count) {
-    return '📊 Notificaciones pendientes: $count';
+    return '📊 Notificacións pendentes: $count';
   }
 
   @override
@@ -1945,34 +1966,34 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get scheduledNotifications => 'Notificaciones programadas:';
+  String get scheduledNotifications => 'Notificacións programadas:';
 
   @override
-  String get noScheduledNotifications => '⚠️ No hay notificaciones programadas';
+  String get noScheduledNotifications => '⚠️ Non hai notificacións programadas';
 
   @override
-  String get notificationHistory => 'Historial de Notificaciones';
+  String get notificationHistory => 'Historial de notificacións';
 
   @override
   String get last24Hours => 'Últimas 24 horas';
 
   @override
-  String get noTitle => 'Sin título';
+  String get noTitle => 'Sen título';
 
   @override
-  String get medicationsAndSchedules => 'Medicamentos y horarios:';
+  String get medicationsAndSchedules => 'Medicamentos e horarios:';
 
   @override
-  String get noSchedulesConfigured => '⚠️ Sin horarios configurados';
+  String get noSchedulesConfigured => '⚠️ Sen horarios configurados';
 
   @override
-  String get closeButton => 'Cerrar';
+  String get closeButton => 'Pechar';
 
   @override
   String get testNotification => 'Probar notificación';
 
   @override
-  String get testNotificationSent => 'Notificación de prueba enviada';
+  String get testNotificationSent => 'Notificación de proba enviada';
 
   @override
   String get testScheduledNotification => 'Probar programada (1 min)';
@@ -1982,64 +2003,67 @@ class AppLocalizationsGl extends AppLocalizations {
       'Notificación programada para 1 minuto';
 
   @override
-  String get rescheduleNotifications => 'Reprogramar notificaciones';
+  String get rescheduleNotifications => 'Reprogramar notificacións';
 
   @override
-  String get notificationsInfo => 'Info de notificaciones';
+  String get notificationsInfo => 'Info de notificacións';
 
   @override
   String notificationsRescheduled(int count) {
-    return 'Notificaciones reprogramadas: $count';
+    return 'Notificacións reprogramadas: $count';
   }
 
   @override
-  String get yesText => 'Sí';
+  String get yesText => 'Si';
 
   @override
-  String get noText => 'No';
+  String get noText => 'Non';
 
   @override
-  String get notificationTypeDynamicFasting => 'Ayuno dinámico';
+  String get notificationTypeDynamicFasting => 'Xaxún dinámico';
 
   @override
-  String get notificationTypeScheduledFasting => 'Ayuno programado';
+  String get notificationTypeScheduledFasting => 'Xaxún programado';
 
   @override
   String get notificationTypeWeeklyPattern => 'Patrón semanal';
 
   @override
-  String get notificationTypeSpecificDate => 'Fecha específica';
+  String get notificationTypeSpecificDate => 'Data específica';
 
   @override
-  String get notificationTypePostponed => 'Pospuesta';
+  String get notificationTypePostponed => 'Adiada';
 
   @override
-  String get notificationTypeDailyRecurring => 'Diaria recurrente';
+  String get notificationTypeDailyRecurring => 'Diaria recorrente';
 
   @override
   String get beforeTaking => 'Antes de tomar';
 
   @override
-  String get afterTaking => 'Después de tomar';
+  String get afterTaking => 'Despois de tomar';
 
   @override
-  String get basedOnActualDose => 'Basado en toma real';
+  String get basedOnActualDose => 'Baseado en toma real';
 
   @override
-  String get basedOnSchedule => 'Basado en horario';
+  String get basedOnSchedule => 'Baseado en horario';
 
   @override
   String today(int day, int month, int year) {
-    return 'Hoy $day/$month/$year';
+    return 'Hoxe $day/$month/$year';
   }
+
+  @override
+  String get returnToToday => 'Volver a hoxe';
 
   @override
   String tomorrow(int day, int month, int year) {
-    return 'Mañana $day/$month/$year';
+    return 'Mañá $day/$month/$year';
   }
 
   @override
-  String get todayOrLater => 'Hoy o posterior';
+  String get todayOrLater => 'Hoxe ou posterior';
 
   @override
   String get pastDueWarning => '⚠️ PASADA';
@@ -2048,20 +2072,20 @@ class AppLocalizationsGl extends AppLocalizations {
   String get batteryOptimizationMenu => '⚙️ Optimización de batería';
 
   @override
-  String get alarmsAndReminders => '⚙️ Alarmas y recordatorios';
+  String get alarmsAndReminders => '⚙️ Alarmas e recordatorios';
 
   @override
-  String get notificationTypeScheduledFastingShort => 'Ayuno programado';
+  String get notificationTypeScheduledFastingShort => 'Xaxún programado';
 
   @override
-  String get basedOnActualDoseShort => 'Basado en toma real';
+  String get basedOnActualDoseShort => 'Baseado en toma real';
 
   @override
-  String get basedOnScheduleShort => 'Basado en horario';
+  String get basedOnScheduleShort => 'Baseado en horario';
 
   @override
   String pendingNotifications(int count) {
-    return '📊 Notificaciones pendientes: $count';
+    return '📊 Notificacións pendentes: $count';
   }
 
   @override
@@ -2070,7 +2094,7 @@ class AppLocalizationsGl extends AppLocalizations {
   }
 
   @override
-  String get noSchedulesConfiguredWarning => '⚠️ Sin horarios configurados';
+  String get noSchedulesConfiguredWarning => '⚠️ Sen horarios configurados';
 
   @override
   String medicationInfo(String name) {
@@ -2084,7 +2108,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String scheduleDate(String date) {
-    return '📅 Fecha: $date';
+    return '📅 Data: $date';
   }
 
   @override
@@ -2110,14 +2134,14 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String errorChanging(String error) {
-    return 'Error al cambiar estado: $error';
+    return 'Erro ao cambiar estado: $error';
   }
 
   @override
   String get testScheduled1Min => 'Probar programada (1 min)';
 
   @override
-  String get alarmsAndRemindersMenu => '⚙️ Alarmas y recordatorios';
+  String get alarmsAndRemindersMenu => '⚙️ Alarmas e recordatorios';
 
   @override
   String medicationStockInfo(String name, String stock) {
@@ -2142,4 +2166,7 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get activeFastingPeriodsTitle => 'Xaxúns Activos';
+
+  @override
+  String get fastingCompleted => 'Xaxún completado! Xa podes comer';
 }

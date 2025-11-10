@@ -471,6 +471,18 @@
       "name": {"type": "String"}
     }
   },
+  "msgMedicationAssignedSuccess": "{name} asignado correctamente",
+  "@msgMedicationAssignedSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "msgUsingSharedStock": "Usando stock compartido de '{name}'. Si cambias la cantidad, se actualizará para todos.",
+  "@msgUsingSharedStock": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "msgMedicationAddError": "Error al guardar el medicamento: {error}",
   "@msgMedicationAddError": {
     "placeholders": {
@@ -893,6 +905,9 @@
   "settingsShowFastingCountdownSubtitle": "Muestra el tiempo restante de ayuno en la pantalla principal",
   "settingsShowFastingNotificationTitle": "Notificación fija de cuenta atrás",
   "settingsShowFastingNotificationSubtitle": "Muestra una notificación fija con el tiempo restante de ayuno (solo Android)",
+  "settingsShowPersonTabsTitle": "Ver personas separadas por pestañas",
+  "settingsShowPersonTabsSubtitle": "Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas",
+  "selectPerson": "Seleccionar persona",
   "fastingNotificationTitle": "Ayuno en curso",
   "fastingNotificationBody": "{medication} • {timeRemaining} restantes (hasta {endTime})",
   "@fastingNotificationBody": {
@@ -1345,6 +1360,7 @@
       }
     }
   },
+  "returnToToday": "Volver a hoy",
   "tomorrow": "Mañana {day}/{month}/{year}",
   "@tomorrow": {
     "placeholders": {
@@ -1493,5 +1509,6 @@
   },
   "done": "Hecho",
   "suspended": "Suspendido",
-  "activeFastingPeriodsTitle": "Ayunos Activos"
+  "activeFastingPeriodsTitle": "Ayunos Activos",
+  "fastingCompleted": "¡Ayuno completado! Ya puedes comer"
 }

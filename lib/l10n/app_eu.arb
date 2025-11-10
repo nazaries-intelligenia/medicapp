@@ -45,7 +45,7 @@
   "doseStatusPending": "Zain",
 
   "@_TREATMENT_DURATION": {},
-  "durationEtengabeaus": "Etengabea",
+  "durationContinuous": "Etengabea",
   "durationSpecificDates": "Fechas zehatzak",
   "durationAsNeeded": "Según beharren arabera",
 
@@ -239,8 +239,8 @@
   "doseHistoryConfirmDelete": "Baieztatu eliminación",
   "doseHistoryConfirmDeleteMessage": "¿Estás seguro de que quieres eliminar este registro?",
   "doseHistoryRecordDeleted": "Registro ongi ezabatu da",
-  "doseHistoryDeleteErrorea": "Errorea al eliminar: {error}",
-  "@doseHistoryDeleteErrorea": {
+  "doseHistoryDeleteError": "Errorea ezabatzean: {error}",
+  "@doseHistoryDeleteError": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -281,8 +281,8 @@
 
   "medicationDurationTitle": "Mota de Tratamendua",
   "medicationDurationSubtitle": "¿Cómo vas a tomar este medicamento?",
-  "durationEtengabeausTitle": "Tratamendua continuo",
-  "durationEtengabeausDesc": "Todos los egun, con patrón regular",
+  "durationContinuousTitle": "Tratamendu etengabea",
+  "durationContinuousDesc": "Egunero, eredu erregularra duela",
   "durationUntilEmptyTitle": "Hasta acabar medicación",
   "durationUntilEmptyDesc": "Termina cuando se acabe el stock",
   "durationSpecificDatesTitle": "Fechas zehatzak",
@@ -471,8 +471,8 @@
       "name": {"type": "String"}
     }
   },
-  "msgMedicationAddErrorea": "Errorea al guardar el medicamento: {error}",
-  "@msgMedicationAddErrorea": {
+  "msgMedicationAddError": "Errorea medikamentua gordetzean: {error}",
+  "@msgMedicationAddError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -483,7 +483,7 @@
   "@_DOSE_ACTION_SCREEN": {},
   "doseActionTitle": "Acción de Toma",
   "doseActionLoading": "Cargando...",
-  "doseActionErrorea": "Errorea",
+  "doseActionError": "Errorea",
   "doseActionMedicationNotFound": "Medicamento no encontrado",
   "doseActionBack": "Volver",
   "doseActionScheduledTime": "Ordua programada: {time}",
@@ -601,8 +601,8 @@
   "editBasicInfoUpdated": "Informazioa actualizada correctamente",
   "editBasicInfoSaving": "Guardando...",
   "editBasicInfoSaveChanges": "Gorde Cambios",
-  "editBasicInfoErrorea": "Errorea al guardar cambios: {error}",
-  "@editBasicInfoErrorea": {
+  "editBasicInfoError": "Errorea aldaketak gordetzean: {error}",
+  "@editBasicInfoError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -630,8 +630,8 @@
   },
   "editDurationSelectDates": "Por favor, selecciona las fechas de inicio y fin",
   "editDurationUpdated": "Duración actualizada correctamente",
-  "editDurationErrorea": "Errorea al guardar cambios: {error}",
-  "@editDurationErrorea": {
+  "editDurationError": "Errorea aldaketak gordetzean: {error}",
+  "@editDurationError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -643,8 +643,8 @@
   "editFastingSelectWhen": "Por favor, selecciona cuándo es el baraualdi",
   "editFastingMinDuration": "La duración del baraualdi debe ser al menos 1 minuto",
   "editFastingUpdated": "Configuración de baraualdi actualizada correctamente",
-  "editFastingErrorea": "Errorea al guardar cambios: {error}",
-  "@editFastingErrorea": {
+  "editFastingError": "Errorea aldaketak gordetzean: {error}",
+  "@editFastingError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -692,8 +692,8 @@
   "editFrequencySelectAtLeastOneDay": "Por favor, selecciona al menos un día de la semana",
   "editFrequencyIntervalMin": "El intervalo debe ser al menos 2 egun",
   "editFrequencyUpdated": "Maiztasuna actualizada correctamente",
-  "editFrequencyErrorea": "Errorea al guardar cambios: {error}",
-  "@editFrequencyErrorea": {
+  "editFrequencyError": "Errorea aldaketak gordetzean: {error}",
+  "@editFrequencyError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -718,8 +718,8 @@
   "editQuantityThresholdValidationMin": "Debe ser al menos 1 día",
   "editQuantityThresholdValidationMax": "No puede ser mayor a 30 egun",
   "editQuantityUpdated": "Kantitatea actualizada correctamente",
-  "editQuantityErrorea": "Errorea al guardar cambios: {error}",
-  "@editQuantityErrorea": {
+  "editQuantityError": "Errorea aldaketak gordetzean: {error}",
+  "@editQuantityError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -731,8 +731,8 @@
   "editScheduleValidationQuantities": "Por favor, ingresa cantidades válidas (mayores a 0)",
   "editScheduleValidationDuplicates": "Las ordu de las tomas no pueden repetirse",
   "editScheduleUpdated": "Orduarios actualizados correctamente",
-  "editScheduleErrorea": "Errorea al guardar cambios: {error}",
-  "@editScheduleErrorea": {
+  "editScheduleError": "Errorea aldaketak gordetzean: {error}",
+  "@editScheduleError": {
     "placeholders": {
       "error": {"type": "String"}
     }
@@ -1005,5 +1005,484 @@
   },
   "done": "Eginda",
   "suspended": "Etenda",
-  "activeFastingPeriodsTitle": "Barau Aldia Aktiboak"
+  "activeFastingPeriodsTitle": "Barau Aldia Aktiboak",
+  "fastingCompleted": "Baraua amaituta! Orain jan dezakezu",
+
+  "@_MEDICATION_LIST_SCREEN": {},
+  "notificationsWillNotWork": "Jakinarazpenek EZ dute funtzionatuko baimen hau gabe.",
+  "debugMenuActivated": "Arazketa menua aktibatuta",
+  "debugMenuDeactivated": "Arazketa menua desaktibatuta",
+  "nextDoseAt": "Hurrengo hartzea: {time}",
+  "@nextDoseAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingDose": "⚠️ Dosi zain: {time}",
+  "@pendingDose": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseTomorrow": "Hurrengo hartzea: bihar {time}etan",
+  "@nextDoseTomorrow": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "nextDoseOnDay": "Hurrengo hartzea: {dayName} {day}/{month} {time}etan",
+  "@nextDoseOnDay": {
+    "placeholders": {
+      "dayName": {
+        "type": "String"
+      },
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dayNameMon": "Al",
+  "dayNameTue": "As",
+  "dayNameWed": "Az",
+  "dayNameThu": "Og",
+  "dayNameFri": "Or",
+  "dayNameSat": "La",
+  "dayNameSun": "Ig",
+  "whichDoseDidYouTake": "Zein hartze hartu duzu?",
+  "insufficientStockForThisDose": "Stock nahikoa ez hartze honetarako\nBehar duzu: {needed} {unit}\nEskuragarri: {available}",
+  "@insufficientStockForThisDose": {
+    "placeholders": {
+      "needed": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      }
+    }
+  },
+  "doseRegisteredAtTime": "{name} hartzea erregistratua {time}etan\nGeratzen den stock-a: {stock}",
+  "@doseRegisteredAtTime": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "allDosesCompletedToday": "✓ Gaurko hartze guztiak osatuta",
+  "remainingDosesToday": "Gaur geratzen diren hartzeak: {count}",
+  "@remainingDosesToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "manualDoseRegistered": "{name} eskuzko hartzea erregistratua\nKantitatea: {quantity} {unit}\nGeratzen den stock-a: {stock}",
+  "@manualDoseRegistered": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationSuspended": "{name} etenda\nEz dira jakinarazpen gehiago programatuko",
+  "@medicationSuspended": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationReactivated": "{name} berraktibatua\nJakinarazpenak berriz programatuta",
+  "@medicationReactivated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStock": "Egungo stock-a: {stock}",
+  "@currentStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityToAdd": "Gehitzeko kantitatea",
+  "example": "Ad: {example}",
+  "@example": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "lastRefill": "Azken karga: {amount} {unit}",
+  "@lastRefill": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "refillButton": "Kargatu",
+  "stockRefilled": "{name} stock-a kargatua\nGehitua: {amount} {unit}\nStock berria: {newStock}",
+  "@stockRefilled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      },
+      "newStock": {
+        "type": "String"
+      }
+    }
+  },
+  "availableStock": "Stock eskuragarria: {stock}",
+  "@availableStock": {
+    "placeholders": {
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityTaken": "Hartutako kantitatea",
+  "registerButton": "Erregistratu",
+  "registerManualDose": "Erregistratu eskuzko hartzea",
+  "refillMedication": "Kargatu botika",
+  "resumeMedication": "Berraktibatu botika",
+  "suspendMedication": "Eten botika",
+  "editMedicationButton": "Editatu botika",
+  "deleteMedicationButton": "Ezabatu botika",
+  "medicationDeletedShort": "{name} ezabatua",
+  "@medicationDeletedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noMedicationsRegistered": "Ez dago botikarik erregistratuta",
+  "addMedicationHint": "Sakatu + botoia bat gehitzeko",
+  "pullToRefresh": "Arrastatu behera kargatzeko",
+  "batteryOptimizationWarning": "Jakinarazpenek funtzionatzeko, desaktibatu bateria murrizketak:",
+  "batteryOptimizationInstructions": "Ezarpenak → Aplikazioak → MedicApp → Bateria → \"Murrizketa gabe\"",
+  "openSettings": "Ireki ezarpenak",
+  "todayDosesLabel": "Gaurko hartzeak:",
+  "doseOfMedicationAt": "{name} hartzea {time}etan",
+  "@doseOfMedicationAt": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "currentStatus": "Egungo egoera: {status}",
+  "@currentStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "whatDoYouWantToDo": "Zer egin nahi duzu?",
+  "deleteButton": "Ezabatu",
+  "markAsSkipped": "Markatu omititu bezala",
+  "markAsTaken": "Markatu hartu bezala",
+  "doseDeletedAt": "{time}etako hartzea ezabatua",
+  "@doseDeletedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleting": "Errorea ezabatzean: {error}",
+  "@errorDeleting": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "doseMarkedAs": "{time}etako hartzea {status} bezala markatua",
+  "@doseMarkedAs": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errorChangingStatus": "Errorea egoera aldatzean: {error}",
+  "@errorChangingStatus": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationUpdatedShort": "{name} eguneratua",
+  "@medicationUpdatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "activateAlarmsPermission": "Aktibatu \"Alarmak eta oroigarriak\"",
+  "alarmsPermissionDescription": "Baimen honek jakinarazpenak konfiguratu den ordu zehatza ateratzea ahalbidetzen du.",
+  "notificationDebugTitle": "Jakinarazpenen arazgaketa",
+  "notificationPermissions": "✓ Jakinarazpen baimenak: {enabled}",
+  "@notificationPermissions": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "exactAlarmsAndroid12": "⏰ Alarma zehatzak (Android 12+): {enabled}",
+  "@exactAlarmsAndroid12": {
+    "placeholders": {
+      "enabled": {
+        "type": "String"
+      }
+    }
+  },
+  "importantWarning": "⚠️ GARRANTZITSUA",
+  "withoutPermissionNoNotifications": "Baimen hau gabe jakinarazpenek EZ dute funtzionatuko.",
+  "alarmsSettings": "Ezarpenak → Aplikazioak → MedicApp → Alarmak eta oroigarriak",
+  "pendingNotificationsCount": "📊 Jakinarazpen zain: {count}",
+  "@pendingNotificationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedules": "💊 Ordutegiekin botikak: {withSchedules}/{total}",
+  "@medicationsWithSchedules": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "scheduledNotifications": "Programatutako jakinarazpenak:",
+  "noScheduledNotifications": "⚠️ Ez dago jakinarazpen programaturik",
+  "notificationHistory": "Jakinarazpenen historia",
+  "last24Hours": "Azken 24 orduak",
+  "noTitle": "Titulurik gabe",
+  "medicationsAndSchedules": "Botikak eta ordutegiak:",
+  "noSchedulesConfigured": "⚠️ Ez dago ordutegirik konfiguratuta",
+  "closeButton": "Itxi",
+  "testNotification": "Probatu jakinarazpena",
+  "testNotificationSent": "Proba jakinarazpena bidalita",
+  "testScheduledNotification": "Probatu programatua (1 min)",
+  "scheduledNotificationInOneMin": "Jakinarazpena minutu baterako programatuta",
+  "rescheduleNotifications": "Berriz programatu jakinarazpenak",
+  "notificationsInfo": "Jakinarazpenen informazioa",
+  "notificationsRescheduled": "Jakinarazpenak berriz programatuta: {count}",
+  "@notificationsRescheduled": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yesText": "Bai",
+  "noText": "Ez",
+  "notificationTypeDynamicFasting": "Barau dinamikoa",
+  "notificationTypeScheduledFasting": "Barau programatua",
+  "notificationTypeWeeklyPattern": "Asteko patroia",
+  "notificationTypeSpecificDate": "Data zehatza",
+  "notificationTypePostponed": "Atzeratua",
+  "notificationTypeDailyRecurring": "Eguneroko errekurrentea",
+  "beforeTaking": "Hartu aurretik",
+  "afterTaking": "Hartu ondoren",
+  "basedOnActualDose": "Benetako dosiaren arabera",
+  "basedOnSchedule": "Ordutegiaren arabera",
+  "today": "Gaur {day}/{month}/{year}",
+  "@today": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "returnToToday": "Itzuli gaurrera",
+  "tomorrow": "Bihar {day}/{month}/{year}",
+  "@tomorrow": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
+    }
+  },
+  "todayOrLater": "Gaur edo geroago",
+  "pastDueWarning": "⚠️ IGAROTA",
+  "batteryOptimizationMenu": "⚙️ Bateria optimizazioa",
+  "alarmsAndReminders": "⚙️ Alarmak eta oroigarriak",
+  "notificationTypeScheduledFastingShort": "Barau programatua",
+  "basedOnActualDoseShort": "Benetako dosiaren arabera",
+  "basedOnScheduleShort": "Ordutegiaren arabera",
+  "pendingNotifications": "📊 Jakinarazpen zain: {count}",
+  "@pendingNotifications": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "medicationsWithSchedulesInfo": "💊 Ordutegiekin botikak: {withSchedules}/{total}",
+  "@medicationsWithSchedulesInfo": {
+    "placeholders": {
+      "withSchedules": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noSchedulesConfiguredWarning": "⚠️ Ez dago ordutegirik konfiguratuta",
+  "medicationInfo": "💊 {name}",
+  "@medicationInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationType": "📋 Mota: {type}",
+  "@notificationType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleDate": "📅 Data: {date}",
+  "@scheduleDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleTime": "⏰ Ordua: {time}",
+  "@scheduleTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationId": "ID: {id}",
+  "@notificationId": {
+    "placeholders": {
+      "id": {
+        "type": "int"
+      }
+    }
+  },
+  "takenStatus": "Hartua",
+  "skippedStatus": "Omitua",
+  "durationEstimate": "{name}\nStock: {stock}\nIraupena estimatua: {days} egun",
+  "@durationEstimate": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "errorChanging": "Errorea egoera aldatzean: {error}",
+  "@errorChanging": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "testScheduled1Min": "Probatu programatua (1 min)",
+  "alarmsAndRemindersMenu": "⚙️ Alarmak eta oroigarriak",
+  "medicationStockInfo": "{name}\nStock: {stock}",
+  "@medicationStockInfo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stock": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsShowPersonTabsTitle": "Ikusi pertsonak fitxa bereizitan",
+  "settingsShowPersonTabsSubtitle": "Pertsona bakoitza fitxa bereizi batean erakusten du. Desaktibatuta badago, pertsona guztiak zerrenda bakarrean nahasten dira etikekin",
+  "selectPerson": "Hautatu pertsona"
 }

@@ -29,17 +29,23 @@ class DailyNotificationScheduler {
 
     // Phase 2: If treatment has an end date, schedule individual notifications for each day
     // Otherwise, use recurring daily notifications
+    // OPTIMIZATION: Only schedule for today + tomorrow (max 2 days) for performance
+    // Notifications will be rescheduled daily when the app is opened
     if (medication.endDate != null) {
       final endDate = medication.endDate!;
       final today = DateTime(now.year, now.month, now.day);
       final end = DateTime(endDate.year, endDate.month, endDate.day);
 
-      // Calculate how many days to schedule (from today to end date)
-      final daysToSchedule = end.difference(today).inDays + 1;
+      // Calculate how many days to schedule (from today to end date, max 2 days)
+      final totalDays = end.difference(today).inDays + 1;
+      final daysToSchedule = totalDays > 2 ? 2 : totalDays;
 
-      print('Scheduling ${medication.name} for $daysToSchedule days (until ${endDate.toString().split(' ')[0]})');
+      print('Scheduling ${medication.name} for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
+      if (totalDays > 2) {
+        print('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
+      }
 
-      // Schedule notifications for each day until end date
+      // Schedule notifications for today + tomorrow only
       for (int day = 0; day < daysToSchedule; day++) {
         final targetDate = today.add(Duration(days: day));
 
@@ -126,6 +132,7 @@ class DailyNotificationScheduler {
 
   /// Schedule notifications for specific dates
   /// V19+: Now requires personId for per-person notification scheduling
+  /// OPTIMIZATION: Only schedule dates for today + tomorrow (max 2 days) for performance
   Future<void> scheduleSpecificDatesNotifications(Medication medication, String personId) async {
     if (medication.selectedDates == null || medication.selectedDates!.isEmpty) {
       print('No specific dates selected for ${medication.name}');
@@ -133,10 +140,15 @@ class DailyNotificationScheduler {
     }
 
     final now = tz.TZDateTime.now(tz.local);
+    final today = DateTime(now.year, now.month, now.day);
+    final maxScheduleDate = today.add(const Duration(days: 2)); // Today + tomorrow only
 
     // V19+: Get person for notification title logic
     final person = await DatabaseHelper.instance.getPerson(personId);
     final isDefault = person?.isDefault ?? false;
+
+    int scheduledCount = 0;
+    int skippedFutureCount = 0;
 
     for (final dateString in medication.selectedDates!) {
       // Parse date (format: yyyy-MM-dd)
@@ -147,10 +159,15 @@ class DailyNotificationScheduler {
 
       // Only schedule if date is in the future or today
       final targetDate = DateTime(year, month, day);
-      final today = DateTime(now.year, now.month, now.day);
 
       if (targetDate.isBefore(today)) {
         print('Skipping past date: $dateString');
+        continue;
+      }
+
+      // OPTIMIZATION: Skip dates beyond 2 days (today + tomorrow)
+      if (targetDate.isAfter(maxScheduleDate)) {
+        skippedFutureCount++;
         continue;
       }
 
@@ -194,7 +211,13 @@ class DailyNotificationScheduler {
           scheduledDate: scheduledDate,
           payload: '${medication.id}|$i|$personId',
         );
+
+        scheduledCount++;
       }
+    }
+
+    if (skippedFutureCount > 0) {
+      print('⚠️  Skipped $skippedFutureCount dates beyond 2-day window (today + tomorrow). Scheduled $scheduledCount dates.');
     }
   }
 

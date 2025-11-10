@@ -26,11 +26,21 @@ class FastingNotificationScheduler {
   final fln.FlutterLocalNotificationsPlugin _notificationsPlugin;
   final bool _isTestMode;
 
-  /// Fixed ID for the ongoing fasting countdown notification
-  /// Only one ongoing notification is shown at a time
-  static const int _ongoingFastingNotificationId = 7000000;
+  /// Base ID for ongoing fasting countdown notifications
+  /// Each person gets their own notification: baseId + hash(personId)
+  static const int _ongoingFastingNotificationIdBase = 7000000;
+
+  /// Track active ongoing notifications by personId
+  final Set<String> _activeOngoingNotifications = {};
 
   FastingNotificationScheduler(this._notificationsPlugin, this._isTestMode);
+
+  /// Generate unique notification ID for a person's ongoing fasting notification
+  int _getOngoingNotificationId(String personId) {
+    // Use hashCode to generate a consistent ID for each person
+    // Ensure it stays within valid Android notification ID range
+    return _ongoingFastingNotificationIdBase + (personId.hashCode & 0xFFFFFF);
+  }
 
   /// Schedule fasting notifications for a medication
   /// V19+: Now requires personId for per-person notification scheduling
@@ -194,18 +204,13 @@ class FastingNotificationScheduler {
     final personName = person?.name ?? 'Usuario';
     final isDefault = person?.isDefault ?? false;
 
-    // Calculate when fasting ends (actual time + fasting duration)
-    final fastingEndTime = actualDoseTime.add(Duration(minutes: medication.fastingDurationMinutes!));
+    // Convert actualDoseTime to TZDateTime in local timezone
+    final actualDoseTZ = tz.TZDateTime.from(actualDoseTime, tz.local);
 
-    // Convert to TZDateTime
-    final scheduledDate = tz.TZDateTime(
-      tz.local,
-      fastingEndTime.year,
-      fastingEndTime.month,
-      fastingEndTime.day,
-      fastingEndTime.hour,
-      fastingEndTime.minute,
-    );
+    // Calculate when fasting ends (actual time + fasting duration)
+    final scheduledDate = actualDoseTZ.add(Duration(minutes: medication.fastingDurationMinutes!));
+
+    print('Scheduled notification for: $scheduledDate');
 
     // Skip if the notification time has already passed (shouldn't happen but safety check)
     final now = tz.TZDateTime.now(tz.local);
@@ -306,8 +311,9 @@ class FastingNotificationScheduler {
 
   /// Show or update the ongoing fasting countdown notification
   /// This notification is persistent (cannot be dismissed by the user)
-  /// and displays the remaining fasting time for the most urgent medication
+  /// and displays the remaining fasting time for a specific person's medication
   Future<void> showOngoingFastingNotification({
+    required String personId,
     required String medicationName,
     required String timeRemaining,
     required String endTime,
@@ -319,6 +325,11 @@ class FastingNotificationScheduler {
     if (!PlatformHelper.isAndroid) return;
 
     try {
+      final notificationId = _getOngoingNotificationId(personId);
+
+      // Track this notification as active
+      _activeOngoingNotifications.add(personId);
+
       // Android notification details with ongoing flag
       final androidDetails = fln.AndroidNotificationDetails(
         'fasting_ongoing',
@@ -340,19 +351,37 @@ class FastingNotificationScheduler {
       final body = '$medicationName • $timeRemaining restantes (hasta $endTime)';
 
       await _notificationsPlugin.show(
-        _ongoingFastingNotificationId,
+        notificationId,
         'Ayuno en curso',
         body,
         platformDetails,
       );
 
-      print('Ongoing fasting notification shown/updated for $medicationName');
+      print('Ongoing fasting notification ID $notificationId shown/updated for $medicationName (person: $personId)');
     } catch (e) {
       print('Error showing ongoing fasting notification: $e');
     }
   }
 
-  /// Cancel the ongoing fasting countdown notification
+  /// Cancel ongoing fasting notification for a specific person
+  Future<void> cancelOngoingFastingNotificationForPerson(String personId) async {
+    // Skip in test mode
+    if (_isTestMode) return;
+
+    // Only relevant for Android
+    if (!PlatformHelper.isAndroid) return;
+
+    try {
+      final notificationId = _getOngoingNotificationId(personId);
+      await _notificationsPlugin.cancel(notificationId);
+      _activeOngoingNotifications.remove(personId);
+      print('Ongoing fasting notification ID $notificationId cancelled for person $personId');
+    } catch (e) {
+      print('Error cancelling ongoing fasting notification for person $personId: $e');
+    }
+  }
+
+  /// Cancel all ongoing fasting countdown notifications
   Future<void> cancelOngoingFastingNotification() async {
     // Skip in test mode
     if (_isTestMode) return;
@@ -361,10 +390,13 @@ class FastingNotificationScheduler {
     if (!PlatformHelper.isAndroid) return;
 
     try {
-      await _notificationsPlugin.cancel(_ongoingFastingNotificationId);
-      print('Ongoing fasting notification cancelled');
+      // Cancel all active ongoing notifications
+      for (final personId in List.from(_activeOngoingNotifications)) {
+        await cancelOngoingFastingNotificationForPerson(personId);
+      }
+      print('All ongoing fasting notifications cancelled');
     } catch (e) {
-      print('Error cancelling ongoing fasting notification: $e');
+      print('Error cancelling ongoing fasting notifications: $e');
     }
   }
 

@@ -82,10 +82,19 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
       // V19+: Reprogramar notificaciones para todas las personas asignadas si el nombre cambió
       if (widget.medication.name != updatedMedication.name) {
         final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+
+        // Cancel all existing notifications once before rescheduling
+        await NotificationService.instance.cancelMedicationNotifications(
+          updatedMedication.id,
+          medication: updatedMedication,
+        );
+
+        // Then schedule for all persons with skipCancellation=true
         for (final person in persons) {
           await NotificationService.instance.scheduleMedicationNotifications(
             updatedMedication,
             personId: person.id,
+            skipCancellation: true,
           );
         }
       }

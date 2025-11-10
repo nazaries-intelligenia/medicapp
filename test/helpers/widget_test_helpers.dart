@@ -38,7 +38,9 @@ Future<void> waitForDatabase(WidgetTester tester) async {
     await DatabaseTestHelper.ensureDefaultPerson();
 
     // Give time for database operations (increased for additional async queries)
-    await Future.delayed(const Duration(milliseconds: 2000));
+    // sqflite uses 10-second timers for transaction synchronization
+    // We need to wait long enough for these to complete
+    await Future.delayed(const Duration(milliseconds: 5000));
   });
 
   // Pump frames to rebuild UI after async operations
@@ -47,7 +49,10 @@ Future<void> waitForDatabase(WidgetTester tester) async {
 
   // Wait for _checkNotificationPermissions and other async timers in MedicationListScreen
   // This prevents "pending timers" warnings in tests
-  await tester.pump(const Duration(seconds: 2));
+  // Pump with duration to allow sqflite's 10-second timers to complete
+  await tester.pump(const Duration(seconds: 11));
+  await tester.pump();
+  await tester.pump();
 }
 
 /// Helper function to actively wait for a widget to appear in the UI.

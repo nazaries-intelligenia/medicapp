@@ -900,6 +900,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String msgMedicationAssignedSuccess(String name) {
+    return '$name asignado correctamente';
+  }
+
+  @override
+  String msgUsingSharedStock(String name) {
+    return 'Usando stock compartido de \'$name\'. Si cambias la cantidad, se actualizará para todos.';
+  }
+
+  @override
   String msgMedicationAddError(String error) {
     return 'Error saving medication: $error';
   }
@@ -1550,6 +1560,16 @@ class AppLocalizationsEn extends AppLocalizations {
       'Show a fixed notification with remaining fasting time (Android only)';
 
   @override
+  String get settingsShowPersonTabsTitle => 'Show persons in separate tabs';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Display each person in a separate tab. When disabled, all persons are mixed in a single list with labels';
+
+  @override
+  String get selectPerson => 'Select person';
+
+  @override
   String get fastingNotificationTitle => 'Fasting in progress';
 
   @override
@@ -2010,6 +2030,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get returnToToday => 'Return to today';
+
+  @override
   String tomorrow(int day, int month, int year) {
     return 'Tomorrow $day/$month/$year';
   }
@@ -2118,4 +2141,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activeFastingPeriodsTitle => 'Active Fasting Periods';
+
+  @override
+  String get fastingCompleted => 'Fasting completed! You can eat now';
 }

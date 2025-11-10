@@ -176,7 +176,7 @@ void main() {
         expect(resultAfter['remainingMinutes'], greaterThan(0));
       });
 
-      test('no debe mostrar cuenta atrás si el ayuno "after" ya finalizó', () async {
+      test('no debe mostrar cuenta atrás si el ayuno "after" ya finalizó hace más de 2 horas', () async {
         final medication = MedicationBuilder()
             .withId('test_after_finished')
             .withSingleDose('08:00', 1.0)
@@ -185,9 +185,10 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Registrar una dosis tomada hace 2 horas (el ayuno ya terminó)
+        // Registrar una dosis tomada hace 4 horas
+        // Con ayuno de 60 min, terminó hace 3 horas (fuera de ventana de 2h)
         final now = DateTime.now();
-        final doseTime = now.subtract(const Duration(hours: 2));
+        final doseTime = now.subtract(const Duration(hours: 4));
 
         final historyEntry = DoseHistoryEntry(
           id: 'test_entry_2',
@@ -205,8 +206,44 @@ void main() {
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // El ayuno ya terminó, no debería mostrar nada
+        // El ayuno terminó hace 3 horas (más de 2h), no debería mostrar nada
         expect(result, isNull);
+      });
+
+      test('debe mostrar mensaje completado si ayuno terminó hace menos de 2 horas', () async {
+        final medication = MedicationBuilder()
+            .withId('test_after_recently_finished')
+            .withSingleDose('08:00', 1.0)
+            .withFasting(type: 'after', duration: 60)
+            .build();
+
+        await DatabaseHelper.instance.insertMedication(medication);
+
+        // Registrar una dosis tomada hace 2 horas
+        // Con ayuno de 60 min, terminó hace 1 hora (dentro de ventana de 2h)
+        final now = DateTime.now();
+        final doseTime = now.subtract(const Duration(hours: 2));
+
+        final historyEntry = DoseHistoryEntry(
+          id: 'test_entry_recently_finished',
+          medicationId: medication.id,
+          medicationName: medication.name,
+          medicationType: medication.type,
+          personId: 'test-person-id',
+          scheduledDateTime: doseTime,
+          registeredDateTime: doseTime,
+          status: DoseStatus.taken,
+          quantity: 1.0,
+        );
+
+        await DatabaseHelper.instance.insertDoseHistory(historyEntry);
+
+        final result = await DoseCalculationService.getActiveFastingPeriod(medication);
+
+        // El ayuno terminó hace 1 hora, debe mostrar mensaje completado
+        expect(result, isNotNull);
+        expect(result!['isActive'], isFalse);
+        expect(result['remainingMinutes'], lessThan(0));
       });
 
       test('debe usar la dosis más reciente para calcular ayuno "after"', () async {

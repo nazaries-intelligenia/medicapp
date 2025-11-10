@@ -913,6 +913,16 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String msgMedicationAssignedSuccess(String name) {
+    return '$name asignado correctamente';
+  }
+
+  @override
+  String msgUsingSharedStock(String name) {
+    return 'Usando stock compartido de \'$name\'. Si cambias la cantidad, se actualizará para todos.';
+  }
+
+  @override
   String msgMedicationAddError(String error) {
     return 'Error al guardar el medicamento: $error';
   }
@@ -1573,6 +1583,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Muestra una notificación fija con el tiempo restante de ayuno (solo Android)';
 
   @override
+  String get settingsShowPersonTabsTitle =>
+      'Ver personas separadas por pestañas';
+
+  @override
+  String get settingsShowPersonTabsSubtitle =>
+      'Muestra cada persona en una pestaña separada. Si se desactiva, todas las personas se mezclan en una sola lista con etiquetas';
+
+  @override
+  String get selectPerson => 'Seleccionar persona';
+
+  @override
   String get fastingNotificationTitle => 'Ayuno en curso';
 
   @override
@@ -2034,6 +2055,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get returnToToday => 'Volver a hoy';
+
+  @override
   String tomorrow(int day, int month, int year) {
     return 'Mañana $day/$month/$year';
   }
@@ -2142,4 +2166,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get activeFastingPeriodsTitle => 'Ayunos Activos';
+
+  @override
+  String get fastingCompleted => '¡Ayuno completado! Ya puedes comer';
 }

@@ -45,12 +45,16 @@ class NotificationCancellationManager {
 
     // Cancel any specific date notifications (for medications with end dates or specific dates)
     // V19+: Cancel for all possible person variants (0-9 based on personId hash modulo)
+    // OPTIMIZATION: Limit cancellation to 3 days (today + tomorrow + 1 buffer) to match scheduling window
     if (medication == null || medication.endDate != null || medication.durationType == TreatmentDurationType.specificDates) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final daysToCheck = medication?.endDate != null
-          ? medication!.endDate!.difference(today).inDays + 7 // Check a week after end date
-          : 365; // If we don't know, check a year ahead
+      // Limit to 3 days to match our scheduling window (today + tomorrow + buffer)
+      int daysToCheck = 3; // Default to 3 days
+      if (medication?.endDate != null) {
+        final calculatedDays = medication!.endDate!.difference(today).inDays + 1;
+        daysToCheck = calculatedDays < 0 ? 0 : (calculatedDays > 3 ? 3 : calculatedDays);
+      }
 
       for (int personVariant = 0; personVariant < 10; personVariant++) {
         final dummyPersonId = 'person-$personVariant';
@@ -118,11 +122,14 @@ class NotificationCancellationManager {
       print('Cancelling fasting notifications for medication $medicationId');
 
       // Calculate date range for fasting notifications
+      // OPTIMIZATION: Limit to 3 days to match scheduling window
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
-      final daysToCheck = medication?.endDate != null
-          ? medication!.endDate!.difference(today).inDays + 7
-          : 365; // Default to checking a year ahead
+      int daysToCheck = 3; // Default to 3 days (today + tomorrow + buffer)
+      if (medication?.endDate != null) {
+        final calculatedDays = medication!.endDate!.difference(today).inDays + 1;
+        daysToCheck = calculatedDays < 0 ? 0 : (calculatedDays > 3 ? 3 : calculatedDays);
+      }
 
       // If we have medication info with dose times, calculate exact fasting notification times
       // V19+: Cancel for all possible person variants

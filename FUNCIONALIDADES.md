@@ -3,12 +3,14 @@
 ## Gestión Multi-Persona (V19+)
 
 - **Soporte para múltiples personas**: Gestiona medicamentos para toda la familia desde una única aplicación (usuario principal, familiares, pacientes a cargo)
-- **Sistema de tabs por persona**: Navegación rápida entre personas mediante pestañas en la pantalla principal, persona por defecto identificada visualmente
+- **Vista adaptable de personas** (configuración en Ajustes, solo visible con 2+ personas):
+  - **Vista separada por pestañas** (por defecto): Navegación rápida entre personas mediante pestañas en pantalla principal e historial, persona por defecto identificada visualmente con icono
+  - **Vista combinada/mezclada**: Todos los medicamentos y tomas en una sola lista con etiquetas de color por persona (chips distintivos en Material 3), útil para visión global de la familia. Al agregar medicamento muestra modal de selección de persona
 - **Asignación de medicamentos**: Interfaz dedicada para asignar/desasignar medicamentos a personas, visualización clara del estado de asignaciones, gestión desde menú contextual de cada medicamento
 - **Configuración independiente**: Cada persona puede tener sus propios horarios, frecuencias y configuraciones para el mismo medicamento compartido
 - **Stock compartido**: Los medicamentos físicos se comparten (un solo stock), pero cada persona tiene su seguimiento independiente
 - **Notificaciones por persona**: Las notificaciones se envían según la configuración de cada persona, con identificación clara del destinatario
-- **Historial por persona**: Seguimiento independiente de adherencia y tomas para cada persona
+- **Historial por persona**: Seguimiento independiente de adherencia y tomas para cada persona (filtrable por persona en ambas vistas)
 - **Gestión de personas**: Crear, editar y eliminar personas desde Ajustes, una persona siempre marcada como por defecto, protección contra eliminación accidental
 - **Migración automática**: Los datos existentes se migran automáticamente a la persona por defecto al actualizar a V19+
 
@@ -32,7 +34,7 @@
 - **Validación inteligente**: Prevención de duplicados (case-insensitive), validación de fechas/días/frecuencias, alertas de horarios duplicados, validación de cantidades no negativas
 - **Interfaz responsiva**: Material Design 3, layout adaptable (3 medicamentos por fila), scroll optimizado. Navegación adaptativa con 4 secciones (Inicio, Medicinas, Historial, Ajustes), pestañas Material 3 para Pastillero/Botiquín, etiquetas adaptativas según dispositivo, NavigationBar (móviles ≤600px) o NavigationRail (tablets/horizontal), pull-to-refresh
 - **Indicadores visuales de stock**: Códigos de color en pantalla principal (rojo: agotado, naranja: bajo, sin indicador: suficiente), detalles al tocar (cantidad exacta y duración estimada)
-- **Soporte multiidioma**: 5 idiomas (Español, Inglés, Catalán, Gallego, Euskera), detección automática según sistema, traducciones completas, sistema extensible con archivos ARB
+- **Soporte multiidioma**: 8 idiomas (Español, Inglés, Catalán, Gallego, Euskera, Alemán, Francés, Italiano), detección automática según sistema, traducciones completas, sistema extensible con archivos ARB
 - **Exportación e importación de base de datos**: Backup completo con timestamp, compartir mediante cualquier app, importación con validación de integridad, backup automático antes de importar, restauración automática si falla, accesible desde ajustes
 
 ## Herramientas de Depuración

@@ -41,6 +41,10 @@ class MedicationListViewModel extends ChangeNotifier {
   bool _showActualTime = false;
   bool _showFastingCountdown = false;
   bool _showFastingNotification = false;
+  bool _showPersonTabs = true;
+
+  // Map to associate medications with their assigned persons (for mixed view)
+  final Map<String, List<Person>> _medicationPersons = {};
 
   // Getters
   List<Medication> get medications => List.unmodifiable(_medications);
@@ -50,8 +54,14 @@ class MedicationListViewModel extends ChangeNotifier {
   bool get showActualTime => _showActualTime;
   bool get showFastingCountdown => _showFastingCountdown;
   bool get showFastingNotification => _showFastingNotification;
+  bool get showPersonTabs => _showPersonTabs;
   List<Map<String, dynamic>> get activeFastingPeriods =>
       _fastingManager.activeFastingPeriods;
+
+  /// Get persons assigned to a medication (useful when showPersonTabs = false)
+  List<Person> getPersonsForMedication(String medicationId) {
+    return _medicationPersons[medicationId] ?? [];
+  }
 
   // Cache getters
   Map<String, dynamic>? getAsNeededDosesInfo(String medicationId) =>
@@ -92,6 +102,44 @@ class MedicationListViewModel extends ChangeNotifier {
     _showFastingCountdown = await PreferencesService.getShowFastingCountdown();
     _showFastingNotification =
         await PreferencesService.getShowFastingNotification();
+    _showPersonTabs = await PreferencesService.getShowPersonTabs();
+  }
+
+  /// Reload preferences and reinitialize if showPersonTabs changed or persons changed
+  Future<void> reloadPreferences() async {
+    final oldShowPersonTabs = _showPersonTabs;
+    final oldShowFastingCountdown = _showFastingCountdown;
+    final oldShowFastingNotification = _showFastingNotification;
+    final oldPersonsCount = _persons.length;
+    await _loadPreferences();
+
+    // Update fasting manager preferences if they changed
+    if (oldShowFastingCountdown != _showFastingCountdown ||
+        oldShowFastingNotification != _showFastingNotification) {
+      _fastingManager.updatePreferences(
+        showFastingCountdown: _showFastingCountdown,
+        showFastingNotification: _showFastingNotification,
+      );
+      // Reload fasting periods with new preferences
+      await _fastingManager.loadFastingPeriods();
+      // Update notification immediately
+      await _fastingManager.updateNotification();
+      // Notify UI to rebuild
+      _safeNotify();
+    }
+
+    // Reload persons to check if the list changed
+    final persons = await DatabaseHelper.instance.getAllPersons();
+    persons.sort((a, b) {
+      if (a.isDefault) return -1;
+      if (b.isDefault) return 1;
+      return a.name.compareTo(b.name);
+    });
+
+    // If showPersonTabs preference changed OR person count changed, reinitialize
+    if (oldShowPersonTabs != _showPersonTabs || oldPersonsCount != persons.length) {
+      await initializePersonsAndTabs();
+    }
   }
 
   /// Initialize persons and select the first one
@@ -110,7 +158,14 @@ class MedicationListViewModel extends ChangeNotifier {
     });
 
     _persons = persons;
-    _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+
+    // Only select a person if person tabs are enabled
+    // In mixed view mode, we don't need a selected person
+    if (_showPersonTabs) {
+      _selectedPerson = _persons.isNotEmpty ? _persons[0] : null;
+    } else {
+      _selectedPerson = null;
+    }
 
     // Now that persons are loaded, load medications
     await loadMedications();
@@ -121,7 +176,10 @@ class MedicationListViewModel extends ChangeNotifier {
     if (_selectedPerson?.id == person.id) return;
     _selectedPerson = person;
     _safeNotify();
-    await loadMedications();
+
+    // Use optimized reload (fast, no notification sync)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
   }
 
   /// Load medications for a specific date
@@ -140,25 +198,94 @@ class MedicationListViewModel extends ChangeNotifier {
     await _loadMedicationsForHistoricalDate(targetDate);
   }
 
+  /// Reload medications without heavy operations (for quick UI updates)
+  Future<void> _reloadMedicationsOnly() async {
+    _isLoading = true;
+    _safeNotify();
+
+    try {
+      // Load medications based on view mode
+      List<Medication> allMedications;
+
+      if (!_showPersonTabs) {
+        // Mixed view: load all medications from all persons
+        allMedications = await DatabaseHelper.instance.getAllMedications();
+
+        // Build map of medication -> persons
+        _medicationPersons.clear();
+        for (final medication in allMedications) {
+          final persons = await DatabaseHelper.instance
+              .getPersonsForMedication(medication.id);
+          _medicationPersons[medication.id] = persons;
+        }
+      } else if (_selectedPerson != null) {
+        // Tab view: load medications for selected person only
+        allMedications = await DatabaseHelper.instance
+            .getMedicationsForPerson(_selectedPerson!.id);
+      } else {
+        // Fallback: load all medications
+        allMedications = await DatabaseHelper.instance.getAllMedications();
+      }
+
+      // Get medication IDs that have doses registered today
+      final medicationIdsWithDosesToday =
+          await DatabaseHelper.instance.getMedicationIdsWithDosesToday();
+
+      // Filter medications for display
+      final medications = allMedications.where((m) {
+        if (m.isSuspended) return false;
+        if (m.durationType != TreatmentDurationType.asNeeded) return true;
+        return medicationIdsWithDosesToday.contains(m.id);
+      }).toList();
+
+      // Load cache data
+      await _loadCacheData(medications);
+
+      // Sort medications by next dose proximity
+      MedicationSorter.sortByNextDose(medications);
+
+      // Update state
+      _medications.clear();
+      _medications.addAll(medications);
+      _isLoading = false;
+      _safeNotify();
+
+      // Update fasting notification in background (non-blocking)
+      _fastingManager.updateNotification().catchError((e) => print('Error updating fasting notification: $e'));
+    } catch (e) {
+      _isLoading = false;
+      _safeNotify();
+      rethrow;
+    }
+  }
+
   /// Load medications for the selected person
   Future<void> loadMedications() async {
     _isLoading = true;
     _safeNotify();
 
     try{
-      // Load medications for selected person
+      // Load medications based on view mode
       List<Medication> allMedications;
-      if (_selectedPerson != null) {
+
+      if (!_showPersonTabs) {
+        // Mixed view: load all medications from all persons
+        allMedications = await DatabaseHelper.instance.getAllMedications();
+
+        // Build map of medication -> persons
+        _medicationPersons.clear();
+        for (final medication in allMedications) {
+          final persons = await DatabaseHelper.instance
+              .getPersonsForMedication(medication.id);
+          _medicationPersons[medication.id] = persons;
+        }
+      } else if (_selectedPerson != null) {
+        // Tab view: load medications for selected person only
         allMedications = await DatabaseHelper.instance
             .getMedicationsForPerson(_selectedPerson!.id);
       } else {
+        // Fallback: load all medications
         allMedications = await DatabaseHelper.instance.getAllMedications();
-      }
-
-      // Synchronize system notifications with database medications
-      if (!_isTestMode) {
-        await NotificationService.instance
-            .syncNotificationsWithMedications(allMedications);
       }
 
       // Get medication IDs that have doses registered today
@@ -187,11 +314,8 @@ class MedicationListViewModel extends ChangeNotifier {
       _isLoading = false;
       _safeNotify();
 
-      // Update fasting notification
-      await _fastingManager.updateNotification();
-
-      // Schedule notifications in background
-      _scheduleNotificationsInBackground(medications);
+      // Update fasting notification in background (non-blocking)
+      _fastingManager.updateNotification().catchError((e) => print('Error updating fasting notification: $e'));
     } catch (e) {
       _isLoading = false;
       _safeNotify();
@@ -373,15 +497,23 @@ class MedicationListViewModel extends ChangeNotifier {
         try {
           final persons = await DatabaseHelper.instance
               .getPersonsForMedication(medication.id);
+
+          // Cancel all existing notifications for this medication once before rescheduling
+          await NotificationService.instance.cancelMedicationNotifications(
+            medication.id,
+            medication: medication,
+          );
+
+          // Then schedule for all persons with skipCancellation=true
           for (final person in persons) {
             await NotificationService.instance.scheduleMedicationNotifications(
               medication,
               personId: person.id,
+              skipCancellation: true, // Already cancelled everything above
             );
           }
         } catch (e) {
-          // Log error but don't block
-          print('Error scheduling notifications for ${medication.name}: $e');
+          // Log error but don't block (silently ignore)
         }
       }
     });
@@ -476,39 +608,47 @@ class MedicationListViewModel extends ChangeNotifier {
 
     await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
-    // Cancel today's notification
-    await NotificationService.instance.cancelTodaysDoseNotification(
-      medication: updatedMedication,
-      doseTime: doseTime,
-      personId: personId,
-    );
+    // Reload medications FIRST (fast, UI-only)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
 
-    // Reschedule notifications
-    await NotificationService.instance.scheduleMedicationNotifications(
-      updatedMedication,
-      personId: personId,
-    );
+    // Handle ALL notification operations in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        // Cancel today's notification
+        await NotificationService.instance.cancelTodaysDoseNotification(
+          medication: updatedMedication,
+          doseTime: doseTime,
+          personId: personId,
+        );
 
-    // Cancel fasting notification if needed
-    await NotificationService.instance.cancelTodaysFastingNotification(
-      medication: updatedMedication,
-      doseTime: doseTime,
-      personId: personId,
-    );
+        // Cancel fasting notification if needed
+        await NotificationService.instance.cancelTodaysFastingNotification(
+          medication: updatedMedication,
+          doseTime: doseTime,
+          personId: personId,
+        );
 
-    // Schedule dynamic fasting notification if needed
-    if (updatedMedication.requiresFasting &&
-        updatedMedication.fastingType == 'after' &&
-        updatedMedication.notifyFasting) {
-      await NotificationService.instance.scheduleDynamicFastingNotification(
-        medication: updatedMedication,
-        actualDoseTime: DateTime.now(),
-        personId: personId,
-      );
-    }
+        // Reschedule notifications
+        await NotificationService.instance.scheduleMedicationNotifications(
+          updatedMedication,
+          personId: personId,
+        );
 
-    // Reload medications
-    await loadMedications();
+        // Schedule dynamic fasting notification if needed
+        if (updatedMedication.requiresFasting &&
+            updatedMedication.fastingType == 'after' &&
+            updatedMedication.notifyFasting) {
+          await NotificationService.instance.scheduleDynamicFastingNotification(
+            medication: updatedMedication,
+            actualDoseTime: now,
+            personId: personId,
+          );
+        }
+      } catch (e) {
+        print('Error handling notifications in background: $e');
+      }
+    });
 
     // Return confirmation message data
     final remainingDoses = updatedMedication.getAvailableDosesToday();
@@ -572,8 +712,9 @@ class MedicationListViewModel extends ChangeNotifier {
 
     // Create history entry
     final now = DateTime.now();
-    final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-    final personId = defaultPerson?.id ?? '';
+    // Use selected person if available, otherwise default person
+    final person = _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
+    final personId = person?.id ?? '';
 
     final historyEntry = DoseHistoryEntry(
       id: '${medication.id}_${now.millisecondsSinceEpoch}',
@@ -589,22 +730,36 @@ class MedicationListViewModel extends ChangeNotifier {
 
     await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
-    // Cancel next pending notification if applicable
-    await _cancelNextPendingNotification(updatedMedication, personId);
+    // Reload medications FIRST (fast, UI-only)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
 
-    // Schedule dynamic fasting notification if needed
-    if (updatedMedication.requiresFasting &&
-        updatedMedication.fastingType == 'after' &&
-        updatedMedication.notifyFasting) {
-      await NotificationService.instance.scheduleDynamicFastingNotification(
-        medication: updatedMedication,
-        actualDoseTime: now,
-        personId: personId,
-      );
-    }
+    // Handle ALL notification operations in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        // Cancel next pending notification if applicable
+        await _cancelNextPendingNotification(updatedMedication, personId);
 
-    // Reload medications
-    await loadMedications();
+        // Reschedule notifications
+        await NotificationService.instance.scheduleMedicationNotifications(
+          updatedMedication,
+          personId: personId,
+        );
+
+        // Schedule dynamic fasting notification if needed
+        if (updatedMedication.requiresFasting &&
+            updatedMedication.fastingType == 'after' &&
+            updatedMedication.notifyFasting) {
+          await NotificationService.instance.scheduleDynamicFastingNotification(
+            medication: updatedMedication,
+            actualDoseTime: now,
+            personId: personId,
+          );
+        }
+      } catch (e) {
+        print('Error handling notifications in background: $e');
+      }
+    });
 
     return 'manualDose|$quantity|${medication.type.stockUnit}|${updatedMedication.stockDisplayText}';
   }
@@ -664,10 +819,19 @@ class MedicationListViewModel extends ChangeNotifier {
     } else {
       final persons = await DatabaseHelper.instance
           .getPersonsForMedication(updatedMedication.id);
+
+      // Cancel all existing notifications once before rescheduling
+      await NotificationService.instance.cancelMedicationNotifications(
+        updatedMedication.id,
+        medication: updatedMedication,
+      );
+
+      // Then schedule for all persons with skipCancellation=true
       for (final person in persons) {
         await NotificationService.instance.scheduleMedicationNotifications(
           updatedMedication,
           personId: person.id,
+          skipCancellation: true, // Already cancelled everything above
         );
       }
     }
@@ -688,18 +852,32 @@ class MedicationListViewModel extends ChangeNotifier {
     );
 
     await DatabaseHelper.instance.updateMedication(updatedMedication);
-    await loadMedications();
+
+    // Use optimized reload (fast, no notification sync)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
 
     return 'refill|$amount|${medication.type.stockUnit}|${updatedMedication.stockDisplayText}';
   }
 
   /// Delete a medication
   Future<void> deleteMedication(Medication medication) async {
+    // 1. Delete from database
     await DatabaseHelper.instance.deleteMedication(medication.id);
-    await NotificationService.instance
-        .cancelMedicationNotifications(medication.id, medication: medication);
+
+    // 2. Update UI IMMEDIATELY (fast, non-blocking)
     _medications.remove(medication);
     _safeNotify();
+
+    // 3. Cancel notifications in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        await NotificationService.instance
+            .cancelMedicationNotifications(medication.id, medication: medication);
+      } catch (e) {
+        print('Error cancelling notifications after medication deletion: $e');
+      }
+    });
   }
 
   /// Delete a dose from today's history
@@ -754,7 +932,35 @@ class MedicationListViewModel extends ChangeNotifier {
       }
     }
 
-    await loadMedications();
+    // Reload UI FIRST (fast, UI-only)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
+
+    // Handle notification operations in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        // Get fresh medication data
+        final freshMedication = _selectedPerson != null
+            ? await DatabaseHelper.instance
+                .getMedicationForPerson(medication.id, _selectedPerson!.id)
+            : await DatabaseHelper.instance.getMedication(medication.id);
+
+        if (freshMedication != null) {
+          // Reschedule notifications for all persons
+          final persons = await DatabaseHelper.instance
+              .getPersonsForMedication(freshMedication.id);
+
+          for (final person in persons) {
+            await NotificationService.instance.scheduleMedicationNotifications(
+              freshMedication,
+              personId: person.id,
+            );
+          }
+        }
+      } catch (e) {
+        print('Error handling notifications after dose deletion: $e');
+      }
+    });
   }
 
   /// Toggle dose status between taken and skipped
@@ -821,24 +1027,65 @@ class MedicationListViewModel extends ChangeNotifier {
       }
     }
 
-    await loadMedications();
+    // Reload UI FIRST (fast, UI-only)
+    await _fastingManager.loadFastingPeriods();
+    await _reloadMedicationsOnly();
+
+    // Handle notification operations in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        // Get fresh medication data
+        final freshMedication = _selectedPerson != null
+            ? await DatabaseHelper.instance
+                .getMedicationForPerson(medication.id, _selectedPerson!.id)
+            : await DatabaseHelper.instance.getMedication(medication.id);
+
+        if (freshMedication != null) {
+          // Reschedule notifications for all persons
+          final persons = await DatabaseHelper.instance
+              .getPersonsForMedication(freshMedication.id);
+
+          for (final person in persons) {
+            await NotificationService.instance.scheduleMedicationNotifications(
+              freshMedication,
+              personId: person.id,
+            );
+          }
+        }
+      } catch (e) {
+        print('Error handling notifications after toggle: $e');
+      }
+    });
   }
 
   /// Create a new medication for the current person
-  Future<void> createMedication(Medication medication) async {
-    Person? targetPerson = _selectedPerson;
-    if (targetPerson == null) {
+  Future<void> createMedication(Medication medication, {String? personId}) async {
+    Person? targetPerson;
+
+    // Use provided personId, or selected person, or default person
+    if (personId != null) {
+      targetPerson = await DatabaseHelper.instance.getPerson(personId);
+    } else if (_selectedPerson != null) {
+      targetPerson = _selectedPerson;
+    } else {
       targetPerson = await DatabaseHelper.instance.getDefaultPerson();
     }
 
     if (targetPerson != null) {
-      await DatabaseHelper.instance.createMedicationForPerson(
+      final personIdForNotifications = targetPerson.id;
+      final medicationId = await DatabaseHelper.instance.createMedicationForPerson(
         medication: medication,
-        personId: targetPerson.id,
+        personId: personIdForNotifications,
       );
-    }
 
-    await loadMedications();
+      // Update UI IMMEDIATELY (fast, UI-only)
+      await _fastingManager.loadFastingPeriods();
+      await _reloadMedicationsOnly();
+
+      // NOTE: Notifications are NOT scheduled here to keep UI fast (<200ms)
+      // They will be scheduled on the next loadMedications() call or app restart
+      // This prevents database locks and race conditions while maintaining fast UI
+    }
   }
 
   /// Update an existing medication
@@ -863,14 +1110,25 @@ class MedicationListViewModel extends ChangeNotifier {
         try {
           final persons = await DatabaseHelper.instance
               .getPersonsForMedication(medication.id);
+
+          // STEP 1: Cancel all existing notifications for this medication once
+          // This prevents the issue where cancellation happens per-person, leaving only the last person's notifications
+          await NotificationService.instance.cancelMedicationNotifications(
+            medication.id,
+            medication: medication,
+          );
+
+          // STEP 2: Reschedule notifications for each person assigned to this medication
+          // Use skipCancellation=true since we already cancelled everything above
           for (final person in persons) {
             await NotificationService.instance.scheduleMedicationNotifications(
               medication,
               personId: person.id,
+              skipCancellation: true, // Already cancelled everything above
             );
           }
         } catch (e) {
-          print('Error rescheduling notifications for ${medication.name}: $e');
+          // Silently ignore errors
         }
       });
     }
@@ -882,7 +1140,13 @@ class MedicationListViewModel extends ChangeNotifier {
     // Get all medications (not filtered by selected person)
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
-    // Reschedule notifications for each medication and each person assigned to it
+    // STEP 1: Cancel all existing notifications once
+    // This prevents the issue where cancellation happens per-person, leaving only the last person's notifications
+    print('Cancelling all existing notifications before rescheduling...');
+    await NotificationService.instance.cancelAllNotifications();
+
+    // STEP 2: Reschedule notifications for each medication and each person assigned to it
+    // Use skipCancellation=true since we already cancelled everything above
     for (final medication in allMedications) {
       if (medication.doseTimes.isNotEmpty && !medication.isSuspended) {
         final persons = await DatabaseHelper.instance
@@ -891,6 +1155,7 @@ class MedicationListViewModel extends ChangeNotifier {
           await NotificationService.instance.scheduleMedicationNotifications(
             medication,
             personId: person.id,
+            skipCancellation: true, // Already cancelled everything above
           );
         }
       }

@@ -22,10 +22,29 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
+  int _previousIndex = 0;
+  bool _settingsChanged = false; // Flag to track if we just left Settings
+
+  // GlobalKeys to access screen states
+  final _medicationListKey = GlobalKey<MedicationListScreenState>();
+  final _doseHistoryKey = GlobalKey<DoseHistoryScreenState>();
+
+  // Keep screen instances in memory
+  late final Widget _medicationListScreen;
+  late final Widget _medicationInventoryScreen;
+  late final Widget _doseHistoryScreen;
+  late final Widget _settingsScreen;
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize screen instances
+    _medicationListScreen = MedicationListScreen(key: _medicationListKey);
+    _medicationInventoryScreen = const MedicationInventoryScreen();
+    _doseHistoryScreen = DoseHistoryScreen(key: _doseHistoryKey);
+    _settingsScreen = const SettingsScreen();
+
     // Process any pending notifications after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
       NotificationService.instance.processPendingNotification();
@@ -33,27 +52,33 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onItemTapped(int index) {
+    // Mark that we're leaving Settings - any screen visited after needs to check for changes
+    if (_selectedIndex == 3 && index != 3) {
+      _settingsChanged = true;
+    }
+
+    // Clear the flag when returning to Settings
+    if (index == 3 && _settingsChanged) {
+      _settingsChanged = false;
+    }
+
+    // If we just left Settings and are entering a screen, trigger reload
+    if (_settingsChanged && index != 3) {
+      if (index == 0) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _medicationListKey.currentState?.reloadAfterSettingsChange();
+        });
+      } else if (index == 2) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _doseHistoryKey.currentState?.reloadAfterSettingsChange();
+        });
+      }
+    }
+
     setState(() {
+      _previousIndex = _selectedIndex;
       _selectedIndex = index;
     });
-  }
-
-  /// Get the current screen based on selected index
-  /// This approach creates screens on-demand instead of keeping all in memory
-  /// which is more efficient and prevents test issues with pending timers
-  Widget _getCurrentScreen() {
-    switch (_selectedIndex) {
-      case 0:
-        return const MedicationListScreen();
-      case 1:
-        return const MedicationInventoryScreen();
-      case 2:
-        return const DoseHistoryScreen();
-      case 3:
-        return const SettingsScreen();
-      default:
-        return const MedicationListScreen();
-    }
   }
 
   @override
@@ -98,7 +123,15 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const VerticalDivider(thickness: 1, width: 1),
             Expanded(
-              child: _getCurrentScreen(),
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  _medicationListScreen,
+                  _medicationInventoryScreen,
+                  _doseHistoryScreen,
+                  _settingsScreen,
+                ],
+              ),
             ),
           ],
         ),
@@ -107,7 +140,15 @@ class _MainScreenState extends State<MainScreen> {
 
     // Use NavigationBar for mobile/portrait with short labels
     return Scaffold(
-      body: _getCurrentScreen(),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: [
+          _medicationListScreen,
+          _medicationInventoryScreen,
+          _doseHistoryScreen,
+          _settingsScreen,
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,

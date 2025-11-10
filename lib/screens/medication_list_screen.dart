@@ -30,10 +30,10 @@ class MedicationListScreen extends StatefulWidget {
   const MedicationListScreen({super.key});
 
   @override
-  State<MedicationListScreen> createState() => _MedicationListScreenState();
+  State<MedicationListScreen> createState() => MedicationListScreenState();
 }
 
-class _MedicationListScreenState extends State<MedicationListScreen>
+class MedicationListScreenState extends State<MedicationListScreen>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   // ViewModel
   late final MedicationListViewModel _viewModel;
@@ -68,12 +68,16 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   }
 
   Future<void> _initializeViewModel() async {
+    // Listen to ViewModel changes FIRST, before initialization
+    _viewModel.addListener(_onViewModelChanged);
+
+    // NOW initialize (this will trigger notifications that will be received)
     await _viewModel.initialize(
       isTestMode: NotificationService.instance.isTestMode,
     );
 
-    // Initialize tab controller after persons are loaded
-    if (mounted && _viewModel.persons.isNotEmpty) {
+    // Initialize tab controller after persons are loaded (only if tabs are enabled)
+    if (mounted && _viewModel.persons.isNotEmpty && _viewModel.showPersonTabs) {
       setState(() {
         _tabController = TabController(
           length: _viewModel.persons.length,
@@ -82,9 +86,6 @@ class _MedicationListScreenState extends State<MedicationListScreen>
         _tabController?.addListener(_onTabChanged);
       });
     }
-
-    // Listen to ViewModel changes
-    _viewModel.addListener(_onViewModelChanged);
   }
 
   void _onViewModelChanged() {
@@ -115,7 +116,42 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _viewModel.loadMedications();
+      // Reschedule notifications when app returns from background
+      // This ensures notifications for today + tomorrow are always up to date
+      NotificationService.instance.rescheduleAllMedicationNotifications();
+
+      // Reload data after settings change
+      reloadAfterSettingsChange();
+    }
+  }
+
+  Future<void> reloadAfterSettingsChange() async {
+    // Check if showPersonTabs preference or person count changed
+    final oldShowPersonTabs = _viewModel.showPersonTabs;
+    final oldPersonsCount = _viewModel.persons.length;
+    await _viewModel.reloadPreferences();
+    final newShowPersonTabs = _viewModel.showPersonTabs;
+    final newPersonsCount = _viewModel.persons.length;
+
+    // If preference changed OR person count changed, rebuild tab controller
+    if (oldShowPersonTabs != newShowPersonTabs || oldPersonsCount != newPersonsCount) {
+      _tabController?.dispose();
+      _tabController = null;
+
+      if (newShowPersonTabs && _viewModel.persons.isNotEmpty) {
+        setState(() {
+          _tabController = TabController(
+            length: _viewModel.persons.length,
+            vsync: this,
+          );
+          _tabController?.addListener(_onTabChanged);
+        });
+      } else {
+        setState(() {});
+      }
+    } else {
+      // Just reload medications if nothing changed
+      await _viewModel.loadMedications();
     }
   }
 
@@ -191,6 +227,39 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   }
 
   void _navigateToAddMedication() async {
+    String? selectedPersonId;
+
+    // If person tabs are disabled, ask which person first
+    if (!_viewModel.showPersonTabs && _viewModel.persons.length > 1) {
+      final l10n = AppLocalizations.of(context)!;
+      selectedPersonId = await showDialog<String>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(l10n.selectPerson),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _viewModel.persons.map((person) {
+                return ListTile(
+                  leading: Icon(
+                    person.isDefault ? Icons.person : Icons.person_outline,
+                  ),
+                  title: Text(person.name),
+                  onTap: () => Navigator.pop(context, person.id),
+                );
+              }).toList(),
+            ),
+          );
+        },
+      );
+
+      // User cancelled
+      if (selectedPersonId == null) return;
+    } else if (!_viewModel.showPersonTabs && _viewModel.persons.length == 1) {
+      // Only one person, use it
+      selectedPersonId = _viewModel.persons.first.id;
+    }
+
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
     final newMedication = await Navigator.push<Medication>(
@@ -203,7 +272,7 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     );
 
     if (newMedication != null) {
-      await _viewModel.createMedication(newMedication);
+      await _viewModel.createMedication(newMedication, personId: selectedPersonId);
     }
   }
 
@@ -508,138 +577,12 @@ class _MedicationListScreenState extends State<MedicationListScreen>
   }
 
   Widget _buildAllFastingCountdowns() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.restaurant,
-                  size: 20,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  AppLocalizations.of(context)!.activeFastingPeriodsTitle,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ],
-            ),
-          ),
-          ...List.generate(_viewModel.activeFastingPeriods.length, (index) {
-            final fasting = _viewModel.activeFastingPeriods[index];
-            return _buildFastingCountdownRow(
-              personName: fasting['personName'] as String,
-              personIsDefault: fasting['personIsDefault'] as bool,
-              medicationName: fasting['medicationName'] as String,
-              fastingEndTime: fasting['fastingEndTime'] as DateTime,
-              isLast: index == _viewModel.activeFastingPeriods.length - 1,
-            );
-          }),
-        ],
-      ),
+    return _FastingCountdownPanel(
+      activeFastingPeriods: _viewModel.activeFastingPeriods,
     );
   }
 
-  Widget _buildFastingCountdownRow({
-    required String personName,
-    required bool personIsDefault,
-    required String medicationName,
-    required DateTime fastingEndTime,
-    required bool isLast,
-  }) {
-    final now = DateTime.now();
-    final remaining = fastingEndTime.difference(now);
-    final hours = remaining.inHours;
-    final minutes = remaining.inMinutes.remainder(60);
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(16, 8, 16, isLast ? 12 : 8),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).dividerColor.withOpacity(0.2),
-                  width: 1,
-                ),
-              ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: personIsDefault
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.secondary,
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                personName[0].toUpperCase(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  personName,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Text(
-                  medicationName,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
-                      ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${hours}h ${minutes}m',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Method removed - now using _FastingCountdownPanel widget
 
   void _showDebugInfo() async {
     await Navigator.push(
@@ -1033,41 +976,28 @@ class _MedicationListScreenState extends State<MedicationListScreen>
     }
   }
 
+  Future<void> _returnToToday() async {
+    // Navegar de vuelta al centro (hoy)
+    await _pageController.animateToPage(
+      _centerPageIndex,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final isToday = selectedDay == today;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            GestureDetector(
-              onTap: _onTitleTap,
-              child: Text(l10n.mainScreenTitle),
-            ),
-            GestureDetector(
-              onTap: _showDatePickerDialog,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    _getTodayDate(),
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  const Icon(
-                    Icons.calendar_today,
-                    size: 16,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        title: GestureDetector(
+          onTap: _onTitleTap,
+          child: Text(l10n.mainScreenTitle),
         ),
         actions: _debugMenuVisible
             ? [
@@ -1079,20 +1009,75 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                 ),
               ]
             : null,
-        bottom: _tabController != null && _viewModel.persons.length > 1
-            ? TabBar(
-                controller: _tabController,
-                isScrollable: _viewModel.persons.length > 3,
-                tabs: _viewModel.persons.map((person) {
-                  return Tab(
-                    text: person.name,
-                    icon: person.isDefault
-                        ? const Icon(Icons.person)
-                        : const Icon(Icons.person_outline),
-                  );
-                }).toList(),
-              )
-            : null,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(
+            (_viewModel.showPersonTabs &&
+                    _tabController != null &&
+                    _viewModel.persons.length > 1)
+                ? 108
+                : 60,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: _showDatePickerDialog,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            _getTodayDate(),
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.calendar_today,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (!isToday)
+                      FilledButton.icon(
+                        onPressed: _returnToToday,
+                        icon: const Icon(Icons.today, size: 20),
+                        label: Text(
+                          l10n.returnToToday,
+                          style: const TextStyle(fontSize: 15),
+                        ),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              if (_viewModel.showPersonTabs &&
+                  _tabController != null &&
+                  _viewModel.persons.length > 1)
+                TabBar(
+                  controller: _tabController,
+                  isScrollable: _viewModel.persons.length > 3,
+                  tabs: _viewModel.persons.map((person) {
+                    return Tab(
+                      text: person.name,
+                      icon: person.isDefault
+                          ? const Icon(Icons.person)
+                          : const Icon(Icons.person_outline),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
       ),
       body: PageView.builder(
         controller: _pageController,
@@ -1134,13 +1119,44 @@ class _MedicationListScreenState extends State<MedicationListScreen>
                                     ? _buildTodayDosesSection(medication)
                                     : null;
 
+                                // Get person names if in mixed view
+                                final personNames = !_viewModel.showPersonTabs
+                                    ? _viewModel
+                                        .getPersonsForMedication(medication.id)
+                                        .map((p) => p.name)
+                                        .toList()
+                                    : null;
+
+                                // Get fasting period for this medication (filtered by selected person)
+                                Map<String, dynamic>? fastingPeriod;
+                                if (_viewModel.showFastingCountdown) {
+                                  // Find fasting period that matches this medication and person
+                                  for (final fp in _viewModel.activeFastingPeriods) {
+                                    if (fp['medicationId'] == medication.id) {
+                                      // If person tabs are enabled, filter by selected person
+                                      if (_viewModel.showPersonTabs) {
+                                        if (_viewModel.selectedPerson != null &&
+                                            fp['personId'] == _viewModel.selectedPerson!.id) {
+                                          fastingPeriod = fp;
+                                          break;
+                                        }
+                                      } else {
+                                        // In mixed view, show first fasting period for this medication
+                                        fastingPeriod = fp;
+                                        break;
+                                      }
+                                    }
+                                  }
+                                }
+
                                 return MedicationCard(
                                   medication: medication,
                                   nextDoseInfo: nextDoseInfo,
                                   nextDoseText: nextDoseText,
                                   asNeededDoseInfo: asNeededDoseInfo,
-                                  fastingPeriod: null,
+                                  fastingPeriod: fastingPeriod,
                                   todayDosesWidget: todayDosesWidget,
+                                  personNames: personNames,
                                   onTap: () => _showDeleteModal(medication),
                                 );
                               },
@@ -1152,9 +1168,288 @@ class _MedicationListScreenState extends State<MedicationListScreen>
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'medication_list_fab',
         onPressed: _navigateToAddMedication,
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+/// Widget for displaying active fasting countdowns with dismiss capability
+class _FastingCountdownPanel extends StatefulWidget {
+  final List<Map<String, dynamic>> activeFastingPeriods;
+
+  const _FastingCountdownPanel({
+    required this.activeFastingPeriods,
+  });
+
+  @override
+  State<_FastingCountdownPanel> createState() => _FastingCountdownPanelState();
+}
+
+class _FastingCountdownPanelState extends State<_FastingCountdownPanel> {
+  final Set<String> _dismissedPeriods = {};
+
+  String _getPeriodKey(Map<String, dynamic> period) {
+    // Include end time to make each fasting period unique
+    final endTime = period['fastingEndTime'] as DateTime;
+    return '${period['personId']}_${period['medicationId']}_${endTime.millisecondsSinceEpoch}';
+  }
+
+  @override
+  void didUpdateWidget(_FastingCountdownPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Clean up dismissed periods that are no longer in the active list
+    final currentKeys = widget.activeFastingPeriods
+        .map((p) => _getPeriodKey(p))
+        .toSet();
+    _dismissedPeriods.removeWhere((key) => !currentKeys.contains(key));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Filter out dismissed periods
+    final visiblePeriods = widget.activeFastingPeriods
+        .where((period) => !_dismissedPeriods.contains(_getPeriodKey(period)))
+        .toList();
+
+    if (visiblePeriods.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.restaurant,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  AppLocalizations.of(context)!.activeFastingPeriodsTitle,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+              ],
+            ),
+          ),
+          ...List.generate(visiblePeriods.length, (index) {
+            final fasting = visiblePeriods[index];
+            return _FastingCountdownRow(
+              personName: fasting['personName'] as String,
+              personIsDefault: fasting['personIsDefault'] as bool,
+              medicationName: fasting['medicationName'] as String,
+              fastingEndTime: fasting['fastingEndTime'] as DateTime,
+              isLast: index == visiblePeriods.length - 1,
+              onDismiss: () {
+                setState(() {
+                  _dismissedPeriods.add(_getPeriodKey(fasting));
+                });
+              },
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+/// Individual row for fasting countdown with dismiss button
+class _FastingCountdownRow extends StatelessWidget {
+  final String personName;
+  final bool personIsDefault;
+  final String medicationName;
+  final DateTime fastingEndTime;
+  final bool isLast;
+  final VoidCallback onDismiss;
+
+  const _FastingCountdownRow({
+    required this.personName,
+    required this.personIsDefault,
+    required this.medicationName,
+    required this.fastingEndTime,
+    required this.isLast,
+    required this.onDismiss,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        final remaining = fastingEndTime.difference(now);
+        final isFinished = remaining.inSeconds <= 0;
+
+        // Check if fasting just finished (within last 5 seconds) to show alert
+        if (isFinished && remaining.inSeconds >= -5) {
+          // Show vibration/sound alert when fasting ends
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Play system notification sound
+            NotificationService.instance.playFastingCompletedSound();
+          });
+        }
+
+        // Format time remaining
+        String timeText;
+        if (remaining.inSeconds <= 0) {
+          timeText = '00:00';
+        } else {
+          final hours = remaining.inHours;
+          final minutes = remaining.inMinutes % 60;
+          final seconds = remaining.inSeconds % 60;
+
+          if (hours > 0) {
+            // Format as HH:MM if hours remain
+            timeText = '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+          } else if (minutes > 0) {
+            // Format as MM:SS if only minutes remain
+            timeText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+          } else {
+            // Format as Ss if only seconds remain (with 's' suffix)
+            timeText = '${seconds.toString().padLeft(2, '0')}s';
+          }
+        }
+
+        return Container(
+          padding: EdgeInsets.fromLTRB(16, 8, 16, isLast ? 12 : 8),
+          decoration: BoxDecoration(
+            border: isLast
+                ? null
+                : Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).dividerColor.withOpacity(0.2),
+                      width: 1,
+                    ),
+                  ),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: personIsDefault
+                      ? (isFinished
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.primary)
+                      : (isFinished
+                          ? Colors.green
+                          : Theme.of(context).colorScheme.secondary),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: isFinished
+                      ? const Icon(Icons.check, color: Colors.white, size: 20)
+                      : Text(
+                          personName[0].toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      personName,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Text(
+                      medicationName,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.grey[600],
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isFinished)
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            AppLocalizations.of(context)!.fastingCompleted,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Colors.green[700],
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            textAlign: TextAlign.center,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: onDismiss,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade700.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.green.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    timeText,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

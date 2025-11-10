@@ -41,25 +41,38 @@ class FastingStateManager {
 
   /// Load fasting periods from ALL persons (not just selected tab)
   Future<void> loadFastingPeriods() async {
+    print('🔄 Loading fasting periods...');
     _activeFastingPeriods.clear();
 
     if (!_showFastingCountdown) {
+      print('❌ Fasting countdown is disabled in settings - skipping load');
       return;
     }
 
+    print('✅ Fasting countdown is enabled - proceeding with load');
+
     // Load all persons to check their fasting periods
     final allPersons = await DatabaseHelper.instance.getAllPersons();
+    print('   Found ${allPersons.length} persons');
 
     for (final person in allPersons) {
+      print('   Checking person: ${person.name} (${person.id})');
       // Load medications for this person
       final personMeds =
           await DatabaseHelper.instance.getMedicationsForPerson(person.id);
+      print('      Medications for this person: ${personMeds.length}');
 
       for (final med in personMeds) {
+        print('      Medication: ${med.name}, requiresFasting: ${med.requiresFasting}');
         if (med.requiresFasting) {
+          // Pass personId to filter doses for this specific person
           final fastingInfo =
-              await DoseCalculationService.getActiveFastingPeriod(med);
+              await DoseCalculationService.getActiveFastingPeriod(
+            med,
+            personId: person.id,
+          );
           if (fastingInfo != null) {
+            print('      ✅ Found active fasting period for ${med.name}');
             // Add fasting period with person information
             _activeFastingPeriods.add({
               'personId': person.id,
@@ -69,10 +82,14 @@ class FastingStateManager {
               'medicationName': med.name,
               ...fastingInfo, // includes: fastingEndTime, fastingType, medicationName
             });
+          } else {
+            print('      ❌ No active fasting period for ${med.name}');
           }
         }
       }
     }
+
+    print('🔄 Loaded ${_activeFastingPeriods.length} active fasting periods');
 
     // Sort by fasting end time (soonest first)
     _activeFastingPeriods.sort((a, b) {
@@ -106,39 +123,52 @@ class FastingStateManager {
       return;
     }
 
-    // Show or cancel notification based on active fasting periods
+    // Show notifications for ALL active fasting periods (one per person)
     if (_activeFastingPeriods.isNotEmpty) {
-      // Get the most urgent fasting period (already sorted by end time)
-      final mostUrgent = _activeFastingPeriods.first;
-      final endTime = mostUrgent['fastingEndTime'] as DateTime;
-      final remainingMinutes = endTime.difference(DateTime.now()).inMinutes;
+      // Track which persons have active fasting
+      final Set<String> activePersons = {};
 
-      // Format time remaining
-      String timeRemaining;
-      if (remainingMinutes < 60) {
-        timeRemaining = '$remainingMinutes min';
-      } else {
-        final hours = remainingMinutes ~/ 60;
-        final minutes = remainingMinutes % 60;
-        if (minutes == 0) {
-          timeRemaining = '${hours}h';
+      for (final fastingPeriod in _activeFastingPeriods) {
+        final personId = fastingPeriod['personId'] as String;
+        final personName = fastingPeriod['personName'] as String;
+        final medicationName = fastingPeriod['medicationName'] as String;
+        final endTime = fastingPeriod['fastingEndTime'] as DateTime;
+        final remainingMinutes = endTime.difference(DateTime.now()).inMinutes;
+
+        // Skip if fasting already ended
+        if (remainingMinutes < 0) continue;
+
+        // Format time remaining
+        String timeRemaining;
+        if (remainingMinutes < 60) {
+          timeRemaining = '$remainingMinutes min';
         } else {
-          timeRemaining = '${hours}h ${minutes}m';
+          final hours = remainingMinutes ~/ 60;
+          final minutes = remainingMinutes % 60;
+          if (minutes == 0) {
+            timeRemaining = '${hours}h';
+          } else {
+            timeRemaining = '${hours}h ${minutes}m';
+          }
         }
+
+        // Format end time
+        final endTimeFormatted = endTime.toTimeString();
+
+        // Show notification for this person
+        await NotificationService.instance.showOngoingFastingNotification(
+          personId: personId,
+          medicationName: '$medicationName ($personName)',
+          timeRemaining: timeRemaining,
+          endTime: endTimeFormatted,
+        );
+
+        activePersons.add(personId);
       }
 
-      // Format end time
-      final endTimeFormatted = endTime.toTimeString();
-
-      // Extract info from mostUrgent map
-      final personName = mostUrgent['personName'] as String;
-      final medicationName = mostUrgent['medicationName'] as String;
-
-      await NotificationService.instance.showOngoingFastingNotification(
-        medicationName: '$medicationName ($personName)',
-        timeRemaining: timeRemaining,
-        endTime: endTimeFormatted,
-      );
+      // Cancel notifications for persons who are no longer fasting
+      // (This handles the case where a fasting period just ended)
+      // TODO: Track previously active persons to cancel their notifications
     } else {
       await NotificationService.instance.cancelOngoingFastingNotification();
     }
