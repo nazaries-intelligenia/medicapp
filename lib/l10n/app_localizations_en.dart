@@ -856,6 +856,16 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String msgMedicationAssignedSuccess(String name) {
+    return '$name asignado correctamente';
+  }
+
+  @override
+  String msgUsingSharedStock(String name) {
+    return 'Usando stock compartido de \'$name\'. Si cambias la cantidad, se actualizará para todos.';
+  }
+
+  @override
   String msgMedicationAddError(String error) {
     return 'Error saving medication: $error';
   }

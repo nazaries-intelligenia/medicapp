@@ -471,6 +471,18 @@
       "name": {"type": "String"}
     }
   },
+  "msgMedicationAssignedSuccess": "{name} asignado correctamente",
+  "@msgMedicationAssignedSuccess": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "msgUsingSharedStock": "Usando stock compartido de '{name}'. Si cambias la cantidad, se actualizará para todos.",
+  "@msgUsingSharedStock": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
   "msgMedicationAddError": "Error al guardar el medicamento: {error}",
   "@msgMedicationAddError": {
     "placeholders": {

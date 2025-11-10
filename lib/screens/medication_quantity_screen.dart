@@ -53,6 +53,33 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
   final _stockController = TextEditingController(text: '0');
   final _lowStockThresholdController = TextEditingController(text: '3');
   bool _isSaving = false;
+  bool _isLoadingExisting = true;
+  Medication? _existingMedication;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingMedication();
+  }
+
+  Future<void> _loadExistingMedication() async {
+    // Check if a medication with this name already exists
+    final allMedications = await DatabaseHelper.instance.getAllMedications();
+    final existing = allMedications.where((m) =>
+      m.name.toLowerCase() == widget.medicationName.toLowerCase()
+    ).toList();
+
+    if (existing.isNotEmpty) {
+      _existingMedication = existing.first;
+      // Pre-fill stock with existing value
+      _stockController.text = _existingMedication!.stockQuantity.toString();
+      _lowStockThresholdController.text = _existingMedication!.lowStockThresholdDays.toString();
+    }
+
+    setState(() {
+      _isLoadingExisting = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -62,8 +89,6 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
   }
 
   Future<void> _saveMedication() async {
-    final l10n = AppLocalizations.of(context)!;
-
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -72,70 +97,38 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
       _isSaving = true;
     });
 
-    try {
-      // Create medication object
-      final newMedication = Medication(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        name: widget.medicationName,
-        type: widget.medicationType,
-        dosageIntervalHours: widget.dosageIntervalHours,
-        durationType: widget.durationType,
-        selectedDates: widget.specificDates,
-        weeklyDays: widget.weeklyDays,
-        dayInterval: widget.dayInterval,
-        doseSchedule: widget.doseSchedule,
-        stockQuantity: double.tryParse(_stockController.text) ?? 0,
-        lowStockThresholdDays: int.tryParse(_lowStockThresholdController.text) ?? 3,
-        startDate: widget.startDate,
-        endDate: widget.endDate,
-        requiresFasting: widget.requiresFasting,
-        fastingType: widget.fastingType,
-        fastingDurationMinutes: widget.fastingDurationMinutes,
-        notifyFasting: widget.notifyFasting,
-      );
+    // Create medication object with schedule data
+    // Note: If medication already exists, we reuse its ID and update stock
+    final newMedication = Medication(
+      id: _existingMedication?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      name: widget.medicationName,
+      type: widget.medicationType,
+      dosageIntervalHours: widget.dosageIntervalHours,
+      durationType: widget.durationType,
+      selectedDates: widget.specificDates,
+      weeklyDays: widget.weeklyDays,
+      dayInterval: widget.dayInterval,
+      doseSchedule: widget.doseSchedule,
+      stockQuantity: double.tryParse(_stockController.text) ?? 0,
+      lowStockThresholdDays: int.tryParse(_lowStockThresholdController.text) ?? 3,
+      startDate: widget.startDate,
+      endDate: widget.endDate,
+      requiresFasting: widget.requiresFasting,
+      fastingType: widget.fastingType,
+      fastingDurationMinutes: widget.fastingDurationMinutes,
+      notifyFasting: widget.notifyFasting,
+    );
 
-      // Save to database
-      await DatabaseHelper.instance.insertMedication(newMedication);
+    // Don't save to database here - let the ViewModel handle it with createMedicationForPerson
+    // which will reuse existing medication if name matches
+    if (!mounted) return;
 
-      // V19+: Schedule notifications for all persons assigned to this medication
-      final persons = await DatabaseHelper.instance.getPersonsForMedication(newMedication.id);
-      for (final person in persons) {
-        await NotificationService.instance.scheduleMedicationNotifications(
-          newMedication,
-          personId: person.id,
-        );
-      }
+    setState(() {
+      _isSaving = false;
+    });
 
-      if (!mounted) return;
-
-      // Show success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.msgMedicationAddedSuccess(newMedication.name)),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
-      );
-
-      // Return to the initial screen (close all the stack)
-      Navigator.pop(context, newMedication);
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.msgMedicationAddError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
-      }
-    }
+    // Return the medication object (ViewModel will handle saving)
+    Navigator.pop(context, newMedication);
   }
 
   @override
@@ -169,7 +162,9 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
+      body: _isLoadingExisting
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
@@ -184,6 +179,31 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 const SizedBox(height: 24),
+
+                // Info banner if medication exists
+                if (_existingMedication != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      border: Border.all(color: Colors.blue.shade200),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.blue.shade700),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            l10n.msgUsingSharedStock(widget.medicationName),
+                            style: TextStyle(color: Colors.blue.shade900),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
 
                 // Card con información
                 StockInputCard(

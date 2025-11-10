@@ -1661,6 +1661,18 @@ abstract class AppLocalizations {
   /// **'{name} añadido correctamente'**
   String msgMedicationAddedSuccess(String name);
 
+  /// No description provided for @msgMedicationAssignedSuccess.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} asignado correctamente'**
+  String msgMedicationAssignedSuccess(String name);
+
+  /// No description provided for @msgUsingSharedStock.
+  ///
+  /// In es, this message translates to:
+  /// **'Usando stock compartido de \'{name}\'. Si cambias la cantidad, se actualizará para todos.'**
+  String msgUsingSharedStock(String name);
+
   /// No description provided for @msgMedicationAddError.
   ///
   /// In es, this message translates to:
