@@ -209,6 +209,7 @@ async function operacionModificaDatos() {
 | `toggleTodayDoseStatus()` | Cambiar taken↔skipped | 2-3s | <200ms (15x) |
 | `selectPerson()` | Cambiar pestaña persona | 1-2s | <200ms (10x) |
 | `refillMedication()` | Rellenar stock | 1-2s | <200ms (10x) |
+| `deleteMedication()` | Eliminar medicamento | 2-3s | <200ms (15x) |
 | `loadMedications()` | Cargar lista completa | 1.5-3s | <300ms (10x) |
 
 #### Método `_reloadMedicationsOnly()`

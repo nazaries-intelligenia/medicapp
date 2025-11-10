@@ -862,11 +862,22 @@ class MedicationListViewModel extends ChangeNotifier {
 
   /// Delete a medication
   Future<void> deleteMedication(Medication medication) async {
+    // 1. Delete from database
     await DatabaseHelper.instance.deleteMedication(medication.id);
-    await NotificationService.instance
-        .cancelMedicationNotifications(medication.id, medication: medication);
+
+    // 2. Update UI IMMEDIATELY (fast, non-blocking)
     _medications.remove(medication);
     _safeNotify();
+
+    // 3. Cancel notifications in background (non-blocking)
+    Future.microtask(() async {
+      try {
+        await NotificationService.instance
+            .cancelMedicationNotifications(medication.id, medication: medication);
+      } catch (e) {
+        print('Error cancelling notifications after medication deletion: $e');
+      }
+    });
   }
 
   /// Delete a dose from today's history
