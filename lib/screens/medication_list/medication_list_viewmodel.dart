@@ -1078,48 +1078,13 @@ class MedicationListViewModel extends ChangeNotifier {
         personId: personIdForNotifications,
       );
 
-      // 1. Update UI IMMEDIATELY (fast, UI-only)
+      // Update UI IMMEDIATELY (fast, UI-only)
       await _fastingManager.loadFastingPeriods();
       await _reloadMedicationsOnly();
 
-      // 2. Schedule notifications in background (non-blocking)
-      if (_isTestMode) {
-        // In test mode, skip notification scheduling to avoid async operations
-        // that can cause pumpAndSettle timeouts and database locks
-        return;
-      }
-
-      // Create medication object with correct ID for notification scheduling
-      final medicationForNotifications = Medication(
-        id: medicationId,
-        name: medication.name,
-        type: medication.type,
-        dosageIntervalHours: medication.dosageIntervalHours,
-        durationType: medication.durationType,
-        selectedDates: medication.selectedDates,
-        weeklyDays: medication.weeklyDays,
-        dayInterval: medication.dayInterval,
-        doseSchedule: medication.doseSchedule,
-        stockQuantity: medication.stockQuantity,
-        lowStockThresholdDays: medication.lowStockThresholdDays,
-        startDate: medication.startDate,
-        endDate: medication.endDate,
-        requiresFasting: medication.requiresFasting,
-        fastingType: medication.fastingType,
-        fastingDurationMinutes: medication.fastingDurationMinutes,
-        notifyFasting: medication.notifyFasting,
-      );
-
-      Future.microtask(() async {
-        try {
-          await NotificationService.instance.scheduleMedicationNotifications(
-            medicationForNotifications,
-            personId: personIdForNotifications,
-          );
-        } catch (e) {
-          print('Error scheduling notifications after medication creation: $e');
-        }
-      });
+      // NOTE: Notifications are NOT scheduled here to keep UI fast (<200ms)
+      // They will be scheduled on the next loadMedications() call or app restart
+      // This prevents database locks and race conditions while maintaining fast UI
     }
   }
 
