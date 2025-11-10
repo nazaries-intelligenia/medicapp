@@ -143,6 +143,7 @@ class _MedicineCabinetScreenState extends State<MedicineCabinetScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'medicine_cabinet_fab',
         onPressed: _navigateToAddMedication,
         child: const Icon(Icons.add),
       ),

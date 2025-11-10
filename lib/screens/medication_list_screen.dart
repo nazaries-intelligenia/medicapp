@@ -1168,6 +1168,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'medication_list_fab',
         onPressed: _navigateToAddMedication,
         child: const Icon(Icons.add),
       ),

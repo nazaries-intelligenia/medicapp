@@ -224,6 +224,7 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
                   },
                 ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'persons_management_fab',
         onPressed: _addPerson,
         icon: const Icon(Icons.person_add),
         label: const Text('Añadir Persona'),
