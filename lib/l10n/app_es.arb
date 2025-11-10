@@ -1497,5 +1497,6 @@
   },
   "done": "Hecho",
   "suspended": "Suspendido",
-  "activeFastingPeriodsTitle": "Ayunos Activos"
+  "activeFastingPeriodsTitle": "Ayunos Activos",
+  "fastingCompleted": "¡Ayuno completado! Ya puedes comer"
 }

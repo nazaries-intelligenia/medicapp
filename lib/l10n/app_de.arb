@@ -1497,5 +1497,6 @@
   },
   "done": "Erledigt",
   "suspended": "Ausgesetzt",
-  "activeFastingPeriodsTitle": "Aktive Nüchternheit"
+  "activeFastingPeriodsTitle": "Aktive Nüchternheit",
+  "fastingCompleted": "Fasten beendet! Du kannst jetzt essen"
 }

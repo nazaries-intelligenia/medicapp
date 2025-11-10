@@ -1497,5 +1497,6 @@
   },
   "done": "Terminé",
   "suspended": "Suspendu",
-  "activeFastingPeriodsTitle": "Jeûnes Actifs"
+  "activeFastingPeriodsTitle": "Jeûnes Actifs",
+  "fastingCompleted": "Jeûne terminé ! Vous pouvez manger maintenant"
 }

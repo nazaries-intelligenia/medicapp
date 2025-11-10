@@ -1006,6 +1006,7 @@
   "done": "Fet",
   "suspended": "Suspès",
   "activeFastingPeriodsTitle": "Dejunis Actius",
+  "fastingCompleted": "Dejuni completat! Ja pots menjar",
 
   "@_MEDICATION_LIST_SCREEN": {},
   "notificationsWillNotWork": "Les notificacions NO funcionaran sense aquest permís.",

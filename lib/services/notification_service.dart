@@ -485,9 +485,10 @@ class NotificationService {
   /// Schedule notifications for a medication based on its dose times
   /// V19+: Now requires personId to schedule notifications for specific person
   /// If [excludeToday] is true, notifications will not be scheduled for today (useful when a dose was already taken)
+  /// If [skipCancellation] is true, skips the automatic cancellation (useful when rescheduling multiple persons)
   Future<void> scheduleMedicationNotifications(
     Medication medication,
-    {required String personId, bool excludeToday = false}
+    {required String personId, bool excludeToday = false, bool skipCancellation = false}
   ) async {
     // Skip in test mode
     if (_isTestMode) return;
@@ -538,7 +539,10 @@ class NotificationService {
 
     // Cancel any existing notifications for this medication first
     // Pass the medication object for smart cancellation
-    await cancelMedicationNotifications(medication.id, medication: medication);
+    // Skip cancellation if explicitly requested (e.g., when bulk rescheduling)
+    if (!skipCancellation) {
+      await cancelMedicationNotifications(medication.id, medication: medication);
+    }
 
     // Different scheduling logic based on duration type
     switch (medication.durationType) {
@@ -575,6 +579,57 @@ class NotificationService {
   /// Cancel all pending notifications
   Future<void> cancelAllNotifications() async {
     await _cancellationManager.cancelAllNotifications();
+  }
+
+  /// Reschedule all notifications for all medications and persons
+  /// This should be called when the app starts to ensure notifications are up to date
+  /// OPTIMIZATION: Only schedules for next 2 days (today + tomorrow)
+  Future<void> rescheduleAllMedicationNotifications() async {
+    // Skip in test mode
+    if (_isTestMode) return;
+
+    print('🔄 Auto-rescheduling all medication notifications...');
+
+    try {
+      // Cancel all existing notifications first
+      await cancelAllNotifications();
+
+      // Get all persons
+      final allPersons = await DatabaseHelper.instance.getAllPersons();
+
+      int totalScheduled = 0;
+      int medicationsProcessed = 0;
+
+      // For each person, get their medications and schedule
+      for (final person in allPersons) {
+        final medications = await DatabaseHelper.instance.getMedicationsForPerson(person.id);
+
+        for (final medication in medications) {
+          // Only schedule if has dose times and is not suspended
+          if (medication.doseTimes.isNotEmpty && !medication.isSuspended) {
+            // Check if medication is active (has no dates, or within date range)
+            final now = DateTime.now();
+            final isActive = (medication.startDate == null || !now.isBefore(medication.startDate!)) &&
+                           (medication.endDate == null || !now.isAfter(medication.endDate!));
+
+            if (isActive) {
+              await scheduleMedicationNotifications(
+                medication,
+                personId: person.id,
+                skipCancellation: true,
+              );
+              totalScheduled++;
+            }
+          }
+          medicationsProcessed++;
+        }
+      }
+
+      final pending = await getPendingNotifications();
+      print('✅ Rescheduling complete: $medicationsProcessed medications checked, $totalScheduled scheduled, ${pending.length} notifications in system');
+    } catch (e) {
+      print('❌ Error rescheduling notifications: $e');
+    }
   }
 
   /// Synchronize system notifications with database medications
@@ -674,6 +729,44 @@ class NotificationService {
       'This is a test notification from MedicApp',
       notificationDetails,
     );
+  }
+
+  /// Play a sound/vibration when fasting is completed
+  Future<void> playFastingCompletedSound() async {
+    // Skip in test mode
+    if (_isTestMode) return;
+
+    try {
+      // Show a quick notification with sound to alert the user
+      const androidDetails = fln.AndroidNotificationDetails(
+        'fasting_completed',
+        'Fasting Completed',
+        channelDescription: 'Alert when fasting period ends',
+        importance: fln.Importance.max,
+        priority: fln.Priority.max,
+        playSound: true,
+        enableVibration: true,
+        timeoutAfter: 3000, // Auto-dismiss after 3 seconds
+      );
+
+      const iOSDetails = fln.DarwinNotificationDetails(
+        presentSound: true,
+      );
+
+      const notificationDetails = fln.NotificationDetails(
+        android: androidDetails,
+        iOS: iOSDetails,
+      );
+
+      await _notificationsPlugin.show(
+        999999, // Unique ID for fasting completion alerts
+        '¡Ayuno completado!',
+        'Ya puedes comer',
+        notificationDetails,
+      );
+    } catch (e) {
+      print('Error playing fasting completed sound: $e');
+    }
   }
 
   /// Test scheduled notification (1 minute in the future)
@@ -851,22 +944,29 @@ class NotificationService {
     );
   }
 
-  /// Show or update the ongoing fasting countdown notification
+  /// Show or update the ongoing fasting countdown notification for a specific person
   /// This notification is persistent (cannot be dismissed by the user)
-  /// and displays the remaining fasting time for the most urgent medication
+  /// and displays the remaining fasting time for that person's medication
   Future<void> showOngoingFastingNotification({
+    required String personId,
     required String medicationName,
     required String timeRemaining,
     required String endTime,
   }) async {
     await _fastingScheduler.showOngoingFastingNotification(
+      personId: personId,
       medicationName: medicationName,
       timeRemaining: timeRemaining,
       endTime: endTime,
     );
   }
 
-  /// Cancel the ongoing fasting countdown notification
+  /// Cancel ongoing fasting notification for a specific person
+  Future<void> cancelOngoingFastingNotificationForPerson(String personId) async {
+    await _fastingScheduler.cancelOngoingFastingNotificationForPerson(personId);
+  }
+
+  /// Cancel all ongoing fasting countdown notifications
   Future<void> cancelOngoingFastingNotification() async {
     await _fastingScheduler.cancelOngoingFastingNotification();
   }

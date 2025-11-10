@@ -1006,6 +1006,7 @@
   "done": "Eginda",
   "suspended": "Etenda",
   "activeFastingPeriodsTitle": "Barau Aldia Aktiboak",
+  "fastingCompleted": "Baraua amaituta! Orain jan dezakezu",
 
   "@_MEDICATION_LIST_SCREEN": {},
   "notificationsWillNotWork": "Jakinarazpenek EZ dute funtzionatuko baimen hau gabe.",

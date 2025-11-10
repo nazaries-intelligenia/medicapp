@@ -217,10 +217,19 @@ class DoseCalculationService {
   ///
   /// Returns a map of scheduled time -> actual time taken
   /// Only includes doses that were actually taken today (not skipped)
-  static Future<Map<String, DateTime>> getActualDoseTimes(Medication medication) async {
+  ///
+  /// If [personId] is provided, only returns doses for that person
+  static Future<Map<String, DateTime>> getActualDoseTimes(
+    Medication medication, {
+    String? personId,
+  }) async {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
     final todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    print('🔍 Getting actual dose times for ${medication.name}');
+    print('   Person ID filter: ${personId ?? "none (all persons)"}');
+    print('   Today range: $todayStart to $todayEnd');
 
     final doses = await DatabaseHelper.instance.getDoseHistoryForDateRange(
       startDate: todayStart,
@@ -228,22 +237,35 @@ class DoseCalculationService {
       medicationId: medication.id,
     );
 
+    print('   Found ${doses.length} dose history entries');
+
     // Filter to only taken doses registered today
-    final takenDosesToday = doses.where((dose) =>
+    var takenDosesToday = doses.where((dose) =>
       dose.status == DoseStatus.taken &&
       dose.registeredDateTime.year == now.year &&
       dose.registeredDateTime.month == now.month &&
       dose.registeredDateTime.day == now.day
     );
 
+    // Filter by person if specified
+    if (personId != null) {
+      takenDosesToday = takenDosesToday.where((dose) => dose.personId == personId);
+      print('   After person filter: ${takenDosesToday.length} doses');
+    }
+
+    print('   Filtered to ${takenDosesToday.length} taken doses today');
+
     // Create map of scheduled time -> actual time
     final Map<String, DateTime> actualTimes = {};
     for (final dose in takenDosesToday) {
       // Extract time (HH:mm) from scheduledDateTime
       final scheduledTime = dose.scheduledDateTime.toTimeString();
+      // Always use registration time - this is when the dose was actually taken
       actualTimes[scheduledTime] = dose.registeredDateTime;
+      print('   Dose scheduled at $scheduledTime, taken at ${dose.registeredDateTime} by person ${dose.personId}');
     }
 
+    print('   Returning ${actualTimes.length} actual times');
     return actualTimes;
   }
 
@@ -255,16 +277,29 @@ class DoseCalculationService {
   /// - fastingType: 'before' or 'after'
   /// - isActive: true if currently in fasting period
   ///
+  /// If [personId] is provided, only checks fasting for that specific person
+  ///
   /// Returns null if medication doesn't require fasting or no active period
-  static Future<Map<String, dynamic>?> getActiveFastingPeriod(Medication medication) async {
+  static Future<Map<String, dynamic>?> getActiveFastingPeriod(
+    Medication medication, {
+    String? personId,
+  }) async {
+    print('📊 Checking active fasting period for ${medication.name}');
+    print('   Person ID filter: ${personId ?? "none (all persons)"}');
+    print('   Requires fasting: ${medication.requiresFasting}');
+    print('   Fasting type: ${medication.fastingType}');
+    print('   Fasting duration: ${medication.fastingDurationMinutes} minutes');
+
     if (!medication.requiresFasting ||
         medication.fastingType == null ||
         medication.fastingDurationMinutes == null ||
         medication.fastingDurationMinutes! <= 0) {
+      print('   ❌ Medication does not require fasting or invalid configuration');
       return null;
     }
 
     final now = DateTime.now();
+    print('   Current time: $now');
 
     // Handle "before" fasting (before taking the dose)
     if (medication.fastingType == 'before') {
@@ -319,10 +354,16 @@ class DoseCalculationService {
 
     // Handle "after" fasting (after taking the dose)
     else if (medication.fastingType == 'after') {
-      // Check if any dose was taken today
-      final actualTimes = await getActualDoseTimes(medication);
+      print('   Handling "after" fasting type');
+      // Check if any dose was taken today (filtered by person if provided)
+      final actualTimes = await getActualDoseTimes(medication, personId: personId);
 
-      if (actualTimes.isEmpty) return null;
+      if (actualTimes.isEmpty) {
+        print('   ❌ No doses taken today${personId != null ? " for this person" : ""}');
+        return null;
+      }
+
+      print('   Found ${actualTimes.length} doses taken today');
 
       // Find the most recent dose taken
       DateTime? mostRecentDoseTime;
@@ -332,23 +373,41 @@ class DoseCalculationService {
         }
       }
 
-      if (mostRecentDoseTime == null) return null;
+      if (mostRecentDoseTime == null) {
+        print('   ❌ Could not determine most recent dose time');
+        return null;
+      }
+
+      print('   Most recent dose taken at: $mostRecentDoseTime');
 
       // Calculate fasting end time
       final fastingEnd = mostRecentDoseTime.add(Duration(minutes: medication.fastingDurationMinutes!));
+      print('   Fasting ends at: $fastingEnd');
 
-      // Check if we're still in the fasting period
-      if (now.isBefore(fastingEnd)) {
+      // Show fasting period if:
+      // 1. Still active (before end time)
+      // 2. OR recently finished (within last 2 hours) so user can see it completed
+      final twoHoursAfterEnd = fastingEnd.add(const Duration(hours: 2));
+      print('   2 hours after end: $twoHoursAfterEnd');
+
+      if (now.isBefore(twoHoursAfterEnd)) {
         final remainingMinutes = fastingEnd.difference(now).inMinutes;
+        final isStillActive = now.isBefore(fastingEnd);
+
+        print('   ✅ Returning fasting period: remainingMinutes=$remainingMinutes, isActive=$isStillActive');
+
         return {
           'fastingEndTime': fastingEnd,
           'remainingMinutes': remainingMinutes,
           'fastingType': 'after',
-          'isActive': true,
+          'isActive': isStillActive,
         };
+      } else {
+        print('   ❌ Fasting period ended more than 2 hours ago');
       }
     }
 
+    print('   ❌ No active fasting period found');
     return null;
   }
 

@@ -1006,6 +1006,7 @@
   "done": "Feito",
   "suspended": "Suspendido",
   "activeFastingPeriodsTitle": "Xaxúns Activos",
+  "fastingCompleted": "Xaxún completado! Xa podes comer",
 
   "@_MEDICATION_LIST_SCREEN": {},
   "notificationsWillNotWork": "As notificacións NON funcionarán sen este permiso.",

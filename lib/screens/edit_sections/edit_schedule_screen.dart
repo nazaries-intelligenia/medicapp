@@ -86,10 +86,19 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
 
       // V19+: Reschedule notifications for all assigned persons with new times
       final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
+
+      // Cancel all existing notifications once before rescheduling
+      await NotificationService.instance.cancelMedicationNotifications(
+        updatedMedication.id,
+        medication: updatedMedication,
+      );
+
+      // Then schedule for all persons with skipCancellation=true
       for (final person in persons) {
         await NotificationService.instance.scheduleMedicationNotifications(
           updatedMedication,
           personId: person.id,
+          skipCancellation: true,
         );
       }
 

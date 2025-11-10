@@ -29,15 +29,20 @@ class WeeklyNotificationScheduler {
 
     // Phase 2: If treatment has an end date, schedule individual occurrences until end date
     // Otherwise, use recurring weekly notifications
+    // OPTIMIZATION: Only schedule for today + tomorrow (max 2 days) for performance
     if (medication.endDate != null) {
       final endDate = medication.endDate!;
       final today = DateTime(now.year, now.month, now.day);
       final end = DateTime(endDate.year, endDate.month, endDate.day);
 
-      print('Scheduling ${medication.name} weekly pattern until ${endDate.toString().split(' ')[0]}');
+      // Calculate how many days to schedule (from today to end date, max 2 days)
+      final totalDays = end.difference(today).inDays + 1;
+      final daysToSchedule = totalDays > 2 ? 2 : totalDays;
 
-      // Schedule individual occurrences for each week until end date
-      final daysToSchedule = end.difference(today).inDays + 1;
+      print('Scheduling ${medication.name} weekly pattern for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
+      if (totalDays > 2) {
+        print('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
+      }
 
       for (int day = 0; day < daysToSchedule; day++) {
         final targetDate = today.add(Duration(days: day));

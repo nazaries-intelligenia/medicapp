@@ -246,64 +246,8 @@ class MedicationCard extends StatelessWidget {
                   // Show fasting countdown if available
                   if (fastingPeriod != null) ...[
                     const SizedBox(height: 4),
-                    Builder(
-                      builder: (context) {
-                        final remainingMinutes = fastingPeriod!['remainingMinutes'] as int;
-                        final fastingType = fastingPeriod!['fastingType'] as String;
-                        final isActive = fastingPeriod!['isActive'] as bool;
-                        final fastingEndTime = fastingPeriod!['fastingEndTime'] as DateTime;
-
-                        final l10n = AppLocalizations.of(context)!;
-
-                        // Format remaining time
-                        String timeText;
-                        if (remainingMinutes < 60) {
-                          timeText = l10n.fastingRemainingMinutes(remainingMinutes);
-                        } else {
-                          final hours = remainingMinutes ~/ 60;
-                          final minutes = remainingMinutes % 60;
-                          if (minutes == 0) {
-                            timeText = l10n.fastingRemainingHours(hours);
-                          } else {
-                            timeText = l10n.fastingRemainingHoursMinutes(hours, minutes);
-                          }
-                        }
-
-                        // Format end time
-                        final endTimeStr = fastingEndTime.toTimeString();
-
-                        final text = isActive
-                            ? l10n.fastingActive(timeText, endTimeStr)
-                            : l10n.fastingUpcoming(timeText, endTimeStr);
-
-                        final iconColor = isActive
-                            ? Colors.orange.shade700
-                            : Colors.blue.shade700;
-                        final textColor = isActive
-                            ? Colors.orange.shade700
-                            : Colors.blue.shade700;
-
-                        return Row(
-                          children: [
-                            Icon(
-                              Icons.restaurant,
-                              size: 18,
-                              color: iconColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Flexible(
-                              child: Text(
-                                text,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: textColor,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                    _FastingCountdownWidget(
+                      fastingPeriod: fastingPeriod!,
                     ),
                   ],
                 ],
@@ -350,6 +294,126 @@ class MedicationCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Widget with live countdown that updates every second
+class _FastingCountdownWidget extends StatefulWidget {
+  final Map<String, dynamic> fastingPeriod;
+
+  const _FastingCountdownWidget({
+    required this.fastingPeriod,
+  });
+
+  @override
+  State<_FastingCountdownWidget> createState() => _FastingCountdownWidgetState();
+}
+
+class _FastingCountdownWidgetState extends State<_FastingCountdownWidget> {
+  late DateTime _fastingEndTime;
+  late String _fastingType;
+  late bool _isActive;
+
+  @override
+  void initState() {
+    super.initState();
+    _fastingEndTime = widget.fastingPeriod['fastingEndTime'] as DateTime;
+    _fastingType = widget.fastingPeriod['fastingType'] as String;
+    _isActive = widget.fastingPeriod['isActive'] as bool;
+  }
+
+  String _formatRemainingTime(Duration remaining) {
+    if (remaining.isNegative) {
+      return '00:00';
+    }
+
+    final hours = remaining.inHours;
+    final minutes = remaining.inMinutes % 60;
+    final seconds = remaining.inSeconds % 60;
+
+    if (hours > 0) {
+      // Format as HH:MM if hours remain
+      return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
+    } else if (minutes > 0) {
+      // Format as MM:SS if only minutes remain
+      return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+    } else {
+      // Format as Ss if only seconds remain (with 's' suffix)
+      return '${seconds.toString().padLeft(2, '0')}s';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        final remaining = _fastingEndTime.difference(now);
+
+        // If fasting is finished (remaining is negative), show completion message
+        if (remaining.isNegative) {
+          return Row(
+            children: [
+              Icon(
+                Icons.check_circle,
+                size: 18,
+                color: Colors.green.shade700,
+              ),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  '¡Ya puedes comer!',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          );
+        }
+
+        final timeText = _formatRemainingTime(remaining);
+        final endTimeStr = _fastingEndTime.toTimeString();
+
+        // Build text without using l10n for the countdown itself
+        final text = _isActive
+            ? 'Ayuno en curso: $timeText (hasta $endTimeStr)'
+            : 'Próximo ayuno: $timeText (hasta $endTimeStr)';
+
+        final iconColor = _isActive
+            ? Colors.orange.shade700
+            : Colors.blue.shade700;
+        final textColor = _isActive
+            ? Colors.orange.shade700
+            : Colors.blue.shade700;
+
+        return Row(
+          children: [
+            Icon(
+              Icons.restaurant,
+              size: 18,
+              color: iconColor,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                text,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

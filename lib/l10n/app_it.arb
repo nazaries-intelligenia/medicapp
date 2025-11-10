@@ -1497,5 +1497,6 @@
   },
   "done": "Fatto",
   "suspended": "Sospeso",
-  "activeFastingPeriodsTitle": "Digiuni Attivi"
+  "activeFastingPeriodsTitle": "Digiuni Attivi",
+  "fastingCompleted": "Digiuno completato! Ora puoi mangiare"
 }

@@ -399,6 +399,7 @@ void main() {
     test('should show ongoing fasting notification in test mode without errors', () async {
       // In test mode, notifications should be no-ops but not throw errors
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Test Medication',
         timeRemaining: '1h 30m',
         endTime: '14:30',
@@ -411,6 +412,7 @@ void main() {
     test('should cancel ongoing fasting notification in test mode without errors', () async {
       // First show a notification
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Test Medication',
         timeRemaining: '45 min',
         endTime: '13:45',
@@ -426,18 +428,21 @@ void main() {
     test('should handle multiple ongoing notification updates', () async {
       // Simulate updating notification multiple times (as would happen with timer)
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Paracetamol',
         timeRemaining: '2h',
         endTime: '16:00',
       );
 
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Paracetamol',
         timeRemaining: '1h 30m',
         endTime: '16:00',
       );
 
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Paracetamol',
         timeRemaining: '1h',
         endTime: '16:00',
@@ -450,6 +455,7 @@ void main() {
     test('should handle switching between different medications', () async {
       // Show notification for first medication
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Paracetamol',
         timeRemaining: '1h',
         endTime: '15:00',
@@ -457,6 +463,7 @@ void main() {
 
       // Switch to more urgent medication
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Ibuprofeno',
         timeRemaining: '30 min',
         endTime: '14:30',
@@ -469,6 +476,7 @@ void main() {
     test('should handle time format variations', () async {
       // Test with minutes only
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Med1',
         timeRemaining: '45 min',
         endTime: '14:45',
@@ -476,6 +484,7 @@ void main() {
 
       // Test with hours only
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Med2',
         timeRemaining: '2h',
         endTime: '16:00',
@@ -483,6 +492,7 @@ void main() {
 
       // Test with hours and minutes
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Med3',
         timeRemaining: '1h 23m',
         endTime: '15:23',
@@ -495,6 +505,7 @@ void main() {
     test('should handle cancellation after showing notification', () async {
       // Show notification
       await service.showOngoingFastingNotification(
+        personId: 'test-person-id',
         medicationName: 'Test Med',
         timeRemaining: '1h',
         endTime: '15:00',

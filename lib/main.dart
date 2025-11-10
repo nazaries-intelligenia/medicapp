@@ -42,7 +42,19 @@ void main() async {
     print('Error initializing default person: $e');
   }
 
+  // Run app immediately for fast startup
   runApp(const MedicApp());
+
+  // Reschedule notifications in background (non-blocking)
+  // This ensures notifications are up to date without blocking app startup
+  Future.microtask(() async {
+    try {
+      await NotificationService.instance.rescheduleAllMedicationNotifications();
+      print('Notifications rescheduled successfully');
+    } catch (e) {
+      print('Error rescheduling notifications: $e');
+    }
+  });
 }
 
 /// Initialize default person if it doesn't exist

@@ -113,20 +113,22 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
       final notification = notificationInfo['notification'];
       if (notification.payload != null && notification.payload!.isNotEmpty) {
         final parts = notification.payload!.split('|');
-        if (parts.isNotEmpty) {
-          final medicationId = parts[0];
-          final medication = widget.medications.firstWhere(
-            (m) => m.id == medicationId,
-            orElse: () => widget.medications.first,
-          );
+        // Payload format: medicationId|doseIndex|personId
+        if (parts.length >= 3) {
+          final personId = parts[2]; // Extract personId from payload
 
-          if (medication.id == medicationId) {
-            // Get persons for this medication
-            final persons = await DatabaseHelper.instance.getPersonsForMedication(medicationId);
-            for (final person in persons) {
-              if (_notificationsByPerson.containsKey(person.id)) {
-                _notificationsByPerson[person.id]!.add(notificationInfo);
-              }
+          // Assign notification to the specific person
+          if (_notificationsByPerson.containsKey(personId)) {
+            _notificationsByPerson[personId]!.add(notificationInfo);
+          }
+        } else if (parts.isNotEmpty) {
+          // Fallback for old notifications without personId
+          // Assign to all persons with this medication
+          final medicationId = parts[0];
+          final persons = await DatabaseHelper.instance.getPersonsForMedication(medicationId);
+          for (final person in persons) {
+            if (_notificationsByPerson.containsKey(person.id)) {
+              _notificationsByPerson[person.id]!.add(notificationInfo);
             }
           }
         }
