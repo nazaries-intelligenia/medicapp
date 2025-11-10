@@ -1072,9 +1072,10 @@ class MedicationListViewModel extends ChangeNotifier {
     }
 
     if (targetPerson != null) {
+      final personIdForNotifications = targetPerson.id;
       final medicationId = await DatabaseHelper.instance.createMedicationForPerson(
         medication: medication,
-        personId: targetPerson.id,
+        personId: personIdForNotifications,
       );
 
       // 1. Update UI IMMEDIATELY (fast, UI-only)
@@ -1088,7 +1089,7 @@ class MedicationListViewModel extends ChangeNotifier {
           if (savedMedication != null) {
             await NotificationService.instance.scheduleMedicationNotifications(
               savedMedication,
-              personId: targetPerson.id,
+              personId: personIdForNotifications,
             );
           }
         } catch (e) {
