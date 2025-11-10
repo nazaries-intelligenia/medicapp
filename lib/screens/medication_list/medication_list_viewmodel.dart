@@ -1083,15 +1083,39 @@ class MedicationListViewModel extends ChangeNotifier {
       await _reloadMedicationsOnly();
 
       // 2. Schedule notifications in background (non-blocking)
+      if (_isTestMode) {
+        // In test mode, skip notification scheduling to avoid async operations
+        // that can cause pumpAndSettle timeouts and database locks
+        return;
+      }
+
+      // Create medication object with correct ID for notification scheduling
+      final medicationForNotifications = Medication(
+        id: medicationId,
+        name: medication.name,
+        type: medication.type,
+        dosageIntervalHours: medication.dosageIntervalHours,
+        durationType: medication.durationType,
+        selectedDates: medication.selectedDates,
+        weeklyDays: medication.weeklyDays,
+        dayInterval: medication.dayInterval,
+        doseSchedule: medication.doseSchedule,
+        stockQuantity: medication.stockQuantity,
+        lowStockThresholdDays: medication.lowStockThresholdDays,
+        startDate: medication.startDate,
+        endDate: medication.endDate,
+        requiresFasting: medication.requiresFasting,
+        fastingType: medication.fastingType,
+        fastingDurationMinutes: medication.fastingDurationMinutes,
+        notifyFasting: medication.notifyFasting,
+      );
+
       Future.microtask(() async {
         try {
-          final savedMedication = await DatabaseHelper.instance.getMedication(medicationId);
-          if (savedMedication != null) {
-            await NotificationService.instance.scheduleMedicationNotifications(
-              savedMedication,
-              personId: personIdForNotifications,
-            );
-          }
+          await NotificationService.instance.scheduleMedicationNotifications(
+            medicationForNotifications,
+            personId: personIdForNotifications,
+          );
         } catch (e) {
           print('Error scheduling notifications after medication creation: $e');
         }
