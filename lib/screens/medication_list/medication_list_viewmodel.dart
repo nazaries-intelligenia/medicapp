@@ -1072,13 +1072,30 @@ class MedicationListViewModel extends ChangeNotifier {
     }
 
     if (targetPerson != null) {
-      await DatabaseHelper.instance.createMedicationForPerson(
+      final medicationId = await DatabaseHelper.instance.createMedicationForPerson(
         medication: medication,
         personId: targetPerson.id,
       );
-    }
 
-    await loadMedications();
+      // 1. Update UI IMMEDIATELY (fast, UI-only)
+      await _fastingManager.loadFastingPeriods();
+      await _reloadMedicationsOnly();
+
+      // 2. Schedule notifications in background (non-blocking)
+      Future.microtask(() async {
+        try {
+          final savedMedication = await DatabaseHelper.instance.getMedication(medicationId);
+          if (savedMedication != null) {
+            await NotificationService.instance.scheduleMedicationNotifications(
+              savedMedication,
+              personId: targetPerson.id,
+            );
+          }
+        } catch (e) {
+          print('Error scheduling notifications after medication creation: $e');
+        }
+      });
+    }
   }
 
   /// Update an existing medication
