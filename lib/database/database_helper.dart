@@ -621,6 +621,23 @@ class DatabaseHelper {
     return null;
   }
 
+  /// Get a single medication by name (case-insensitive)
+  /// Returns only the shared medication data (no person-specific schedule)
+  Future<Medication?> getMedicationByName(String name) async {
+    final db = await database;
+    final maps = await db.query(
+      'medications',
+      where: 'LOWER(name) = LOWER(?)',
+      whereArgs: [name],
+      limit: 1,
+    );
+
+    if (maps.isNotEmpty) {
+      return Medication.fromJson(maps.first);
+    }
+    return null;
+  }
+
   /// Get a single medication for a specific person (includes doseSchedule from person_medications)
   Future<Medication?> getMedicationForPerson(String medicationId, String personId) async {
     final db = await database;
@@ -1188,6 +1205,8 @@ class DatabaseHelper {
   // Note: In v19+, this is handled automatically by the migration script
   // This method is kept for manual migration if needed
   Future<void> migrateUnassignedMedicationsToDefaultPerson() async {
+    final db = await database;
+
     // Get default person
     final defaultPerson = await getDefaultPerson();
     if (defaultPerson == null) {
@@ -1199,24 +1218,54 @@ class DatabaseHelper {
     final unassignedMedications = await getMedicationsWithoutPersonAssignment();
     print('Found ${unassignedMedications.length} medications without person assignment');
 
-    // Assign each medication to the default person
-    // In v19+, we need to create dummy schedule data since medications table doesn't have it
-    for (final medication in unassignedMedications) {
-      // Check if already assigned
-      final isAssigned = await isPersonAssignedToMedication(
-        personId: defaultPerson.id,
-        medicationId: medication.id,
-      );
-
-      if (!isAssigned) {
-        await assignMedicationToPerson(
-          personId: defaultPerson.id,
-          medicationId: medication.id,
-          scheduleData: medication, // Use medication data as schedule
-        );
-        print('Assigned medication ${medication.name} to default person ${defaultPerson.name}');
-      }
+    if (unassignedMedications.isEmpty) {
+      return; // Nothing to migrate
     }
+
+    // Use a transaction to prevent database locks
+    await db.transaction((txn) async {
+      // Assign each medication to the default person
+      // In v19+, we need to create dummy schedule data since medications table doesn't have it
+      for (final medication in unassignedMedications) {
+        // Check if already assigned using the transaction
+        final existing = await txn.query(
+          'person_medications',
+          where: 'personId = ? AND medicationId = ?',
+          whereArgs: [defaultPerson.id, medication.id],
+          limit: 1,
+        );
+
+        if (existing.isEmpty) {
+          // Create person_medication entry using transaction
+          await txn.insert(
+            'person_medications',
+            {
+              'id': DateTime.now().millisecondsSinceEpoch.toString() + '_${medication.id}',
+              'personId': defaultPerson.id,
+              'medicationId': medication.id,
+              'assignedDate': DateTime.now().toIso8601String(),
+              'durationType': medication.durationType.name,
+              'dosageIntervalHours': medication.dosageIntervalHours,
+              'doseSchedule': jsonEncode(medication.doseSchedule),
+              'takenDosesToday': medication.takenDosesToday,
+              'skippedDosesToday': medication.skippedDosesToday,
+              'takenDosesDate': medication.takenDosesDate,
+              'selectedDates': medication.selectedDates != null ? jsonEncode(medication.selectedDates) : null,
+              'weeklyDays': medication.weeklyDays != null ? jsonEncode(medication.weeklyDays) : null,
+              'dayInterval': medication.dayInterval,
+              'startDate': medication.startDate?.toIso8601String(),
+              'endDate': medication.endDate?.toIso8601String(),
+              'requiresFasting': medication.requiresFasting ? 1 : 0,
+              'fastingType': medication.fastingType,
+              'fastingDurationMinutes': medication.fastingDurationMinutes,
+              'notifyFasting': medication.notifyFasting ? 1 : 0,
+              'isSuspended': medication.isSuspended ? 1 : 0,
+            },
+          );
+          print('Assigned medication ${medication.name} to default person ${defaultPerson.name}');
+        }
+      }
+    });
 
     print('Migration complete: ${unassignedMedications.length} medications assigned to ${defaultPerson.name}');
   }

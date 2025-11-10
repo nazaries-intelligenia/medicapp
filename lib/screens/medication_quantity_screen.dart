@@ -64,13 +64,10 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
 
   Future<void> _loadExistingMedication() async {
     // Check if a medication with this name already exists
-    final allMedications = await DatabaseHelper.instance.getAllMedications();
-    final existing = allMedications.where((m) =>
-      m.name.toLowerCase() == widget.medicationName.toLowerCase()
-    ).toList();
+    // Use efficient query by name instead of loading all medications
+    _existingMedication = await DatabaseHelper.instance.getMedicationByName(widget.medicationName);
 
-    if (existing.isNotEmpty) {
-      _existingMedication = existing.first;
+    if (_existingMedication != null) {
       // Pre-fill stock with existing value
       _stockController.text = _existingMedication!.stockQuantity.toString();
       _lowStockThresholdController.text = _existingMedication!.lowStockThresholdDays.toString();
