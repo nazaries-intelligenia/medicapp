@@ -60,20 +60,20 @@ void main() {
       expect(find.text('Por favor, introduce la cantidad disponible'), findsOneWidget);
     });
 
-    testWidgets('should show error for negative stock quantity', (WidgetTester tester) async {
+    testWidgets('should prevent entering negative stock quantity with input formatter', (WidgetTester tester) async {
       await pumpScreen(tester, EditQuantityScreen(medication: testMedication));
 
-      // Enter negative value
+      // Try to enter negative value - the formatter should block the "-" character
       final stockField = find.widgetWithText(TextFormField, '20.0');
       await tester.enterText(stockField, '-5');
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
-      await tester.pumpAndSettle();
+      // The field should not contain the negative sign
+      final textField = tester.widget<TextFormField>(stockField);
+      final text = textField.controller?.text ?? '';
 
-      // Should show validation error
-      expect(find.text('La cantidad debe ser mayor o igual a 0'), findsOneWidget);
+      // The formatter blocks "-", so text should not contain it
+      expect(text.contains('-'), isFalse, reason: 'Negative sign should be blocked by input formatter');
     });
 
     testWidgets('should accept zero stock quantity', (WidgetTester tester) async {
@@ -90,6 +90,38 @@ void main() {
 
       // Should not show stock quantity validation error
       expect(find.text('La cantidad debe ser mayor o igual a 0'), findsNothing);
+    });
+
+    testWidgets('should accept comma as decimal separator in stock field', (WidgetTester tester) async {
+      await pumpScreen(tester, EditQuantityScreen(medication: testMedication));
+
+      // Find the first TextFormField (stock quantity field)
+      final stockField = find.byType(TextFormField).first;
+
+      // Enter value with comma as decimal separator
+      await tester.enterText(stockField, '15,5');
+      await tester.pump();
+
+      // Get the field after entering text to check the value
+      final textField = tester.widget<TextFormField>(stockField);
+      final text = textField.controller?.text ?? '';
+      expect(text, '15,5', reason: 'Comma should be accepted as decimal separator');
+    });
+
+    testWidgets('should accept dot as decimal separator in stock field', (WidgetTester tester) async {
+      await pumpScreen(tester, EditQuantityScreen(medication: testMedication));
+
+      // Find the first TextFormField (stock quantity field)
+      final stockField = find.byType(TextFormField).first;
+
+      // Enter value with dot as decimal separator
+      await tester.enterText(stockField, '15.5');
+      await tester.pump();
+
+      // Get the field after entering text to check the value
+      final textField = tester.widget<TextFormField>(stockField);
+      final text = textField.controller?.text ?? '';
+      expect(text, '15.5', reason: 'Dot should be accepted as decimal separator');
     });
 
     testWidgets('should show error for empty threshold days', (WidgetTester tester) async {
@@ -216,20 +248,22 @@ void main() {
       expect(find.text('La cantidad debe ser mayor o igual a 0'), findsNothing);
     });
 
-    testWidgets('should handle invalid number format gracefully', (WidgetTester tester) async {
+    testWidgets('should prevent entering invalid characters with input formatter', (WidgetTester tester) async {
       await pumpScreen(tester, EditQuantityScreen(medication: testMedication));
 
-      // Enter invalid format
+      // Try to enter invalid characters - the formatter should block them
       final stockField = find.byType(TextFormField).first;
       await tester.enterText(stockField, 'abc');
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
-      await tester.pumpAndSettle();
+      // The field should reject all letters and remain with original or empty value
+      final textField = tester.widget<TextFormField>(stockField);
+      final text = textField.controller?.text ?? '';
 
-      // Should show validation error (tryParse returns null, treated as invalid)
-      expect(find.text('La cantidad debe ser mayor o igual a 0'), findsOneWidget);
+      // The formatter blocks letters, so text should not contain 'a', 'b', or 'c'
+      expect(text.contains('a'), isFalse, reason: 'Letters should be blocked by input formatter');
+      expect(text.contains('b'), isFalse, reason: 'Letters should be blocked by input formatter');
+      expect(text.contains('c'), isFalse, reason: 'Letters should be blocked by input formatter');
     });
   });
 

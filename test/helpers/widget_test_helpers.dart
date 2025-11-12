@@ -91,7 +91,10 @@ Future<void> scrollToWidget(WidgetTester tester, Finder finder) async {
     } catch (e) {
       // If dragUntilVisible fails, try manual scroll
       await tester.drag(scrollView.first, const Offset(0, -300));
-      await tester.pumpAndSettle();
+      // Use manual pumps to avoid timeout with async BD operations
+      for (int i = 0; i < 10; i++) {
+        await tester.pump(const Duration(milliseconds: 50));
+      }
     }
   }
 }
@@ -235,7 +238,7 @@ Future<void> addMedicationWithDuration(
     // Find the interval field by looking for the field with "Cada cuántas horas" label
     final intervalField = find.byType(TextFormField).first;
     await tester.enterText(intervalField, dosageIntervalHours.toString());
-    await tester.pumpAndSettle();
+    await tester.pump(); // Changed from pumpAndSettle() - formatter doesn't trigger animations
   }
 
   await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
@@ -263,11 +266,31 @@ Future<void> addMedicationWithDuration(
   // The "No" option should be pre-selected by default, so we just continue
   await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
   await tester.tap(find.text(getL10n(tester).btnContinue));
-  await tester.pumpAndSettle();
+
+  // Wait for navigation and async DB operations to complete
+  await waitForDatabase(tester);
 
   // Now we're on the quantity screen (final step)
   // Just verify we're there
   expect(find.text(getL10n(tester).medicationQuantityTitle), findsWidgets);
+
+  // CRITICAL: Wait for the screen to finish loading existing medication from database
+  // The screen shows a CircularProgressIndicator while _isLoadingExisting is true
+  // The initState calls _loadExistingMedication() which queries the database
+  // We need to give it time to complete this query and update the UI
+  await tester.runAsync(() async {
+    await Future.delayed(const Duration(milliseconds: 2000));
+  });
+  await tester.pump();
+  await tester.pump();
+
+  // Now wait for the TextFormFields to appear before proceeding
+  // This is especially important when creating medications after other medications exist
+  await waitForWidget(
+    tester,
+    find.byType(TextFormField),
+    timeout: const Duration(seconds: 30), // Longer timeout for DB operations
+  );
 
   // Enter stock quantity if specified (default is '0')
   // The quantity screen has 2 fields: 'Cantidad disponible' and 'Avisar cuando queden'
@@ -275,13 +298,32 @@ Future<void> addMedicationWithDuration(
   if (stockQuantity != '0') {
     // Find the first TextFormField (Cantidad disponible)
     final quantityField = find.byType(TextFormField).first;
+
+    // Verify the field exists before trying to enter text
+    expect(quantityField, findsOneWidget, reason: 'Quantity field not found - screen may not be fully loaded');
+
+    // Scroll to the field if needed
+    await scrollToWidget(tester, quantityField);
+
     // Clear and enter the stock quantity
     await tester.enterText(quantityField, stockQuantity);
-    await tester.pumpAndSettle();
+    await tester.pump(); // Changed from pumpAndSettle() - formatter doesn't trigger animations
   }
 
   // Scroll to and tap save medication button
   await scrollToWidget(tester, find.text(getL10n(tester).saveMedicationButton));
+
+  // Give extra time for the button to be fully rendered after scroll
+  await tester.pump(const Duration(milliseconds: 100));
+  await tester.pump();
+
+  // Wait for the button to be visible and tappable
+  await waitForWidget(
+    tester,
+    find.text(getL10n(tester).saveMedicationButton),
+    timeout: const Duration(seconds: 30), // Longer timeout for safety
+  );
+
   await tester.tap(find.text(getL10n(tester).saveMedicationButton));
 
   // Wait for the save operation to start (button shows loading indicator)

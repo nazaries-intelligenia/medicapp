@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication_type.dart';
 import '../../utils/datetime_extensions.dart';
+import '../../utils/number_utils.dart';
 
 /// Helper class to hold time and quantity for each dose
 class DoseEntry {
@@ -223,7 +224,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
   bool allQuantitiesValid() {
     for (int i = 0; i < _doseEntries.length; i++) {
       final text = _quantityControllers[i].text.trim();
-      final quantity = double.tryParse(text);
+      final quantity = NumberUtils.parseLocalizedDouble(text);
       if (quantity == null || quantity <= 0) {
         return false;
       }
@@ -246,7 +247,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
   Map<String, double> getDoseSchedule() {
     // Update dose entry quantities from controllers
     for (int i = 0; i < _doseEntries.length; i++) {
-      final quantity = double.parse(_quantityControllers[i].text.trim());
+      final quantity = NumberUtils.parseLocalizedDouble(_quantityControllers[i].text.trim()) ?? 1.0;
       _doseEntries[i].quantity = quantity;
     }
 
@@ -457,7 +458,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                             ),
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             inputFormatters: [
-                              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                              LocalizedDecimalInputFormatter(decimalDigits: 2),
                             ],
                           ),
                         ],

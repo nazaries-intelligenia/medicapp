@@ -18,6 +18,7 @@ MedicApp es una aplicación de recordatorio de medicamentos construida con Flutt
 - **Test helpers optimizados**: MedicationBuilder pattern con 100% de adopción en la suite de tests
 - **Cobertura**: ~75-80% estimada
 - **Internacionalización**: 8 idiomas soportados (ES, EN, CA, GL, EU, DE, FR, IT)
+- **Entrada de números localizada**: Soporte completo para separadores decimales regionales (coma y punto)
 
 ### Arquitectura Multi-Persona V19+ (Noviembre 2025)
 

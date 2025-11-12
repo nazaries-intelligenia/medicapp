@@ -151,10 +151,12 @@ class _MedicationFastingScreenState extends State<MedicationFastingScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Indicador de progreso
-              LinearProgressIndicator(
-                value: progressValue,
-                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              ClipRRect(
                 borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progressValue,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                ),
               ),
               const SizedBox(height: 24),
 

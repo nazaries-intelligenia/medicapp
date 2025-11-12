@@ -8,6 +8,7 @@ import '../services/notification_service.dart';
 import 'medication_quantity/widgets/stock_input_card.dart';
 import 'medication_quantity/widgets/medication_summary_card.dart';
 import '../widgets/action_buttons.dart';
+import '../utils/number_utils.dart';
 
 /// Pantalla 7: Cantidad de medicamentos (última pantalla del flujo)
 class MedicationQuantityScreen extends StatefulWidget {
@@ -106,7 +107,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
       weeklyDays: widget.weeklyDays,
       dayInterval: widget.dayInterval,
       doseSchedule: widget.doseSchedule,
-      stockQuantity: double.tryParse(_stockController.text) ?? 0,
+      stockQuantity: NumberUtils.parseLocalizedDouble(_stockController.text) ?? 0,
       lowStockThresholdDays: int.tryParse(_lowStockThresholdController.text) ?? 3,
       startDate: widget.startDate,
       endDate: widget.endDate,
@@ -170,10 +171,12 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Indicador de progreso
-                LinearProgressIndicator(
-                  value: 1.0, // Always 100% since this is the last step
-                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                ClipRRect(
                   borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: 1.0, // Always 100% since this is the last step
+                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  ),
                 ),
                 const SizedBox(height: 24),
 

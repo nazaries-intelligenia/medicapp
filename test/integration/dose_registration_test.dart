@@ -127,14 +127,18 @@ void main() {
 
     // Tap on the medication to open modal
     await tester.tap(find.text('Ibuprofeno'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Tap "Registrar toma"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify dose selection dialog IS shown (because there are multiple doses per day)
     expect(find.text('Registrar toma de Ibuprofeno'), findsOneWidget);
@@ -159,14 +163,18 @@ void main() {
 
     // Tap on the medication to open modal
     await tester.tap(find.text('Aspirina'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Tap "Registrar toma"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify the dialog is shown (because there are 2 doses per day)
     expect(find.text('Registrar toma de Aspirina'), findsOneWidget);
@@ -186,7 +194,10 @@ void main() {
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 500));
     });
-    await tester.pumpAndSettle();
+    // Use manual pumps to avoid timeout
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Verify the medication is still in the list (operation completed successfully)
     expect(find.text('Aspirina'), findsOneWidget);
@@ -260,21 +271,28 @@ void main() {
 
     // Tap on the medication to open modal
     await tester.tap(find.text('Vitamina D'));
-    await tester.pumpAndSettle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     // Tap "Registrar toma"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify dialog is shown
     expect(find.text('Registrar toma de Vitamina D'), findsOneWidget);
 
     // Tap cancel
     await tester.tap(find.text(getL10n(tester).btnCancel));
-    await tester.pumpAndSettle();
+    // Use manual pumps to avoid timeout
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify dialog is closed and no confirmation message is shown
     expect(find.text('Registrar toma de Vitamina D'), findsNothing);
@@ -292,7 +310,10 @@ void main() {
 
     // Register first dose
     await tester.tap(find.text(getL10n(tester).summaryMedication));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
@@ -300,8 +321,10 @@ void main() {
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
 
-    // Wait for dialog to open
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog to open - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify all 3 doses are shown initially
     expect(find.text('08:00'), findsOneWidget);
@@ -348,14 +371,20 @@ void main() {
     // Wait for medication to appear in the list after reload
     await waitForWidget(tester, find.text('Medicamento'));
     await tester.tap(find.text('Medicamento'));
-    await tester.pumpAndSettle(); // Wait for modal animation
+    // Wait for modal animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump();
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
     await waitForDatabase(tester);
-    await tester.pumpAndSettle(); // Wait for dialog animation to complete
+    // Wait for dialog animation - use manual pumps
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Verify the dialog is shown
     expect(find.text('Registrar toma de Medicamento'), findsOneWidget);
@@ -482,14 +511,20 @@ void main() {
 
     // Select the remaining scheduled dose (20:00)
     await tester.tap(find.text('20:00'));
-    await tester.pumpAndSettle();
+    // Use manual pumps to avoid timeout
+    for (int i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
 
     // Wait for dose registration to complete
     await waitForDatabase(tester);
     await tester.runAsync(() async {
       await Future.delayed(const Duration(milliseconds: 500));
     });
-    await tester.pumpAndSettle();
+    // Use manual pumps to avoid timeout
+    for (int i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
 
     // Verify the medication is still in the list (operation completed successfully)
     expect(find.text('MedDual'), findsOneWidget);
