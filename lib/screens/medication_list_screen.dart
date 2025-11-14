@@ -94,6 +94,25 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
   void _onViewModelChanged() {
     if (mounted) {
+      // Check if number of persons changed and update TabController if needed
+      final shouldHaveTabs = _viewModel.showPersonTabs && _viewModel.persons.length > 1;
+      final currentTabCount = _tabController?.length ?? 0;
+      final newTabCount = _viewModel.persons.length;
+
+      if (shouldHaveTabs && currentTabCount != newTabCount) {
+        // Rebuild TabController with new length
+        _tabController?.dispose();
+        _tabController = TabController(
+          length: newTabCount,
+          vsync: this,
+        );
+        _tabController?.addListener(_onTabChanged);
+      } else if (!shouldHaveTabs && _tabController != null) {
+        // Remove TabController if tabs should not be shown
+        _tabController?.dispose();
+        _tabController = null;
+      }
+
       setState(() {});
     }
   }

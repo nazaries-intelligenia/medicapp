@@ -1092,9 +1092,15 @@ class MedicationListViewModel extends ChangeNotifier {
       await _fastingManager.loadFastingPeriods();
       await _reloadMedicationsOnly();
 
-      // NOTE: Notifications are NOT scheduled here to keep UI fast (<200ms)
-      // They will be scheduled on the next loadMedications() call or app restart
-      // This prevents database locks and race conditions while maintaining fast UI
+      // Schedule notifications in background (non-blocking)
+      // This ensures notifications are created when medication is assigned to new person
+      Future.microtask(() async {
+        try {
+          await NotificationService.instance.rescheduleAllMedicationNotifications();
+        } catch (e) {
+          print('Error rescheduling notifications after create: $e');
+        }
+      });
     }
   }
 

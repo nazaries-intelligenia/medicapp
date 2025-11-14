@@ -3,7 +3,17 @@
     "allow": [
       "Bash(timeout 120 flutter build:*)",
       "Bash(git stash:*)",
-      "Bash(flutter doctor:*)"
+      "Bash(flutter doctor:*)",
+      "Bash(flutter build:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter test:*)",
+      "Bash(find:*)",
+      "Bash(/mnt/c/Users/RPO/flutter/bin/flutter test:*)",
+      "Bash(flutter clean:*)",
+      "Bash(tee:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []
