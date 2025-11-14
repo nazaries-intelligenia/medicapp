@@ -604,10 +604,13 @@ class MedicationListScreenState extends State<MedicationListScreen>
       activeFastingPeriods: _viewModel.activeFastingPeriods,
       dismissedPeriods: _dismissedFastingPeriods,
       soundPlayedPeriods: _soundPlayedFastingPeriods,
-      onDismissPeriod: (key) {
+      onDismissPeriod: (key, personId) {
         setState(() {
           _dismissedFastingPeriods.add(key);
         });
+
+        // Cancel ongoing fasting notification for this person
+        NotificationService.instance.cancelOngoingFastingNotificationForPerson(personId);
       },
       onSoundPlayed: (key) {
         setState(() {
@@ -1219,7 +1222,7 @@ class _FastingCountdownPanel extends StatelessWidget {
   final List<Map<String, dynamic>> activeFastingPeriods;
   final Set<String> dismissedPeriods;
   final Set<String> soundPlayedPeriods;
-  final Function(String) onDismissPeriod;
+  final Function(String key, String personId) onDismissPeriod;
   final Function(String) onSoundPlayed;
 
   const _FastingCountdownPanel({
@@ -1283,6 +1286,7 @@ class _FastingCountdownPanel extends StatelessWidget {
           ...List.generate(visiblePeriods.length, (index) {
             final fasting = visiblePeriods[index];
             final periodKey = _getPeriodKey(fasting);
+            final personId = fasting['personId'] as String;
             return _FastingCountdownRow(
               personName: fasting['personName'] as String,
               personIsDefault: fasting['personIsDefault'] as bool,
@@ -1292,7 +1296,7 @@ class _FastingCountdownPanel extends StatelessWidget {
               periodKey: periodKey,
               soundAlreadyPlayed: soundPlayedPeriods.contains(periodKey),
               onSoundPlayed: () => onSoundPlayed(periodKey),
-              onDismiss: () => onDismissPeriod(periodKey),
+              onDismiss: () => onDismissPeriod(periodKey, personId),
             );
           }),
         ],
