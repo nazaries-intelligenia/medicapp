@@ -91,6 +91,20 @@ class FastingStateManager {
 
     print('🔄 Loaded ${_activeFastingPeriods.length} active fasting periods');
 
+    // Filter out periods that have already finished
+    // Only keep periods where the fasting end time is in the future
+    final now = DateTime.now();
+    _activeFastingPeriods.removeWhere((period) {
+      final endTime = period['fastingEndTime'] as DateTime;
+      final hasEnded = endTime.isBefore(now);
+      if (hasEnded) {
+        print('   Removing finished period: ends at $endTime (${period['medicationName']} for ${period['personName']})');
+      }
+      return hasEnded;
+    });
+
+    print('🔄 After removing finished periods: ${_activeFastingPeriods.length} active periods');
+
     // Filter to keep only the LATEST ending fasting period per person
     // (If a person has multiple medications requiring fasting, show only the most restrictive one)
     final Map<String, Map<String, dynamic>> latestByPerson = {};
