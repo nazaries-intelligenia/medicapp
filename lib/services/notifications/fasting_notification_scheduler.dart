@@ -340,6 +340,9 @@ class FastingNotificationScheduler {
         ongoing: true, // This makes the notification persistent
         autoCancel: false, // User cannot dismiss it
         showWhen: false, // Don't show the time when notification was posted
+        playSound: false, // Don't play sound when showing/updating notification
+        enableVibration: false, // Don't vibrate when showing/updating notification
+        silent: true, // Make notification completely silent
         icon: '@mipmap/ic_launcher',
       );
 
