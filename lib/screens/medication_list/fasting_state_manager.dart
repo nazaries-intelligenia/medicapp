@@ -139,6 +139,9 @@ class FastingStateManager {
     updateNotification();
   }
 
+  // Track which persons currently have active ongoing notifications
+  final Set<String> _personsWithActiveNotifications = {};
+
   /// Update or cancel the ongoing fasting notification based on current state
   Future<void> updateNotification() async {
     // Only show on Android and if both preferences are enabled
@@ -146,14 +149,15 @@ class FastingStateManager {
         !_showFastingCountdown ||
         !_showFastingNotification) {
       await NotificationService.instance.cancelOngoingFastingNotification();
+      _personsWithActiveNotifications.clear();
       return;
     }
 
+    // Track which persons should have notifications in this update cycle
+    final Set<String> currentActivePersons = {};
+
     // Show notifications for ALL active fasting periods (one per person)
     if (_activeFastingPeriods.isNotEmpty) {
-      // Track which persons have active fasting
-      final Set<String> activePersons = {};
-
       for (final fastingPeriod in _activeFastingPeriods) {
         final personId = fastingPeriod['personId'] as String;
         final personName = fastingPeriod['personName'] as String;
@@ -161,8 +165,15 @@ class FastingStateManager {
         final endTime = fastingPeriod['fastingEndTime'] as DateTime;
         final remainingMinutes = endTime.difference(DateTime.now()).inMinutes;
 
-        // Skip if fasting already ended
-        if (remainingMinutes < 0) continue;
+        // If fasting already ended, cancel notification for this person
+        if (remainingMinutes < 0) {
+          if (_personsWithActiveNotifications.contains(personId)) {
+            print('⏰ Fasting ended for $personName - cancelling ongoing notification');
+            await NotificationService.instance.cancelOngoingFastingNotificationForPerson(personId);
+            _personsWithActiveNotifications.remove(personId);
+          }
+          continue;
+        }
 
         // Format time remaining
         String timeRemaining;
@@ -189,14 +200,16 @@ class FastingStateManager {
           endTime: endTimeFormatted,
         );
 
-        activePersons.add(personId);
+        currentActivePersons.add(personId);
       }
 
-      // Cancel notifications for persons who are no longer fasting
-      // (This handles the case where a fasting period just ended)
-      // TODO: Track previously active persons to cancel their notifications
+      // Update tracking set
+      _personsWithActiveNotifications.clear();
+      _personsWithActiveNotifications.addAll(currentActivePersons);
     } else {
+      // No active fasting periods - cancel all notifications
       await NotificationService.instance.cancelOngoingFastingNotification();
+      _personsWithActiveNotifications.clear();
     }
   }
 
