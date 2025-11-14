@@ -91,6 +91,32 @@ class FastingStateManager {
 
     print('🔄 Loaded ${_activeFastingPeriods.length} active fasting periods');
 
+    // Filter to keep only the LATEST ending fasting period per person
+    // (If a person has multiple medications requiring fasting, show only the most restrictive one)
+    final Map<String, Map<String, dynamic>> latestByPerson = {};
+    for (final period in _activeFastingPeriods) {
+      final personId = period['personId'] as String;
+      final endTime = period['fastingEndTime'] as DateTime;
+
+      if (!latestByPerson.containsKey(personId)) {
+        // First fasting period for this person
+        latestByPerson[personId] = period;
+      } else {
+        // Compare with existing period for this person
+        final existingEndTime = latestByPerson[personId]!['fastingEndTime'] as DateTime;
+        if (endTime.isAfter(existingEndTime)) {
+          // This fasting period ends later, so it's more restrictive
+          latestByPerson[personId] = period;
+        }
+      }
+    }
+
+    // Replace list with filtered results (one per person)
+    _activeFastingPeriods.clear();
+    _activeFastingPeriods.addAll(latestByPerson.values);
+
+    print('🔄 After filtering: ${_activeFastingPeriods.length} periods (one per person)');
+
     // Sort by fasting end time (soonest first)
     _activeFastingPeriods.sort((a, b) {
       final aTime = a['fastingEndTime'] as DateTime;
