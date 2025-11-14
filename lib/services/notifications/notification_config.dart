@@ -9,24 +9,21 @@ class NotificationConfig {
     bool autoCancel = false,
     bool includeActions = true,
   }) {
-    // Define notification actions
+    // Define notification actions (icons removed as they're optional and causing type issues)
     final actions = includeActions ? <fln.AndroidNotificationAction>[
       const fln.AndroidNotificationAction(
         'register_dose',
         'Registrar',
-        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
         showsUserInterface: false,
       ),
       const fln.AndroidNotificationAction(
         'skip_dose',
         'No tomada',
-        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
         showsUserInterface: false,
       ),
       const fln.AndroidNotificationAction(
         'snooze_dose',
         'Posponer 10min',
-        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
         showsUserInterface: false,
       ),
     ] : null;

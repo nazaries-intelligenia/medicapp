@@ -81,25 +81,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationTypeCapsule => 'Capsule';
 
   @override
-  String get medicationTypeTablet => 'Tablet';
+  String get medicationTypeInjection => 'Injection';
 
   @override
   String get medicationTypeSyrup => 'Syrup';
 
   @override
-  String get medicationTypeDrops => 'Drops';
+  String get medicationTypeOvule => 'Ovule';
 
   @override
-  String get medicationTypeInjection => 'Injection';
-
-  @override
-  String get medicationTypePatch => 'Patch';
+  String get medicationTypeSuppository => 'Suppository';
 
   @override
   String get medicationTypeInhaler => 'Inhaler';
 
   @override
-  String get medicationTypeCream => 'Cream';
+  String get medicationTypeSachet => 'Sachet';
+
+  @override
+  String get medicationTypeSpray => 'Spray';
+
+  @override
+  String get medicationTypeOintment => 'Ointment';
+
+  @override
+  String get medicationTypeLotion => 'Lotion';
+
+  @override
+  String get medicationTypeBandage => 'Bandage';
+
+  @override
+  String get medicationTypeDrops => 'Drops';
 
   @override
   String get medicationTypeOther => 'Other';
