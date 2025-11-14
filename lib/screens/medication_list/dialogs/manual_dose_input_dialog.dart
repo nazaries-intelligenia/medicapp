@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
+import '../../../utils/number_utils.dart';
 
 class ManualDoseInputDialog {
   static Future<double?> show(
@@ -69,6 +70,9 @@ class ManualDoseInputDialog {
                   ),
                   textAlign: TextAlign.center,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    LocalizedDecimalInputFormatter(decimalDigits: 2),
+                  ],
                   autofocus: true,
                 ),
               ],
@@ -81,7 +85,7 @@ class ManualDoseInputDialog {
             ),
             FilledButton(
               onPressed: () {
-                final quantity = double.tryParse(doseController.text.trim());
+                final quantity = NumberUtils.parseLocalizedDouble(doseController.text.trim());
                 if (quantity != null && quantity > 0) {
                   Navigator.pop(dialogContext, quantity);
                 }

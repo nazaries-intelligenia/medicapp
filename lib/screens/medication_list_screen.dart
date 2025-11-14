@@ -45,6 +45,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
   bool _batteryBannerDismissed = false;
   TabController? _tabController;
 
+  // Fasting countdown state (persists across tab changes)
+  final Set<String> _dismissedFastingPeriods = {};
+  final Set<String> _soundPlayedFastingPeriods = {};
+
   // Day navigation
   static const int _centerPageIndex = 10000; // Centro para navegación "ilimitada"
   late final PageController _pageController;
@@ -90,6 +94,25 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
   void _onViewModelChanged() {
     if (mounted) {
+      // Check if number of persons changed and update TabController if needed
+      final shouldHaveTabs = _viewModel.showPersonTabs && _viewModel.persons.length > 1;
+      final currentTabCount = _tabController?.length ?? 0;
+      final newTabCount = _viewModel.persons.length;
+
+      if (shouldHaveTabs && currentTabCount != newTabCount) {
+        // Rebuild TabController with new length
+        _tabController?.dispose();
+        _tabController = TabController(
+          length: newTabCount,
+          vsync: this,
+        );
+        _tabController?.addListener(_onTabChanged);
+      } else if (!shouldHaveTabs && _tabController != null) {
+        // Remove TabController if tabs should not be shown
+        _tabController?.dispose();
+        _tabController = null;
+      }
+
       setState(() {});
     }
   }
@@ -579,6 +602,21 @@ class MedicationListScreenState extends State<MedicationListScreen>
   Widget _buildAllFastingCountdowns() {
     return _FastingCountdownPanel(
       activeFastingPeriods: _viewModel.activeFastingPeriods,
+      dismissedPeriods: _dismissedFastingPeriods,
+      soundPlayedPeriods: _soundPlayedFastingPeriods,
+      onDismissPeriod: (key, personId) {
+        setState(() {
+          _dismissedFastingPeriods.add(key);
+        });
+
+        // Cancel ongoing fasting notification for this person
+        NotificationService.instance.cancelOngoingFastingNotificationForPerson(personId);
+      },
+      onSoundPlayed: (key) {
+        setState(() {
+          _soundPlayedFastingPeriods.add(key);
+        });
+      },
     );
   }
 
@@ -1010,13 +1048,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
               ]
             : null,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(
-            (_viewModel.showPersonTabs &&
-                    _tabController != null &&
-                    _viewModel.persons.length > 1)
-                ? 108
-                : 60,
-          ),
+          preferredSize: const Size.fromHeight(60),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -1060,112 +1092,121 @@ class MedicationListScreenState extends State<MedicationListScreen>
                   ],
                 ),
               ),
-              if (_viewModel.showPersonTabs &&
-                  _tabController != null &&
-                  _viewModel.persons.length > 1)
-                TabBar(
-                  controller: _tabController,
-                  isScrollable: _viewModel.persons.length > 3,
-                  tabs: _viewModel.persons.map((person) {
-                    return Tab(
-                      text: person.name,
-                      icon: person.isDefault
-                          ? const Icon(Icons.person)
-                          : const Icon(Icons.person_outline),
-                    );
-                  }).toList(),
-                ),
             ],
           ),
         ),
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
-        itemBuilder: (context, index) {
-          return _viewModel.isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : _viewModel.medications.isEmpty
-                  ? EmptyMedicationsView(onRefresh: _viewModel.loadMedications)
-                  : Column(
-                      children: [
-                        if (PlatformHelper.isAndroid && !_batteryBannerDismissed)
-                          BatteryOptimizationBanner(onDismiss: _dismissBatteryBanner),
-                        if (_viewModel.activeFastingPeriods.isNotEmpty)
-                          _buildAllFastingCountdowns(),
-                        Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: _viewModel.loadMedications,
-                            child: ListView.builder(
-                              padding:
-                                  const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                              itemCount: _viewModel.medications.length,
-                              itemBuilder: (context, index) {
-                                final medication = _viewModel.medications[index];
-                                final nextDoseInfo =
-                                    DoseCalculationService.getNextDoseInfo(medication);
-                                final nextDoseText = nextDoseInfo != null
-                                    ? DoseCalculationService.formatNextDose(
-                                        nextDoseInfo, context)
-                                    : null;
-                                final asNeededDoseInfo =
-                                    _viewModel.getAsNeededDosesInfo(medication.id);
-                                final todayDosesWidget = (medication
-                                            .isTakenDosesDateToday &&
-                                        (medication.takenDosesToday.isNotEmpty ||
-                                            medication.skippedDosesToday.isNotEmpty))
-                                    ? _buildTodayDosesSection(medication)
-                                    : null;
+      body: Column(
+        children: [
+          // Contador de ayuno (aparece encima de las pestañas)
+          if (_viewModel.activeFastingPeriods.isNotEmpty)
+            _buildAllFastingCountdowns(),
+          // Pestañas de usuarios
+          if (_viewModel.showPersonTabs &&
+              _tabController != null &&
+              _viewModel.persons.length > 1)
+            TabBar(
+              controller: _tabController,
+              isScrollable: _viewModel.persons.length > 3,
+              tabs: _viewModel.persons.map((person) {
+                return Tab(
+                  text: person.name,
+                  icon: person.isDefault
+                      ? const Icon(Icons.person)
+                      : const Icon(Icons.person_outline),
+                );
+              }).toList(),
+            ),
+          // Contenido con navegación por días
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              onPageChanged: _onPageChanged,
+              itemBuilder: (context, index) {
+                return _viewModel.isLoading
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : _viewModel.medications.isEmpty
+                        ? EmptyMedicationsView(onRefresh: _viewModel.loadMedications)
+                        : Column(
+                            children: [
+                              if (PlatformHelper.isAndroid && !_batteryBannerDismissed)
+                                BatteryOptimizationBanner(onDismiss: _dismissBatteryBanner),
+                              Expanded(
+                                child: RefreshIndicator(
+                                  onRefresh: _viewModel.loadMedications,
+                                  child: ListView.builder(
+                                    padding:
+                                        const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                                    itemCount: _viewModel.medications.length,
+                                    itemBuilder: (context, index) {
+                                      final medication = _viewModel.medications[index];
+                                      final nextDoseInfo =
+                                          DoseCalculationService.getNextDoseInfo(medication);
+                                      final nextDoseText = nextDoseInfo != null
+                                          ? DoseCalculationService.formatNextDose(
+                                              nextDoseInfo, context)
+                                          : null;
+                                      final asNeededDoseInfo =
+                                          _viewModel.getAsNeededDosesInfo(medication.id);
+                                      final todayDosesWidget = (medication
+                                                  .isTakenDosesDateToday &&
+                                              (medication.takenDosesToday.isNotEmpty ||
+                                                  medication.skippedDosesToday.isNotEmpty))
+                                          ? _buildTodayDosesSection(medication)
+                                          : null;
 
-                                // Get person names if in mixed view
-                                final personNames = !_viewModel.showPersonTabs
-                                    ? _viewModel
-                                        .getPersonsForMedication(medication.id)
-                                        .map((p) => p.name)
-                                        .toList()
-                                    : null;
+                                      // Get person names if in mixed view
+                                      final personNames = !_viewModel.showPersonTabs
+                                          ? _viewModel
+                                              .getPersonsForMedication(medication.id)
+                                              .map((p) => p.name)
+                                              .toList()
+                                          : null;
 
-                                // Get fasting period for this medication (filtered by selected person)
-                                Map<String, dynamic>? fastingPeriod;
-                                if (_viewModel.showFastingCountdown) {
-                                  // Find fasting period that matches this medication and person
-                                  for (final fp in _viewModel.activeFastingPeriods) {
-                                    if (fp['medicationId'] == medication.id) {
-                                      // If person tabs are enabled, filter by selected person
-                                      if (_viewModel.showPersonTabs) {
-                                        if (_viewModel.selectedPerson != null &&
-                                            fp['personId'] == _viewModel.selectedPerson!.id) {
-                                          fastingPeriod = fp;
-                                          break;
+                                      // Get fasting period for this medication (filtered by selected person)
+                                      Map<String, dynamic>? fastingPeriod;
+                                      if (_viewModel.showFastingCountdown) {
+                                        // Find fasting period that matches this medication and person
+                                        for (final fp in _viewModel.activeFastingPeriods) {
+                                          if (fp['medicationId'] == medication.id) {
+                                            // If person tabs are enabled, filter by selected person
+                                            if (_viewModel.showPersonTabs) {
+                                              if (_viewModel.selectedPerson != null &&
+                                                  fp['personId'] == _viewModel.selectedPerson!.id) {
+                                                fastingPeriod = fp;
+                                                break;
+                                              }
+                                            } else {
+                                              // In mixed view, show first fasting period for this medication
+                                              fastingPeriod = fp;
+                                              break;
+                                            }
+                                          }
                                         }
-                                      } else {
-                                        // In mixed view, show first fasting period for this medication
-                                        fastingPeriod = fp;
-                                        break;
                                       }
-                                    }
-                                  }
-                                }
 
-                                return MedicationCard(
-                                  medication: medication,
-                                  nextDoseInfo: nextDoseInfo,
-                                  nextDoseText: nextDoseText,
-                                  asNeededDoseInfo: asNeededDoseInfo,
-                                  fastingPeriod: fastingPeriod,
-                                  todayDosesWidget: todayDosesWidget,
-                                  personNames: personNames,
-                                  onTap: () => _showDeleteModal(medication),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-        },
+                                      return MedicationCard(
+                                        medication: medication,
+                                        nextDoseInfo: nextDoseInfo,
+                                        nextDoseText: nextDoseText,
+                                        asNeededDoseInfo: asNeededDoseInfo,
+                                        fastingPeriod: fastingPeriod,
+                                        todayDosesWidget: todayDosesWidget,
+                                        personNames: personNames,
+                                        onTap: () => _showDeleteModal(medication),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'medication_list_fab',
@@ -1177,19 +1218,20 @@ class MedicationListScreenState extends State<MedicationListScreen>
 }
 
 /// Widget for displaying active fasting countdowns with dismiss capability
-class _FastingCountdownPanel extends StatefulWidget {
+class _FastingCountdownPanel extends StatelessWidget {
   final List<Map<String, dynamic>> activeFastingPeriods;
+  final Set<String> dismissedPeriods;
+  final Set<String> soundPlayedPeriods;
+  final Function(String key, String personId) onDismissPeriod;
+  final Function(String) onSoundPlayed;
 
   const _FastingCountdownPanel({
     required this.activeFastingPeriods,
+    required this.dismissedPeriods,
+    required this.soundPlayedPeriods,
+    required this.onDismissPeriod,
+    required this.onSoundPlayed,
   });
-
-  @override
-  State<_FastingCountdownPanel> createState() => _FastingCountdownPanelState();
-}
-
-class _FastingCountdownPanelState extends State<_FastingCountdownPanel> {
-  final Set<String> _dismissedPeriods = {};
 
   String _getPeriodKey(Map<String, dynamic> period) {
     // Include end time to make each fasting period unique
@@ -1198,20 +1240,10 @@ class _FastingCountdownPanelState extends State<_FastingCountdownPanel> {
   }
 
   @override
-  void didUpdateWidget(_FastingCountdownPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Clean up dismissed periods that are no longer in the active list
-    final currentKeys = widget.activeFastingPeriods
-        .map((p) => _getPeriodKey(p))
-        .toSet();
-    _dismissedPeriods.removeWhere((key) => !currentKeys.contains(key));
-  }
-
-  @override
   Widget build(BuildContext context) {
     // Filter out dismissed periods
-    final visiblePeriods = widget.activeFastingPeriods
-        .where((period) => !_dismissedPeriods.contains(_getPeriodKey(period)))
+    final visiblePeriods = activeFastingPeriods
+        .where((period) => !dismissedPeriods.contains(_getPeriodKey(period)))
         .toList();
 
     if (visiblePeriods.isEmpty) {
@@ -1253,17 +1285,18 @@ class _FastingCountdownPanelState extends State<_FastingCountdownPanel> {
           ),
           ...List.generate(visiblePeriods.length, (index) {
             final fasting = visiblePeriods[index];
+            final periodKey = _getPeriodKey(fasting);
+            final personId = fasting['personId'] as String;
             return _FastingCountdownRow(
               personName: fasting['personName'] as String,
               personIsDefault: fasting['personIsDefault'] as bool,
               medicationName: fasting['medicationName'] as String,
               fastingEndTime: fasting['fastingEndTime'] as DateTime,
               isLast: index == visiblePeriods.length - 1,
-              onDismiss: () {
-                setState(() {
-                  _dismissedPeriods.add(_getPeriodKey(fasting));
-                });
-              },
+              periodKey: periodKey,
+              soundAlreadyPlayed: soundPlayedPeriods.contains(periodKey),
+              onSoundPlayed: () => onSoundPlayed(periodKey),
+              onDismiss: () => onDismissPeriod(periodKey, personId),
             );
           }),
         ],
@@ -1273,12 +1306,15 @@ class _FastingCountdownPanelState extends State<_FastingCountdownPanel> {
 }
 
 /// Individual row for fasting countdown with dismiss button
-class _FastingCountdownRow extends StatelessWidget {
+class _FastingCountdownRow extends StatefulWidget {
   final String personName;
   final bool personIsDefault;
   final String medicationName;
   final DateTime fastingEndTime;
   final bool isLast;
+  final String periodKey;
+  final bool soundAlreadyPlayed;
+  final VoidCallback onSoundPlayed;
   final VoidCallback onDismiss;
 
   const _FastingCountdownRow({
@@ -1287,8 +1323,28 @@ class _FastingCountdownRow extends StatelessWidget {
     required this.medicationName,
     required this.fastingEndTime,
     required this.isLast,
+    required this.periodKey,
+    required this.soundAlreadyPlayed,
+    required this.onSoundPlayed,
     required this.onDismiss,
   });
+
+  @override
+  State<_FastingCountdownRow> createState() => _FastingCountdownRowState();
+}
+
+class _FastingCountdownRowState extends State<_FastingCountdownRow> {
+  bool _soundTriggered = false;
+  bool? _wasFinishedOnInit;
+
+  @override
+  void initState() {
+    super.initState();
+    // Record if fasting was already finished when widget was created
+    final now = DateTime.now();
+    final remaining = widget.fastingEndTime.difference(now);
+    _wasFinishedOnInit = remaining.inSeconds <= 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1296,15 +1352,24 @@ class _FastingCountdownRow extends StatelessWidget {
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {
         final now = DateTime.now();
-        final remaining = fastingEndTime.difference(now);
+        final remaining = widget.fastingEndTime.difference(now);
         final isFinished = remaining.inSeconds <= 0;
 
-        // Check if fasting just finished (within last 5 seconds) to show alert
-        if (isFinished && remaining.inSeconds >= -5) {
-          // Show vibration/sound alert when fasting ends
+        // Play sound only if:
+        // 1. Fasting just finished (isFinished = true)
+        // 2. Sound not already played globally
+        // 3. Sound not triggered locally in this widget instance
+        // 4. Fasting was NOT already finished when widget was created (prevents sound on app open/tab change)
+        if (isFinished &&
+            !widget.soundAlreadyPlayed &&
+            !_soundTriggered &&
+            _wasFinishedOnInit == false) {
+          _soundTriggered = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             // Play system notification sound
             NotificationService.instance.playFastingCompletedSound();
+            // Mark as played
+            widget.onSoundPlayed();
           });
         }
 
@@ -1330,9 +1395,9 @@ class _FastingCountdownRow extends StatelessWidget {
         }
 
         return Container(
-          padding: EdgeInsets.fromLTRB(16, 8, 16, isLast ? 12 : 8),
+          padding: EdgeInsets.fromLTRB(16, 8, 16, widget.isLast ? 12 : 8),
           decoration: BoxDecoration(
-            border: isLast
+            border: widget.isLast
                 ? null
                 : Border(
                     bottom: BorderSide(
@@ -1347,7 +1412,7 @@ class _FastingCountdownRow extends StatelessWidget {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: personIsDefault
+                  color: widget.personIsDefault
                       ? (isFinished
                           ? Colors.green
                           : Theme.of(context).colorScheme.primary)
@@ -1360,7 +1425,7 @@ class _FastingCountdownRow extends StatelessWidget {
                   child: isFinished
                       ? const Icon(Icons.check, color: Colors.white, size: 20)
                       : Text(
-                          personName[0].toUpperCase(),
+                          widget.personName[0].toUpperCase(),
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -1375,13 +1440,13 @@ class _FastingCountdownRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      personName,
+                      widget.personName,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                     ),
                     Text(
-                      medicationName,
+                      widget.medicationName,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Colors.grey[600],
                           ),
@@ -1414,7 +1479,7 @@ class _FastingCountdownRow extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: onDismiss,
+                        onTap: widget.onDismiss,
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(

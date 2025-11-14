@@ -254,11 +254,11 @@ abstract class AppLocalizations {
   /// **'Cápsula'**
   String get medicationTypeCapsule;
 
-  /// No description provided for @medicationTypeTablet.
+  /// No description provided for @medicationTypeInjection.
   ///
   /// In es, this message translates to:
-  /// **'Comprimido'**
-  String get medicationTypeTablet;
+  /// **'Inyección'**
+  String get medicationTypeInjection;
 
   /// No description provided for @medicationTypeSyrup.
   ///
@@ -266,23 +266,17 @@ abstract class AppLocalizations {
   /// **'Jarabe'**
   String get medicationTypeSyrup;
 
-  /// No description provided for @medicationTypeDrops.
+  /// No description provided for @medicationTypeOvule.
   ///
   /// In es, this message translates to:
-  /// **'Gotas'**
-  String get medicationTypeDrops;
+  /// **'Óvulo'**
+  String get medicationTypeOvule;
 
-  /// No description provided for @medicationTypeInjection.
+  /// No description provided for @medicationTypeSuppository.
   ///
   /// In es, this message translates to:
-  /// **'Inyección'**
-  String get medicationTypeInjection;
-
-  /// No description provided for @medicationTypePatch.
-  ///
-  /// In es, this message translates to:
-  /// **'Parche'**
-  String get medicationTypePatch;
+  /// **'Supositorio'**
+  String get medicationTypeSuppository;
 
   /// No description provided for @medicationTypeInhaler.
   ///
@@ -290,11 +284,41 @@ abstract class AppLocalizations {
   /// **'Inhalador'**
   String get medicationTypeInhaler;
 
-  /// No description provided for @medicationTypeCream.
+  /// No description provided for @medicationTypeSachet.
   ///
   /// In es, this message translates to:
-  /// **'Crema'**
-  String get medicationTypeCream;
+  /// **'Sobre'**
+  String get medicationTypeSachet;
+
+  /// No description provided for @medicationTypeSpray.
+  ///
+  /// In es, this message translates to:
+  /// **'Spray'**
+  String get medicationTypeSpray;
+
+  /// No description provided for @medicationTypeOintment.
+  ///
+  /// In es, this message translates to:
+  /// **'Pomada'**
+  String get medicationTypeOintment;
+
+  /// No description provided for @medicationTypeLotion.
+  ///
+  /// In es, this message translates to:
+  /// **'Loción'**
+  String get medicationTypeLotion;
+
+  /// No description provided for @medicationTypeBandage.
+  ///
+  /// In es, this message translates to:
+  /// **'Apósito'**
+  String get medicationTypeBandage;
+
+  /// No description provided for @medicationTypeDrops.
+  ///
+  /// In es, this message translates to:
+  /// **'Gota'**
+  String get medicationTypeDrops;
 
   /// No description provided for @medicationTypeOther.
   ///

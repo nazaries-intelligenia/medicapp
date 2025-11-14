@@ -103,7 +103,7 @@ void main() {
       expect(find.text('Por favor, ingresa cantidades válidas (mayores a 0)'), findsOneWidget);
     });
 
-    testWidgets('should accept negative quantities in text field but reject on save', (WidgetTester tester) async {
+    testWidgets('should prevent entering negative quantities with input formatter', (WidgetTester tester) async {
       final medication = MedicationBuilder()
           .withId('test-med-5')
           .build();
@@ -112,17 +112,17 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Enter negative quantity
+      // Try to enter negative quantity - the formatter should block the "-" character
       final quantityFields = find.byType(TextField);
       await tester.enterText(quantityFields.first, '-1');
       await tester.pump();
 
-      // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
-      await tester.pump();
+      // The field should remain empty or only have "1" (without the minus sign)
+      final textField = tester.widget<TextField>(quantityFields.first);
+      final text = textField.controller?.text ?? '';
 
-      // Should show validation error
-      expect(find.text('Por favor, ingresa cantidades válidas (mayores a 0)'), findsOneWidget);
+      // The formatter blocks "-", so text should either be empty or "1"
+      expect(text.contains('-'), isFalse, reason: 'Negative sign should be blocked by input formatter');
     });
 
     testWidgets('should accept empty quantities in text field but reject on save', (WidgetTester tester) async {
@@ -145,6 +145,71 @@ void main() {
 
       // Should show validation error
       expect(find.text('Por favor, ingresa cantidades válidas (mayores a 0)'), findsOneWidget);
+    });
+
+    testWidgets('should accept comma as decimal separator', (WidgetTester tester) async {
+      final medication = MedicationBuilder()
+          .withId('test-med-7')
+          .build();
+
+      await pumpScreen(tester, EditScheduleScreen(medication: medication));
+
+      await tester.pumpAndSettle();
+
+      // Enter quantity with comma as decimal separator
+      final quantityFields = find.byType(TextField);
+      await tester.enterText(quantityFields.first, '2,5');
+      await tester.pump();
+
+      // The field should accept the comma
+      final textField = tester.widget<TextField>(quantityFields.first);
+      final text = textField.controller?.text ?? '';
+      expect(text, '2,5', reason: 'Comma should be accepted as decimal separator');
+    });
+
+    testWidgets('should accept dot as decimal separator', (WidgetTester tester) async {
+      final medication = MedicationBuilder()
+          .withId('test-med-8')
+          .build();
+
+      await pumpScreen(tester, EditScheduleScreen(medication: medication));
+
+      await tester.pumpAndSettle();
+
+      // Enter quantity with dot as decimal separator
+      final quantityFields = find.byType(TextField);
+      await tester.enterText(quantityFields.first, '2.5');
+      await tester.pump();
+
+      // The field should accept the dot
+      final textField = tester.widget<TextField>(quantityFields.first);
+      final text = textField.controller?.text ?? '';
+      expect(text, '2.5', reason: 'Dot should be accepted as decimal separator');
+    });
+
+    testWidgets('should prevent entering multiple decimal separators', (WidgetTester tester) async {
+      final medication = MedicationBuilder()
+          .withId('test-med-9')
+          .build();
+
+      await pumpScreen(tester, EditScheduleScreen(medication: medication));
+
+      await tester.pumpAndSettle();
+
+      // Try to enter multiple decimal separators
+      final quantityFields = find.byType(TextField);
+      await tester.enterText(quantityFields.first, '2,5,3');
+      await tester.pump();
+
+      // The field should reject the second decimal separator
+      final textField = tester.widget<TextField>(quantityFields.first);
+      final text = textField.controller?.text ?? '';
+
+      // Should only have one decimal separator
+      final commaCount = ','.allMatches(text).length;
+      final dotCount = '.'.allMatches(text).length;
+      expect(commaCount + dotCount, lessThanOrEqualTo(1),
+        reason: 'Only one decimal separator should be allowed');
     });
   });
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
+import '../../../utils/number_utils.dart';
 
 class RefillInputDialog {
   static Future<double?> show(
@@ -76,6 +77,9 @@ class RefillInputDialog {
                   ),
                   textAlign: TextAlign.center,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: [
+                    LocalizedDecimalInputFormatter(decimalDigits: 2),
+                  ],
                   autofocus: true,
                 ),
               ],
@@ -88,7 +92,7 @@ class RefillInputDialog {
             ),
             FilledButton(
               onPressed: () {
-                final amount = double.tryParse(refillController.text.trim());
+                final amount = NumberUtils.parseLocalizedDouble(refillController.text.trim());
                 if (amount != null && amount > 0) {
                   Navigator.pop(dialogContext, amount);
                 }

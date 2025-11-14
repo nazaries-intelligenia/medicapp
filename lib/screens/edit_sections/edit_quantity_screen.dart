@@ -4,6 +4,7 @@ import '../../models/medication.dart';
 import '../../database/database_helper.dart';
 import 'edit_quantity/widgets/quantity_form_card.dart';
 import '../../widgets/action_buttons.dart';
+import '../../utils/number_utils.dart';
 
 /// Pantalla para editar la cantidad disponible y umbral de bajo stock
 class EditQuantityScreen extends StatefulWidget {
@@ -63,7 +64,7 @@ class _EditQuantityScreenState extends State<EditQuantityScreen> {
         weeklyDays: widget.medication.weeklyDays,
         dayInterval: widget.medication.dayInterval,
         doseSchedule: widget.medication.doseSchedule,
-        stockQuantity: double.tryParse(_stockController.text) ?? 0,
+        stockQuantity: NumberUtils.parseLocalizedDouble(_stockController.text) ?? 0,
         takenDosesToday: widget.medication.takenDosesToday,
         skippedDosesToday: widget.medication.skippedDosesToday,
         takenDosesDate: widget.medication.takenDosesDate,

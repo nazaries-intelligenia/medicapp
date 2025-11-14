@@ -7,6 +7,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:android_intent_plus/android_intent.dart';
 import '../models/medication.dart';
 import '../models/treatment_duration_type.dart';
+import '../models/dose_history_entry.dart';
 import '../screens/dose_action_screen.dart';
 import '../database/database_helper.dart';
 import '../main.dart' show navigatorKey;
@@ -294,6 +295,7 @@ class NotificationService {
   /// Handle notification tap
   void _onNotificationTapped(fln.NotificationResponse response) async {
     print('Notification tapped: ${response.payload}');
+    print('Action ID: ${response.actionId}');
 
     if (response.payload == null || response.payload!.isEmpty) {
       print('No payload in notification');
@@ -310,6 +312,18 @@ class NotificationService {
     final medicationId = parts[0];
     final doseIndexStr = parts[1];
     final personId = parts[2];
+
+    // Handle quick actions (register, skip, snooze)
+    if (response.actionId != null && response.actionId!.isNotEmpty) {
+      await _handleNotificationAction(
+        actionId: response.actionId!,
+        medicationId: medicationId,
+        doseIndexStr: doseIndexStr,
+        personId: personId,
+        notificationId: response.id ?? 0,
+      );
+      return; // Don't navigate to the screen if an action was pressed
+    }
 
     // For postponed notifications, the format is "medicationId|doseTime"
     // where doseTime is the actual time string (HH:mm)
@@ -383,6 +397,240 @@ class NotificationService {
 
     // Try to navigate with retry logic (V19+: now includes personId)
     await _navigateWithRetry(medicationId, doseTime, personId);
+  }
+
+  /// Handle notification action (register, skip, snooze)
+  Future<void> _handleNotificationAction({
+    required String actionId,
+    required String medicationId,
+    required String doseIndexStr,
+    required String personId,
+    required int notificationId,
+  }) async {
+    print('🎯 Handling action: $actionId for medication $medicationId');
+
+    try {
+      // Get medication and dose time
+      final medications = await DatabaseHelper.instance.getMedicationsForPerson(personId);
+      final medication = medications.where((m) => m.id == medicationId).firstOrNull;
+
+      if (medication == null) {
+        print('❌ Medication not found');
+        await _notificationsPlugin.cancel(notificationId);
+        return;
+      }
+
+      // Parse dose index or time
+      String doseTime;
+      if (doseIndexStr.contains(':')) {
+        doseTime = doseIndexStr; // Already a time string
+      } else {
+        final doseIndex = int.tryParse(doseIndexStr);
+        if (doseIndex == null || doseIndex >= medication.doseTimes.length) {
+          print('❌ Invalid dose index');
+          return;
+        }
+        doseTime = medication.doseTimes[doseIndex];
+      }
+
+      switch (actionId) {
+        case 'register_dose':
+          await _registerDoseFromNotification(medication, doseTime, personId, notificationId);
+          break;
+        case 'skip_dose':
+          await _skipDoseFromNotification(medication, doseTime, personId, notificationId);
+          break;
+        case 'snooze_dose':
+          await _snoozeDoseNotification(medication, doseTime, personId, notificationId);
+          break;
+        default:
+          print('⚠️  Unknown action: $actionId');
+      }
+    } catch (e) {
+      print('❌ Error handling notification action: $e');
+    }
+  }
+
+  /// Register dose from notification action
+  Future<void> _registerDoseFromNotification(
+    Medication medication,
+    String doseTime,
+    String personId,
+    int notificationId,
+  ) async {
+    print('✅ Registering dose for ${medication.name} at $doseTime');
+
+    try {
+      final doseQuantity = medication.getDoseQuantity(doseTime);
+
+      // Check if there's enough stock
+      if (medication.stockQuantity < doseQuantity) {
+        print('⚠️  Insufficient stock');
+        // TODO: Show a notification about insufficient stock
+        return;
+      }
+
+      // Update medication
+      final updatedTakenDoses = List<String>.from(medication.takenDosesToday);
+      if (!updatedTakenDoses.contains(doseTime)) {
+        updatedTakenDoses.add(doseTime);
+      }
+
+      final updatedSkippedDoses = List<String>.from(medication.skippedDosesToday);
+      updatedSkippedDoses.remove(doseTime);
+
+      final updatedMedication = medication.copyWith(
+        stockQuantity: medication.stockQuantity - doseQuantity,
+        takenDosesToday: updatedTakenDoses,
+        skippedDosesToday: updatedSkippedDoses,
+        takenDosesDate: DateTime.now().toDateString(),
+      );
+
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: personId,
+      );
+
+      // Create history entry
+      final now = DateTime.now();
+      final scheduledDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(doseTime.split(':')[0]),
+        int.parse(doseTime.split(':')[1]),
+      );
+
+      final historyEntry = DoseHistoryEntry(
+        id: '${medication.id}_${now.millisecondsSinceEpoch}',
+        medicationId: medication.id,
+        medicationName: medication.name,
+        medicationType: medication.type,
+        personId: personId,
+        scheduledDateTime: scheduledDateTime,
+        registeredDateTime: now,
+        status: DoseStatus.taken,
+        quantity: doseQuantity,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(historyEntry);
+
+      // Cancel notification
+      await _notificationsPlugin.cancel(notificationId);
+
+      // Schedule fasting notification if needed
+      if (medication.requiresFasting && medication.fastingType == 'after') {
+        await _fastingScheduler.scheduleDynamicFastingNotification(
+          medication: medication,
+          actualDoseTime: now,
+          personId: personId,
+        );
+      }
+
+      print('✅ Dose registered successfully');
+    } catch (e) {
+      print('❌ Error registering dose: $e');
+    }
+  }
+
+  /// Skip dose from notification action
+  Future<void> _skipDoseFromNotification(
+    Medication medication,
+    String doseTime,
+    String personId,
+    int notificationId,
+  ) async {
+    print('⏭️  Skipping dose for ${medication.name} at $doseTime');
+
+    try {
+      // Update medication
+      final updatedSkippedDoses = List<String>.from(medication.skippedDosesToday);
+      if (!updatedSkippedDoses.contains(doseTime)) {
+        updatedSkippedDoses.add(doseTime);
+      }
+
+      final updatedTakenDoses = List<String>.from(medication.takenDosesToday);
+      updatedTakenDoses.remove(doseTime);
+
+      final updatedMedication = medication.copyWith(
+        skippedDosesToday: updatedSkippedDoses,
+        takenDosesToday: updatedTakenDoses,
+        takenDosesDate: DateTime.now().toDateString(),
+      );
+
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: personId,
+      );
+
+      // Create history entry
+      final now = DateTime.now();
+      final scheduledDateTime = DateTime(
+        now.year,
+        now.month,
+        now.day,
+        int.parse(doseTime.split(':')[0]),
+        int.parse(doseTime.split(':')[1]),
+      );
+
+      final historyEntry = DoseHistoryEntry(
+        id: '${medication.id}_${now.millisecondsSinceEpoch}',
+        medicationId: medication.id,
+        medicationName: medication.name,
+        medicationType: medication.type,
+        personId: personId,
+        scheduledDateTime: scheduledDateTime,
+        registeredDateTime: now,
+        status: DoseStatus.skipped,
+        quantity: 0.0,
+      );
+
+      await DatabaseHelper.instance.insertDoseHistory(historyEntry);
+
+      // Cancel notification
+      await _notificationsPlugin.cancel(notificationId);
+
+      print('✅ Dose skipped successfully');
+    } catch (e) {
+      print('❌ Error skipping dose: $e');
+    }
+  }
+
+  /// Snooze notification for 10 minutes
+  Future<void> _snoozeDoseNotification(
+    Medication medication,
+    String doseTime,
+    String personId,
+    int notificationId,
+  ) async {
+    print('⏰ Snoozing notification for ${medication.name} at $doseTime');
+
+    try {
+      // Cancel current notification
+      await _notificationsPlugin.cancel(notificationId);
+
+      // Schedule new notification in 10 minutes
+      final snoozeTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 10));
+
+      final person = await DatabaseHelper.instance.getPerson(personId);
+      final isDefault = person?.isDefault ?? false;
+
+      final notificationDetails = NotificationConfig.getNotificationDetails();
+
+      await _notificationsPlugin.zonedSchedule(
+        notificationId, // Reuse same ID
+        NotificationConfig.buildNotificationTitle(person?.name, isDefault),
+        '${medication.name} - ${medication.type.displayName}',
+        snoozeTime,
+        notificationDetails,
+        androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
+        payload: '${medication.id}|$doseTime|$personId', // Use actual time instead of index
+      );
+
+      print('✅ Notification snoozed until ${snoozeTime.toString()}');
+    } catch (e) {
+      print('❌ Error snoozing notification: $e');
+    }
   }
 
   /// Navigate to DoseActionScreen with retry logic for when app is starting

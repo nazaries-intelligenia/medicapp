@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../../../models/medication_type.dart';
+import '../../../../utils/number_utils.dart';
 
 class QuantityFormCard extends StatelessWidget {
   final TextEditingController stockController;
@@ -97,12 +98,15 @@ class QuantityFormCard extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [
+                LocalizedDecimalInputFormatter(decimalDigits: 2),
+              ],
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return l10n.editQuantityValidationRequired;
                 }
 
-                final quantity = double.tryParse(value.trim());
+                final quantity = NumberUtils.parseLocalizedDouble(value.trim());
                 if (quantity == null || quantity < 0) {
                   return l10n.editQuantityValidationMin;
                 }
