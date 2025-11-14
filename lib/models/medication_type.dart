@@ -11,7 +11,10 @@ enum MedicationType {
   sachet,
   spray,
   ointment,
-  lotion;
+  lotion,
+  bandage,
+  drops,
+  other;
 
   String get displayName {
     switch (this) {
@@ -37,6 +40,12 @@ enum MedicationType {
         return 'Pomada';
       case MedicationType.lotion:
         return 'Loción';
+      case MedicationType.bandage:
+        return 'Apósito';
+      case MedicationType.drops:
+        return 'Gota';
+      case MedicationType.other:
+        return 'Otro';
     }
   }
 
@@ -64,6 +73,12 @@ enum MedicationType {
         return Icons.opacity;
       case MedicationType.lotion:
         return Icons.water;
+      case MedicationType.bandage:
+        return Icons.healing;
+      case MedicationType.drops:
+        return Icons.invert_colors;
+      case MedicationType.other:
+        return Icons.category;
     }
   }
 
@@ -92,6 +107,12 @@ enum MedicationType {
         return Colors.green;
       case MedicationType.lotion:
         return Colors.indigo;
+      case MedicationType.bandage:
+        return Colors.amber;
+      case MedicationType.drops:
+        return Colors.blueGrey;
+      case MedicationType.other:
+        return Colors.grey;
     }
   }
 
@@ -120,6 +141,12 @@ enum MedicationType {
         return 'gramos';
       case MedicationType.lotion:
         return 'ml';
+      case MedicationType.bandage:
+        return 'apósitos';
+      case MedicationType.drops:
+        return 'gotas';
+      case MedicationType.other:
+        return 'unidades';
     }
   }
 
@@ -148,6 +175,12 @@ enum MedicationType {
         return 'gramo';
       case MedicationType.lotion:
         return 'ml';
+      case MedicationType.bandage:
+        return 'apósito';
+      case MedicationType.drops:
+        return 'gota';
+      case MedicationType.other:
+        return 'unidad';
     }
   }
 }
