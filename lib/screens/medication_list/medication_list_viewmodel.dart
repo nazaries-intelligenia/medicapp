@@ -917,9 +917,22 @@ class MedicationListViewModel extends ChangeNotifier {
       skippedDosesToday: skippedDoses,
     );
 
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
+    // Get person for updates (use selected person or default)
+    final defaultPerson =
+        _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
 
-    // Delete from history
+    // Update in database (use person-specific update method)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    } else {
+      await DatabaseHelper.instance.updateMedication(updatedMedication);
+    }
+
+    // Delete from history (filter by personId to ensure we delete the correct entry)
     final now = DateTime.now();
     final scheduledDateTime = DateTime(
       now.year,
@@ -936,7 +949,8 @@ class MedicationListViewModel extends ChangeNotifier {
           entry.scheduledDateTime.month == scheduledDateTime.month &&
           entry.scheduledDateTime.day == scheduledDateTime.day &&
           entry.scheduledDateTime.hour == scheduledDateTime.hour &&
-          entry.scheduledDateTime.minute == scheduledDateTime.minute) {
+          entry.scheduledDateTime.minute == scheduledDateTime.minute &&
+          entry.personId == personId) {  // Filter by personId
         await DatabaseHelper.instance.deleteDoseHistory(entry.id);
         break;
       }
@@ -1008,9 +1022,22 @@ class MedicationListViewModel extends ChangeNotifier {
       skippedDosesToday: skippedDoses,
     );
 
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
+    // Get person for updates (use selected person or default)
+    final defaultPerson =
+        _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
+    final personId = defaultPerson?.id ?? '';
 
-    // Update history entry
+    // Update in database (use person-specific update method)
+    if (defaultPerson != null) {
+      await DatabaseHelper.instance.updateMedicationForPerson(
+        medication: updatedMedication,
+        personId: defaultPerson.id,
+      );
+    } else {
+      await DatabaseHelper.instance.updateMedication(updatedMedication);
+    }
+
+    // Update history entry (filter by personId to ensure we update the correct entry)
     final now = DateTime.now();
     final scheduledDateTime = DateTime(
       now.year,
@@ -1027,7 +1054,8 @@ class MedicationListViewModel extends ChangeNotifier {
           entry.scheduledDateTime.month == scheduledDateTime.month &&
           entry.scheduledDateTime.day == scheduledDateTime.day &&
           entry.scheduledDateTime.hour == scheduledDateTime.hour &&
-          entry.scheduledDateTime.minute == scheduledDateTime.minute) {
+          entry.scheduledDateTime.minute == scheduledDateTime.minute &&
+          entry.personId == personId) {  // Filter by personId
         final updatedEntry = entry.copyWith(
           status: wasTaken ? DoseStatus.skipped : DoseStatus.taken,
           registeredDateTime: DateTime.now(),
