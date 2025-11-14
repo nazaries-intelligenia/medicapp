@@ -41,6 +41,31 @@ class NotificationConfig {
     }
   }
 
+  /// Get Android notification details specifically for fasting completion alerts
+  /// These should have maximum priority and sound to ensure user sees them
+  static fln.AndroidNotificationDetails getFastingCompletionAndroidDetails() {
+    return const fln.AndroidNotificationDetails(
+      'fasting_completion', // Unique channel ID for fasting alerts
+      'Alertas de fin de ayuno',
+      channelDescription: 'Notificaciones importantes cuando termina el período de ayuno',
+      importance: fln.Importance.max,  // Maximum importance
+      priority: fln.Priority.max,      // Maximum priority
+      ticker: 'Fin del ayuno',
+      icon: '@drawable/ic_notification',
+      enableVibration: true,
+      playSound: true,
+      autoCancel: true,  // Auto-dismiss when tapped
+    );
+  }
+
+  /// Get NotificationDetails specifically for fasting completion notifications
+  static fln.NotificationDetails getFastingCompletionDetails() {
+    return fln.NotificationDetails(
+      android: getFastingCompletionAndroidDetails(),
+      iOS: getDarwinNotificationDetails(),
+    );
+  }
+
   /// Create standard NotificationDetails for regular notifications
   static fln.NotificationDetails getNotificationDetails({bool autoCancel = false}) {
     return fln.NotificationDetails(

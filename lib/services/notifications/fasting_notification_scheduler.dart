@@ -241,6 +241,7 @@ class FastingNotificationScheduler {
       body: body,
       scheduledDate: scheduledDate,
       payload: '${medication.id}|fasting-dynamic|$personId',
+      isFastingCompletion: true,  // Use high-priority channel for fasting alerts
     );
 
     print('Successfully scheduled dynamic fasting notification');
@@ -448,11 +449,15 @@ class FastingNotificationScheduler {
     required String body,
     required tz.TZDateTime scheduledDate,
     String? payload,
+    bool isFastingCompletion = false,
   }) async {
     // Skip in test mode
     if (_isTestMode) return;
 
-    final notificationDetails = NotificationConfig.getNotificationDetails();
+    // Use special configuration for fasting completion notifications
+    final notificationDetails = isFastingCompletion
+        ? NotificationConfig.getFastingCompletionDetails()
+        : NotificationConfig.getNotificationDetails();
 
     print('Scheduling one-time notification ID $id for $scheduledDate');
 
