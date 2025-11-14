@@ -1331,6 +1331,16 @@ class _FastingCountdownRow extends StatefulWidget {
 
 class _FastingCountdownRowState extends State<_FastingCountdownRow> {
   bool _soundTriggered = false;
+  bool? _wasFinishedOnInit;
+
+  @override
+  void initState() {
+    super.initState();
+    // Record if fasting was already finished when widget was created
+    final now = DateTime.now();
+    final remaining = widget.fastingEndTime.difference(now);
+    _wasFinishedOnInit = remaining.inSeconds <= 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1341,8 +1351,15 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
         final remaining = widget.fastingEndTime.difference(now);
         final isFinished = remaining.inSeconds <= 0;
 
-        // Play sound only once when fasting finishes
-        if (isFinished && !widget.soundAlreadyPlayed && !_soundTriggered) {
+        // Play sound only if:
+        // 1. Fasting just finished (isFinished = true)
+        // 2. Sound not already played globally
+        // 3. Sound not triggered locally in this widget instance
+        // 4. Fasting was NOT already finished when widget was created (prevents sound on app open/tab change)
+        if (isFinished &&
+            !widget.soundAlreadyPlayed &&
+            !_soundTriggered &&
+            _wasFinishedOnInit == false) {
           _soundTriggered = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
             // Play system notification sound
