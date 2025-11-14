@@ -4,7 +4,33 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart' as
 class NotificationConfig {
   /// Get standard Android notification details for medication reminders
   /// Pass [autoCancel] = true to auto-cancel the notification after user taps
-  static fln.AndroidNotificationDetails getAndroidNotificationDetails({bool autoCancel = false}) {
+  /// Pass [includeActions] = true to include quick actions (Register, Skip, Snooze)
+  static fln.AndroidNotificationDetails getAndroidNotificationDetails({
+    bool autoCancel = false,
+    bool includeActions = true,
+  }) {
+    // Define notification actions
+    final actions = includeActions ? <fln.AndroidNotificationAction>[
+      const fln.AndroidNotificationAction(
+        'register_dose',
+        'Registrar',
+        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
+        showsUserInterface: false,
+      ),
+      const fln.AndroidNotificationAction(
+        'skip_dose',
+        'No tomada',
+        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
+        showsUserInterface: false,
+      ),
+      const fln.AndroidNotificationAction(
+        'snooze_dose',
+        'Posponer 10min',
+        icon: fln.DrawableResourceAndroidIcon('@drawable/ic_notification'),
+        showsUserInterface: false,
+      ),
+    ] : null;
+
     return fln.AndroidNotificationDetails(
       'medication_reminders', // channel ID
       'Recordatorios de Medicamentos', // channel name
@@ -16,6 +42,7 @@ class NotificationConfig {
       enableVibration: true,
       playSound: true,
       autoCancel: autoCancel,
+      actions: actions,
     );
   }
 
