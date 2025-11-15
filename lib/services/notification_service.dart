@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart'
+    as fln;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -43,16 +44,32 @@ class NotificationService {
 
   NotificationService._init() {
     // Initialize specialized services
-    _dailyScheduler = DailyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _weeklyScheduler = WeeklyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _fastingScheduler = FastingNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _cancellationManager = NotificationCancellationManager(_notificationsPlugin, _isTestMode);
+    _dailyScheduler = DailyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _weeklyScheduler = WeeklyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _fastingScheduler = FastingNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _cancellationManager = NotificationCancellationManager(
+      _notificationsPlugin,
+      _isTestMode,
+    );
   }
 
   /// Get standard Android notification details for medication reminders
   /// Pass [autoCancel] = true to auto-cancel the notification after user taps
-  fln.AndroidNotificationDetails _getAndroidNotificationDetails({bool autoCancel = false}) {
-    return NotificationConfig.getAndroidNotificationDetails(autoCancel: autoCancel);
+  fln.AndroidNotificationDetails _getAndroidNotificationDetails({
+    bool autoCancel = false,
+  }) {
+    return NotificationConfig.getAndroidNotificationDetails(
+      autoCancel: autoCancel,
+    );
   }
 
   /// Get standard iOS/Darwin notification details for medication reminders
@@ -67,26 +84,58 @@ class NotificationService {
   void enableTestMode() {
     _isTestMode = true;
     // Recreate specialized services with test mode enabled
-    _dailyScheduler = DailyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _weeklyScheduler = WeeklyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _fastingScheduler = FastingNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _cancellationManager = NotificationCancellationManager(_notificationsPlugin, _isTestMode);
+    _dailyScheduler = DailyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _weeklyScheduler = WeeklyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _fastingScheduler = FastingNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _cancellationManager = NotificationCancellationManager(
+      _notificationsPlugin,
+      _isTestMode,
+    );
   }
 
   /// Disable test mode (enables actual notifications)
   void disableTestMode() {
     _isTestMode = false;
     // Recreate specialized services with test mode disabled
-    _dailyScheduler = DailyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _weeklyScheduler = WeeklyNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _fastingScheduler = FastingNotificationScheduler(_notificationsPlugin, _isTestMode);
-    _cancellationManager = NotificationCancellationManager(_notificationsPlugin, _isTestMode);
+    _dailyScheduler = DailyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _weeklyScheduler = WeeklyNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _fastingScheduler = FastingNotificationScheduler(
+      _notificationsPlugin,
+      _isTestMode,
+    );
+    _cancellationManager = NotificationCancellationManager(
+      _notificationsPlugin,
+      _isTestMode,
+    );
   }
 
   /// Helper method to generate notification title based on person
   /// V19+: Only shows person name in title if person is not the default user
-  String buildNotificationTitle(String? personName, bool isDefault, {String suffix = ''}) {
-    return NotificationConfig.buildNotificationTitle(personName, isDefault, suffix: suffix);
+  String buildNotificationTitle(
+    String? personName,
+    bool isDefault, {
+    String suffix = '',
+  }) {
+    return NotificationConfig.buildNotificationTitle(
+      personName,
+      isDefault,
+      suffix: suffix,
+    );
   }
 
   /// Initialize the notification service
@@ -116,7 +165,9 @@ class NotificationService {
     }
 
     // Android initialization settings
-    const androidSettings = fln.AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = fln.AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     // iOS initialization settings
     const iOSSettings = fln.DarwinInitializationSettings(
@@ -136,6 +187,67 @@ class NotificationService {
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
+
+    // Create notification channels explicitly (Android 8.0+)
+    await _createNotificationChannels();
+  }
+
+  /// Create Android notification channels explicitly with actions configured
+  /// This ensures that notification actions work correctly on Android 8.0+ (API 26+)
+  Future<void> _createNotificationChannels() async {
+    final androidPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
+
+    if (androidPlugin != null) {
+      // Define the actions that will be available on notifications
+      const actions = <fln.AndroidNotificationAction>[
+        fln.AndroidNotificationAction(
+          'register_dose',
+          'Registrar',
+          showsUserInterface: false,
+        ),
+        fln.AndroidNotificationAction(
+          'skip_dose',
+          'No tomada',
+          showsUserInterface: false,
+        ),
+        fln.AndroidNotificationAction(
+          'snooze_dose',
+          'Posponer 10min',
+          showsUserInterface: false,
+        ),
+      ];
+
+      // Create medication reminders channel with actions
+      const medicationChannel = fln.AndroidNotificationChannel(
+        'medication_reminders', // Must match the channel ID in NotificationConfig
+        'Recordatorios de Medicamentos',
+        description: 'Notificaciones para recordarte tomar tus medicamentos',
+        importance: fln.Importance.high,
+        playSound: true,
+        enableVibration: true,
+        actions: actions, // Enable actions on this channel
+      );
+
+      // Create fasting completion channel (no actions needed)
+      const fastingChannel = fln.AndroidNotificationChannel(
+        'fasting_completion',
+        'Alertas de fin de ayuno',
+        description:
+            'Notificaciones importantes cuando termina el período de ayuno',
+        importance: fln.Importance.max,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      // Create both channels
+      await androidPlugin.createNotificationChannel(medicationChannel);
+      await androidPlugin.createNotificationChannel(fastingChannel);
+
+      print('✅ Notification channels created successfully with actions');
+    }
   }
 
   /// Request notification permissions (especially important for iOS and Android 13+)
@@ -146,8 +258,10 @@ class NotificationService {
     bool granted = true;
 
     // For Android 13+ (API level 33+)
-    final androidPlugin = _notificationsPlugin.resolvePlatformSpecificImplementation<
-        fln.AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidPlugin != null) {
       final result = await androidPlugin.requestNotificationsPermission();
@@ -156,8 +270,10 @@ class NotificationService {
     }
 
     // For iOS
-    final iOSPlugin = _notificationsPlugin.resolvePlatformSpecificImplementation<
-        fln.IOSFlutterLocalNotificationsPlugin>();
+    final iOSPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.IOSFlutterLocalNotificationsPlugin
+        >();
 
     if (iOSPlugin != null) {
       final result = await iOSPlugin.requestPermissions(
@@ -178,8 +294,10 @@ class NotificationService {
     if (_isTestMode) return true;
 
     // For Android
-    final androidPlugin = _notificationsPlugin.resolvePlatformSpecificImplementation<
-        fln.AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidPlugin != null) {
       final result = await androidPlugin.areNotificationsEnabled();
@@ -196,15 +314,18 @@ class NotificationService {
     if (_isTestMode) return true;
 
     // For Android
-    final androidPlugin = _notificationsPlugin.resolvePlatformSpecificImplementation<
-        fln.AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _notificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          fln.AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidPlugin != null) {
       // Try to check if we can schedule exact alarms
       // Note: This API is available in flutter_local_notifications 15.0.0+
       try {
         final result = await androidPlugin.canScheduleExactNotifications();
-        return result ?? true; // Return true if method not available (older Android)
+        return result ??
+            true; // Return true if method not available (older Android)
       } catch (e) {
         print('Error checking exact alarm permission: $e');
         return true; // Assume true if check fails
@@ -344,8 +465,11 @@ class NotificationService {
 
       // Load medication to get the dose time (v19+ person-specific lookup)
       try {
-        final medications = await DatabaseHelper.instance.getMedicationsForPerson(personId);
-        final medication = medications.where((m) => m.id == medicationId).firstOrNull;
+        final medications = await DatabaseHelper.instance
+            .getMedicationsForPerson(personId);
+        final medication = medications
+            .where((m) => m.id == medicationId)
+            .firstOrNull;
 
         if (medication == null) {
           print('⚠️ Medication not found for notification ID ${response.id}');
@@ -356,12 +480,18 @@ class NotificationService {
           doseTime = '00:00';
           print('⚠️ Using dummy time 00:00 - DoseActionScreen will show error');
         } else if (doseIndex >= medication.doseTimes.length) {
-          print('⚠️ Invalid dose index $doseIndex for medication ${medication.name} (has ${medication.doseTimes.length} doses)');
+          print(
+            '⚠️ Invalid dose index $doseIndex for medication ${medication.name} (has ${medication.doseTimes.length} doses)',
+          );
           await _notificationsPlugin.cancel(response.id ?? 0);
           // Use the first dose time as fallback
-          doseTime = medication.doseTimes.isNotEmpty ? medication.doseTimes[0] : '00:00';
+          doseTime = medication.doseTimes.isNotEmpty
+              ? medication.doseTimes[0]
+              : '00:00';
           medicationName = medication.name;
-          print('⚠️ Using fallback time $doseTime - DoseActionScreen will handle it');
+          print(
+            '⚠️ Using fallback time $doseTime - DoseActionScreen will handle it',
+          );
         } else {
           doseTime = medication.doseTimes[doseIndex];
           medicationName = medication.name;
@@ -372,7 +502,9 @@ class NotificationService {
         await _notificationsPlugin.cancel(response.id ?? 0);
         // Still try to navigate with a dummy time
         doseTime = '00:00';
-        print('⚠️ Using dummy time 00:00 due to error - DoseActionScreen will show error');
+        print(
+          '⚠️ Using dummy time 00:00 due to error - DoseActionScreen will show error',
+        );
       }
     }
 
@@ -411,8 +543,12 @@ class NotificationService {
 
     try {
       // Get medication and dose time
-      final medications = await DatabaseHelper.instance.getMedicationsForPerson(personId);
-      final medication = medications.where((m) => m.id == medicationId).firstOrNull;
+      final medications = await DatabaseHelper.instance.getMedicationsForPerson(
+        personId,
+      );
+      final medication = medications
+          .where((m) => m.id == medicationId)
+          .firstOrNull;
 
       if (medication == null) {
         print('❌ Medication not found');
@@ -435,13 +571,28 @@ class NotificationService {
 
       switch (actionId) {
         case 'register_dose':
-          await _registerDoseFromNotification(medication, doseTime, personId, notificationId);
+          await _registerDoseFromNotification(
+            medication,
+            doseTime,
+            personId,
+            notificationId,
+          );
           break;
         case 'skip_dose':
-          await _skipDoseFromNotification(medication, doseTime, personId, notificationId);
+          await _skipDoseFromNotification(
+            medication,
+            doseTime,
+            personId,
+            notificationId,
+          );
           break;
         case 'snooze_dose':
-          await _snoozeDoseNotification(medication, doseTime, personId, notificationId);
+          await _snoozeDoseNotification(
+            medication,
+            doseTime,
+            personId,
+            notificationId,
+          );
           break;
         default:
           print('⚠️  Unknown action: $actionId');
@@ -476,7 +627,9 @@ class NotificationService {
         updatedTakenDoses.add(doseTime);
       }
 
-      final updatedSkippedDoses = List<String>.from(medication.skippedDosesToday);
+      final updatedSkippedDoses = List<String>.from(
+        medication.skippedDosesToday,
+      );
       updatedSkippedDoses.remove(doseTime);
 
       final updatedMedication = medication.copyWith(
@@ -544,7 +697,9 @@ class NotificationService {
 
     try {
       // Update medication
-      final updatedSkippedDoses = List<String>.from(medication.skippedDosesToday);
+      final updatedSkippedDoses = List<String>.from(
+        medication.skippedDosesToday,
+      );
       if (!updatedSkippedDoses.contains(doseTime)) {
         updatedSkippedDoses.add(doseTime);
       }
@@ -610,7 +765,9 @@ class NotificationService {
       await _notificationsPlugin.cancel(notificationId);
 
       // Schedule new notification in 10 minutes
-      final snoozeTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 10));
+      final snoozeTime = tz.TZDateTime.now(
+        tz.local,
+      ).add(const Duration(minutes: 10));
 
       final person = await DatabaseHelper.instance.getPerson(personId);
       final isDefault = person?.isDefault ?? false;
@@ -624,7 +781,8 @@ class NotificationService {
         snoozeTime,
         notificationDetails,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
-        payload: '${medication.id}|$doseTime|$personId', // Use actual time instead of index
+        payload:
+            '${medication.id}|$doseTime|$personId', // Use actual time instead of index
       );
 
       print('✅ Notification snoozed until ${snoozeTime.toString()}');
@@ -635,8 +793,15 @@ class NotificationService {
 
   /// Navigate to DoseActionScreen with retry logic for when app is starting
   /// V19+: Now includes personId parameter
-  Future<void> _navigateWithRetry(String medicationId, String doseTime, String personId, {int attempt = 1}) async {
-    print('📱 Attempting navigation (attempt $attempt) for medication $medicationId at $doseTime');
+  Future<void> _navigateWithRetry(
+    String medicationId,
+    String doseTime,
+    String personId, {
+    int attempt = 1,
+  }) async {
+    print(
+      '📱 Attempting navigation (attempt $attempt) for medication $medicationId at $doseTime',
+    );
 
     final context = navigatorKey.currentContext;
     if (context != null && context.mounted) {
@@ -663,18 +828,29 @@ class NotificationService {
         print('Stack trace: ${StackTrace.current}');
       }
     } else {
-      print('⏳ Context not available yet (context: $context, mounted: ${context?.mounted})');
+      print(
+        '⏳ Context not available yet (context: $context, mounted: ${context?.mounted})',
+      );
     }
 
     // If context is not available, retry with exponential backoff
-    if (attempt <= 10) { // Increased from 5 to 10 attempts
-      final delayMs = 200 * attempt; // Increased delay: 200ms, 400ms, 600ms, ...
+    if (attempt <= 10) {
+      // Increased from 5 to 10 attempts
+      final delayMs =
+          200 * attempt; // Increased delay: 200ms, 400ms, 600ms, ...
       print('⏳ Will retry in ${delayMs}ms (attempt ${attempt + 1} of 10)');
       await Future.delayed(Duration(milliseconds: delayMs));
-      await _navigateWithRetry(medicationId, doseTime, personId, attempt: attempt + 1); // V19+: Pass personId in retry
+      await _navigateWithRetry(
+        medicationId,
+        doseTime,
+        personId,
+        attempt: attempt + 1,
+      ); // V19+: Pass personId in retry
     } else {
       // After 10 attempts, store as pending notification
-      print('⚠️ Failed to navigate after 10 attempts, storing as pending notification');
+      print(
+        '⚠️ Failed to navigate after 10 attempts, storing as pending notification',
+      );
       _pendingMedicationId = medicationId;
       _pendingDoseTime = doseTime;
       _pendingPersonId = personId; // V19+: Store pending personId
@@ -685,8 +861,12 @@ class NotificationService {
   /// Should be called after the app is fully initialized
   /// V19+: Now includes personId handling
   Future<void> processPendingNotification() async {
-    if (_pendingMedicationId != null && _pendingDoseTime != null && _pendingPersonId != null) {
-      print('🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime | $_pendingPersonId');
+    if (_pendingMedicationId != null &&
+        _pendingDoseTime != null &&
+        _pendingPersonId != null) {
+      print(
+        '🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime | $_pendingPersonId',
+      );
 
       final medicationId = _pendingMedicationId!;
       final doseTime = _pendingDoseTime!;
@@ -720,7 +900,9 @@ class NotificationService {
           print('Stack trace: ${StackTrace.current}');
         }
       } else {
-        print('❌ Context still not available for pending notification (context: $context, mounted: ${context?.mounted})');
+        print(
+          '❌ Context still not available for pending notification (context: $context, mounted: ${context?.mounted})',
+        );
         // Try one more time with retry logic
         print('🔄 Attempting to navigate with retry logic...');
         await _navigateWithRetry(medicationId, doseTime, personId, attempt: 1);
@@ -735,9 +917,11 @@ class NotificationService {
   /// If [excludeToday] is true, notifications will not be scheduled for today (useful when a dose was already taken)
   /// If [skipCancellation] is true, skips the automatic cancellation (useful when rescheduling multiple persons)
   Future<void> scheduleMedicationNotifications(
-    Medication medication,
-    {required String personId, bool excludeToday = false, bool skipCancellation = false}
-  ) async {
+    Medication medication, {
+    required String personId,
+    bool excludeToday = false,
+    bool skipCancellation = false,
+  }) async {
     // Skip in test mode
     if (_isTestMode) return;
 
@@ -748,29 +932,45 @@ class NotificationService {
 
     // Skip if medication is suspended
     if (medication.isSuspended) {
-      print('Skipping notifications for ${medication.name}: medication is suspended');
+      print(
+        'Skipping notifications for ${medication.name}: medication is suspended',
+      );
       // Cancel any existing notifications for this medication
-      await cancelMedicationNotifications(medication.id, medication: medication);
+      await cancelMedicationNotifications(
+        medication.id,
+        medication: medication,
+      );
       return;
     }
 
     // Check if exact alarms are allowed (Android 12+)
     final canScheduleExact = await canScheduleExactAlarms();
     if (!canScheduleExact) {
-      print('⚠️ WARNING: Cannot schedule exact alarms. Notifications may not fire on time.');
-      print('   User needs to enable "Alarms & reminders" permission in app settings.');
+      print(
+        '⚠️ WARNING: Cannot schedule exact alarms. Notifications may not fire on time.',
+      );
+      print(
+        '   User needs to enable "Alarms & reminders" permission in app settings.',
+      );
     }
 
     // Phase 2: Only schedule notifications for active treatments
     // Skip if treatment hasn't started (isPending) or has already finished (isFinished)
     if (!medication.isActive) {
       if (medication.isPending) {
-        print('Skipping notifications for ${medication.name}: treatment starts on ${medication.startDate}');
+        print(
+          'Skipping notifications for ${medication.name}: treatment starts on ${medication.startDate}',
+        );
       } else if (medication.isFinished) {
-        print('Skipping notifications for ${medication.name}: treatment ended on ${medication.endDate}');
+        print(
+          'Skipping notifications for ${medication.name}: treatment ended on ${medication.endDate}',
+        );
       }
       // Cancel any existing notifications for this medication
-      await cancelMedicationNotifications(medication.id, medication: medication);
+      await cancelMedicationNotifications(
+        medication.id,
+        medication: medication,
+      );
       return;
     }
 
@@ -789,26 +989,42 @@ class NotificationService {
     // Pass the medication object for smart cancellation
     // Skip cancellation if explicitly requested (e.g., when bulk rescheduling)
     if (!skipCancellation) {
-      await cancelMedicationNotifications(medication.id, medication: medication);
+      await cancelMedicationNotifications(
+        medication.id,
+        medication: medication,
+      );
     }
 
     // Different scheduling logic based on duration type
     switch (medication.durationType) {
       case TreatmentDurationType.specificDates:
-        await _dailyScheduler.scheduleSpecificDatesNotifications(medication, personId);
+        await _dailyScheduler.scheduleSpecificDatesNotifications(
+          medication,
+          personId,
+        );
         break;
       case TreatmentDurationType.weeklyPattern:
-        await _weeklyScheduler.scheduleWeeklyPatternNotifications(medication, personId);
+        await _weeklyScheduler.scheduleWeeklyPatternNotifications(
+          medication,
+          personId,
+        );
         break;
       default:
         // For everyday and untilFinished: use daily recurring notifications
-        await _dailyScheduler.scheduleDailyNotifications(medication, personId, excludeToday: excludeToday);
+        await _dailyScheduler.scheduleDailyNotifications(
+          medication,
+          personId,
+          excludeToday: excludeToday,
+        );
         break;
     }
 
     // Schedule fasting notifications if required
     if (medication.requiresFasting && medication.notifyFasting) {
-      await _fastingScheduler.scheduleFastingNotifications(medication, personId);
+      await _fastingScheduler.scheduleFastingNotifications(
+        medication,
+        personId,
+      );
     }
 
     // Verify notifications were scheduled
@@ -820,8 +1036,14 @@ class NotificationService {
   /// If [medication] is provided, uses smart cancellation based on actual dose count and type
   /// Otherwise, uses brute-force cancellation for safety
   /// V19+: Cancels notifications for ALL persons assigned to this medication
-  Future<void> cancelMedicationNotifications(String medicationId, {Medication? medication}) async {
-    await _cancellationManager.cancelMedicationNotifications(medicationId, medication: medication);
+  Future<void> cancelMedicationNotifications(
+    String medicationId, {
+    Medication? medication,
+  }) async {
+    await _cancellationManager.cancelMedicationNotifications(
+      medicationId,
+      medication: medication,
+    );
   }
 
   /// Cancel all pending notifications
@@ -850,15 +1072,19 @@ class NotificationService {
 
       // For each person, get their medications and schedule
       for (final person in allPersons) {
-        final medications = await DatabaseHelper.instance.getMedicationsForPerson(person.id);
+        final medications = await DatabaseHelper.instance
+            .getMedicationsForPerson(person.id);
 
         for (final medication in medications) {
           // Only schedule if has dose times and is not suspended
           if (medication.doseTimes.isNotEmpty && !medication.isSuspended) {
             // Check if medication is active (has no dates, or within date range)
             final now = DateTime.now();
-            final isActive = (medication.startDate == null || !now.isBefore(medication.startDate!)) &&
-                           (medication.endDate == null || !now.isAfter(medication.endDate!));
+            final isActive =
+                (medication.startDate == null ||
+                    !now.isBefore(medication.startDate!)) &&
+                (medication.endDate == null ||
+                    !now.isAfter(medication.endDate!));
 
             if (isActive) {
               await scheduleMedicationNotifications(
@@ -874,7 +1100,9 @@ class NotificationService {
       }
 
       final pending = await getPendingNotifications();
-      print('✅ Rescheduling complete: $medicationsProcessed medications checked, $totalScheduled scheduled, ${pending.length} notifications in system');
+      print(
+        '✅ Rescheduling complete: $medicationsProcessed medications checked, $totalScheduled scheduled, ${pending.length} notifications in system',
+      );
     } catch (e) {
       print('❌ Error rescheduling notifications: $e');
     }
@@ -888,7 +1116,9 @@ class NotificationService {
   /// - Deleted medications
   /// - Previous installations
   /// - Database imports/restores
-  Future<void> syncNotificationsWithMedications(List<Medication> activeMedications) async {
+  Future<void> syncNotificationsWithMedications(
+    List<Medication> activeMedications,
+  ) async {
     // Skip in test mode
     if (_isTestMode) return;
 
@@ -899,7 +1129,9 @@ class NotificationService {
 
     // Get all pending notifications from the system
     final pendingNotifications = await getPendingNotifications();
-    print('Found ${pendingNotifications.length} pending notifications in system');
+    print(
+      'Found ${pendingNotifications.length} pending notifications in system',
+    );
 
     // Create a set of active medication IDs for fast lookup
     final activeMedicationIds = activeMedications.map((m) => m.id).toSet();
@@ -918,19 +1150,25 @@ class NotificationService {
           // If this medication is not in the active medications list, mark for cancellation
           if (!activeMedicationIds.contains(medicationId)) {
             orphanedNotificationIds.add(notification.id);
-            print('Found orphaned notification ID ${notification.id} for deleted medication: $medicationId');
+            print(
+              'Found orphaned notification ID ${notification.id} for deleted medication: $medicationId',
+            );
           }
         }
       } else {
         // No payload - could be an orphaned notification, mark for cancellation
         orphanedNotificationIds.add(notification.id);
-        print('Found notification without payload ID ${notification.id}, marking for cancellation');
+        print(
+          'Found notification without payload ID ${notification.id}, marking for cancellation',
+        );
       }
     }
 
     // Cancel all orphaned notifications
     if (orphanedNotificationIds.isNotEmpty) {
-      print('Cancelling ${orphanedNotificationIds.length} orphaned notifications');
+      print(
+        'Cancelling ${orphanedNotificationIds.length} orphaned notifications',
+      );
       for (final notificationId in orphanedNotificationIds) {
         await _notificationsPlugin.cancel(notificationId);
       }
@@ -997,9 +1235,7 @@ class NotificationService {
         timeoutAfter: 3000, // Auto-dismiss after 3 seconds
       );
 
-      const iOSDetails = fln.DarwinNotificationDetails(
-        presentSound: true,
-      );
+      const iOSDetails = fln.DarwinNotificationDetails(presentSound: true);
 
       const notificationDetails = fln.NotificationDetails(
         android: androidDetails,
@@ -1025,7 +1261,9 @@ class NotificationService {
     final now = tz.TZDateTime.now(tz.local);
     final scheduledDate = now.add(const Duration(minutes: 1));
 
-    print('Scheduling test notification for: $scheduledDate (1 minute from now)');
+    print(
+      'Scheduling test notification for: $scheduledDate (1 minute from now)',
+    );
     print('Current time: $now');
     print('Timezone: ${tz.local}');
 
@@ -1107,10 +1345,18 @@ class NotificationService {
       doseTime: originalDoseTime,
     );
 
-    final newDateTime = DateTime(scheduledDate.year, scheduledDate.month, scheduledDate.day, newTime.hour, newTime.minute);
+    final newDateTime = DateTime(
+      scheduledDate.year,
+      scheduledDate.month,
+      scheduledDate.day,
+      newTime.hour,
+      newTime.minute,
+    );
     final newTimeString = newDateTime.toTimeString();
 
-    print('Scheduling postponed notification ID $notificationId for ${medication.name} at $newTimeString on $scheduledDate');
+    print(
+      'Scheduling postponed notification ID $notificationId for ${medication.name} at $newTimeString on $scheduledDate',
+    );
 
     // Get standard notification details with auto-cancel enabled
     final androidDetails = _getAndroidNotificationDetails(autoCancel: true);
@@ -1124,13 +1370,18 @@ class NotificationService {
     try {
       await _notificationsPlugin.zonedSchedule(
         notificationId,
-        buildNotificationTitle(person?.name, isDefault, suffix: '(pospuesto)'), // V19+: Conditional person name
+        buildNotificationTitle(
+          person?.name,
+          isDefault,
+          suffix: '(pospuesto)',
+        ), // V19+: Conditional person name
         '${medication.name} - ${medication.type.displayName}',
         scheduledDate,
         notificationDetails,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
         // No matchDateTimeComponents - this is a one-time notification
-        payload: '${medication.id}|$originalDoseTime|$personId', // V19+: Now includes personId
+        payload:
+            '${medication.id}|$originalDoseTime|$personId', // V19+: Now includes personId
       );
       print('Successfully scheduled postponed notification ID $notificationId');
     } catch (e) {
@@ -1141,8 +1392,16 @@ class NotificationService {
   /// Cancel a specific postponed notification
   /// Call this when the user registers the dose or explicitly cancels the postponed reminder
   /// V19+: Now requires personId to cancel person-specific postponed notification
-  Future<void> cancelPostponedNotification(String medicationId, String doseTime, String personId) async {
-    await _cancellationManager.cancelPostponedNotification(medicationId, doseTime, personId);
+  Future<void> cancelPostponedNotification(
+    String medicationId,
+    String doseTime,
+    String personId,
+  ) async {
+    await _cancellationManager.cancelPostponedNotification(
+      medicationId,
+      doseTime,
+      personId,
+    );
   }
 
   /// Cancel a specific dose notification for today
@@ -1169,7 +1428,7 @@ class NotificationService {
     required Medication medication,
     required DateTime actualDoseTime,
     required String personId,
-  }) async{
+  }) async {
     await _fastingScheduler.scheduleDynamicFastingNotification(
       medication: medication,
       actualDoseTime: actualDoseTime,
@@ -1210,7 +1469,9 @@ class NotificationService {
   }
 
   /// Cancel ongoing fasting notification for a specific person
-  Future<void> cancelOngoingFastingNotificationForPerson(String personId) async {
+  Future<void> cancelOngoingFastingNotificationForPerson(
+    String personId,
+  ) async {
     await _fastingScheduler.cancelOngoingFastingNotificationForPerson(personId);
   }
 
@@ -1288,7 +1549,9 @@ class NotificationService {
 
   /// Clean notification history entries older than 24 hours
   void _cleanOldHistoryEntries(List<Map<String, dynamic>> history) {
-    final cutoffTime = DateTime.now().subtract(Duration(hours: _historyDurationHours));
+    final cutoffTime = DateTime.now().subtract(
+      Duration(hours: _historyDurationHours),
+    );
 
     history.removeWhere((entry) {
       try {
