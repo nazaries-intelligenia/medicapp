@@ -1494,8 +1494,8 @@ class NotificationService {
           : '📦 Stock bajo: ${medication.name}';
 
       final body = isInsufficientForDose
-          ? 'No hay suficiente ${medication.type.unit} para la próxima dosis. Stock actual: ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.unit}.'
-          : 'Quedan ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.unit}. Considera reabastecer pronto.';
+          ? 'No hay suficiente ${medication.type.stockUnit} para la próxima dosis. Stock actual: ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}.'
+          : 'Quedan ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}. Considera reabastecer pronto.';
 
       await _notificationsPlugin.show(
         notificationId,
