@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../models/person.dart';
@@ -56,6 +57,9 @@ class DatabaseHelper {
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: (db) async {
+        // Enable foreign key constraints (required for CASCADE DELETE)
+        await db.execute('PRAGMA foreign_keys = ON');
+
         // Debug: Check database schema
         final result = await db.rawQuery('PRAGMA table_info(medications)');
         print('Database columns: ${result.map((e) => e['name']).toList()}');
@@ -1069,7 +1073,7 @@ class DatabaseHelper {
     required Medication scheduleData,
   }) async {
     final personMedication = PersonMedication(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: Uuid().v4(), // Use UUID instead of timestamp to ensure uniqueness
       personId: personId,
       medicationId: medicationId,
       assignedDate: DateTime.now().toIso8601String(),
@@ -1294,6 +1298,21 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final currentDbPath = join(dbPath, 'medications.db');
 
+    // Check if database file exists BEFORE accessing database
+    // (accessing database would create it if it doesn't exist)
+    final dbFile = File(currentDbPath);
+    if (!await dbFile.exists()) {
+      throw Exception('Database file not found');
+    }
+
+    // Debug: Check what's in the database before export
+    final db = await database;
+    final medications = await db.query('medications');
+    print('Exporting database with ${medications.length} medications:');
+    for (var med in medications) {
+      print('  - ${med['id']}: ${med['name']}');
+    }
+
     // Create a temporary directory for the export
     final tempDir = await getTemporaryDirectory();
     final timestamp = DateTime.now().toIso8601String().replaceAll(':', '-').replaceAll('.', '-');
@@ -1301,11 +1320,6 @@ class DatabaseHelper {
     final exportPath = join(tempDir.path, exportFileName);
 
     // Copy the database file
-    final dbFile = File(currentDbPath);
-    if (!await dbFile.exists()) {
-      throw Exception('Database file not found');
-    }
-
     await dbFile.copy(exportPath);
     print('Database exported to: $exportPath');
 
@@ -1327,13 +1341,16 @@ class DatabaseHelper {
 
     // Close current database connection
     if (_database != null) {
+      print('Closing current database connection...');
       await _database!.close();
       _database = null;
+      print('Database connection closed');
     }
 
     // Get the target database path
     final dbPath = await getDatabasesPath();
     final targetDbPath = join(dbPath, 'medications.db');
+    print('Target database path: $targetDbPath');
 
     // Backup current database before importing (just in case)
     final currentDbFile = File(targetDbPath);
@@ -1343,14 +1360,43 @@ class DatabaseHelper {
       print('Current database backed up to: $backupPath');
     }
 
+    // Delete the existing database files (including WAL and SHM) to ensure clean replacement
+    if (await currentDbFile.exists()) {
+      await currentDbFile.delete();
+      print('Deleted existing database file');
+    }
+
+    // Delete WAL (Write-Ahead Log) and SHM (Shared Memory) files if they exist
+    final walFile = File('$targetDbPath-wal');
+    if (await walFile.exists()) {
+      await walFile.delete();
+      print('Deleted WAL file');
+    }
+
+    final shmFile = File('$targetDbPath-shm');
+    if (await shmFile.exists()) {
+      await shmFile.delete();
+      print('Deleted SHM file');
+    }
+
     // Copy the import file to the database location
     await importFile.copy(targetDbPath);
     print('Database imported from: $importPath');
 
+    // Add a small delay to ensure file system operations complete
+    await Future.delayed(const Duration(milliseconds: 100));
+
     // Verify the imported database by opening it
     try {
       _database = await _initDB('medications.db');
-      print('Database imported successfully and verified');
+
+      // Debug: Check what's in the imported database
+      final db = await database;
+      final medications = await db.query('medications');
+      print('Database imported successfully. Medications count: ${medications.length}');
+      for (var med in medications) {
+        print('  - ${med['id']}: ${med['name']}');
+      }
     } catch (e) {
       // If verification fails, restore from backup
       print('Import verification failed: $e');

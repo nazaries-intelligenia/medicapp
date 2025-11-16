@@ -11,7 +11,7 @@ MedicApp uses SQLite V19 as its local database management system. The architectu
 - **Architecture**: Multi-person with shared data and individual configurations
 - **Location**: `medications.db` in the application's database directory
 - **Migrations**: Automatic progressive migration system (V1 → V19)
-- **Integrity**: Foreign keys enabled with deletion cascades
+- **Integrity**: Foreign keys explicitly enabled in `onOpen` with deletion cascades
 - **Indexes**: Optimized for frequent queries
 
 ### Design Philosophy
@@ -49,7 +49,7 @@ CREATE TABLE persons (
 #### Rules
 
 - There must be at least one person with `isDefault = 1`
-- IDs are generated as timestamps in milliseconds
+- IDs are generated as timestamps in milliseconds (format: milliseconds since epoch)
 - Name cannot be empty
 
 ---
@@ -126,7 +126,7 @@ CREATE TABLE person_medications (
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | TEXT PRIMARY KEY | Unique identifier for the person-medication relationship |
+| `id` | TEXT PRIMARY KEY | Unique identifier for the person-medication relationship (UUID v4) |
 | `personId` | TEXT NOT NULL | FK to `persons.id` |
 | `medicationId` | TEXT NOT NULL | FK to `medications.id` |
 | `assignedDate` | TEXT NOT NULL | ISO8601 date when the medication was assigned to the person |
@@ -764,6 +764,10 @@ final backupPath = await DatabaseHelper.instance.exportDatabase();
 
 The application copies the `.db` file to a temporary location. The user can then share this file (Google Drive, email, etc.).
 
+**Security improvements**:
+- Verifies that the database file exists **before** accessing the database (prevents automatic creation)
+- Throws exception if the database is in-memory (cannot be exported)
+
 #### 2. Backup Import
 
 ```dart
@@ -773,6 +777,9 @@ await DatabaseHelper.instance.importDatabase('/path/to/backup.db');
 **Notes**:
 - An automatic backup of the current file is created before importing (`.backup`)
 - If import fails, the backup is automatically restored
+- **Complete cleanup**: Deletes WAL (Write-Ahead Log) and SHM (Shared Memory) files before importing to avoid conflicts
+- Includes a 100ms delay after import to ensure file system operations complete
+- Verifies the integrity of the imported database before confirming
 
 #### 3. Automatic Backup (Recommended for Production)
 

@@ -11,7 +11,7 @@ MedicApp utilitza SQLite V19 com a sistema de gestió de base de dades local. L'
 - **Arquitectura**: Multi-persona amb dades compartides i configuracions individuals
 - **Ubicació**: `medications.db` al directori de base de dades de l'aplicació
 - **Migracions**: Sistema automàtic de migracions progressives (V1 → V19)
-- **Integritat**: Claus foranes habilitades amb cascades d'eliminació
+- **Integritat**: Claus foranes habilitades explícitament a `onOpen` amb cascades d'eliminació
 - **Índexs**: Optimitzats per a consultes freqüents
 
 ### Filosofia de Disseny
@@ -49,7 +49,7 @@ CREATE TABLE persons (
 #### Regles
 
 - Ha d'existir almenys una persona amb `isDefault = 1`
-- Els IDs es generen com timestamps en mil·lisegons
+- Els IDs es generen com timestamps en mil·lisegons (format: mil·lisegons des de epoch)
 - El nom no pot estar buit
 
 ---
@@ -126,7 +126,7 @@ CREATE TABLE person_medications (
 
 | Camp | Tipus | Descripció |
 |-------|------|-------------|
-| `id` | TEXT PRIMARY KEY | Identificador únic de la relació persona-medicament |
+| `id` | TEXT PRIMARY KEY | Identificador únic de la relació persona-medicament (UUID v4) |
 | `personId` | TEXT NOT NULL | FK a `persons.id` |
 | `medicationId` | TEXT NOT NULL | FK a `medications.id` |
 | `assignedDate` | TEXT NOT NULL | Data ISO8601 quan es va assignar el medicament a la persona |
@@ -764,6 +764,10 @@ final backupPath = await DatabaseHelper.instance.exportDatabase();
 
 L'aplicació copia l'arxiu `.db` a una ubicació temporal. L'usuari pot després compartir aquest arxiu (Google Drive, correu, etc.).
 
+**Millores de seguretat**:
+- Verifica que l'arxiu de base de dades existeixi **abans** d'accedir a la base de dades (evita creació automàtica)
+- Llança excepció si la base de dades és in-memory (no es pot exportar)
+
 #### 2. Importació de Backup
 
 ```dart
@@ -773,6 +777,9 @@ await DatabaseHelper.instance.importDatabase('/path/to/backup.db');
 **Notes**:
 - Es crea un backup automàtic de l'arxiu actual abans d'importar (`.backup`)
 - Si la importació falla, es restaura automàticament el backup
+- **Neteja completa**: Elimina arxius WAL (Write-Ahead Log) i SHM (Shared Memory) abans d'importar per evitar conflictes
+- Inclou un retard de 100ms després de la importació per assegurar que les operacions del sistema d'arxius es completin
+- Verifica la integritat de la base de dades importada abans de confirmar
 
 #### 3. Backup Automàtic (Recomanat per a Producció)
 

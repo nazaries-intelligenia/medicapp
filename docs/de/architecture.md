@@ -427,6 +427,37 @@ class DoseCalculationService {
 - Formatiert lokalisierte Nachrichten ("Heute um 18:00", "Morgen um 08:00")
 - Respektiert Start-/Enddaten der Behandlung
 
+### FastingConflictService
+
+Erkennt Konflikte zwischen Medikamentenzeitplänen und Fastenphasen.
+
+```dart
+class FastingConflictService {
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
+  });
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
+}
+```
+
+**Verantwortlichkeiten:**
+- Überprüft, ob ein vorgeschlagener Zeitplan mit der Fastenphase eines anderen Medikaments kollidiert
+- Berechnet aktive Fastenphasen (vor/nach Medikamenteneinnahme)
+- Schlägt alternative Zeiten vor, die Konflikte vermeiden
+- Unterstützt sowohl "vor" (vor der Einnahme) als auch "nach" (nach der Einnahme) Fastentypen
+
+**Anwendungsfälle:**
+- Beim Hinzufügen einer neuen Dosiszeit in `DoseScheduleEditor`
+- Beim Erstellen oder Bearbeiten eines Medikaments in `EditScheduleScreen`
+- Verhindert Konflikte, die die Wirksamkeit der Behandlung beeinträchtigen könnten
+
+**Hinweis:** Derzeit ist die Fastenvalidierung in `EditScheduleScreen` deaktiviert, um Timer-Probleme in Tests zu vermeiden, aber die Infrastruktur ist bereit, bei Bedarf aktiviert zu werden.
+
 ---
 
 ## Ansichtsschicht (Screens/Widgets)

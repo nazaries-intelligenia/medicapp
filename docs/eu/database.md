@@ -11,7 +11,7 @@ MedicApp-ek SQLite V19 erabiltzen du datu-base lokala kudeaketa sistema gisa. Ar
 - **Arkitektura**: Pertsona anitzeko partekatutako datuak eta konfigurazio indibidualak
 - **Kokapena**: `medications.db` aplikazioaren datu-base direktorioan
 - **Migrazioak**: Migrazio progresiboen sistema automatikoa (V1 → V19)
-- **Osotasuna**: Ezabaketa kaskadak gaituta dauden atzerriko gakoak
+- **Osotasuna**: Atzerriko gakoak esplizituki gaituta `onOpen`-en ezabatze kaskadekin
 - **Indizeak**: Kontsulta ohikoak optimizatzeko
 
 ### Diseinu Filosofia
@@ -49,7 +49,7 @@ CREATE TABLE persons (
 #### Arauak
 
 - Gutxienez pertsona bat egon behar da `isDefault = 1`-rekin
-- ID-ak milisegundoko timestamp gisa sortzen dira
+- ID-ak milisegundoko timestamp gisa sortzen dira (formatua: milisegundoak epoch-tik)
 - Izena ezin da hutsik egon
 
 ---
@@ -126,7 +126,7 @@ CREATE TABLE person_medications (
 
 | Eremua | Mota | Deskribapena |
 |--------|------|--------------|
-| `id` | TEXT PRIMARY KEY | Pertsona-sendagai erlazioaren identifikatzaile bakarra |
+| `id` | TEXT PRIMARY KEY | Pertsona-sendagai erlazioaren identifikatzaile bakarra (UUID v4) |
 | `personId` | TEXT NOT NULL | `persons.id`-ra FK |
 | `medicationId` | TEXT NOT NULL | `medications.id`-ra FK |
 | `assignedDate` | TEXT NOT NULL | ISO8601 data sendagaia pertsonari esleitu zenean |
@@ -764,6 +764,10 @@ final backupPath = await DatabaseHelper.instance.exportDatabase();
 
 Aplikazioak `.db` fitxategia kokapen aldi baterako batera kopiatzen du. Erabiltzaileak gero fitxategi hau partekatu dezake (Google Drive, posta, etab.).
 
+**Segurtasun hobekuntzak**:
+- Datu-base fitxategia existitzen dela egiaztatzen du datu-basera sartu **aurretik** (sorrera automatikoa saihesten du)
+- Salbuespena jaurtitzen du datu-basea in-memory bada (ezin da esportatu)
+
 #### 2. Backup Inportazioa
 
 ```dart
@@ -773,6 +777,9 @@ await DatabaseHelper.instance.importDatabase('/bidea/backup.db');
 **Oharrak**:
 - Inportatu aurretik uneko fitxategiaren backup automatikoa sortzen da (`.backup`)
 - Inportazioak huts egiten badu, backupa automatikoki berreskuratzen da
+- **Garbiketa osoa**: WAL (Write-Ahead Log) eta SHM (Shared Memory) fitxategiak ezabatzen ditu inportatu aurretik gatazka saihesteko
+- 100ms-ko atzerapena barne hartzen du inportazioaren ondoren fitxategi sistemaren eragiketak osatzeko
+- Inportatutako datu-basearen osotasuna egiaztatzen du berretsi aurretik
 
 #### 3. Backup Automatikoa (Gomendatua Produkziorako)
 

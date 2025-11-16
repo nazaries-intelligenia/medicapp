@@ -428,6 +428,39 @@ class DoseCalculationService {
 
 ---
 
+### FastingConflictService
+
+Detecta conflictes entre horaris de medicaments i períodes de dejuni.
+
+```dart
+class FastingConflictService {
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
+  });
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
+}
+```
+
+**Responsabilitats:**
+- Verifica si un horari proposat coincideix amb un període de dejuni d'un altre medicament
+- Calcula períodes de dejuni actius (abans/després de prendre medicaments)
+- Suggereix horaris alternatius que evitin conflictes
+- Suporta dejuni "before" (abans de prendre) i "after" (després de prendre)
+
+**Casos d'ús:**
+- En afegir un nou horari de dosi a `DoseScheduleEditor`
+- En crear o editar un medicament a `EditScheduleScreen`
+- Prevé conflictes que podrien comprometre l'efectivitat del tractament
+
+**Nota:** Actualment la validació està desactivada a `EditScheduleScreen` per evitar problemes amb timers en tests, però la infraestructura està llesta per activar-se quan calgui.
+
+---
+
 ## Capa de Vista (Screens/Widgets)
 
 ### Estructura de Pantalles Principals

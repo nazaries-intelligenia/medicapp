@@ -11,7 +11,7 @@ MedicApp utilizza SQLite V19 come sistema di gestione di database locale. L'arch
 - **Architettura**: Multi-persona con dati condivisi e configurazioni individuali
 - **Ubicazione**: `medications.db` nella directory del database dell'applicazione
 - **Migrazioni**: Sistema automatico di migrazioni progressive (V1 → V19)
-- **Integrità**: Chiavi esterne abilitate con cascate di eliminazione
+- **Integrità**: Chiavi esterne esplicitamente abilitate in `onOpen` con eliminazione a cascata
 - **Indici**: Ottimizzati per query frequenti
 
 ### Filosofia di Design
@@ -49,7 +49,7 @@ CREATE TABLE persons (
 #### Regole
 
 - Deve esistere almeno una persona con `isDefault = 1`
-- Gli ID si generano come timestamp in millisecondi
+- Gli ID si generano come timestamp (formato: millisecondi dall'epoch)
 - Il nome non può essere vuoto
 
 ---
@@ -126,7 +126,7 @@ CREATE TABLE person_medications (
 
 | Campo | Tipo | Descrizione |
 |-------|------|-------------|
-| `id` | TEXT PRIMARY KEY | Identificatore unico della relazione persona-farmaco |
+| `id` | TEXT PRIMARY KEY | Identificatore univoco per la relazione persona-farmaco (UUID v4) |
 | `personId` | TEXT NOT NULL | FK a `persons.id` |
 | `medicationId` | TEXT NOT NULL | FK a `medications.id` |
 | `assignedDate` | TEXT NOT NULL | Data ISO8601 quando è stato assegnato il farmaco alla persona |
@@ -764,6 +764,11 @@ final backupPath = await DatabaseHelper.instance.exportDatabase();
 
 L'applicazione copia il file `.db` in una posizione temporanea. L'utente può poi condividere questo file (Google Drive, email, ecc.).
 
+**Miglioramenti di sicurezza:**
+- Verifica che il file del database esista prima dell'esportazione
+- Genera eccezione se si tenta di esportare un database in memoria
+- Valida il percorso di destinazione
+
 #### 2. Importazione di Backup
 
 ```dart
@@ -773,6 +778,9 @@ await DatabaseHelper.instance.importDatabase('/path/to/backup.db');
 **Note**:
 - Viene creato un backup automatico del file attuale prima di importare (`.backup`)
 - Se l'importazione fallisce, viene ripristinato automaticamente il backup
+- Elimina i file WAL (Write-Ahead Logging) e SHM (Shared Memory) prima dell'importazione
+- Include un ritardo di 100ms dopo la chiusura del database per garantire il rilascio dei file
+- Verifica l'integrità del database importato mediante query di test
 
 #### 3. Backup Automatico (Raccomandato per Produzione)
 

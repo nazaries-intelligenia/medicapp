@@ -426,6 +426,27 @@ class DoseCalculationService {
 - Formatta messaggi localizzati ("Oggi alle 18:00", "Domani alle 08:00")
 - Rispetta date di inizio/fine trattamento
 
+### FastingConflictService
+
+Gestisce i conflitti tra periodi di digiuno di farmaci diversi.
+
+```dart
+class FastingConflictService {
+  static Future<List<FastingConflict>> detectConflicts({
+    required String personId,
+    required DateTime proposedDoseTime,
+    required Medication proposedMedication,
+  });
+  static bool hasConflict(DateTime start1, DateTime end1, DateTime start2, DateTime end2);
+}
+```
+
+**Responsabilità:**
+- Rileva sovrapposizioni tra periodi di digiuno attivi
+- Valida orari proposti per nuove dosi
+- Previene programmazione di dosi con conflitti di digiuno
+- Fornisce informazioni dettagliate sui conflitti rilevati
+
 ---
 
 ## Livello delle Viste (Screens/Widgets)

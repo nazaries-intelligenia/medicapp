@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
+import 'package:medicapp/models/person.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
@@ -11,6 +12,15 @@ void main() {
   DatabaseTestHelper.setup();
 
   group('As-Needed Medications - Main Screen Display', () {
+    setUp(() async {
+      // Create test person first (required for foreign key constraints)
+      final testPerson = Person(
+        id: 'test-person-id',
+        name: 'Test User',
+        isDefault: false,
+      );
+      await DatabaseHelper.instance.insertPerson(testPerson);
+    });
     test('getMedicationIdsWithDosesToday returns empty set when no doses taken today', () async {
       // Create an as-needed medication
       final medication = MedicationBuilder()

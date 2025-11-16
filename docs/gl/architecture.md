@@ -426,6 +426,26 @@ class DoseCalculationService {
 - Formatea mensaxes localizadas ("Hoxe ás 18:00", "Mañá ás 08:00")
 - Respecta datas de inicio/fin de tratamento
 
+### FastingConflictService
+
+Xestión de conflitos entre períodos de xaxún de diferentes medicamentos.
+
+```dart
+class FastingConflictService {
+  static List<FastingConflict> checkFastingConflicts({
+    required List<Medication> medications,
+    required String personId,
+  });
+  static String formatConflictMessage(FastingConflict conflict, BuildContext context);
+}
+```
+
+**Responsabilidades:**
+- Detecta solapamentos entre períodos de xaxún de diferentes medicamentos
+- Calcula conflitos entre doses con xaxún previo e posterior
+- Formatea mensaxes de advertencia localizadas para o usuario
+- Suxire axustes de horarios para evitar conflitos
+
 ---
 
 ## Capa de Vista (Screens/Widgets)

@@ -41,8 +41,11 @@ class DatabaseTestHelper {
 
   /// Limpia todos los datos de la base de datos.
   static Future<void> cleanDatabase() async {
-    await DatabaseHelper.instance.deleteAllMedications();
+    // Delete all data in the correct order (respecting foreign keys)
     await DatabaseHelper.instance.deleteAllDoseHistory();
+    // Note: Deleting persons will cascade delete person_medications due to FK constraints
+    await DatabaseHelper.instance.deleteAllPersons();
+    await DatabaseHelper.instance.deleteAllMedications();
     await DatabaseHelper.resetDatabase();
   }
 

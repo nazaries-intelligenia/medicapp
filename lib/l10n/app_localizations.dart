@@ -3745,6 +3745,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¡Ayuno completado! Ya puedes comer'**
   String get fastingCompleted;
+
+  /// No description provided for @fastingConflictTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Conflicto con Período de Ayuno'**
+  String get fastingConflictTitle;
+
+  /// No description provided for @fastingConflictMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Esta hora coincide con el período de ayuno del medicamento {medicationName}'**
+  String fastingConflictMessage(String medicationName);
+
+  /// No description provided for @fastingConflictSelectedTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora seleccionada'**
+  String get fastingConflictSelectedTime;
+
+  /// No description provided for @fastingConflictPeriod.
+  ///
+  /// In es, this message translates to:
+  /// **'Período de ayuno'**
+  String get fastingConflictPeriod;
+
+  /// No description provided for @fastingConflictType.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo de ayuno'**
+  String get fastingConflictType;
+
+  /// No description provided for @fastingTypeBefore.
+  ///
+  /// In es, this message translates to:
+  /// **'Antes de tomar'**
+  String get fastingTypeBefore;
+
+  /// No description provided for @fastingTypeAfter.
+  ///
+  /// In es, this message translates to:
+  /// **'Después de tomar'**
+  String get fastingTypeAfter;
+
+  /// No description provided for @fastingConflictExplanationBefore.
+  ///
+  /// In es, this message translates to:
+  /// **'Durante este período, no debes comer antes de tomar {medicationName}. Si tomas otro medicamento en esta hora, podrías tener comida en el estómago.'**
+  String fastingConflictExplanationBefore(String medicationName);
+
+  /// No description provided for @fastingConflictExplanationAfter.
+  ///
+  /// In es, this message translates to:
+  /// **'Durante este período, no debes comer después de tomar {medicationName}. Si tomas otro medicamento en esta hora, no podrías comer.'**
+  String fastingConflictExplanationAfter(String medicationName);
+
+  /// No description provided for @fastingConflictUseSuggested.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar hora sugerida ({time})'**
+  String fastingConflictUseSuggested(String time);
+
+  /// No description provided for @fastingConflictOverride.
+  ///
+  /// In es, this message translates to:
+  /// **'Omitir y continuar'**
+  String get fastingConflictOverride;
 }
 
 class _AppLocalizationsDelegate

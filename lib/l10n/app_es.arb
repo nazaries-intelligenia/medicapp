@@ -1514,5 +1514,46 @@
   "done": "Hecho",
   "suspended": "Suspendido",
   "activeFastingPeriodsTitle": "Ayunos Activos",
-  "fastingCompleted": "¡Ayuno completado! Ya puedes comer"
+  "fastingCompleted": "¡Ayuno completado! Ya puedes comer",
+
+  "@_FASTING_CONFLICT_DIALOG": {},
+  "fastingConflictTitle": "Conflicto con Período de Ayuno",
+  "fastingConflictMessage": "Esta hora coincide con el período de ayuno del medicamento {medicationName}",
+  "@fastingConflictMessage": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingConflictSelectedTime": "Hora seleccionada",
+  "fastingConflictPeriod": "Período de ayuno",
+  "fastingConflictType": "Tipo de ayuno",
+  "fastingTypeBefore": "Antes de tomar",
+  "fastingTypeAfter": "Después de tomar",
+  "fastingConflictExplanationBefore": "Durante este período, no debes comer antes de tomar {medicationName}. Si tomas otro medicamento en esta hora, podrías tener comida en el estómago.",
+  "@fastingConflictExplanationBefore": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingConflictExplanationAfter": "Durante este período, no debes comer después de tomar {medicationName}. Si tomas otro medicamento en esta hora, no podrías comer.",
+  "@fastingConflictExplanationAfter": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingConflictUseSuggested": "Usar hora sugerida ({time})",
+  "@fastingConflictUseSuggested": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "fastingConflictOverride": "Omitir y continuar"
 }
