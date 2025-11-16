@@ -1,8 +1,9 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-432%2B%20passing-brightgreen)]()
-[![Coverage](https://img.shields.io/badge/coverage-75--80%25-green)]()
-[![Flutter](https://img.shields.io/badge/Flutter-3.9.2%2B-blue)]()
+[![Tests](https://img.shields.io/badge/tests-570%20passing-brightgreen)]()
+[![Coverage](https://img.shields.io/badge/coverage-80%2B%25-green)]()
+[![Flutter](https://img.shields.io/badge/Flutter-3.38.1-blue)]()
+[![Dart](https://img.shields.io/badge/Dart-3.10.0-blue)]()
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-blueviolet)]()
 
 **Aplicación móvil de gestión de medicamentos con arquitectura multi-persona, diseñada para familias y cuidadores.**
@@ -29,9 +30,11 @@ Selecciona tu idioma / Select your language:
 ## 📊 Estado del Proyecto / Project Status
 
 - **Versión / Version:** 1.0.0+1
-- **Tests:** 432+ pasando / passing
-- **Cobertura / Coverage:** 75-80%
-- **Idiomas / Languages:** 8
+- **Tests:** 570 pasando / passing ✅
+- **Cobertura / Coverage:** 80%+
+- **Flutter:** 3.38.1
+- **Dart:** 3.10.0
+- **Idiomas / Languages:** 8 (ES, EN, CA, DE, EU, FR, GL, IT)
 - **Estado / Status:** Production Ready ✅
 
 ---
@@ -61,6 +64,7 @@ flutter test
 - ✅ 14 tipos de medicamentos / 14 medication types
 - ✅ Notificaciones inteligentes / Smart notifications
 - ✅ Control de stock (Pastillero) / Stock control
+- ✅ Seguimiento de fechas de caducidad (V20+) / Expiration date tracking
 - ✅ Historial automático de dosis / Automatic dose history
 - ✅ Configuración de ayuno / Fasting configuration
 - ✅ 8 idiomas soportados / 8 supported languages
