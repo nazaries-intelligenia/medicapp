@@ -26,9 +26,9 @@ void main() {
           .build();
 
       // Schedule for multiple persons
-      final person1Id = 'person-1';
-      final person2Id = 'person-2';
-      final person3Id = 'person-3';
+      const person1Id = 'person-1';
+      const person2Id = 'person-2';
+      const person3Id = 'person-3';
 
       // Schedule for each person
       await service.scheduleMedicationNotifications(medication, personId: person1Id);
@@ -70,7 +70,7 @@ void main() {
           .withStartDate(DateTime.now())
           .build();
 
-      final personId = 'person-to-reschedule';
+      const personId = 'person-to-reschedule';
 
       // Initial scheduling
       await service.scheduleMedicationNotifications(medication, personId: personId);
@@ -245,7 +245,7 @@ void main() {
           .withStartDate(DateTime.now())
           .build();
 
-      final personId = 'test-person-payload';
+      const personId = 'test-person-payload';
 
       // Schedule notification
       await service.scheduleMedicationNotifications(medication, personId: personId);

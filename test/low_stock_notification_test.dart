@@ -32,8 +32,8 @@ void main() {
   group('Low Stock Notification ID Generation', () {
     test('should generate IDs in the 7,000,000-7,999,999 range', () {
       // Arrange
-      final medicationId1 = 'med-123';
-      final medicationId2 = 'med-456';
+      const medicationId1 = 'med-123';
+      const medicationId2 = 'med-456';
 
       // Act
       final id1 = NotificationIdGenerator.generateLowStockId(medicationId1);
@@ -49,7 +49,7 @@ void main() {
 
     test('should generate consistent IDs for the same medication', () {
       // Arrange
-      final medicationId = 'med-consistent';
+      const medicationId = 'med-consistent';
 
       // Act
       final id1 = NotificationIdGenerator.generateLowStockId(medicationId);

@@ -14,9 +14,9 @@ void main() {
       final today = getTodayString();
 
       // Calculate times relative to 10:00 AM: 2 hours ago, 1 hour ago, 1 hour ahead
-      final twoHoursAgo = '08:00';    // 2 hours overdue
-      final oneHourAgo = '09:00';     // 1 hour overdue
-      final oneHourAhead = '11:00';   // 1 hour in future
+      const twoHoursAgo = '08:00';    // 2 hours overdue
+      const oneHourAgo = '09:00';     // 1 hour overdue
+      const oneHourAhead = '11:00';   // 1 hour in future
 
       // Medication A: pending dose (1 hour overdue)
       final medA = MedicationBuilder()
@@ -61,9 +61,9 @@ void main() {
       final today = getTodayString();
 
       // Calculate future times relative to 10:00 AM
-      final oneHourAhead = '11:00';   // 1 hour ahead
-      final twoHoursAhead = '12:00';  // 2 hours ahead
-      final sixHoursAhead = '16:00';  // 6 hours ahead
+      const oneHourAhead = '11:00';   // 1 hour ahead
+      const twoHoursAhead = '12:00';  // 2 hours ahead
+      const sixHoursAhead = '16:00';  // 6 hours ahead
 
       // Medication A: dose 6 hours ahead
       final medA = MedicationBuilder()
@@ -154,9 +154,9 @@ void main() {
       final today = getTodayString();
 
       // Calculate times relative to 10:00 AM: 4 hours ago (taken), current hour (pending), 2 hours ahead (future)
-      final fourHoursAgo = '06:00';     // 4 hours ago (taken)
-      final currentHourTime = '10:00';  // Current hour (pending, just passed)
-      final twoHoursAhead = '12:00';    // 2 hours ahead
+      const fourHoursAgo = '06:00';     // 4 hours ago (taken)
+      const currentHourTime = '10:00';  // Current hour (pending, just passed)
+      const twoHoursAhead = '12:00';    // 2 hours ahead
 
       // Medication A: has doses at multiple times, one already taken
       final medA = MedicationBuilder()
@@ -172,7 +172,7 @@ void main() {
           .build();
 
       // Medication B: has dose 1 hour ahead
-      final oneHourAhead = '11:00';  // 1 hour ahead
+      const oneHourAhead = '11:00';  // 1 hour ahead
       final medB = MedicationBuilder()
           .withId('med_b')
           .withName('Medication B')

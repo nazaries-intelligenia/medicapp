@@ -396,7 +396,7 @@ void main() {
       expect(medication.stockQuantity, 10.0); // Initial stock
 
       // Calculate expected stock after taking doses
-      final expectedStock = 10.0 - 1.0 - 1.5;
+      const expectedStock = 10.0 - 1.0 - 1.5;
 
       // Stock should be deducted when doses are marked as taken
       final realStock = 10.0 - (medication.takenDosesToday.contains('08:00') ? 1.0 : 0.0) -
