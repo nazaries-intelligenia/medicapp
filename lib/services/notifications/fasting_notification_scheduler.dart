@@ -5,6 +5,7 @@ import '../../database/database_helper.dart';
 import '../../utils/platform_helper.dart';
 import '../notification_id_generator.dart';
 import 'notification_config.dart';
+import '../logger_service.dart';
 
 /// Helper class to represent a fasting period
 class _FastingPeriod {
@@ -50,20 +51,20 @@ class FastingNotificationScheduler {
     }
 
     if (medication.fastingDurationMinutes == null || medication.fastingDurationMinutes! <= 0) {
-      print('Invalid fasting duration for ${medication.name}');
+      LoggerService.info('Invalid fasting duration for ${medication.name}');
       return;
     }
 
     if (medication.fastingType == null) {
-      print('Fasting type not specified for ${medication.name}');
+      LoggerService.info('Fasting type not specified for ${medication.name}');
       return;
     }
 
-    print('========================================');
-    print('Scheduling fasting notifications for ${medication.name}');
-    print('Fasting type: ${medication.fastingType}');
-    print('Fasting duration: ${medication.fastingDurationMinutes} minutes');
-    print('========================================');
+    LoggerService.info('========================================');
+    LoggerService.info('Scheduling fasting notifications for ${medication.name}');
+    LoggerService.info('Fasting type: ${medication.fastingType}');
+    LoggerService.info('Fasting duration: ${medication.fastingDurationMinutes} minutes');
+    LoggerService.info('========================================');
 
     final now = tz.TZDateTime.now(tz.local);
 
@@ -126,7 +127,7 @@ class FastingNotificationScheduler {
 
       // Skip if the fasting start time has already passed
       if (period.start.isBefore(now)) {
-        print('⏭️  Skipping past fasting period: ${period.start}');
+        LoggerService.info('⏭️  Skipping past fasting period: ${period.start}');
         continue;
       }
 
@@ -150,7 +151,7 @@ class FastingNotificationScheduler {
           isBefore: period.isBefore,
         );
 
-        print('Scheduling "before" fasting notification ID $notificationId for ${medication.name} at $notificationTime');
+        LoggerService.info('Scheduling "before" fasting notification ID $notificationId for ${medication.name} at $notificationTime');
 
         await _scheduleOneTimeNotification(
           id: notificationId,
@@ -161,7 +162,7 @@ class FastingNotificationScheduler {
         );
       } else {
         // For "after" fasting: notification will be scheduled dynamically when dose is registered
-        print('Skipping "after" fasting notification for ${medication.name} - will be scheduled dynamically when dose is taken');
+        LoggerService.info('Skipping "after" fasting notification for ${medication.name} - will be scheduled dynamically when dose is taken');
       }
     }
   }
@@ -189,15 +190,15 @@ class FastingNotificationScheduler {
     }
 
     if (medication.fastingDurationMinutes == null || medication.fastingDurationMinutes! <= 0) {
-      print('Invalid fasting duration for ${medication.name}');
+      LoggerService.info('Invalid fasting duration for ${medication.name}');
       return;
     }
 
-    print('========================================');
-    print('Scheduling dynamic fasting notification for ${medication.name}');
-    print('Actual dose time: $actualDoseTime');
-    print('Fasting duration: ${medication.fastingDurationMinutes} minutes');
-    print('========================================');
+    LoggerService.info('========================================');
+    LoggerService.info('Scheduling dynamic fasting notification for ${medication.name}');
+    LoggerService.info('Actual dose time: $actualDoseTime');
+    LoggerService.info('Fasting duration: ${medication.fastingDurationMinutes} minutes');
+    LoggerService.info('========================================');
 
     // V19+: Get person for notification body logic
     final person = await DatabaseHelper.instance.getPerson(personId);
@@ -210,12 +211,12 @@ class FastingNotificationScheduler {
     // Calculate when fasting ends (actual time + fasting duration)
     final scheduledDate = actualDoseTZ.add(Duration(minutes: medication.fastingDurationMinutes!));
 
-    print('Scheduled notification for: $scheduledDate');
+    LoggerService.info('Scheduled notification for: $scheduledDate');
 
     // Skip if the notification time has already passed (shouldn't happen but safety check)
     final now = tz.TZDateTime.now(tz.local);
     if (scheduledDate.isBefore(now)) {
-      print('⏭️  Skipping past fasting notification time: $scheduledDate');
+      LoggerService.info('⏭️  Skipping past fasting notification time: $scheduledDate');
       return;
     }
 
@@ -227,7 +228,7 @@ class FastingNotificationScheduler {
       actualDoseTime: actualDoseTime,
     );
 
-    print('Scheduling dynamic fasting notification ID $notificationId for ${medication.name} at $scheduledDate');
+    LoggerService.info('Scheduling dynamic fasting notification ID $notificationId for ${medication.name} at $scheduledDate');
 
     // Schedule the "you can eat now" notification
     // V19+: Only include person name for non-default users
@@ -244,7 +245,7 @@ class FastingNotificationScheduler {
       isFastingCompletion: true,  // Use high-priority channel for fasting alerts
     );
 
-    print('Successfully scheduled dynamic fasting notification');
+    LoggerService.info('Successfully scheduled dynamic fasting notification');
   }
 
   /// Cancel today's fasting notification for a "before" fasting type medication
@@ -273,7 +274,7 @@ class FastingNotificationScheduler {
       return;
     }
 
-    print('Cancelling today\'s fasting notification for ${medication.name} at $doseTime (person: $personId)');
+    LoggerService.info('Cancelling today\'s fasting notification for ${medication.name} at $doseTime (person: $personId)');
 
     // Parse dose time
     final parts = doseTime.split(':');
@@ -307,7 +308,7 @@ class FastingNotificationScheduler {
 
     // Cancel the notification
     await _notificationsPlugin.cancel(notificationId);
-    print('Cancelled fasting notification ID $notificationId for ${medication.name}');
+    LoggerService.info('Cancelled fasting notification ID $notificationId for ${medication.name}');
   }
 
   /// Show or update the ongoing fasting countdown notification
@@ -361,9 +362,9 @@ class FastingNotificationScheduler {
         platformDetails,
       );
 
-      print('Ongoing fasting notification ID $notificationId shown/updated for $medicationName (person: $personId)');
+      LoggerService.info('Ongoing fasting notification ID $notificationId shown/updated for $medicationName (person: $personId)');
     } catch (e) {
-      print('Error showing ongoing fasting notification: $e');
+      LoggerService.error('Error showing ongoing fasting notification: $e', e);
     }
   }
 
@@ -379,9 +380,9 @@ class FastingNotificationScheduler {
       final notificationId = _getOngoingNotificationId(personId);
       await _notificationsPlugin.cancel(notificationId);
       _activeOngoingNotifications.remove(personId);
-      print('Ongoing fasting notification ID $notificationId cancelled for person $personId');
+      LoggerService.info('Ongoing fasting notification ID $notificationId cancelled for person $personId');
     } catch (e) {
-      print('Error cancelling ongoing fasting notification for person $personId: $e');
+      LoggerService.error('Error cancelling ongoing fasting notification for person $personId: $e', e);
     }
   }
 
@@ -398,9 +399,9 @@ class FastingNotificationScheduler {
       for (final personId in List.from(_activeOngoingNotifications)) {
         await cancelOngoingFastingNotificationForPerson(personId);
       }
-      print('All ongoing fasting notifications cancelled');
+      LoggerService.info('All ongoing fasting notifications cancelled');
     } catch (e) {
-      print('Error cancelling ongoing fasting notifications: $e');
+      LoggerService.error('Error cancelling ongoing fasting notifications: $e', e);
     }
   }
 
@@ -437,7 +438,7 @@ class FastingNotificationScheduler {
     // Add the last period
     merged.add(current);
 
-    print('Merged ${periods.length} fasting periods into ${merged.length} non-overlapping periods');
+    LoggerService.info('Merged ${periods.length} fasting periods into ${merged.length} non-overlapping periods');
 
     return merged;
   }
@@ -459,7 +460,7 @@ class FastingNotificationScheduler {
         ? NotificationConfig.getFastingCompletionDetails()
         : NotificationConfig.getNotificationDetails();
 
-    print('Scheduling one-time notification ID $id for $scheduledDate');
+    LoggerService.info('Scheduling one-time notification ID $id for $scheduledDate');
 
     try {
       await _notificationsPlugin.zonedSchedule(
@@ -472,9 +473,9 @@ class FastingNotificationScheduler {
         // No matchDateTimeComponents - this is a one-time notification
         payload: payload,
       );
-      print('Successfully scheduled one-time notification ID $id');
+      LoggerService.info('Successfully scheduled one-time notification ID $id');
     } catch (e) {
-      print('Failed to schedule one-time notification: $e');
+      LoggerService.error('Failed to schedule one-time notification: $e', e);
     }
   }
 }

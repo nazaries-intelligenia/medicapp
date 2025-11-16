@@ -5,6 +5,7 @@ import '../../database/database_helper.dart';
 import '../notification_id_generator.dart';
 import '../../utils/datetime_extensions.dart';
 import 'notification_config.dart';
+import '../logger_service.dart';
 
 /// Handles scheduling of weekly pattern medication notifications
 class WeeklyNotificationScheduler {
@@ -17,7 +18,7 @@ class WeeklyNotificationScheduler {
   /// V19+: Now requires personId for per-person notification scheduling
   Future<void> scheduleWeeklyPatternNotifications(Medication medication, String personId) async{
     if (medication.weeklyDays == null || medication.weeklyDays!.isEmpty) {
-      print('No weekly days selected for ${medication.name}');
+      LoggerService.info('No weekly days selected for ${medication.name}');
       return;
     }
 
@@ -39,9 +40,9 @@ class WeeklyNotificationScheduler {
       final totalDays = end.difference(today).inDays + 1;
       final daysToSchedule = totalDays > 2 ? 2 : totalDays;
 
-      print('Scheduling ${medication.name} weekly pattern for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
+      LoggerService.info('Scheduling ${medication.name} weekly pattern for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
       if (totalDays > 2) {
-        print('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
+        LoggerService.warning('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
       }
 
       for (int day = 0; day < daysToSchedule; day++) {
@@ -128,7 +129,7 @@ class WeeklyNotificationScheduler {
             doseIndex: i,
           );
 
-          print('Scheduling weekly recurring notification ID $notificationId for ${medication.name} on weekday $weekday at $hour:$minute');
+          LoggerService.info('Scheduling weekly recurring notification ID $notificationId for ${medication.name} on weekday $weekday at $hour:$minute');
 
           await _scheduleWeeklyNotification(
             id: notificationId,
@@ -155,7 +156,7 @@ class WeeklyNotificationScheduler {
 
     final notificationDetails = NotificationConfig.getNotificationDetails();
 
-    print('Scheduling weekly notification ID $id for $scheduledDate (recurring weekly)');
+    LoggerService.info('Scheduling weekly notification ID $id for $scheduledDate (recurring weekly)');
 
     try {
       await _notificationsPlugin.zonedSchedule(
@@ -168,9 +169,9 @@ class WeeklyNotificationScheduler {
         matchDateTimeComponents: fln.DateTimeComponents.dayOfWeekAndTime, // Repeat weekly on the same day and time
         payload: payload,
       );
-      print('Successfully scheduled weekly notification ID $id');
+      LoggerService.info('Successfully scheduled weekly notification ID $id');
     } catch (e) {
-      print('Failed to schedule weekly notification: $e');
+      LoggerService.error('Failed to schedule weekly notification: $e', e);
     }
   }
 
@@ -187,7 +188,7 @@ class WeeklyNotificationScheduler {
 
     final notificationDetails = NotificationConfig.getNotificationDetails();
 
-    print('Scheduling one-time notification ID $id for $scheduledDate');
+    LoggerService.info('Scheduling one-time notification ID $id for $scheduledDate');
 
     try {
       await _notificationsPlugin.zonedSchedule(
@@ -200,9 +201,9 @@ class WeeklyNotificationScheduler {
         // No matchDateTimeComponents - this is a one-time notification
         payload: payload,
       );
-      print('Successfully scheduled one-time notification ID $id');
+      LoggerService.info('Successfully scheduled one-time notification ID $id');
     } catch (e) {
-      print('Failed to schedule one-time notification: $e');
+      LoggerService.error('Failed to schedule one-time notification: $e', e);
     }
   }
 }

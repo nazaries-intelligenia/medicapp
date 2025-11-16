@@ -8,6 +8,7 @@ import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/dose_history_service.dart';
 import '../services/snackbar_service.dart';
+import '../services/logger_service.dart';
 import '../utils/platform_helper.dart';
 import 'medication_info_screen.dart';
 import 'edit_medication_menu_screen.dart';
@@ -190,7 +191,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
         });
       }
     } catch (e) {
-      print('Could not load battery banner preference: $e');
+      LoggerService.error('Could not load battery banner preference: $e', e);
     }
   }
 
@@ -204,7 +205,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
         });
       }
     } catch (e) {
-      print('Could not save battery banner preference: $e');
+      LoggerService.error('Could not save battery banner preference: $e', e);
       if (mounted) {
         setState(() {
           _batteryBannerDismissed = true;

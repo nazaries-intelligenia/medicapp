@@ -66,6 +66,9 @@ dependencies:
   # UUID generation for unique IDs
   uuid: ^4.0.0
 
+  # Professional logging
+  logger: ^2.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

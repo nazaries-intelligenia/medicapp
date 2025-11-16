@@ -4,6 +4,7 @@ import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../notification_id_generator.dart';
 import '../../utils/datetime_extensions.dart';
+import '../logger_service.dart';
 
 /// Handles cancellation of all notification types
 class NotificationCancellationManager {
@@ -20,7 +21,7 @@ class NotificationCancellationManager {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('Cancelling all notifications for medication $medicationId (all persons)');
+    LoggerService.info('Cancelling all notifications for medication $medicationId (all persons)');
 
     // Determine the number of doses to cancel
     final maxDoses = medication?.doseTimes.length ?? 24;
@@ -119,7 +120,7 @@ class NotificationCancellationManager {
 
     // Cancel any fasting notifications (static "before" fasting and dynamic "after" fasting)
     if (medication == null || medication.requiresFasting) {
-      print('Cancelling fasting notifications for medication $medicationId');
+      LoggerService.info('Cancelling fasting notifications for medication $medicationId');
 
       // Calculate date range for fasting notifications
       // OPTIMIZATION: Limit to 3 days to match scheduling window
@@ -134,7 +135,7 @@ class NotificationCancellationManager {
       // If we have medication info with dose times, calculate exact fasting notification times
       // V19+: Cancel for all possible person variants
       if (medication != null && medication.doseTimes.isNotEmpty && medication.fastingDurationMinutes != null) {
-        print('Using exact fasting times from medication data');
+        LoggerService.info('Using exact fasting times from medication data');
 
         for (int personVariant = 0; personVariant < 10; personVariant++) {
           final dummyPersonId = 'person-$personVariant';
@@ -209,7 +210,7 @@ class NotificationCancellationManager {
       } else {
         // No medication info or no dose times: use broader cancellation
         // V19+: Cancel for all possible person variants
-        print('Using broad cancellation approach for fasting notifications');
+        LoggerService.info('Using broad cancellation approach for fasting notifications');
 
         for (int personVariant = 0; personVariant < 10; personVariant++) {
           final dummyPersonId = 'person-$personVariant';
@@ -270,7 +271,7 @@ class NotificationCancellationManager {
       }
     }
 
-    print('Finished cancelling notifications for medication $medicationId');
+    LoggerService.info('Finished cancelling notifications for medication $medicationId');
   }
 
   /// Cancel a specific postponed notification
@@ -288,7 +289,7 @@ class NotificationCancellationManager {
     );
     await _notificationsPlugin.cancel(notificationId);
 
-    print('Cancelled postponed notification ID $notificationId for medication $medicationId at $doseTime (person: $personId)');
+    LoggerService.info('Cancelled postponed notification ID $notificationId for medication $medicationId at $doseTime (person: $personId)');
   }
 
   /// Cancel a specific dose notification for today
@@ -303,12 +304,12 @@ class NotificationCancellationManager {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('Cancelling today\'s dose notification for ${medication.name} at $doseTime (person: $personId)');
+    LoggerService.info('Cancelling today\'s dose notification for ${medication.name} at $doseTime (person: $personId)');
 
     // Find the dose index for this time
     final doseIndex = medication.doseTimes.indexOf(doseTime);
     if (doseIndex == -1) {
-      print('Dose time $doseTime not found in medication dose times');
+      LoggerService.warning('Dose time $doseTime not found in medication dose times');
       return;
     }
 
@@ -328,7 +329,7 @@ class NotificationCancellationManager {
             doseIndex: doseIndex,
           );
           await _notificationsPlugin.cancel(notificationId);
-          print('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
+          LoggerService.info('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
         }
         break;
 
@@ -344,7 +345,7 @@ class NotificationCancellationManager {
             doseIndex: doseIndex,
           );
           await _notificationsPlugin.cancel(notificationId);
-          print('Cancelled weekly pattern notification ID $notificationId for $todayString at $doseTime');
+          LoggerService.info('Cancelled weekly pattern notification ID $notificationId for $todayString at $doseTime');
         } else {
           // Recurring weekly notifications, cancel by weekday
           final notificationId = NotificationIdGenerator.generate(
@@ -355,7 +356,7 @@ class NotificationCancellationManager {
             doseIndex: doseIndex,
           );
           await _notificationsPlugin.cancel(notificationId);
-          print('Cancelled recurring weekly notification ID $notificationId for weekday ${now.weekday} at $doseTime');
+          LoggerService.info('Cancelled recurring weekly notification ID $notificationId for weekday ${now.weekday} at $doseTime');
         }
         break;
 
@@ -371,7 +372,7 @@ class NotificationCancellationManager {
             doseIndex: doseIndex,
           );
           await _notificationsPlugin.cancel(notificationId);
-          print('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
+          LoggerService.info('Cancelled specific date notification ID $notificationId for $todayString at $doseTime');
         } else {
           // Recurring daily notifications, cancel the recurring notification
           final notificationId = NotificationIdGenerator.generate(
@@ -381,7 +382,7 @@ class NotificationCancellationManager {
             doseIndex: doseIndex,
           );
           await _notificationsPlugin.cancel(notificationId);
-          print('Cancelled recurring daily notification ID $notificationId for $doseTime');
+          LoggerService.info('Cancelled recurring daily notification ID $notificationId for $doseTime');
         }
         break;
     }
