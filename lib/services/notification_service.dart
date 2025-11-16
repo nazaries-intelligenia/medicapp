@@ -1480,6 +1480,7 @@ class NotificationService {
     required Medication medication,
     required String personName,
     bool isInsufficientForDose = false,
+    int? daysRemaining,
   }) async {
     if (_isTestMode) return;
 
@@ -1493,9 +1494,16 @@ class NotificationService {
           ? '⚠️ Stock insuficiente: ${medication.name}'
           : '📦 Stock bajo: ${medication.name}';
 
-      final body = isInsufficientForDose
-          ? 'No hay suficiente ${medication.type.stockUnit} para la próxima dosis. Stock actual: ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}.'
-          : 'Quedan ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}. Considera reabastecer pronto.';
+      String body;
+      if (isInsufficientForDose) {
+        body = 'No hay suficiente ${medication.type.stockUnit} para la próxima dosis. Stock actual: ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}.';
+      } else if (daysRemaining != null) {
+        body = daysRemaining == 1
+            ? 'Solo queda 1 día de stock (${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}). Considera reabastecer hoy.'
+            : 'Quedan aproximadamente $daysRemaining días de stock (${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}). Considera reabastecer pronto.';
+      } else {
+        body = 'Quedan ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.stockUnit}. Considera reabastecer pronto.';
+      }
 
       await _notificationsPlugin.show(
         notificationId,
@@ -1507,9 +1515,72 @@ class NotificationService {
         ),
       );
 
-      print('📦 Low stock notification shown for ${medication.name}');
+      print('📦 Low stock notification shown for ${medication.name} (days remaining: $daysRemaining)');
     } catch (e) {
       print('Error showing low stock notification: $e');
+    }
+  }
+
+  /// Check all medications for low stock and send proactive notifications
+  /// This should be called daily to alert users before they run out
+  Future<void> checkLowStockForAllMedications() async {
+    if (_isTestMode) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final today = DateTime.now().toIso8601String().split('T')[0];
+      final lastCheckKey = 'last_stock_check_date';
+      final lastCheck = prefs.getString(lastCheckKey);
+
+      // Only check once per day
+      if (lastCheck == today) {
+        print('📦 Stock already checked today, skipping');
+        return;
+      }
+
+      print('📦 Checking low stock for all medications...');
+
+      // Get all persons
+      final persons = await DatabaseHelper.instance.getAllPersons();
+
+      for (final person in persons) {
+        // Get medications for this person
+        final medications = await DatabaseHelper.instance.getMedicationsForPerson(person.id);
+
+        for (final medication in medications) {
+          // Skip suspended medications
+          if (medication.isSuspended) continue;
+
+          // Check if stock is low
+          if (medication.isStockLow) {
+            // Calculate days remaining
+            int? daysRemaining;
+            final dailyDose = medication.durationType == TreatmentDurationType.asNeeded
+                ? medication.lastDailyConsumption
+                : medication.totalDailyDose;
+
+            if (dailyDose != null && dailyDose > 0) {
+              daysRemaining = (medication.stockQuantity / dailyDose).floor();
+            }
+
+            // Show notification
+            await showLowStockNotification(
+              medication: medication,
+              personName: person.name,
+              isInsufficientForDose: false,
+              daysRemaining: daysRemaining,
+            );
+
+            print('📦 Low stock alert sent for ${medication.name} (${person.name})');
+          }
+        }
+      }
+
+      // Save today's date to avoid duplicate checks
+      await prefs.setString(lastCheckKey, today);
+      print('📦 Stock check completed for today');
+    } catch (e) {
+      print('Error checking low stock: $e');
     }
   }
 
