@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'medication_type.dart';
 import 'treatment_duration_type.dart';
 import '../utils/datetime_extensions.dart';
+import '../services/logger_service.dart';
 
 class Medication {
   final String id;
@@ -112,7 +113,7 @@ class Medication {
         final decoded = jsonDecode(doseScheduleString) as Map<String, dynamic>;
         doseSchedule = decoded.map((key, value) => MapEntry(key, (value as num).toDouble()));
       } catch (e) {
-        print('Error parsing doseSchedule: $e');
+        LoggerService.error('Error parsing doseSchedule: $e', e);
       }
     } else {
       // Legacy: migrate from old doseTimes format (comma-separated string)

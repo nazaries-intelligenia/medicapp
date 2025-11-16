@@ -8,6 +8,7 @@ import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../models/person.dart';
 import '../models/person_medication.dart';
+import '../services/logger_service.dart';
 
 class DatabaseHelper {
   // Singleton pattern
@@ -62,7 +63,7 @@ class DatabaseHelper {
 
         // Debug: Check database schema
         final result = await db.rawQuery('PRAGMA table_info(medications)');
-        print('Database columns: ${result.map((e) => e['name']).toList()}');
+        LoggerService.debug('Database columns: ${result.map((e) => e['name']).toList()}');
       },
     );
   }
@@ -398,7 +399,7 @@ class DatabaseHelper {
       // - medications: shared data (stock)
       // - person_medications: individual schedule data per person
 
-      print('=== Starting migration to v19 ===');
+      LoggerService.info('=== Starting migration to v19 ===');
 
       const idType = 'TEXT PRIMARY KEY';
       const textType = 'TEXT NOT NULL';
@@ -501,7 +502,7 @@ class DatabaseHelper {
       await db.execute('DROP TABLE person_medications_old');
       await db.execute('DROP TABLE medications_old');
 
-      print('=== Migration to v19 complete ===');
+      LoggerService.info('=== Migration to v19 complete ===');
     }
 
     if (oldVersion < 20) {
@@ -509,7 +510,7 @@ class DatabaseHelper {
       await db.execute('''
         ALTER TABLE medications ADD COLUMN expirationDate TEXT
       ''');
-      print('Migration to v20: Added expirationDate column');
+      LoggerService.info('Migration to v20: Added expirationDate column');
     }
   }
 
@@ -536,7 +537,7 @@ class DatabaseHelper {
     if (existingMed.isNotEmpty) {
       // Medication exists, reuse it (shared stock)
       medicationId = existingMed.first['id'] as String;
-      print('Reusing existing medication: $medicationId (${medication.name})');
+      LoggerService.info('Reusing existing medication: $medicationId (${medication.name})');
     } else {
       // Create new medication (shared data only)
       medicationId = medication.id;
@@ -554,7 +555,7 @@ class DatabaseHelper {
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
-      print('Created new medication: $medicationId (${medication.name})');
+      LoggerService.info('Created new medication: $medicationId (${medication.name})');
     }
 
     // Create person_medication relationship with individual schedule
@@ -587,7 +588,7 @@ class DatabaseHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    print('Assigned medication to person: $personId');
+    LoggerService.info('Assigned medication to person: $personId');
     return medicationId;
   }
 
@@ -1228,13 +1229,13 @@ class DatabaseHelper {
     // Get default person
     final defaultPerson = await getDefaultPerson();
     if (defaultPerson == null) {
-      print('No default person found, cannot migrate medications');
+      LoggerService.warning('No default person found, cannot migrate medications');
       return;
     }
 
     // Get all medications without person assignment
     final unassignedMedications = await getMedicationsWithoutPersonAssignment();
-    print('Found ${unassignedMedications.length} medications without person assignment');
+    LoggerService.info('Found ${unassignedMedications.length} medications without person assignment');
 
     if (unassignedMedications.isEmpty) {
       return; // Nothing to migrate
@@ -1280,12 +1281,12 @@ class DatabaseHelper {
               'isSuspended': medication.isSuspended ? 1 : 0,
             },
           );
-          print('Assigned medication ${medication.name} to default person ${defaultPerson.name}');
+          LoggerService.info('Assigned medication ${medication.name} to default person ${defaultPerson.name}');
         }
       }
     });
 
-    print('Migration complete: ${unassignedMedications.length} medications assigned to ${defaultPerson.name}');
+    LoggerService.info('Migration complete: ${unassignedMedications.length} medications assigned to ${defaultPerson.name}');
   }
 
   // Delete - Delete all person-medication relationships (useful for testing)
@@ -1322,9 +1323,9 @@ class DatabaseHelper {
     // Debug: Check what's in the database before export
     final db = await database;
     final medications = await db.query('medications');
-    print('Exporting database with ${medications.length} medications:');
+    LoggerService.info('Exporting database with ${medications.length} medications:');
     for (var med in medications) {
-      print('  - ${med['id']}: ${med['name']}');
+      LoggerService.info('  - ${med['id']}: ${med['name']}');
     }
 
     // Create a temporary directory for the export
@@ -1335,7 +1336,7 @@ class DatabaseHelper {
 
     // Copy the database file
     await dbFile.copy(exportPath);
-    print('Database exported to: $exportPath');
+    LoggerService.info('Database exported to: $exportPath');
 
     return exportPath;
   }
@@ -1355,47 +1356,47 @@ class DatabaseHelper {
 
     // Close current database connection
     if (_database != null) {
-      print('Closing current database connection...');
+      LoggerService.info('Closing current database connection...');
       await _database!.close();
       _database = null;
-      print('Database connection closed');
+      LoggerService.info('Database connection closed');
     }
 
     // Get the target database path
     final dbPath = await getDatabasesPath();
     final targetDbPath = join(dbPath, 'medications.db');
-    print('Target database path: $targetDbPath');
+    LoggerService.info('Target database path: $targetDbPath');
 
     // Backup current database before importing (just in case)
     final currentDbFile = File(targetDbPath);
     if (await currentDbFile.exists()) {
       final backupPath = '$targetDbPath.backup';
       await currentDbFile.copy(backupPath);
-      print('Current database backed up to: $backupPath');
+      LoggerService.info('Current database backed up to: $backupPath');
     }
 
     // Delete the existing database files (including WAL and SHM) to ensure clean replacement
     if (await currentDbFile.exists()) {
       await currentDbFile.delete();
-      print('Deleted existing database file');
+      LoggerService.info('Deleted existing database file');
     }
 
     // Delete WAL (Write-Ahead Log) and SHM (Shared Memory) files if they exist
     final walFile = File('$targetDbPath-wal');
     if (await walFile.exists()) {
       await walFile.delete();
-      print('Deleted WAL file');
+      LoggerService.info('Deleted WAL file');
     }
 
     final shmFile = File('$targetDbPath-shm');
     if (await shmFile.exists()) {
       await shmFile.delete();
-      print('Deleted SHM file');
+      LoggerService.info('Deleted SHM file');
     }
 
     // Copy the import file to the database location
     await importFile.copy(targetDbPath);
-    print('Database imported from: $importPath');
+    LoggerService.info('Database imported from: $importPath');
 
     // Add a small delay to ensure file system operations complete
     await Future.delayed(const Duration(milliseconds: 100));
@@ -1407,19 +1408,19 @@ class DatabaseHelper {
       // Debug: Check what's in the imported database
       final db = await database;
       final medications = await db.query('medications');
-      print('Database imported successfully. Medications count: ${medications.length}');
+      LoggerService.info('Database imported successfully. Medications count: ${medications.length}');
       for (var med in medications) {
-        print('  - ${med['id']}: ${med['name']}');
+        LoggerService.info('  - ${med['id']}: ${med['name']}');
       }
     } catch (e) {
       // If verification fails, restore from backup
-      print('Import verification failed: $e');
+      LoggerService.error('Import verification failed: $e', e);
       final backupPath = '$targetDbPath.backup';
       final backupFile = File(backupPath);
       if (await backupFile.exists()) {
         await backupFile.copy(targetDbPath);
         _database = await _initDB('medications.db');
-        print('Restored database from backup');
+        LoggerService.info('Restored database from backup');
       }
       throw Exception('Failed to import database: $e');
     }

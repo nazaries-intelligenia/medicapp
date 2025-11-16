@@ -5,6 +5,7 @@ import '../../database/database_helper.dart';
 import '../notification_id_generator.dart';
 import '../../utils/datetime_extensions.dart';
 import 'notification_config.dart';
+import '../logger_service.dart';
 
 /// Handles scheduling of daily recurring medication notifications
 class DailyNotificationScheduler {
@@ -39,9 +40,9 @@ class DailyNotificationScheduler {
       final totalDays = end.difference(today).inDays + 1;
       final daysToSchedule = totalDays > 2 ? 2 : totalDays;
 
-      print('Scheduling ${medication.name} for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
+      LoggerService.info('Scheduling ${medication.name} for $daysToSchedule days (total treatment: $totalDays days, until ${endDate.toString().split(' ')[0]})');
       if (totalDays > 2) {
-        print('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
+        LoggerService.warning('⚠️  Scheduling limited to next 2 days (today + tomorrow). Remaining ${totalDays - 2} days will be scheduled automatically.');
       }
 
       // Schedule notifications for today + tomorrow only
@@ -50,7 +51,7 @@ class DailyNotificationScheduler {
 
         // Skip today if excludeToday is true (dose already taken today)
         if (excludeToday && day == 0) {
-          print('⏭️  Skipping today (dose already taken)');
+          LoggerService.info('⏭️  Skipping today (dose already taken)');
           continue;
         }
 
@@ -71,11 +72,11 @@ class DailyNotificationScheduler {
 
           // Skip if the time has already passed
           if (scheduledDate.isBefore(now)) {
-            print('⏭️  Skipping past time: ${scheduledDate} (now: $now)');
+            LoggerService.info('⏭️  Skipping past time: ${scheduledDate} (now: $now)');
             continue;
           }
 
-          print('✅ Scheduling notification for: ${scheduledDate} (${doseTime})');
+          LoggerService.info('✅ Scheduling notification for: ${scheduledDate} (${doseTime})');
 
           // Generate unique ID for this specific date and dose (V19+: includes personId)
           final dateString = DateTime(targetDate.year, targetDate.month, targetDate.day).toDateString();
@@ -98,7 +99,7 @@ class DailyNotificationScheduler {
       }
     } else {
       // No end date: use recurring daily notifications
-      print('Scheduling ${medication.name} with recurring daily notifications (no end date)');
+      LoggerService.info('Scheduling ${medication.name} with recurring daily notifications (no end date)');
 
       for (int i = 0; i < medication.doseTimes.length; i++) {
         final doseTime = medication.doseTimes[i];
@@ -114,7 +115,7 @@ class DailyNotificationScheduler {
           doseIndex: i,
         );
 
-        print('Scheduling recurring notification ID $notificationId for ${medication.name} at $hour:$minute daily');
+        LoggerService.info('Scheduling recurring notification ID $notificationId for ${medication.name} at $hour:$minute daily');
 
         await _scheduleNotification(
           id: notificationId,
@@ -134,7 +135,7 @@ class DailyNotificationScheduler {
   /// OPTIMIZATION: Only schedule dates for today + tomorrow (max 2 days) for performance
   Future<void> scheduleSpecificDatesNotifications(Medication medication, String personId) async {
     if (medication.selectedDates == null || medication.selectedDates!.isEmpty) {
-      print('No specific dates selected for ${medication.name}');
+      LoggerService.info('No specific dates selected for ${medication.name}');
       return;
     }
 
@@ -160,7 +161,7 @@ class DailyNotificationScheduler {
       final targetDate = DateTime(year, month, day);
 
       if (targetDate.isBefore(today)) {
-        print('Skipping past date: $dateString');
+        LoggerService.info('Skipping past date: $dateString');
         continue;
       }
 
@@ -188,7 +189,7 @@ class DailyNotificationScheduler {
 
         // Skip if the time has already passed
         if (scheduledDate.isBefore(now)) {
-          print('Skipping past time: $dateString $doseTime');
+          LoggerService.info('Skipping past time: $dateString $doseTime');
           continue;
         }
 
@@ -201,7 +202,7 @@ class DailyNotificationScheduler {
           doseIndex: i,
         );
 
-        print('Scheduling specific date notification ID $notificationId for ${medication.name} on $dateString at $hour:$minute');
+        LoggerService.info('Scheduling specific date notification ID $notificationId for ${medication.name} on $dateString at $hour:$minute');
 
         await _scheduleOneTimeNotification(
           id: notificationId,
@@ -216,7 +217,7 @@ class DailyNotificationScheduler {
     }
 
     if (skippedFutureCount > 0) {
-      print('⚠️  Skipped $skippedFutureCount dates beyond 2-day window (today + tomorrow). Scheduled $scheduledCount dates.');
+      LoggerService.warning('⚠️  Skipped $skippedFutureCount dates beyond 2-day window (today + tomorrow). Scheduled $scheduledCount dates.');
     }
   }
 
@@ -248,21 +249,21 @@ class DailyNotificationScheduler {
 
     // If excludeToday is true (dose already taken today), always schedule for tomorrow
     if (excludeToday) {
-      print('⏰ Excluding today (dose already taken), scheduling for tomorrow');
+      LoggerService.info('⏰ Excluding today (dose already taken), scheduling for tomorrow');
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
     // Otherwise, if the scheduled time has already passed today, schedule for tomorrow
     else if (scheduledDate.isBefore(now)) {
-      print('⏰ Time has passed for today, scheduling for tomorrow');
+      LoggerService.info('⏰ Time has passed for today, scheduling for tomorrow');
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
-    print('📅 Final scheduled date/time: $scheduledDate');
+    LoggerService.info('📅 Final scheduled date/time: $scheduledDate');
 
     final notificationDetails = NotificationConfig.getNotificationDetails();
 
     // Schedule the notification to repeat daily
-    print('Attempting to schedule notification ID $id for $hour:$minute on $scheduledDate');
+    LoggerService.info('Attempting to schedule notification ID $id for $hour:$minute on $scheduledDate');
 
     try {
       await _notificationsPlugin.zonedSchedule(
@@ -275,12 +276,12 @@ class DailyNotificationScheduler {
         matchDateTimeComponents: fln.DateTimeComponents.time, // Repeat daily at same time
         payload: payload,
       );
-      print('Successfully scheduled notification ID $id with exactAllowWhileIdle');
+      LoggerService.info('Successfully scheduled notification ID $id with exactAllowWhileIdle');
     } catch (e) {
       // If exact alarms are not permitted, try with inexact alarms
-      print('Failed to schedule exact alarm: $e');
-      print('This may require SCHEDULE_EXACT_ALARM permission on Android 12+');
-      print('Falling back to inexact alarm...');
+      LoggerService.error('Failed to schedule exact alarm: $e', e);
+      LoggerService.warning('This may require SCHEDULE_EXACT_ALARM permission on Android 12+');
+      LoggerService.info('Falling back to inexact alarm...');
 
       try {
         await _notificationsPlugin.zonedSchedule(
@@ -293,9 +294,9 @@ class DailyNotificationScheduler {
           matchDateTimeComponents: fln.DateTimeComponents.time,
           payload: payload,
         );
-        print('Successfully scheduled notification ID $id with inexact mode');
+        LoggerService.info('Successfully scheduled notification ID $id with inexact mode');
       } catch (e2) {
-        print('Failed to schedule inexact alarm: $e2');
+        LoggerService.error('Failed to schedule inexact alarm: $e2', e2);
         // Don't throw - allow the app to continue without notifications
       }
     }
@@ -314,7 +315,7 @@ class DailyNotificationScheduler {
 
     final notificationDetails = NotificationConfig.getNotificationDetails();
 
-    print('Scheduling one-time notification ID $id for $scheduledDate');
+    LoggerService.info('Scheduling one-time notification ID $id for $scheduledDate');
 
     try {
       await _notificationsPlugin.zonedSchedule(
@@ -327,9 +328,9 @@ class DailyNotificationScheduler {
         // No matchDateTimeComponents - this is a one-time notification
         payload: payload,
       );
-      print('Successfully scheduled one-time notification ID $id');
+      LoggerService.info('Successfully scheduled one-time notification ID $id');
     } catch (e) {
-      print('Failed to schedule one-time notification: $e');
+      LoggerService.error('Failed to schedule one-time notification: $e', e);
     }
   }
 }

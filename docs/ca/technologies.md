@@ -788,7 +788,228 @@ Per a MedicApp, l'arquitectura **Database as Single Source of Truth + StatefulWi
 
 ---
 
-## 6. Emmagatzematge Local
+## 6. Registre i Depuració
+
+### logger ^2.0.0
+
+**Versió utilitzada:** `^2.0.0` (compatible amb `2.0.0` fins `< 3.0.0`)
+
+**Propòsit:**
+logger és una biblioteca de logging professional per a Dart que proporciona un sistema de logs estructurat, configurable i amb múltiples nivells de severitat. Reemplaza l'ús de `print()` statements amb un sistema de logging robust apropiat per a aplicacions en producció.
+
+**Nivells de logging:**
+
+MedicApp utilitza 6 nivells de log segons la seva severitat:
+
+1. **VERBOSE (trace):** Informació de diagnòstic molt detallada (desenvolupament)
+2. **DEBUG:** Informació útil durant desenvolupament
+3. **INFO:** Missatges informacionals sobre flux de l'aplicació
+4. **WARNING:** Advertències que no impedeixen el funcionament
+5. **ERROR:** Errors que requereixen atenció però l'app pot recuperar-se
+6. **WTF (What a Terrible Failure):** Errors greus que no haurien d'ocórrer mai
+
+**Implementació a MedicApp:**
+
+**`lib/services/logger_service.dart`:**
+```dart
+import 'package:logger/logger.dart';
+
+class LoggerService {
+  LoggerService._();
+
+  static Logger? _logger;
+  static bool _isTestMode = false;
+
+  static Logger get instance {
+    _logger ??= _createLogger();
+    return _logger!;
+  }
+
+  static Logger _createLogger() {
+    return Logger(
+      filter: _LogFilter(),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 5,
+        lineLength: 80,
+        colors: true,
+        printEmojis: true,
+        dateTimeFormat: DateTimeFormat.onlyTime,
+      ),
+      output: ConsoleOutput(),
+    );
+  }
+
+  // Mètodes de conveniència
+  static void debug(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.d(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void info(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.i(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void error(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.e(message, error: error, stackTrace: stackTrace);
+    }
+  }
+}
+
+class _LogFilter extends LogFilter {
+  @override
+  bool shouldLog(LogEvent event) {
+    if (LoggerService.isTestMode) return false;
+    if (kReleaseMode) {
+      return event.level.index >= Level.warning.index;
+    }
+    return true;
+  }
+}
+```
+
+**Ús en el codi:**
+
+```dart
+// ABANS (amb print)
+print('Scheduling notification for ${medication.name}');
+print('Error al guardar: $e');
+
+// DESPRÉS (amb LoggerService)
+LoggerService.info('Scheduling notification for ${medication.name}');
+LoggerService.error('Error al guardar', e);
+```
+
+**Exemples d'ús per nivell:**
+
+```dart
+// Informació de flux normal
+LoggerService.info('Medicament creat: ${medication.name}');
+
+// Debugging durant desenvolupament
+LoggerService.debug('Query executat: SELECT * FROM medications WHERE id = ${id}');
+
+// Advertències no crítiques
+LoggerService.warning('Estoc baix per a ${medication.name}: ${stock} unitats');
+
+// Errors recuperables
+LoggerService.error('Error al programar notificació', e, stackTrace);
+
+// Errors greus
+LoggerService.wtf('Estat inconsistent: medicament sense ID', error);
+```
+
+**Característiques utilitzades:**
+
+1. **PrettyPrinter:** Format llegible amb colors, emojis i timestamps:
+```
+💡 INFO 14:23:45 | Medicament creat: Ibuprofèn
+⚠️  WARNING 14:24:10 | Estoc baix: Paracetamol
+❌ ERROR 14:25:33 | Error al guardar
+```
+
+2. **Filtrat automàtic:** En release, només mostra warnings i errors:
+```dart
+// Debug mode: mostra tots els logs
+// Release mode: només WARNING, ERROR, WTF
+```
+
+3. **Test mode:** Suprimeix tots els logs durant testing:
+```dart
+LoggerService.enableTestMode();  // A setUp de tests
+```
+
+4. **Stack traces automàtics:** Per a errors, imprimeix stack trace complet:
+```dart
+LoggerService.error('Database error', e, stackTrace);
+// Output inclou stack trace formatat
+```
+
+5. **Sense dependència de BuildContext:** Pot usar-se a qualsevol part del codi:
+```dart
+// En serveis
+class NotificationService {
+  void scheduleNotification() {
+    LoggerService.info('Scheduling notification...');
+  }
+}
+
+// En models
+class Medication {
+  void validate() {
+    if (stock < 0) {
+      LoggerService.warning('Estoc negatiu: $stock');
+    }
+  }
+}
+```
+
+**Per què logger:**
+
+1. **Professional:** Dissenyat per a producció, no només desenvolupament
+2. **Configurable:** Diferents nivells, filtres, formats
+3. **Rendiment:** Filtrat intel·ligent en release mode
+4. **Debugging millorat:** Colors, emojis, timestamps, stack traces
+5. **Testing friendly:** Mode test per suprimir logs
+6. **Zero configuration:** Funciona out-of-the-box amb configuració sensata
+
+**Migració de print() a LoggerService:**
+
+MedicApp va migrar **279 print() statements** en **15 arxius** al sistema LoggerService:
+
+| Arxiu | Prints migrats | Nivell predominant |
+|---------|----------------|-------------------|
+| notification_service.dart | 112 | info, error, warning |
+| database_helper.dart | 26 | debug, info, error |
+| fasting_notification_scheduler.dart | 32 | info, warning |
+| daily_notification_scheduler.dart | 25 | info, warning |
+| dose_calculation_service.dart | 25 | debug, info |
+| medication_list_viewmodel.dart | 7 | info, error |
+| **Total** | **279** | - |
+
+**Comparativa amb alternatives:**
+
+| Característica | logger | print() | logging package | custom solution |
+|----------------|--------|---------|----------------|-----------------|
+| **Nivells de log** | ✅ 6 nivells | ❌ Cap | ✅ 7 nivells | ⚠️ Manual |
+| **Colors** | ✅ Sí | ❌ No | ⚠️ Bàsic | ⚠️ Manual |
+| **Timestamps** | ✅ Configurable | ❌ No | ✅ Sí | ⚠️ Manual |
+| **Filtrat** | ✅ Automàtic | ❌ No | ✅ Manual | ⚠️ Manual |
+| **Stack traces** | ✅ Automàtic | ❌ Manual | ⚠️ Manual | ⚠️ Manual |
+| **Pretty print** | ✅ Excel·lent | ❌ Bàsic | ⚠️ Bàsic | ⚠️ Manual |
+| **Mida** | ✅ ~50KB | ✅ 0KB | ⚠️ ~100KB | ✅ Variable |
+
+**Per què NO print():**
+
+- ❌ No diferencia entre debug, info, warning, error
+- ❌ Sense timestamps, dificulta debugging
+- ❌ Sense colors, difícil de llegir en consola
+- ❌ No es pot filtrar en producció
+- ❌ No apropiat per a aplicacions professionals
+
+**Per què NO logging package (dart:logging):**
+
+- ⚠️ Més complex de configurar
+- ⚠️ Pretty printing requereix implementació custom
+- ⚠️ Menys ergonòmic (més boilerplate)
+- ⚠️ No inclou colors/emojis by default
+
+**Trade-offs de logger:**
+
+- ✅ **Pros:** Setup simple, output hermós, filtrat intel·ligent, apropiat per a producció
+- ❌ **Contres:** Afegeix ~50KB a l'APK (irrellevant), una dependència més
+
+**Decisió:** Per a MedicApp, on el debugging i monitoring són crítics (és una app mèdica), logger proporciona el balance perfecte entre simplicitat i funcionalitat professional. Els 50KB addicionals són insignificants comparats amb els beneficis de debugging i el codi més mantenible.
+
+**Documentació oficial:** https://pub.dev/packages/logger
+
+---
+
+## 7. Emmagatzematge Local
 
 ### shared_preferences ^2.2.2
 
@@ -869,7 +1090,7 @@ class PreferencesService {
 
 ---
 
-## 7. Operacions d'Arxius
+## 8. Operacions d'Arxius
 
 ### file_picker ^8.0.0+1
 
@@ -989,7 +1210,7 @@ Future<void> exportDatabase() async {
 
 ---
 
-## 8. Testing
+## 9. Testing
 
 ### flutter_test (SDK)
 
@@ -1213,7 +1434,7 @@ class MedicationFactory {
 
 ---
 
-## 9. Eines de Desenvolupament
+## 10. Eines de Desenvolupament
 
 ### flutter_launcher_icons ^0.14.4
 
@@ -1358,7 +1579,7 @@ final medication = Medication(
 
 ---
 
-## 10. Dependències de Plataforma
+## 11. Dependències de Plataforma
 
 ### Android
 
@@ -1446,7 +1667,7 @@ dependencies {
 
 ---
 
-## 11. Versions i Compatibilitat
+## 12. Versions i Compatibilitat
 
 ### Taula de Dependències
 
@@ -1466,14 +1687,15 @@ dependencies {
 | **share_plus** | `^10.1.4` | Compartir arxius | Arxius |
 | **path_provider** | `^2.1.5` | Directoris del sistema | Persistència |
 | **uuid** | `^4.0.0` | Generador d'UUIDs | Utilitat |
+| **logger** | `^2.0.0` | Sistema de registre professional | Logging |
 | **sqflite_common_ffi** | `^2.3.0` | Testing de SQLite | Testing (dev) |
 | **flutter_launcher_icons** | `^0.14.4` | Generació d'icones | Eina (dev) |
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Eina (dev) |
 | **flutter_lints** | `^6.0.0` | Anàlisi estàtic | Eina (dev) |
 
-**Total dependències de producció:** 14
+**Total dependències de producció:** 15
 **Total dependències de desenvolupament:** 4
-**Total:** 18
+**Total:** 19
 
 ---
 
@@ -1501,9 +1723,9 @@ dependencies {
 
 ---
 
-## 12. Comparatives i Decisions
+## 13. Comparatives i Decisions
 
-### 12.1. Base de Dades: SQLite vs Hive vs Isar vs Drift
+### 13.1. Base de Dades: SQLite vs Hive vs Isar vs Drift
 
 **Decisió:** SQLite (sqflite)
 
@@ -1572,7 +1794,7 @@ Sacrifiquem ~10-15% de rendiment en operacions massives (irrellevant per a casos
 
 ---
 
-### 12.2. Notificacions: flutter_local_notifications vs awesome_notifications vs Firebase
+### 13.2. Notificacions: flutter_local_notifications vs awesome_notifications vs Firebase
 
 **Decisió:** flutter_local_notifications
 
@@ -1628,7 +1850,7 @@ Per a apps com MedicApp (gestió personal, sense col·laboració multi-usuari, s
 
 ---
 
-### 12.3. Gestió d'Estat: Vanilla Flutter vs Provider vs BLoC vs Riverpod
+### 13.3. Gestió d'Estat: Vanilla Flutter vs Provider vs BLoC vs Riverpod
 
 **Decisió:** Vanilla Flutter (sense biblioteca de gestió d'estat)
 
@@ -1803,6 +2025,7 @@ MedicApp utilitza un stack tecnològic **simple, robust i apropiat** per a una a
 - **Notificacions locals:** Privacitat total i funcionament offline.
 - **Localització ARB:** 8 idiomes amb pluralització Unicode CLDR.
 - **Vanilla Flutter:** Sense gestió d'estat innecessària.
+- **Logger package:** Sistema de registre professional amb 6 nivells i filtrat intel·ligent.
 - **432+ tests:** Cobertura del 75-80% amb tests unitaris, de widget i integració.
 
 Cada decisió tecnològica està **justificada per requisits reals**, no per hype o tendències. El resultat és una aplicació mantenible, fiable i que fa exactament el que promet sense complexitat artificial.

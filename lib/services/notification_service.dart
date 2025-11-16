@@ -20,6 +20,7 @@ import 'notifications/daily_notification_scheduler.dart';
 import 'notifications/weekly_notification_scheduler.dart';
 import 'notifications/fasting_notification_scheduler.dart';
 import 'notifications/notification_cancellation_manager.dart';
+import 'logger_service.dart';
 
 class NotificationService {
   // Singleton pattern
@@ -150,18 +151,18 @@ class NotificationService {
     try {
       // Get device timezone name (this may not work on all platforms)
       final String timeZoneName = DateTime.now().timeZoneName;
-      print('Device timezone name: $timeZoneName');
+      LoggerService.info('Device timezone name: $timeZoneName');
 
       // Common timezone mappings
       // For most cases, we'll use Europe/Madrid as it's a common timezone
       // but log the device timezone for debugging
       tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
-      print('Using timezone: Europe/Madrid');
+      LoggerService.info('Using timezone: Europe/Madrid');
     } catch (e) {
-      print('Error setting timezone: $e');
+      LoggerService.error('Error setting timezone: $e', e);
       // Fallback to UTC if there's an error
       tz.setLocalLocation(tz.UTC);
-      print('Using fallback timezone: UTC');
+      LoggerService.info('Using fallback timezone: UTC');
     }
 
     // Android initialization settings
@@ -228,7 +229,7 @@ class NotificationService {
       await androidPlugin.createNotificationChannel(medicationChannel);
       await androidPlugin.createNotificationChannel(fastingChannel);
 
-      print('✅ Notification channels created successfully');
+      LoggerService.info('✅ Notification channels created successfully');
     }
   }
 
@@ -248,7 +249,7 @@ class NotificationService {
     if (androidPlugin != null) {
       final result = await androidPlugin.requestNotificationsPermission();
       granted = result ?? false;
-      print('Android notification permission granted: $granted');
+      LoggerService.info('Android notification permission granted: $granted');
     }
 
     // For iOS
@@ -264,7 +265,7 @@ class NotificationService {
         sound: true,
       );
       granted = result ?? false;
-      print('iOS notification permission granted: $granted');
+      LoggerService.info('iOS notification permission granted: $granted');
     }
 
     return granted;
@@ -309,7 +310,7 @@ class NotificationService {
         return result ??
             true; // Return true if method not available (older Android)
       } catch (e) {
-        print('Error checking exact alarm permission: $e');
+        LoggerService.error('Error checking exact alarm permission: $e', e);
         return true; // Assume true if check fails
       }
     }
@@ -326,7 +327,7 @@ class NotificationService {
 
     // Only for Android
     if (!PlatformHelper.isAndroid) {
-      print('Exact alarm settings are only available on Android');
+      LoggerService.info('Exact alarm settings are only available on Android');
       return;
     }
 
@@ -339,9 +340,9 @@ class NotificationService {
       );
 
       await intent.launch();
-      print('Opened exact alarm settings');
+      LoggerService.info('Opened exact alarm settings');
     } catch (e) {
-      print('Error opening exact alarm settings: $e');
+      LoggerService.error('Error opening exact alarm settings: $e', e);
 
       // Fallback: open general app settings
       try {
@@ -350,9 +351,9 @@ class NotificationService {
           data: 'package:com.medicapp.medicapp',
         );
         await fallbackIntent.launch();
-        print('Opened app settings as fallback');
+        LoggerService.info('Opened app settings as fallback');
       } catch (e2) {
-        print('Error opening app settings: $e2');
+        LoggerService.error('Error opening app settings: $e2', e2);
       }
     }
   }
@@ -365,7 +366,7 @@ class NotificationService {
 
     // Only for Android
     if (!PlatformHelper.isAndroid) {
-      print('Battery optimization settings are only available on Android');
+      LoggerService.info('Battery optimization settings are only available on Android');
       return;
     }
 
@@ -378,9 +379,9 @@ class NotificationService {
       );
 
       await intent.launch();
-      print('Opened app settings for battery configuration');
+      LoggerService.info('Opened app settings for battery configuration');
     } catch (e) {
-      print('Error opening app settings: $e');
+      LoggerService.error('Error opening app settings: $e', e);
 
       // Fallback: open general settings
       try {
@@ -388,27 +389,27 @@ class NotificationService {
           action: 'android.settings.SETTINGS',
         );
         await fallbackIntent.launch();
-        print('Opened general settings as fallback');
+        LoggerService.info('Opened general settings as fallback');
       } catch (e2) {
-        print('Error opening settings: $e2');
+        LoggerService.error('Error opening settings: $e2', e2);
       }
     }
   }
 
   /// Handle notification tap
   void _onNotificationTapped(fln.NotificationResponse response) async {
-    print('Notification tapped: ${response.payload}');
-    print('Action ID: ${response.actionId}');
+    LoggerService.info('Notification tapped: ${response.payload}');
+    LoggerService.info('Action ID: ${response.actionId}');
 
     if (response.payload == null || response.payload!.isEmpty) {
-      print('No payload in notification');
+      LoggerService.info('No payload in notification');
       return;
     }
 
     // Parse payload: "medicationId|doseIndex|personId" (V19+)
     final parts = response.payload!.split('|');
     if (parts.length != 3) {
-      print('Invalid payload format (expected 3 parts): ${response.payload}');
+      LoggerService.warning('Invalid payload format (expected 3 parts): ${response.payload}');
       return;
     }
 
@@ -441,7 +442,7 @@ class NotificationService {
       // This is a regular notification, need to get the dose time from medication
       final doseIndex = int.tryParse(doseIndexStr);
       if (doseIndex == null) {
-        print('Invalid dose index: $doseIndexStr');
+        LoggerService.warning('Invalid dose index: $doseIndexStr');
         return;
       }
 
@@ -454,15 +455,15 @@ class NotificationService {
             .firstOrNull;
 
         if (medication == null) {
-          print('⚠️ Medication not found for notification ID ${response.id}');
+          LoggerService.warning('⚠️ Medication not found for notification ID ${response.id}');
           // Cancel this orphaned notification to prevent future taps
           await _notificationsPlugin.cancel(response.id ?? 0);
           // Still try to navigate - DoseActionScreen will show an error message
           // Use a dummy time since we can't get the real dose time
           doseTime = '00:00';
-          print('⚠️ Using dummy time 00:00 - DoseActionScreen will show error');
+          LoggerService.warning('⚠️ Using dummy time 00:00 - DoseActionScreen will show error');
         } else if (doseIndex >= medication.doseTimes.length) {
-          print(
+          LoggerService.warning(
             '⚠️ Invalid dose index $doseIndex for medication ${medication.name} (has ${medication.doseTimes.length} doses)',
           );
           await _notificationsPlugin.cancel(response.id ?? 0);
@@ -471,7 +472,7 @@ class NotificationService {
               ? medication.doseTimes[0]
               : '00:00';
           medicationName = medication.name;
-          print(
+          LoggerService.warning(
             '⚠️ Using fallback time $doseTime - DoseActionScreen will handle it',
           );
         } else {
@@ -479,12 +480,12 @@ class NotificationService {
           medicationName = medication.name;
         }
       } catch (e) {
-        print('❌ Error loading medication: $e');
+        LoggerService.error('❌ Error loading medication: $e', e);
         // Try to cancel the notification since something went wrong
         await _notificationsPlugin.cancel(response.id ?? 0);
         // Still try to navigate with a dummy time
         doseTime = '00:00';
-        print(
+        LoggerService.warning(
           '⚠️ Using dummy time 00:00 due to error - DoseActionScreen will show error',
         );
       }
@@ -495,7 +496,7 @@ class NotificationService {
       final person = await DatabaseHelper.instance.getPerson(personId);
       personName = person?.name;
     } catch (e) {
-      print('Error getting person name: $e');
+      LoggerService.error('Error getting person name: $e', e);
     }
 
     // Log notification interaction for debugging
@@ -521,7 +522,7 @@ class NotificationService {
     required String personId,
     required int notificationId,
   }) async {
-    print('🎯 Handling action: $actionId for medication $medicationId');
+    LoggerService.info('🎯 Handling action: $actionId for medication $medicationId');
 
     try {
       // Get medication and dose time
@@ -533,7 +534,7 @@ class NotificationService {
           .firstOrNull;
 
       if (medication == null) {
-        print('❌ Medication not found');
+        LoggerService.warning('❌ Medication not found');
         await _notificationsPlugin.cancel(notificationId);
         return;
       }
@@ -545,7 +546,7 @@ class NotificationService {
       } else {
         final doseIndex = int.tryParse(doseIndexStr);
         if (doseIndex == null || doseIndex >= medication.doseTimes.length) {
-          print('❌ Invalid dose index');
+          LoggerService.warning('❌ Invalid dose index');
           return;
         }
         doseTime = medication.doseTimes[doseIndex];
@@ -577,10 +578,10 @@ class NotificationService {
           );
           break;
         default:
-          print('⚠️  Unknown action: $actionId');
+          LoggerService.warning('⚠️  Unknown action: $actionId');
       }
     } catch (e) {
-      print('❌ Error handling notification action: $e');
+      LoggerService.error('❌ Error handling notification action: $e', e);
     }
   }
 
@@ -591,14 +592,14 @@ class NotificationService {
     String personId,
     int notificationId,
   ) async {
-    print('✅ Registering dose for ${medication.name} at $doseTime');
+    LoggerService.info('✅ Registering dose for ${medication.name} at $doseTime');
 
     try {
       final doseQuantity = medication.getDoseQuantity(doseTime);
 
       // Check if there's enough stock
       if (medication.stockQuantity < doseQuantity) {
-        print('⚠️  Insufficient stock');
+        LoggerService.warning('⚠️  Insufficient stock');
 
         // Get person information for notification
         final person = await DatabaseHelper.instance.getPerson(personId);
@@ -673,9 +674,9 @@ class NotificationService {
         );
       }
 
-      print('✅ Dose registered successfully');
+      LoggerService.info('✅ Dose registered successfully');
     } catch (e) {
-      print('❌ Error registering dose: $e');
+      LoggerService.error('❌ Error registering dose: $e', e);
     }
   }
 
@@ -686,7 +687,7 @@ class NotificationService {
     String personId,
     int notificationId,
   ) async {
-    print('⏭️  Skipping dose for ${medication.name} at $doseTime');
+    LoggerService.info('⏭️  Skipping dose for ${medication.name} at $doseTime');
 
     try {
       // Update medication
@@ -738,9 +739,9 @@ class NotificationService {
       // Cancel notification
       await _notificationsPlugin.cancel(notificationId);
 
-      print('✅ Dose skipped successfully');
+      LoggerService.info('✅ Dose skipped successfully');
     } catch (e) {
-      print('❌ Error skipping dose: $e');
+      LoggerService.error('❌ Error skipping dose: $e', e);
     }
   }
 
@@ -751,7 +752,7 @@ class NotificationService {
     String personId,
     int notificationId,
   ) async {
-    print('⏰ Snoozing notification for ${medication.name} at $doseTime');
+    LoggerService.info('⏰ Snoozing notification for ${medication.name} at $doseTime');
 
     try {
       // Cancel current notification
@@ -778,9 +779,9 @@ class NotificationService {
             '${medication.id}|$doseTime|$personId', // Use actual time instead of index
       );
 
-      print('✅ Notification snoozed until ${snoozeTime.toString()}');
+      LoggerService.info('✅ Notification snoozed until ${snoozeTime.toString()}');
     } catch (e) {
-      print('❌ Error snoozing notification: $e');
+      LoggerService.error('❌ Error snoozing notification: $e', e);
     }
   }
 
@@ -792,13 +793,13 @@ class NotificationService {
     String personId, {
     int attempt = 1,
   }) async {
-    print(
+    LoggerService.info(
       '📱 Attempting navigation (attempt $attempt) for medication $medicationId at $doseTime',
     );
 
     final context = navigatorKey.currentContext;
     if (context != null && context.mounted) {
-      print('✅ Context available, navigating to DoseActionScreen');
+      LoggerService.info('✅ Context available, navigating to DoseActionScreen');
       try {
         await Navigator.push(
           context,
@@ -814,14 +815,14 @@ class NotificationService {
         _pendingMedicationId = null;
         _pendingDoseTime = null;
         _pendingPersonId = null; // V19+: Clear pending personId
-        print('✅ Navigation successful, screen was shown');
+        LoggerService.info('✅ Navigation successful, screen was shown');
         return;
       } catch (e) {
-        print('❌ Error navigating: $e');
-        print('Stack trace: ${StackTrace.current}');
+        LoggerService.error('❌ Error navigating: $e', e);
+        LoggerService.info('Stack trace: ${StackTrace.current}');
       }
     } else {
-      print(
+      LoggerService.info(
         '⏳ Context not available yet (context: $context, mounted: ${context?.mounted})',
       );
     }
@@ -831,7 +832,7 @@ class NotificationService {
       // Increased from 5 to 10 attempts
       final delayMs =
           200 * attempt; // Increased delay: 200ms, 400ms, 600ms, ...
-      print('⏳ Will retry in ${delayMs}ms (attempt ${attempt + 1} of 10)');
+      LoggerService.info('⏳ Will retry in ${delayMs}ms (attempt ${attempt + 1} of 10)');
       await Future.delayed(Duration(milliseconds: delayMs));
       await _navigateWithRetry(
         medicationId,
@@ -841,7 +842,7 @@ class NotificationService {
       ); // V19+: Pass personId in retry
     } else {
       // After 10 attempts, store as pending notification
-      print(
+      LoggerService.warning(
         '⚠️ Failed to navigate after 10 attempts, storing as pending notification',
       );
       _pendingMedicationId = medicationId;
@@ -857,7 +858,7 @@ class NotificationService {
     if (_pendingMedicationId != null &&
         _pendingDoseTime != null &&
         _pendingPersonId != null) {
-      print(
+      LoggerService.info(
         '🔔 Processing pending notification: $_pendingMedicationId | $_pendingDoseTime | $_pendingPersonId',
       );
 
@@ -875,8 +876,8 @@ class NotificationService {
 
       final context = navigatorKey.currentContext;
       if (context != null && context.mounted) {
-        print('✅ Context available, navigating to pending DoseActionScreen');
-        try {
+        LoggerService.info('✅ Context available, navigating to pending DoseActionScreen');
+        try{
           await Navigator.push(
             context,
             MaterialPageRoute(
@@ -887,21 +888,21 @@ class NotificationService {
               ),
             ),
           );
-          print('✅ Pending notification processed successfully');
+          LoggerService.info('✅ Pending notification processed successfully');
         } catch (e) {
-          print('❌ Error processing pending notification: $e');
-          print('Stack trace: ${StackTrace.current}');
+          LoggerService.error('❌ Error processing pending notification: $e', e);
+          LoggerService.info('Stack trace: ${StackTrace.current}');
         }
       } else {
-        print(
+        LoggerService.warning(
           '❌ Context still not available for pending notification (context: $context, mounted: ${context?.mounted})',
         );
         // Try one more time with retry logic
-        print('🔄 Attempting to navigate with retry logic...');
+        LoggerService.info('🔄 Attempting to navigate with retry logic...');
         await _navigateWithRetry(medicationId, doseTime, personId, attempt: 1);
       }
     } else {
-      print('ℹ️ No pending notifications to process');
+      LoggerService.info('ℹ️ No pending notifications to process');
     }
   }
 
@@ -919,13 +920,13 @@ class NotificationService {
     if (_isTestMode) return;
 
     if (medication.doseTimes.isEmpty) {
-      print('No dose times for medication: ${medication.name}');
+      LoggerService.info('No dose times for medication: ${medication.name}');
       return;
     }
 
     // Skip if medication is suspended
     if (medication.isSuspended) {
-      print(
+      LoggerService.info(
         'Skipping notifications for ${medication.name}: medication is suspended',
       );
       // Cancel any existing notifications for this medication
@@ -939,10 +940,10 @@ class NotificationService {
     // Check if exact alarms are allowed (Android 12+)
     final canScheduleExact = await canScheduleExactAlarms();
     if (!canScheduleExact) {
-      print(
+      LoggerService.warning(
         '⚠️ WARNING: Cannot schedule exact alarms. Notifications may not fire on time.',
       );
-      print(
+      LoggerService.warning(
         '   User needs to enable "Alarms & reminders" permission in app settings.',
       );
     }
@@ -951,11 +952,11 @@ class NotificationService {
     // Skip if treatment hasn't started (isPending) or has already finished (isFinished)
     if (!medication.isActive) {
       if (medication.isPending) {
-        print(
+        LoggerService.info(
           'Skipping notifications for ${medication.name}: treatment starts on ${medication.startDate}',
         );
       } else if (medication.isFinished) {
-        print(
+        LoggerService.info(
           'Skipping notifications for ${medication.name}: treatment ended on ${medication.endDate}',
         );
       }
@@ -967,16 +968,16 @@ class NotificationService {
       return;
     }
 
-    print('========================================');
-    print('Scheduling notifications for ${medication.name}');
-    print('Current time: ${tz.TZDateTime.now(tz.local)}');
-    print('Timezone: ${tz.local}');
-    print('Dose times: ${medication.doseTimes}');
-    print('Duration type: ${medication.durationType.name}');
-    print('Is active: ${medication.isActive}');
-    print('Start date: ${medication.startDate}');
-    print('End date: ${medication.endDate}');
-    print('========================================');
+    LoggerService.info('========================================');
+    LoggerService.info('Scheduling notifications for ${medication.name}');
+    LoggerService.info('Current time: ${tz.TZDateTime.now(tz.local)}');
+    LoggerService.info('Timezone: ${tz.local}');
+    LoggerService.info('Dose times: ${medication.doseTimes}');
+    LoggerService.info('Duration type: ${medication.durationType.name}');
+    LoggerService.info('Is active: ${medication.isActive}');
+    LoggerService.info('Start date: ${medication.startDate}');
+    LoggerService.info('End date: ${medication.endDate}');
+    LoggerService.info('========================================');
 
     // Cancel any existing notifications for this medication first
     // Pass the medication object for smart cancellation
@@ -1022,7 +1023,7 @@ class NotificationService {
 
     // Verify notifications were scheduled
     final pending = await getPendingNotifications();
-    print('Total pending notifications after scheduling: ${pending.length}');
+    LoggerService.info('Total pending notifications after scheduling: ${pending.length}');
   }
 
   /// Cancel all notifications for a specific medication
@@ -1051,7 +1052,7 @@ class NotificationService {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('🔄 Auto-rescheduling all medication notifications...');
+    LoggerService.info('🔄 Auto-rescheduling all medication notifications...');
 
     try {
       // Cancel all existing notifications first
@@ -1093,11 +1094,11 @@ class NotificationService {
       }
 
       final pending = await getPendingNotifications();
-      print(
+      LoggerService.info(
         '✅ Rescheduling complete: $medicationsProcessed medications checked, $totalScheduled scheduled, ${pending.length} notifications in system',
       );
     } catch (e) {
-      print('❌ Error rescheduling notifications: $e');
+      LoggerService.error('❌ Error rescheduling notifications: $e', e);
     }
   }
 
@@ -1115,14 +1116,14 @@ class NotificationService {
     // Skip in test mode
     if (_isTestMode) return;
 
-    print('========================================');
-    print('Syncing notifications with database medications');
-    print('Active medications: ${activeMedications.length}');
-    print('========================================');
+    LoggerService.info('========================================');
+    LoggerService.info('Syncing notifications with database medications');
+    LoggerService.info('Active medications: ${activeMedications.length}');
+    LoggerService.info('========================================');
 
     // Get all pending notifications from the system
     final pendingNotifications = await getPendingNotifications();
-    print(
+    LoggerService.info(
       'Found ${pendingNotifications.length} pending notifications in system',
     );
 
@@ -1143,7 +1144,7 @@ class NotificationService {
           // If this medication is not in the active medications list, mark for cancellation
           if (!activeMedicationIds.contains(medicationId)) {
             orphanedNotificationIds.add(notification.id);
-            print(
+            LoggerService.info(
               'Found orphaned notification ID ${notification.id} for deleted medication: $medicationId',
             );
           }
@@ -1151,7 +1152,7 @@ class NotificationService {
       } else {
         // No payload - could be an orphaned notification, mark for cancellation
         orphanedNotificationIds.add(notification.id);
-        print(
+        LoggerService.info(
           'Found notification without payload ID ${notification.id}, marking for cancellation',
         );
       }
@@ -1159,19 +1160,19 @@ class NotificationService {
 
     // Cancel all orphaned notifications
     if (orphanedNotificationIds.isNotEmpty) {
-      print(
+      LoggerService.info(
         'Cancelling ${orphanedNotificationIds.length} orphaned notifications',
       );
       for (final notificationId in orphanedNotificationIds) {
         await _notificationsPlugin.cancel(notificationId);
       }
-      print('Successfully cancelled orphaned notifications');
+      LoggerService.info('Successfully cancelled orphaned notifications');
     } else {
-      print('No orphaned notifications found - system is clean');
+      LoggerService.info('No orphaned notifications found - system is clean');
     }
 
-    print('Notification sync completed');
-    print('========================================');
+    LoggerService.info('Notification sync completed');
+    LoggerService.info('========================================');
   }
 
   /// Get list of pending notifications (for debugging)
@@ -1242,7 +1243,7 @@ class NotificationService {
         notificationDetails,
       );
     } catch (e) {
-      print('Error playing fasting completed sound: $e');
+      LoggerService.error('Error playing fasting completed sound: $e', e);
     }
   }
 
@@ -1254,11 +1255,11 @@ class NotificationService {
     final now = tz.TZDateTime.now(tz.local);
     final scheduledDate = now.add(const Duration(minutes: 1));
 
-    print(
+    LoggerService.info(
       'Scheduling test notification for: $scheduledDate (1 minute from now)',
     );
-    print('Current time: $now');
-    print('Timezone: ${tz.local}');
+    LoggerService.info('Current time: $now');
+    LoggerService.info('Timezone: ${tz.local}');
 
     const androidDetails = fln.AndroidNotificationDetails(
       'test_channel',
@@ -1290,9 +1291,9 @@ class NotificationService {
         notificationDetails,
         androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
       );
-      print('Test notification scheduled successfully for 1 minute from now');
+      LoggerService.info('Test notification scheduled successfully for 1 minute from now');
     } catch (e) {
-      print('Error scheduling test notification: $e');
+      LoggerService.error('Error scheduling test notification: $e', e);
     }
   }
 
@@ -1347,7 +1348,7 @@ class NotificationService {
     );
     final newTimeString = newDateTime.toTimeString();
 
-    print(
+    LoggerService.info(
       'Scheduling postponed notification ID $notificationId for ${medication.name} at $newTimeString on $scheduledDate',
     );
 
@@ -1376,9 +1377,9 @@ class NotificationService {
         payload:
             '${medication.id}|$originalDoseTime|$personId', // V19+: Now includes personId
       );
-      print('Successfully scheduled postponed notification ID $notificationId');
+      LoggerService.info('Successfully scheduled postponed notification ID $notificationId');
     } catch (e) {
-      print('Failed to schedule postponed notification: $e');
+      LoggerService.error('Failed to schedule postponed notification: $e', e);
     }
   }
 
@@ -1515,9 +1516,9 @@ class NotificationService {
         ),
       );
 
-      print('📦 Low stock notification shown for ${medication.name} (days remaining: $daysRemaining)');
+      LoggerService.info('📦 Low stock notification shown for ${medication.name} (days remaining: $daysRemaining)');
     } catch (e) {
-      print('Error showing low stock notification: $e');
+      LoggerService.error('Error showing low stock notification: $e', e);
     }
   }
 
@@ -1534,11 +1535,11 @@ class NotificationService {
 
       // Only check once per day
       if (lastCheck == today) {
-        print('📦 Stock already checked today, skipping');
+        LoggerService.info('📦 Stock already checked today, skipping');
         return;
       }
 
-      print('📦 Checking low stock for all medications...');
+      LoggerService.info('📦 Checking low stock for all medications...');
 
       // Get all persons
       final persons = await DatabaseHelper.instance.getAllPersons();
@@ -1571,16 +1572,16 @@ class NotificationService {
               daysRemaining: daysRemaining,
             );
 
-            print('📦 Low stock alert sent for ${medication.name} (${person.name})');
+            LoggerService.info('📦 Low stock alert sent for ${medication.name} (${person.name})');
           }
         }
       }
 
       // Save today's date to avoid duplicate checks
       await prefs.setString(lastCheckKey, today);
-      print('📦 Stock check completed for today');
+      LoggerService.info('📦 Stock check completed for today');
     } catch (e) {
-      print('Error checking low stock: $e');
+      LoggerService.error('Error checking low stock: $e', e);
     }
   }
 
@@ -1626,7 +1627,7 @@ class NotificationService {
       final jsonList = history.map((e) => jsonEncode(e)).toList();
       await prefs.setStringList(_notificationHistoryKey, jsonList);
     } catch (e) {
-      print('Error logging notification: $e');
+      LoggerService.error('Error logging notification: $e', e);
     }
   }
 
@@ -1646,7 +1647,7 @@ class NotificationService {
 
       return history;
     } catch (e) {
-      print('Error getting notification history: $e');
+      LoggerService.error('Error getting notification history: $e', e);
       return [];
     }
   }
@@ -1674,7 +1675,7 @@ class NotificationService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_notificationHistoryKey);
     } catch (e) {
-      print('Error clearing notification history: $e');
+      LoggerService.error('Error clearing notification history: $e', e);
     }
   }
 }

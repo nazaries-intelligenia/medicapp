@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../services/notification_service.dart';
+import '../../../services/logger_service.dart';
 
 class NotificationPermissionDialog {
   static Future<void> checkAndShowIfNeeded({
@@ -28,7 +29,7 @@ class NotificationPermissionDialog {
     // Now check if exact alarms are allowed (critical for Android 12+)
     final canScheduleExact = await NotificationService.instance.canScheduleExactAlarms();
 
-    print('🔔 Checking permissions - canScheduleExact: $canScheduleExact');
+    LoggerService.info('🔔 Checking permissions - canScheduleExact: $canScheduleExact');
 
     if (!canScheduleExact && hasMedications) {
       // Show warning dialog for exact alarms only

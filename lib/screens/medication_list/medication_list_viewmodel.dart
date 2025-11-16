@@ -7,6 +7,7 @@ import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
 import '../../services/preferences_service.dart';
 import '../../services/dose_action_service.dart';
+import '../../services/logger_service.dart';
 import '../../utils/medication_sorter.dart';
 import '../../utils/datetime_extensions.dart';
 import 'medication_cache_manager.dart';
@@ -255,7 +256,7 @@ class MedicationListViewModel extends ChangeNotifier {
       _safeNotify();
 
       // Update fasting notification in background (non-blocking)
-      _fastingManager.updateNotification().catchError((e) => print('Error updating fasting notification: $e'));
+      _fastingManager.updateNotification().catchError((e) => LoggerService.error('Error updating fasting notification: $e', e));
     } catch (e) {
       _isLoading = false;
       _safeNotify();
@@ -319,7 +320,7 @@ class MedicationListViewModel extends ChangeNotifier {
       _safeNotify();
 
       // Update fasting notification in background (non-blocking)
-      _fastingManager.updateNotification().catchError((e) => print('Error updating fasting notification: $e'));
+      _fastingManager.updateNotification().catchError((e) => LoggerService.error('Error updating fasting notification: $e', e));
     } catch (e) {
       _isLoading = false;
       _safeNotify();
@@ -656,7 +657,7 @@ class MedicationListViewModel extends ChangeNotifier {
           );
         }
       } catch (e) {
-        print('Error handling notifications in background: $e');
+        LoggerService.error('Error handling notifications in background: $e', e);
       }
     });
 
@@ -767,7 +768,7 @@ class MedicationListViewModel extends ChangeNotifier {
           );
         }
       } catch (e) {
-        print('Error handling notifications in background: $e');
+        LoggerService.error('Error handling notifications in background: $e', e);
       }
     });
 
@@ -885,7 +886,7 @@ class MedicationListViewModel extends ChangeNotifier {
         await NotificationService.instance
             .cancelMedicationNotifications(medication.id, medication: medication);
       } catch (e) {
-        print('Error cancelling notifications after medication deletion: $e');
+        LoggerService.error('Error cancelling notifications after medication deletion: $e', e);
       }
     });
   }
@@ -982,7 +983,7 @@ class MedicationListViewModel extends ChangeNotifier {
           }
         }
       } catch (e) {
-        print('Error handling notifications after dose deletion: $e');
+        LoggerService.error('Error handling notifications after dose deletion: $e', e);
       }
     });
   }
@@ -1091,7 +1092,7 @@ class MedicationListViewModel extends ChangeNotifier {
           }
         }
       } catch (e) {
-        print('Error handling notifications after toggle: $e');
+        LoggerService.error('Error handling notifications after toggle: $e', e);
       }
     });
   }
@@ -1126,7 +1127,7 @@ class MedicationListViewModel extends ChangeNotifier {
         try {
           await NotificationService.instance.rescheduleAllMedicationNotifications();
         } catch (e) {
-          print('Error rescheduling notifications after create: $e');
+          LoggerService.error('Error rescheduling notifications after create: $e', e);
         }
       });
     }
@@ -1186,7 +1187,7 @@ class MedicationListViewModel extends ChangeNotifier {
 
     // STEP 1: Cancel all existing notifications once
     // This prevents the issue where cancellation happens per-person, leaving only the last person's notifications
-    print('Cancelling all existing notifications before rescheduling...');
+    LoggerService.info('Cancelling all existing notifications before rescheduling...');
     await NotificationService.instance.cancelAllNotifications();
 
     // STEP 2: Reschedule notifications for each medication and each person assigned to it

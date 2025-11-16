@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
+import 'services/logger_service.dart';
 import 'database/database_helper.dart';
 import 'models/person.dart';
 
@@ -17,29 +18,29 @@ void main() async {
   // Initialize notification service
   try {
     await NotificationService.instance.initialize();
-    print('Notification service initialized successfully');
+    LoggerService.info('Notification service initialized successfully');
 
     // Request notification permissions
     final granted = await NotificationService.instance.requestPermissions();
-    print('Notification permissions granted: $granted');
+    LoggerService.info('Notification permissions granted: $granted');
 
     if (!granted) {
-      print('WARNING: Notification permissions were not granted!');
+      LoggerService.warning('WARNING: Notification permissions were not granted!');
     }
 
     // Verify notifications are enabled
     final enabled = await NotificationService.instance.areNotificationsEnabled();
-    print('Notifications enabled: $enabled');
+    LoggerService.info('Notifications enabled: $enabled');
   } catch (e) {
-    print('Error initializing notifications: $e');
+    LoggerService.error('Error initializing notifications: $e', e);
   }
 
   // Initialize default person if needed
   try {
     await _initializeDefaultPerson();
-    print('Default person initialized successfully');
+    LoggerService.info('Default person initialized successfully');
   } catch (e) {
-    print('Error initializing default person: $e');
+    LoggerService.error('Error initializing default person: $e', e);
   }
 
   // Run app immediately for fast startup
@@ -50,9 +51,9 @@ void main() async {
   Future.microtask(() async {
     try {
       await NotificationService.instance.rescheduleAllMedicationNotifications();
-      print('Notifications rescheduled successfully');
+      LoggerService.info('Notifications rescheduled successfully');
     } catch (e) {
-      print('Error rescheduling notifications: $e');
+      LoggerService.error('Error rescheduling notifications: $e', e);
     }
   });
 }
@@ -69,9 +70,9 @@ Future<void> _initializeDefaultPerson() async {
     );
 
     await DatabaseHelper.instance.insertPerson(defaultPerson);
-    print('Default person created with name: ${defaultPerson.name}');
+    LoggerService.info('Default person created with name: ${defaultPerson.name}');
   } else {
-    print('Default person already exists');
+    LoggerService.info('Default person already exists');
   }
 }
 

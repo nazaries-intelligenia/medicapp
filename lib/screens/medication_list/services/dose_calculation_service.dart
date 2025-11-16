@@ -4,6 +4,7 @@ import '../../../models/medication.dart';
 import '../../../models/treatment_duration_type.dart';
 import '../../../models/dose_history_entry.dart';
 import '../../../database/database_helper.dart';
+import '../../../services/logger_service.dart';
 import '../../../utils/datetime_extensions.dart';
 
 /// Service for calculating dose-related information
@@ -227,9 +228,9 @@ class DoseCalculationService {
     final todayStart = DateTime(now.year, now.month, now.day);
     final todayEnd = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
-    print('🔍 Getting actual dose times for ${medication.name}');
-    print('   Person ID filter: ${personId ?? "none (all persons)"}');
-    print('   Today range: $todayStart to $todayEnd');
+    LoggerService.info('🔍 Getting actual dose times for ${medication.name}');
+    LoggerService.info('   Person ID filter: ${personId ?? "none (all persons)"}');
+    LoggerService.info('   Today range: $todayStart to $todayEnd');
 
     final doses = await DatabaseHelper.instance.getDoseHistoryForDateRange(
       startDate: todayStart,
@@ -237,7 +238,7 @@ class DoseCalculationService {
       medicationId: medication.id,
     );
 
-    print('   Found ${doses.length} dose history entries');
+    LoggerService.info('   Found ${doses.length} dose history entries');
 
     // Filter to only taken doses registered today
     var takenDosesToday = doses.where((dose) =>
@@ -250,10 +251,10 @@ class DoseCalculationService {
     // Filter by person if specified
     if (personId != null) {
       takenDosesToday = takenDosesToday.where((dose) => dose.personId == personId);
-      print('   After person filter: ${takenDosesToday.length} doses');
+      LoggerService.info('   After person filter: ${takenDosesToday.length} doses');
     }
 
-    print('   Filtered to ${takenDosesToday.length} taken doses today');
+    LoggerService.info('   Filtered to ${takenDosesToday.length} taken doses today');
 
     // Create map of scheduled time -> actual time
     final Map<String, DateTime> actualTimes = {};
@@ -262,10 +263,10 @@ class DoseCalculationService {
       final scheduledTime = dose.scheduledDateTime.toTimeString();
       // Always use registration time - this is when the dose was actually taken
       actualTimes[scheduledTime] = dose.registeredDateTime;
-      print('   Dose scheduled at $scheduledTime, taken at ${dose.registeredDateTime} by person ${dose.personId}');
+      LoggerService.info('   Dose scheduled at $scheduledTime, taken at ${dose.registeredDateTime} by person ${dose.personId}');
     }
 
-    print('   Returning ${actualTimes.length} actual times');
+    LoggerService.info('   Returning ${actualTimes.length} actual times');
     return actualTimes;
   }
 
@@ -284,22 +285,22 @@ class DoseCalculationService {
     Medication medication, {
     String? personId,
   }) async {
-    print('📊 Checking active fasting period for ${medication.name}');
-    print('   Person ID filter: ${personId ?? "none (all persons)"}');
-    print('   Requires fasting: ${medication.requiresFasting}');
-    print('   Fasting type: ${medication.fastingType}');
-    print('   Fasting duration: ${medication.fastingDurationMinutes} minutes');
+    LoggerService.info('📊 Checking active fasting period for ${medication.name}');
+    LoggerService.info('   Person ID filter: ${personId ?? "none (all persons)"}');
+    LoggerService.info('   Requires fasting: ${medication.requiresFasting}');
+    LoggerService.info('   Fasting type: ${medication.fastingType}');
+    LoggerService.info('   Fasting duration: ${medication.fastingDurationMinutes} minutes');
 
     if (!medication.requiresFasting ||
         medication.fastingType == null ||
         medication.fastingDurationMinutes == null ||
         medication.fastingDurationMinutes! <= 0) {
-      print('   ❌ Medication does not require fasting or invalid configuration');
+      LoggerService.info('   ❌ Medication does not require fasting or invalid configuration');
       return null;
     }
 
     final now = DateTime.now();
-    print('   Current time: $now');
+    LoggerService.info('   Current time: $now');
 
     // Handle "before" fasting (before taking the dose)
     if (medication.fastingType == 'before') {
@@ -354,16 +355,16 @@ class DoseCalculationService {
 
     // Handle "after" fasting (after taking the dose)
     else if (medication.fastingType == 'after') {
-      print('   Handling "after" fasting type');
+      LoggerService.info('   Handling "after" fasting type');
       // Check if any dose was taken today (filtered by person if provided)
       final actualTimes = await getActualDoseTimes(medication, personId: personId);
 
       if (actualTimes.isEmpty) {
-        print('   ❌ No doses taken today${personId != null ? " for this person" : ""}');
+        LoggerService.info('   ❌ No doses taken today${personId != null ? " for this person" : ""}');
         return null;
       }
 
-      print('   Found ${actualTimes.length} doses taken today');
+      LoggerService.info('   Found ${actualTimes.length} doses taken today');
 
       // Find the most recent dose taken
       DateTime? mostRecentDoseTime;
@@ -374,27 +375,27 @@ class DoseCalculationService {
       }
 
       if (mostRecentDoseTime == null) {
-        print('   ❌ Could not determine most recent dose time');
+        LoggerService.info('   ❌ Could not determine most recent dose time');
         return null;
       }
 
-      print('   Most recent dose taken at: $mostRecentDoseTime');
+      LoggerService.info('   Most recent dose taken at: $mostRecentDoseTime');
 
       // Calculate fasting end time
       final fastingEnd = mostRecentDoseTime.add(Duration(minutes: medication.fastingDurationMinutes!));
-      print('   Fasting ends at: $fastingEnd');
+      LoggerService.info('   Fasting ends at: $fastingEnd');
 
       // Show fasting period if:
       // 1. Still active (before end time)
       // 2. OR recently finished (within last 2 hours) so user can see it completed
       final twoHoursAfterEnd = fastingEnd.add(const Duration(hours: 2));
-      print('   2 hours after end: $twoHoursAfterEnd');
+      LoggerService.info('   2 hours after end: $twoHoursAfterEnd');
 
       if (now.isBefore(twoHoursAfterEnd)) {
         final remainingMinutes = fastingEnd.difference(now).inMinutes;
         final isStillActive = now.isBefore(fastingEnd);
 
-        print('   ✅ Returning fasting period: remainingMinutes=$remainingMinutes, isActive=$isStillActive');
+        LoggerService.info('   ✅ Returning fasting period: remainingMinutes=$remainingMinutes, isActive=$isStillActive');
 
         return {
           'fastingEndTime': fastingEnd,
@@ -403,11 +404,11 @@ class DoseCalculationService {
           'isActive': isStillActive,
         };
       } else {
-        print('   ❌ Fasting period ended more than 2 hours ago');
+        LoggerService.info('   ❌ Fasting period ended more than 2 hours ago');
       }
     }
 
-    print('   ❌ No active fasting period found');
+    LoggerService.info('   ❌ No active fasting period found');
     return null;
   }
 

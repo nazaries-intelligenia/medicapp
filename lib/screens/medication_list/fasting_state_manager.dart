@@ -1,6 +1,7 @@
 import 'dart:async';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/logger_service.dart';
 import '../../utils/datetime_extensions.dart';
 import '../../utils/platform_helper.dart';
 import 'services/dose_calculation_service.dart';
@@ -41,29 +42,29 @@ class FastingStateManager {
 
   /// Load fasting periods from ALL persons (not just selected tab)
   Future<void> loadFastingPeriods() async {
-    print('🔄 Loading fasting periods...');
+    LoggerService.info('🔄 Loading fasting periods...');
     _activeFastingPeriods.clear();
 
     if (!_showFastingCountdown) {
-      print('❌ Fasting countdown is disabled in settings - skipping load');
+      LoggerService.info('❌ Fasting countdown is disabled in settings - skipping load');
       return;
     }
 
-    print('✅ Fasting countdown is enabled - proceeding with load');
+    LoggerService.info('✅ Fasting countdown is enabled - proceeding with load');
 
     // Load all persons to check their fasting periods
     final allPersons = await DatabaseHelper.instance.getAllPersons();
-    print('   Found ${allPersons.length} persons');
+    LoggerService.info('   Found ${allPersons.length} persons');
 
     for (final person in allPersons) {
-      print('   Checking person: ${person.name} (${person.id})');
+      LoggerService.info('   Checking person: ${person.name} (${person.id})');
       // Load medications for this person
       final personMeds =
           await DatabaseHelper.instance.getMedicationsForPerson(person.id);
-      print('      Medications for this person: ${personMeds.length}');
+      LoggerService.info('      Medications for this person: ${personMeds.length}');
 
       for (final med in personMeds) {
-        print('      Medication: ${med.name}, requiresFasting: ${med.requiresFasting}');
+        LoggerService.info('      Medication: ${med.name}, requiresFasting: ${med.requiresFasting}');
         if (med.requiresFasting) {
           // Pass personId to filter doses for this specific person
           final fastingInfo =
@@ -72,7 +73,7 @@ class FastingStateManager {
             personId: person.id,
           );
           if (fastingInfo != null) {
-            print('      ✅ Found active fasting period for ${med.name}');
+            LoggerService.info('      ✅ Found active fasting period for ${med.name}');
             // Add fasting period with person information
             _activeFastingPeriods.add({
               'personId': person.id,
@@ -83,13 +84,13 @@ class FastingStateManager {
               ...fastingInfo, // includes: fastingEndTime, fastingType, medicationName
             });
           } else {
-            print('      ❌ No active fasting period for ${med.name}');
+            LoggerService.info('      ❌ No active fasting period for ${med.name}');
           }
         }
       }
     }
 
-    print('🔄 Loaded ${_activeFastingPeriods.length} active fasting periods');
+    LoggerService.info('🔄 Loaded ${_activeFastingPeriods.length} active fasting periods');
 
     // Filter out periods that have already finished
     // Only keep periods where the fasting end time is in the future
@@ -98,12 +99,12 @@ class FastingStateManager {
       final endTime = period['fastingEndTime'] as DateTime;
       final hasEnded = endTime.isBefore(now);
       if (hasEnded) {
-        print('   Removing finished period: ends at $endTime (${period['medicationName']} for ${period['personName']})');
+        LoggerService.info('   Removing finished period: ends at $endTime (${period['medicationName']} for ${period['personName']})');
       }
       return hasEnded;
     });
 
-    print('🔄 After removing finished periods: ${_activeFastingPeriods.length} active periods');
+    LoggerService.info('🔄 After removing finished periods: ${_activeFastingPeriods.length} active periods');
 
     // Filter to keep only the LATEST ending fasting period per person
     // (If a person has multiple medications requiring fasting, show only the most restrictive one)
@@ -129,7 +130,7 @@ class FastingStateManager {
     _activeFastingPeriods.clear();
     _activeFastingPeriods.addAll(latestByPerson.values);
 
-    print('🔄 After filtering: ${_activeFastingPeriods.length} periods (one per person)');
+    LoggerService.info('🔄 After filtering: ${_activeFastingPeriods.length} periods (one per person)');
 
     // Sort by fasting end time (soonest first)
     _activeFastingPeriods.sort((a, b) {
@@ -182,7 +183,7 @@ class FastingStateManager {
         // If fasting already ended, cancel notification for this person
         if (remainingMinutes < 0) {
           if (_personsWithActiveNotifications.contains(personId)) {
-            print('⏰ Fasting ended for $personName - cancelling ongoing notification');
+            LoggerService.info('⏰ Fasting ended for $personName - cancelling ongoing notification');
             await NotificationService.instance.cancelOngoingFastingNotificationForPerson(personId);
             _personsWithActiveNotifications.remove(personId);
           }
