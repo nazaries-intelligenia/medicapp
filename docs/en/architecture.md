@@ -426,6 +426,37 @@ class DoseCalculationService {
 - Formats localized messages ("Today at 6:00 PM", "Tomorrow at 8:00 AM")
 - Respects treatment start/end dates
 
+### FastingConflictService
+
+Detects conflicts between medication schedules and fasting periods.
+
+```dart
+class FastingConflictService {
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
+  });
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
+}
+```
+
+**Responsibilities:**
+- Checks if a proposed schedule conflicts with another medication's fasting period
+- Calculates active fasting periods (before/after taking medications)
+- Suggests alternative times that avoid conflicts
+- Supports both "before" (before taking) and "after" (after taking) fasting types
+
+**Use cases:**
+- When adding a new dose time in `DoseScheduleEditor`
+- When creating or editing a medication in `EditScheduleScreen`
+- Prevents conflicts that could compromise treatment effectiveness
+
+**Note:** Currently fasting validation is disabled in `EditScheduleScreen` to avoid timer issues in tests, but the infrastructure is ready to be activated when needed.
+
 ---
 
 ## View Layer (Screens/Widgets)

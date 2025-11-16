@@ -426,6 +426,37 @@ class DoseCalculationService {
 - Lokalizatutako mezuak formateatu ("Gaur 18:00etan", "Bihar 08:00etan")
 - Tratamenduaren hasiera/amaiera datak errespetatu
 
+### FastingConflictService
+
+Sendagaien ordutegien eta baraualdi aldien arteko gatazkak detektatzen ditu.
+
+```dart
+class FastingConflictService {
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
+  });
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
+}
+```
+
+**Erantzukizunak:**
+- Proposatutako ordutegi bat beste sendagai baten baraualdi aldiarekin bat datorren egiaztatzen du
+- Baraualdi aldi aktiboak kalkulatzen ditu (sendagaia hartu aurretik/ondoren)
+- Gatazkak saihesten dituzten ordutegi alternatiboak iradokitzen ditu
+- "before" (hartu aurretik) eta "after" (hartu ondoren) baraualdia onartzen du
+
+**Erabilera kasuak:**
+- `DoseScheduleEditor`-en dosi ordutegi berri bat gehitzean
+- `EditScheduleScreen`-en sendagaia sortu edo editatzean
+- Tratamenduaren eraginkortasuna arriskuan jar dezaketen gatazkak saihesten ditu
+
+**Oharra:** Gaur egun balidazioa desaktibatuta dago `EditScheduleScreen`-en testetan timers-ekin arazorik ez izateko, baina azpiegitura prest dago behar denean aktibatzeko.
+
 ---
 
 ## Ikuspegi Geruza (Screens/Widgets)

@@ -11,7 +11,7 @@ MedicApp utiliza SQLite V19 como sistema de gestión de base de datos local. La 
 - **Arquitectura**: Multi-persona con datos compartidos y configuraciones individuales
 - **Ubicación**: `medications.db` en el directorio de base de datos de la aplicación
 - **Migraciones**: Sistema automático de migraciones progresivas (V1 → V19)
-- **Integridad**: Claves foráneas habilitadas con cascadas de eliminación
+- **Integridad**: Claves foráneas habilitadas explícitamente en `onOpen` con cascadas de eliminación
 - **Índices**: Optimizados para consultas frecuentes
 
 ### Filosofía de Diseño
@@ -49,7 +49,7 @@ CREATE TABLE persons (
 #### Reglas
 
 - Debe existir al menos una persona con `isDefault = 1`
-- Los IDs se generan como timestamps en milisegundos
+- Los IDs se generan como timestamps en milisegundos (formato: milisegundos desde epoch)
 - El nombre no puede estar vacío
 
 ---
@@ -126,7 +126,7 @@ CREATE TABLE person_medications (
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `id` | TEXT PRIMARY KEY | Identificador único de la relación persona-medicamento |
+| `id` | TEXT PRIMARY KEY | Identificador único de la relación persona-medicamento (UUID v4) |
 | `personId` | TEXT NOT NULL | FK a `persons.id` |
 | `medicationId` | TEXT NOT NULL | FK a `medications.id` |
 | `assignedDate` | TEXT NOT NULL | Fecha ISO8601 cuando se asignó el medicamento a la persona |
@@ -764,6 +764,10 @@ final backupPath = await DatabaseHelper.instance.exportDatabase();
 
 La aplicación copia el archivo `.db` a una ubicación temporal. El usuario puede luego compartir este archivo (Google Drive, correo, etc.).
 
+**Mejoras de seguridad**:
+- Verifica que el archivo de base de datos exista **antes** de acceder a la base de datos (evita creación automática)
+- Lanza excepción si la base de datos es in-memory (no se puede exportar)
+
 #### 2. Importación de Backup
 
 ```dart
@@ -773,6 +777,9 @@ await DatabaseHelper.instance.importDatabase('/path/to/backup.db');
 **Notas**:
 - Se crea un backup automático del archivo actual antes de importar (`.backup`)
 - Si la importación falla, se restaura automáticamente el backup
+- **Limpieza completa**: Elimina archivos WAL (Write-Ahead Log) y SHM (Shared Memory) antes de importar para evitar conflictos
+- Incluye un delay de 100ms después de la importación para asegurar que las operaciones del sistema de archivos se completen
+- Verifica la integridad de la base de datos importada antes de confirmar
 
 #### 3. Backup Automático (Recomendado para Producción)
 

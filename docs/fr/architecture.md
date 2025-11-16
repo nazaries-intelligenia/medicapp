@@ -426,6 +426,33 @@ class DoseCalculationService {
 - Formate les messages localisés ("Aujourd'hui à 18:00", "Demain à 08:00")
 - Respecte les dates de début/fin de traitement
 
+### FastingConflictService
+
+Service de détection et gestion des conflits de jeûne entre médicaments.
+
+```dart
+class FastingConflictService {
+  static Future<List<FastingConflict>> detectConflicts({
+    required String personId,
+    required Medication newMedication,
+    String? timeToCheck,
+  });
+
+  static String getConflictDescription(
+    FastingConflict conflict,
+    BuildContext context,
+  );
+
+  static bool hasActiveConflicts(List<FastingConflict> conflicts);
+}
+```
+
+**Responsabilités :**
+- Détecte les conflits de jeûne entre les médicaments d'une même personne
+- Identifie les chevauchements de périodes de jeûne (avant/après la prise)
+- Génère des descriptions localisées des conflits détectés
+- Aide à prévenir les incompatibilités dans les horaires de prise avec jeûne
+
 ---
 
 ## Couche de Vue (Screens/Widgets)

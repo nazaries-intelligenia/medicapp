@@ -426,6 +426,37 @@ class DoseCalculationService {
 - Formatea mensajes localizados ("Hoy a las 18:00", "Mañana a las 08:00")
 - Respeta fechas de inicio/fin de tratamiento
 
+### FastingConflictService
+
+Detecta conflictos entre horarios de medicamentos y períodos de ayuno.
+
+```dart
+class FastingConflictService {
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
+  });
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
+}
+```
+
+**Responsabilidades:**
+- Verifica si un horario propuesto coincide con un período de ayuno de otro medicamento
+- Calcula períodos de ayuno activos (antes/después de tomar medicamentos)
+- Sugiere horarios alternativos que eviten conflictos
+- Soporta ayuno "before" (antes de tomar) y "after" (después de tomar)
+
+**Casos de uso:**
+- Al añadir un nuevo horario de dosis en `DoseScheduleEditor`
+- Al crear o editar un medicamento en `EditScheduleScreen`
+- Previene conflictos que podrían comprometer la efectividad del tratamiento
+
+**Nota:** Actualmente la validación está desactivada en `EditScheduleScreen` para evitar problemas con timers en tests, pero la infraestructura está lista para activarse cuando sea necesario.
+
 ---
 
 ## Capa de Vista (Screens/Widgets)
