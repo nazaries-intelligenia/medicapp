@@ -6,6 +6,7 @@ import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/dose_action_service.dart';
+import '../services/snackbar_service.dart';
 import '../utils/datetime_extensions.dart';
 import '../widgets/medication_header_card.dart';
 import 'dose_action/widgets/take_dose_button.dart';
@@ -68,31 +69,24 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
 
       // Show confirmation and go back
       Navigator.pop(context, true); // Return true to indicate changes were made
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.doseActionTakenRegistered(
-              _medication!.name,
-              widget.doseTime,
-              updatedMedication.stockDisplayText,
-            ),
-          ),
-          duration: const Duration(seconds: 2),
+      SnackBarService.showSuccess(
+        context,
+        l10n.doseActionTakenRegistered(
+          _medication!.name,
+          widget.doseTime,
+          updatedMedication.stockDisplayText,
         ),
+        duration: const Duration(seconds: 2),
       );
     } on InsufficientStockException catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.doseActionInsufficientStock(
-              e.doseQuantity.toString(),
-              e.unit,
-              _medication!.stockDisplayText,
-            ),
-          ),
-          duration: const Duration(seconds: 3),
+      SnackBarService.showError(
+        context,
+        l10n.doseActionInsufficientStock(
+          e.doseQuantity.toString(),
+          e.unit,
+          _medication!.stockDisplayText,
         ),
       );
     }
@@ -112,16 +106,12 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     // Show confirmation and go back
     Navigator.pop(context, true); // Return true to indicate changes were made
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.doseActionSkippedRegistered(
-            _medication!.name,
-            widget.doseTime,
-            _medication!.stockDisplayText,
-          ),
-        ),
-        duration: const Duration(seconds: 2),
+    SnackBarService.showInfo(
+      context,
+      l10n.doseActionSkippedRegistered(
+        _medication!.name,
+        widget.doseTime,
+        _medication!.stockDisplayText,
       ),
     );
   }
@@ -160,13 +150,9 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     // Show confirmation and go back
     Navigator.pop(context, true); // Return true to indicate changes were made
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.doseActionPostponed(_medication!.name, newTimeString),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.doseActionPostponed(_medication!.name, newTimeString),
     );
   }
 
@@ -194,13 +180,9 @@ class _DoseActionScreenState extends State<DoseActionScreen> {
     // Show confirmation and go back
     Navigator.pop(context, true); // Return true to indicate changes were made
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.doseActionPostponed15(_medication!.name, newTimeString),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.doseActionPostponed15(_medication!.name, newTimeString),
     );
   }
 
