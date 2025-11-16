@@ -6,6 +6,7 @@ import '../models/person.dart';
 import '../database/database_helper.dart';
 import '../services/dose_history_service.dart';
 import '../services/preferences_service.dart';
+import '../services/snackbar_service.dart';
 import 'dose_history/widgets/dose_history_card.dart';
 import 'dose_history/widgets/filter_dialog.dart';
 import 'dose_history/widgets/statistics_card.dart';
@@ -335,13 +336,10 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
     if (!mounted) return;
 
     // Show confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          l10n.statusUpdatedTo(newStatus.displayName),
-        ),
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.statusUpdatedTo(newStatus.displayName),
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -411,21 +409,18 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.registeredTimeUpdated),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.registeredTimeUpdated,
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.errorUpdatingTime(e.toString())),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.errorUpdatingTime(e.toString()),
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -452,31 +447,26 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
       if (!mounted) return;
 
       // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseHistoryRecordDeleted),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showInfo(
+        context,
+        l10n.doseHistoryRecordDeleted,
+        duration: const Duration(seconds: 2),
       );
     } on MedicationNotFoundException {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseActionMedicationNotFound),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.doseActionMedicationNotFound,
+        duration: const Duration(seconds: 3),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseHistoryDeleteError(e.toString())),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.doseHistoryDeleteError(e.toString()),
+        duration: const Duration(seconds: 3),
       );
     }
   }

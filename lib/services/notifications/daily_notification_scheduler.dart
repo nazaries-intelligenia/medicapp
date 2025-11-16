@@ -1,7 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
 import 'package:timezone/timezone.dart' as tz;
 import '../../models/medication.dart';
-import '../../models/treatment_duration_type.dart';
 import '../../database/database_helper.dart';
 import '../notification_id_generator.dart';
 import '../../utils/datetime_extensions.dart';

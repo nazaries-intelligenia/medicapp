@@ -4,6 +4,7 @@ import '../../models/medication.dart';
 import '../../widgets/forms/dose_schedule_editor.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar horarios y cantidades de las tomas
@@ -33,22 +34,12 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
     if (editorState == null) return;
 
     if (!editorState.allQuantitiesValid()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editScheduleValidationQuantities),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editScheduleValidationQuantities);
       return;
     }
 
     if (editorState.hasDuplicateTimes()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editScheduleValidationDuplicates),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editScheduleValidationDuplicates);
       return;
     }
 
@@ -110,26 +101,18 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editScheduleUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editScheduleUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editScheduleError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } finally {
+      SnackBarService.showError(context, l10n.editScheduleError(e.toString()));
+    } finally{
       if (mounted) {
         setState(() {
           _isSaving = false;

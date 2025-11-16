@@ -1529,7 +1529,7 @@ class NotificationService {
     try {
       final prefs = await SharedPreferences.getInstance();
       final today = DateTime.now().toIso8601String().split('T')[0];
-      final lastCheckKey = 'last_stock_check_date';
+      const lastCheckKey = 'last_stock_check_date';
       final lastCheck = prefs.getString(lastCheckKey);
 
       // Only check once per day
@@ -1654,7 +1654,7 @@ class NotificationService {
   /// Clean notification history entries older than 24 hours
   void _cleanOldHistoryEntries(List<Map<String, dynamic>> history) {
     final cutoffTime = DateTime.now().subtract(
-      Duration(hours: _historyDurationHours),
+      const Duration(hours: _historyDurationHours),
     );
 
     history.removeWhere((entry) {

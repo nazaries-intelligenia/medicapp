@@ -117,40 +117,40 @@ void main() {
 
     test('should convert page index to date offset correctly', () {
       // Página actual = centerPageIndex significa offset = 0 (hoy)
-      final pageOffset0 = centerPageIndex;
+      const pageOffset0 = centerPageIndex;
       expect(pageOffset0 - centerPageIndex, 0);
 
       // Página centerPageIndex - 1 significa offset = -1 (ayer)
-      final pageOffsetMinus1 = centerPageIndex - 1;
+      const pageOffsetMinus1 = centerPageIndex - 1;
       expect(pageOffsetMinus1 - centerPageIndex, -1);
 
       // Página centerPageIndex + 1 significa offset = 1 (mañana)
-      final pageOffsetPlus1 = centerPageIndex + 1;
+      const pageOffsetPlus1 = centerPageIndex + 1;
       expect(pageOffsetPlus1 - centerPageIndex, 1);
     });
 
     test('should convert date offset to page index correctly', () {
       // Offset 0 (hoy) debería dar página centerPageIndex
-      final pageForToday = centerPageIndex + 0;
+      const pageForToday = centerPageIndex + 0;
       expect(pageForToday, centerPageIndex);
 
       // Offset -5 (hace 5 días) debería dar página centerPageIndex - 5
-      final pageForFiveDaysAgo = centerPageIndex + (-5);
+      const pageForFiveDaysAgo = centerPageIndex + (-5);
       expect(pageForFiveDaysAgo, centerPageIndex - 5);
 
       // Offset 10 (dentro de 10 días) debería dar página centerPageIndex + 10
-      final pageForTenDaysLater = centerPageIndex + 10;
+      const pageForTenDaysLater = centerPageIndex + 10;
       expect(pageForTenDaysLater, centerPageIndex + 10);
     });
 
     test('should handle large offsets correctly', () {
       // Verificar que podemos manejar offsets grandes (ej: 1 año = 365 días)
-      final oneYearOffset = 365;
-      final pageForOneYearLater = centerPageIndex + oneYearOffset;
+      const oneYearOffset = 365;
+      const pageForOneYearLater = centerPageIndex + oneYearOffset;
       expect(pageForOneYearLater, centerPageIndex + 365);
 
-      final oneYearAgoOffset = -365;
-      final pageForOneYearAgo = centerPageIndex + oneYearAgoOffset;
+      const oneYearAgoOffset = -365;
+      const pageForOneYearAgo = centerPageIndex + oneYearAgoOffset;
       expect(pageForOneYearAgo, centerPageIndex - 365);
     });
   });
@@ -162,9 +162,9 @@ void main() {
       const centerPageIndex = 10000;
 
       // Calcular fecha desde página
-      final page = centerPageIndex - 5; // 5 días atrás
-      final dayOffset = page - centerPageIndex;
-      final calculatedDate = today.add(Duration(days: dayOffset));
+      const page = centerPageIndex - 5; // 5 días atrás
+      const dayOffset = page - centerPageIndex;
+      final calculatedDate = today.add(const Duration(days: dayOffset));
 
       expect(dayOffset, -5);
       expect(calculatedDate.difference(today).inDays, -5);

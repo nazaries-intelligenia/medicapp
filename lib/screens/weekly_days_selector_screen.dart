@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import '../services/snackbar_service.dart';
 import 'weekly_days_selector/widgets/day_selection_tile.dart';
 import 'weekly_days_selector/widgets/selection_count_info.dart';
 import '../widgets/action_buttons.dart';
@@ -60,12 +61,7 @@ class _WeeklyDaysSelectorScreenState extends State<WeeklyDaysSelectorScreen> {
   void _continue() {
     final l10n = AppLocalizations.of(context)!;
     if (_selectedDays.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.weeklyDaysSelectorSelectAtLeastOne),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      SnackBarService.showWarning(context, l10n.weeklyDaysSelectorSelectAtLeastOne);
       return;
     }
 

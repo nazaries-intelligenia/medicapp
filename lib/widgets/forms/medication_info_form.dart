@@ -227,7 +227,7 @@ class MedicationInfoForm extends StatelessWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
-            final spacing = 8.0;
+            const spacing = 8.0;
             final itemWidth = (constraints.maxWidth - (spacing * 2)) / 3;
 
             return Wrap(

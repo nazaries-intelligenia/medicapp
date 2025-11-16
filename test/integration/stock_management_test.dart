@@ -115,9 +115,10 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump();
 
-    // Verify the tap was processed - the warning icon should still be visible
-    // (The SnackBar shows stock details but we can't reliably verify its text in tests)
-    expect(find.byIcon(Icons.warning), findsOneWidget);
+    // Verify the tap was processed - now there should be 2 warning icons visible:
+    // 1. The original warning icon in the medication card
+    // 2. A new warning icon in the SnackBar message (added by SnackBarService)
+    expect(find.byIcon(Icons.warning), findsNWidgets(2));
 
     // Verify the medication is still displayed (operation didn't crash)
     expect(find.text('Aspirina'), findsOneWidget);

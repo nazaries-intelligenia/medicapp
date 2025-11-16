@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
+import '../services/snackbar_service.dart';
 import 'medication_times_screen.dart';
 import 'medication_dosage/widgets/dosage_mode_option_card.dart';
 import 'medication_dosage/widgets/interval_input_card.dart';
@@ -79,32 +80,17 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
       final interval = int.tryParse(_intervalController.text);
 
       if (interval == null || interval <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationInvalidInterval),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationInvalidInterval);
         return;
       }
 
       if (interval > 24) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationIntervalTooLarge),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationIntervalTooLarge);
         return;
       }
 
       if (24 % interval != 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationIntervalNotDivisor),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationIntervalNotDivisor);
         return;
       }
 
@@ -115,22 +101,12 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
       final doses = int.tryParse(_customDosesController.text);
 
       if (doses == null || doses <= 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationInvalidDoseCount),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationInvalidDoseCount);
         return;
       }
 
       if (doses > 24) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationTooManyDoses),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationTooManyDoses);
         return;
       }
 

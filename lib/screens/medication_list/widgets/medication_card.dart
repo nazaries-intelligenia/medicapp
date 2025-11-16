@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
+import '../../../services/snackbar_service.dart';
 import '../../../utils/datetime_extensions.dart';
 
 class MedicationCard extends StatelessWidget {
@@ -265,13 +266,19 @@ class MedicationCard extends StatelessWidget {
                             ? l10n.medicationStockInfo(medication.name, medication.stockDisplayText)
                             : l10n.durationEstimate(medication.name, medication.stockDisplayText, daysLeft);
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(message),
+                        if (medication.isStockEmpty) {
+                          SnackBarService.showError(
+                            context,
+                            message,
                             duration: const Duration(seconds: 2),
-                            backgroundColor: stockColor,
-                          ),
-                        );
+                          );
+                        } else {
+                          SnackBarService.showWarning(
+                            context,
+                            message,
+                            duration: const Duration(seconds: 2),
+                          );
+                        }
                       },
                       child: Container(
                         padding: const EdgeInsets.all(6),

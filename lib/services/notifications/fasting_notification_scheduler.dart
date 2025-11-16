@@ -134,7 +134,7 @@ class FastingNotificationScheduler {
       // "after" fasting notifications are scheduled dynamically when the dose is actually taken
       if (period.isBefore) {
         // Notify when to stop eating (before taking the medication)
-        final title = '🍽️ Comenzar ayuno';
+        const title = '🍽️ Comenzar ayuno';
         // V19+: Only include person name for non-default users
         final body = isDefault
           ? 'Es hora de dejar de comer para ${medication.name}'

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import '../services/snackbar_service.dart';
 import '../utils/datetime_extensions.dart';
 import 'specific_dates_selector/widgets/instructions_card.dart';
 import 'specific_dates_selector/widgets/selected_dates_list_card.dart';
@@ -57,18 +58,13 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
 
     if (picked != null) {
       final dateString = picked.toDateString();
-      setState(() {
-        if (_selectedDates.contains(dateString)) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.specificDatesSelectorAlreadySelected),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        } else {
+      if (_selectedDates.contains(dateString)) {
+        SnackBarService.showWarning(context, l10n.specificDatesSelectorAlreadySelected);
+      } else {
+        setState(() {
           _selectedDates.add(dateString);
-        }
-      });
+        });
+      }
     }
   }
 
@@ -81,12 +77,7 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
   void _continue() {
     final l10n = AppLocalizations.of(context)!;
     if (_selectedDates.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.specificDatesSelectorSelectAtLeastOne),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      SnackBarService.showWarning(context, l10n.specificDatesSelectorSelectAtLeastOne);
       return;
     }
 

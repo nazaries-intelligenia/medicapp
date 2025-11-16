@@ -7,6 +7,7 @@ import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/dose_history_service.dart';
+import '../services/snackbar_service.dart';
 import '../utils/platform_helper.dart';
 import 'medication_info_screen.dart';
 import 'edit_medication_menu_screen.dart';
@@ -239,13 +240,12 @@ class MedicationListScreenState extends State<MedicationListScreen>
         _lastTapTime = null;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(_debugMenuVisible
-              ? l10n.debugMenuActivated
-              : l10n.debugMenuDeactivated),
-          duration: const Duration(seconds: 1),
-        ),
+      SnackBarService.showInfo(
+        context,
+        _debugMenuVisible
+            ? l10n.debugMenuActivated
+            : l10n.debugMenuDeactivated,
+        duration: const Duration(seconds: 1),
       );
     }
   }
@@ -319,11 +319,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.medicationUpdatedShort(updatedMedication.name)),
-            duration: const Duration(seconds: 2),
-          ),
+        SnackBarService.showInfo(
+          context,
+          l10n.medicationUpdatedShort(updatedMedication.name),
+          duration: const Duration(seconds: 2),
         );
       }
     }
@@ -334,26 +333,26 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
     // Validate before closing modal
     if (medication.doseTimes.isEmpty) {
-      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.noScheduledTimes),
+      if (mounted) {
+        SnackBarService.showInfo(
+          context,
+          l10n.noScheduledTimes,
           duration: const Duration(seconds: 2),
-        ),
-      );
+        );
+      }
       return;
     }
 
     if (medication.stockQuantity <= 0) {
-      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(l10n.medicineCabinetNoStockAvailable),
+      if (mounted) {
+        SnackBarService.showInfo(
+          context,
+          l10n.medicineCabinetNoStockAvailable,
           duration: const Duration(seconds: 2),
-        ),
-      );
+        );
+      }
       return;
     }
 
@@ -366,11 +365,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
         : await DatabaseHelper.instance.getMedication(medication.id);
 
     if (freshMedication == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseActionMedicationNotFound),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.doseActionMedicationNotFound,
+        duration: const Duration(seconds: 2),
       );
       return;
     }
@@ -414,17 +412,14 @@ class MedicationListScreenState extends State<MedicationListScreen>
           medication: freshMedication,
         );
         final parts = result.split('|');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.extraDoseRegistered(
-                freshMedication.name,
-                parts[1],
-                parts[2],
-              ),
-            ),
-            duration: const Duration(seconds: 2),
+        SnackBarService.showInfo(
+          context,
+          l10n.extraDoseRegistered(
+            freshMedication.name,
+            parts[1],
+            parts[2],
           ),
+          duration: const Duration(seconds: 2),
         );
       } else if (selectedDoseTime != null) {
         final result = await _viewModel.registerDose(
@@ -436,25 +431,21 @@ class MedicationListScreenState extends State<MedicationListScreen>
             ? '${l10n.doseRegisteredAtTime(freshMedication.name, selectedDoseTime, parts[1])}\n${l10n.allDosesCompletedToday}'
             : '${l10n.doseRegisteredAtTime(freshMedication.name, selectedDoseTime, parts[2])}\n${l10n.remainingDosesToday(int.parse(parts[1]))}';
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(confirmationMessage),
-            duration: const Duration(seconds: 3),
-          ),
+        SnackBarService.showInfo(
+          context,
+          confirmationMessage,
+          duration: const Duration(seconds: 3),
         );
       }
     } on InsufficientStockException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.insufficientStockForThisDose(
-              e.doseQuantity.toString(),
-              e.unit,
-              freshMedication.stockDisplayText,
-            ),
-          ),
-          duration: const Duration(seconds: 3),
+      SnackBarService.showError(
+        context,
+        l10n.insufficientStockForThisDose(
+          e.doseQuantity.toString(),
+          e.unit,
+          freshMedication.stockDisplayText,
         ),
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -464,11 +455,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
     Navigator.pop(context);
 
     if (medication.stockQuantity <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.medicineCabinetNoStockAvailable),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showInfo(
+        context,
+        l10n.medicineCabinetNoStockAvailable,
+        duration: const Duration(seconds: 2),
       );
       return;
     }
@@ -492,24 +482,20 @@ class MedicationListScreenState extends State<MedicationListScreen>
           parts[3],
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(confirmationMessage),
-            duration: const Duration(seconds: 3),
-          ),
+        SnackBarService.showInfo(
+          context,
+          confirmationMessage,
+          duration: const Duration(seconds: 3),
         );
       } on InsufficientStockException catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.insufficientStockForThisDose(
-                e.doseQuantity.toString(),
-                e.unit,
-                medication.stockDisplayText,
-              ),
-            ),
-            duration: const Duration(seconds: 3),
+        SnackBarService.showError(
+          context,
+          l10n.insufficientStockForThisDose(
+            e.doseQuantity.toString(),
+            e.unit,
+            medication.stockDisplayText,
           ),
+          duration: const Duration(seconds: 3),
         );
       }
     }
@@ -547,24 +533,16 @@ class MedicationListScreenState extends State<MedicationListScreen>
       final result = await _viewModel.toggleSuspendMedication(medicationToUpdate);
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            result == 'suspended'
-                ? l10n.medicationSuspended(medicationToUpdate.name)
-                : l10n.medicationReactivated(medicationToUpdate.name),
-          ),
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showInfo(
+        context,
+        result == 'suspended'
+            ? l10n.medicationSuspended(medicationToUpdate.name)
+            : l10n.medicationReactivated(medicationToUpdate.name),
+        duration: const Duration(seconds: 3),
       );
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, 'Error: $e');
     }
   }
 
@@ -586,18 +564,15 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.stockRefilled(
-              medication.name,
-              parts[1],
-              parts[2],
-              parts[3],
-            ),
-          ),
-          duration: const Duration(seconds: 3),
+      SnackBarService.showSuccess(
+        context,
+        l10n.stockRefilled(
+          medication.name,
+          parts[1],
+          parts[2],
+          parts[3],
         ),
+        duration: const Duration(seconds: 3),
       );
 
       // For as-needed medications, ask for expiration date after refill
@@ -633,11 +608,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
         final l10n = AppLocalizations.of(context)!;
         await _viewModel.deleteMedication(medication);
         Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.medicationDeletedShort(medication.name)),
-            duration: const Duration(seconds: 2),
-          ),
+        SnackBarService.showInfo(
+          context,
+          l10n.medicationDeletedShort(medication.name),
+          duration: const Duration(seconds: 2),
         );
       },
     );
@@ -683,11 +657,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.testNotificationSent),
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.testNotificationSent,
+      duration: const Duration(seconds: 2),
     );
   }
 
@@ -696,11 +669,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.scheduledNotificationInOneMin),
-        duration: const Duration(seconds: 3),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.scheduledNotificationInOneMin,
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -710,11 +682,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.notificationsRescheduled(pendingCount)),
-        duration: const Duration(seconds: 3),
-      ),
+    SnackBarService.showInfo(
+      context,
+      l10n.notificationsRescheduled(pendingCount),
+      duration: const Duration(seconds: 3),
     );
   }
 
@@ -770,21 +741,18 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseDeletedAt(doseTime)),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showInfo(
+        context,
+        l10n.doseDeletedAt(doseTime),
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.errorDeleting(e.toString())),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.errorDeleting(e.toString()),
+        duration: const Duration(seconds: 3),
       );
     }
   }
@@ -833,31 +801,26 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.doseMarkedAs(
-              doseTime, wasTaken ? l10n.skippedStatus : l10n.takenStatus)),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showInfo(
+        context,
+        l10n.doseMarkedAs(
+            doseTime, wasTaken ? l10n.skippedStatus : l10n.takenStatus),
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
 
       if (e is InsufficientStockException) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.insufficientStockForDose),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
+        SnackBarService.showError(
+          context,
+          l10n.insufficientStockForDose,
+          duration: const Duration(seconds: 2),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorChangingStatus(e.toString())),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
+        SnackBarService.showError(
+          context,
+          l10n.errorChangingStatus(e.toString()),
+          duration: const Duration(seconds: 3),
         );
       }
     }
@@ -915,12 +878,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
       }).firstOrNull;
 
       if (entry == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.errorFindingDoseEntry),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 2),
-          ),
+        SnackBarService.showError(
+          context,
+          l10n.errorFindingDoseEntry,
+          duration: const Duration(seconds: 2),
         );
         return;
       }
@@ -983,21 +944,18 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.registeredTimeUpdated),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.registeredTimeUpdated,
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.errorUpdatingTime(e.toString())),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 3),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.errorUpdatingTime(e.toString()),
+        duration: const Duration(seconds: 3),
       );
     }
   }

@@ -376,8 +376,8 @@ void main() {
       // First dose should be adjusted to avoid 08:00-10:00 period
       // Should be either before 08:00 or after 10:00
       final firstDoseMinutes = suggestedTimes[0].hour * 60 + suggestedTimes[0].minute;
-      final conflictStart = 8 * 60;
-      final conflictEnd = 10 * 60;
+      const conflictStart = 8 * 60;
+      const conflictEnd = 10 * 60;
 
       final isBeforeConflict = firstDoseMinutes < conflictStart;
       final isAfterConflict = firstDoseMinutes > conflictEnd;

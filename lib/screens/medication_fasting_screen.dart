@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
+import '../services/snackbar_service.dart';
 import '../widgets/forms/fasting_configuration_form.dart';
 import 'medication_quantity_screen.dart';
 import '../widgets/action_buttons.dart';
@@ -83,12 +84,7 @@ class _MedicationFastingScreenState extends State<MedicationFastingScreen> {
         message = l10n.validationFastingDuration;
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, message);
       return;
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
+import '../services/snackbar_service.dart';
 import '../widgets/forms/dose_schedule_editor.dart';
 import 'medication_fasting_screen.dart';
 import '../widgets/action_buttons.dart';
@@ -48,32 +49,17 @@ class _MedicationTimesScreenState extends State<MedicationTimesScreen> {
     if (editorState == null) return;
 
     if (!editorState.allTimesSelected()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.validationSelectAllTimes),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.validationSelectAllTimes);
       return;
     }
 
     if (!editorState.allQuantitiesValid()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.validationEnterValidAmounts),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.validationEnterValidAmounts);
       return;
     }
 
     if (editorState.hasDuplicateTimes()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.validationDuplicateTimes),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.validationDuplicateTimes);
       return;
     }
 

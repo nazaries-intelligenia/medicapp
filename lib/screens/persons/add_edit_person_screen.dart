@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../../database/database_helper.dart';
 import '../../models/person.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/snackbar_service.dart';
 
 /// Screen for adding or editing a person
 class AddEditPersonScreen extends StatefulWidget {
@@ -54,7 +55,7 @@ class _AddEditPersonScreenState extends State<AddEditPersonScreen> {
         final updatedPerson = widget.person!.copyWith(name: name);
         await DatabaseHelper.instance.updatePerson(updatedPerson);
         if (mounted) {
-          _showSnackBar('Persona actualizada correctamente', isError: false);
+          SnackBarService.showSuccess(context, 'Persona actualizada correctamente');
         }
       } else {
         // Create new person
@@ -65,7 +66,7 @@ class _AddEditPersonScreenState extends State<AddEditPersonScreen> {
         );
         await DatabaseHelper.instance.insertPerson(newPerson);
         if (mounted) {
-          _showSnackBar('Persona añadida correctamente', isError: false);
+          SnackBarService.showSuccess(context, 'Persona añadida correctamente');
         }
       }
 
@@ -77,20 +78,9 @@ class _AddEditPersonScreenState extends State<AddEditPersonScreen> {
         setState(() {
           _isLoading = false;
         });
-        _showSnackBar('Error al guardar persona: $e', isError: true);
+        SnackBarService.showError(context, 'Error al guardar persona: $e');
       }
     }
-  }
-
-  /// Show a snackbar message
-  void _showSnackBar(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   @override

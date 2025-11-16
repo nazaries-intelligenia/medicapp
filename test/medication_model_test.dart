@@ -271,7 +271,7 @@ void main() {
           .build();
 
       // Simulate refill with new amount
-      final refillAmount = 40.0;
+      const refillAmount = 40.0;
       final updatedMedication = MedicationBuilder.from(medication)
           .withStock(medication.stockQuantity + refillAmount)
           .withLastRefill(refillAmount)

@@ -18,8 +18,8 @@ void main() {
 
     test('_buildNotificationTitle should hide name for default user', () {
       // Simulate a default person with name
-      final isDefault = true;
-      final personName = 'Yo';
+      const isDefault = true;
+      const personName = 'Yo';
 
       // Build title for default user
       final title = service.buildNotificationTitle(personName, isDefault);
@@ -29,7 +29,7 @@ void main() {
       expect(title, isNot(contains('Yo')));
 
       // Also test with null name
-      final String? nullName = null;
+      const String? nullName = null;
       final titleWithNull = service.buildNotificationTitle(nullName, isDefault);
 
       // Should NOT include any name
@@ -40,8 +40,8 @@ void main() {
 
     test('_buildNotificationTitle should show name for non-default user', () {
       // Simulate a non-default person
-      final isDefault = false;
-      final personName = 'María';
+      const isDefault = false;
+      const personName = 'María';
 
       // Build title for non-default user
       final title = service.buildNotificationTitle(personName, isDefault);
@@ -53,8 +53,8 @@ void main() {
 
     test('_buildNotificationTitle should show name for another non-default user', () {
       // Simulate another non-default person
-      final isDefault = false;
-      final personName = 'Juan';
+      const isDefault = false;
+      const personName = 'Juan';
 
       // Build title for non-default user
       final title = service.buildNotificationTitle(personName, isDefault);
@@ -66,8 +66,8 @@ void main() {
 
     test('_buildNotificationTitle should handle suffix for default user', () {
       // Simulate a default person with suffix
-      final isDefault = true;
-      final personName = 'Yo';
+      const isDefault = true;
+      const personName = 'Yo';
 
       // Build title with suffix for default user
       final title = service.buildNotificationTitle(personName, isDefault, suffix: '(pospuesto)');
@@ -80,8 +80,8 @@ void main() {
 
     test('_buildNotificationTitle should handle suffix for non-default user', () {
       // Simulate a non-default person with suffix
-      final isDefault = false;
-      final personName = 'María';
+      const isDefault = false;
+      const personName = 'María';
 
       // Build title with suffix for non-default user
       final title = service.buildNotificationTitle(personName, isDefault, suffix: '(pospuesto)');
@@ -94,8 +94,8 @@ void main() {
 
     test('_buildNotificationTitle should handle null person name', () {
       // Simulate a person with null name
-      final isDefault = false;
-      final String? personName = null;
+      const isDefault = false;
+      const String? personName = null;
 
       // Build title with null name
       final title = service.buildNotificationTitle(personName, isDefault);

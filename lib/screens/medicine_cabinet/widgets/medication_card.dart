@@ -5,6 +5,7 @@ import '../../../models/treatment_duration_type.dart';
 import '../../../database/database_helper.dart';
 import '../../../services/dose_action_service.dart';
 import '../../../services/medication_update_service.dart';
+import '../../../services/snackbar_service.dart';
 import '../../edit_medication_menu_screen.dart';
 import 'medication_options_modal.dart';
 import '../../medication_list/dialogs/refill_input_dialog.dart';
@@ -77,17 +78,13 @@ class _MedicationCardState extends State<MedicationCard> {
       if (!mounted) return;
 
       // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.medicineCabinetRefillSuccess(
-              widget.medication.name,
-              refillAmount.toString(),
-              widget.medication.type.stockUnit,
-              updatedMedication.stockDisplayText,
-            ),
-          ),
-          duration: const Duration(seconds: 3),
+      SnackBarService.showSuccess(
+        context,
+        l10n.medicineCabinetRefillSuccess(
+          widget.medication.name,
+          refillAmount.toString(),
+          widget.medication.type.stockUnit,
+          updatedMedication.stockDisplayText,
         ),
       );
 
@@ -116,11 +113,9 @@ class _MedicationCardState extends State<MedicationCard> {
 
     // Check if there's any stock available
     if (widget.medication.stockQuantity <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.medicineCabinetNoStockAvailable),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showError(
+        context,
+        l10n.medicineCabinetNoStockAvailable,
       );
       return;
     }
@@ -155,31 +150,23 @@ class _MedicationCardState extends State<MedicationCard> {
         if (!mounted) return;
 
         // Show confirmation
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.medicineCabinetDoseRegistered(
-                widget.medication.name,
-                doseQuantity.toString(),
-                widget.medication.type.stockUnit,
-                updatedMedication.stockDisplayText,
-              ),
-            ),
-            duration: const Duration(seconds: 3),
+        SnackBarService.showSuccess(
+          context,
+          l10n.medicineCabinetDoseRegistered(
+            widget.medication.name,
+            doseQuantity.toString(),
+            widget.medication.type.stockUnit,
+            updatedMedication.stockDisplayText,
           ),
         );
       } on InsufficientStockException catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.medicineCabinetInsufficientStock(
-                e.doseQuantity.toString(),
-                e.unit,
-                widget.medication.stockDisplayText,
-              ),
-            ),
-            duration: const Duration(seconds: 3),
+        SnackBarService.showError(
+          context,
+          l10n.medicineCabinetInsufficientStock(
+            e.doseQuantity.toString(),
+            e.unit,
+            widget.medication.stockDisplayText,
           ),
         );
       }
@@ -228,11 +215,9 @@ class _MedicationCardState extends State<MedicationCard> {
       if (!mounted) return;
 
       // Show confirmation
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.medicineCabinetDeleteSuccess(widget.medication.name)),
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.medicineCabinetDeleteSuccess(widget.medication.name),
       );
     }
   }
@@ -272,11 +257,9 @@ class _MedicationCardState extends State<MedicationCard> {
     if (!mounted) return;
 
     // Show confirmation
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.medicineCabinetResumeSuccess(widget.medication.name)),
-        duration: const Duration(seconds: 2),
-      ),
+    SnackBarService.showSuccess(
+      context,
+      l10n.medicineCabinetResumeSuccess(widget.medication.name),
     );
   }
 
