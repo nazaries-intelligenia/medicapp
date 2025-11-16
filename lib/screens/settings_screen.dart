@@ -3,6 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
+import '../services/snackbar_service.dart';
 import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
 import 'settings/widgets/setting_option_card.dart';
@@ -138,11 +139,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (!mounted) return;
 
       if (result.status == ShareResultStatus.success) {
-        _showSnackBar(l10n.settingsExportSuccess, isError: false);
+        SnackBarService.showSuccess(context, l10n.settingsExportSuccess);
       }
     } catch (e) {
       if (!mounted) return;
-      _showSnackBar(l10n.settingsExportError(e.toString()), isError: true);
+      SnackBarService.showError(context, l10n.settingsExportError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {
@@ -193,13 +194,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
       if (!mounted) return;
 
-      _showSnackBar(l10n.settingsImportSuccess, isError: false);
+      SnackBarService.showSuccess(context, l10n.settingsImportSuccess);
 
       // Show restart dialog
       _showRestartDialog();
     } catch (e) {
       if (!mounted) return;
-      _showSnackBar(l10n.settingsImportError(e.toString()), isError: true);
+      SnackBarService.showError(context, l10n.settingsImportError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {
@@ -249,17 +250,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Text(l10n.settingsRestartDialogButton),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Show a snackbar message
-  void _showSnackBar(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: const Duration(seconds: 3),
       ),
     );
   }

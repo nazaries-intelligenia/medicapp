@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
+import '../services/snackbar_service.dart';
 import '../widgets/forms/frequency_option_card.dart';
 import 'weekly_days_selector_screen.dart';
 import 'medication_dosage_screen.dart';
@@ -83,12 +84,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
     // Validar según el modo seleccionado
     if (_selectedMode == FrequencyMode.weeklyDays) {
       if (_weeklyDays == null || _weeklyDays!.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationSelectWeekdays),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationSelectWeekdays);
         return;
       }
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../database/database_helper.dart';
 import '../../models/person.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/snackbar_service.dart';
 import 'add_edit_person_screen.dart';
 
 /// Screen for managing persons (users of the app)
@@ -41,7 +42,7 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
         setState(() {
           _isLoading = false;
         });
-        _showSnackBar('Error al cargar personas: $e', isError: true);
+        SnackBarService.showError(context, 'Error al cargar personas: $e');
       }
     }
   }
@@ -80,7 +81,7 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
 
     // Don't allow deleting the default person
     if (person.isDefault) {
-      _showSnackBar('No puedes eliminar la persona por defecto', isError: true);
+      SnackBarService.showError(context, 'No puedes eliminar la persona por defecto');
       return;
     }
 
@@ -110,22 +111,11 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
 
     try {
       await DatabaseHelper.instance.deletePerson(person.id);
-      _showSnackBar('Persona eliminada correctamente', isError: false);
+      SnackBarService.showSuccess(context, 'Persona eliminada correctamente');
       _loadPersons();
     } catch (e) {
-      _showSnackBar('Error al eliminar persona: $e', isError: true);
+      SnackBarService.showError(context, 'Error al eliminar persona: $e');
     }
-  }
-
-  /// Show a snackbar message
-  void _showSnackBar(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
-    );
   }
 
   @override

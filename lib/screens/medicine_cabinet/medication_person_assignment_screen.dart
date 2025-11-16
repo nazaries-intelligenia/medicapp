@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/medication.dart';
 import '../../models/person.dart';
 import '../../database/database_helper.dart';
+import '../../services/snackbar_service.dart';
 
 /// Pantalla para gestionar la asignación de personas a un medicamento.
 /// Permite ver qué personas están asignadas y agregar/remover asignaciones.
@@ -50,12 +51,7 @@ class _MedicationPersonAssignmentScreenState
         _isLoading = false;
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cargar datos: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, 'Error al cargar datos: $e');
       }
     }
   }
@@ -72,21 +68,14 @@ class _MedicationPersonAssignmentScreenState
       await _loadData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${person.name} asignado a ${widget.medication.name}'),
-            backgroundColor: Colors.green,
-          ),
+        SnackBarService.showSuccess(
+          context,
+          '${person.name} asignado a ${widget.medication.name}',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al asignar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, 'Error al asignar: $e');
       }
     }
   }
@@ -129,22 +118,14 @@ class _MedicationPersonAssignmentScreenState
       await _loadData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text('${person.name} desasignado de ${widget.medication.name}'),
-            backgroundColor: Colors.orange,
-          ),
+        SnackBarService.showWarning(
+          context,
+          '${person.name} desasignado de ${widget.medication.name}',
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al desasignar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, 'Error al desasignar: $e');
       }
     }
   }

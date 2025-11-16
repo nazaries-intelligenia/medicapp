@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../database/database_helper.dart';
+import '../../services/snackbar_service.dart';
 import 'edit_quantity/widgets/quantity_form_card.dart';
 import '../../widgets/action_buttons.dart';
 import '../../utils/number_utils.dart';
@@ -84,25 +85,17 @@ class _EditQuantityScreenState extends State<EditQuantityScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editQuantityUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editQuantityUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editQuantityError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editQuantityError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {

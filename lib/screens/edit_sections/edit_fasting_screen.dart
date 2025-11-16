@@ -5,6 +5,7 @@ import '../../models/medication.dart';
 import '../../widgets/forms/fasting_configuration_form.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar la configuración de ayuno
@@ -81,12 +82,7 @@ class _EditFastingScreenState extends State<EditFastingScreen> {
         message = 'La duración del ayuno debe ser al menos 1 minuto';
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, message);
       return;
     }
 
@@ -143,25 +139,17 @@ class _EditFastingScreenState extends State<EditFastingScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editFastingUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editFastingUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editFastingError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editFastingError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {

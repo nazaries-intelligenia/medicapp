@@ -5,6 +5,7 @@ import '../../models/medication_type.dart';
 import '../../widgets/forms/medication_info_form.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
 /// Pantalla para editar información básica del medicamento (nombre y tipo)
@@ -102,13 +103,10 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
       if (!mounted) return;
 
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editBasicInfoUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editBasicInfoUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
@@ -116,12 +114,7 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
       if (!mounted) return;
 
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editBasicInfoError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editBasicInfoError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {

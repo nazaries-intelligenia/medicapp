@@ -4,6 +4,7 @@ import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/snackbar_service.dart';
 import 'edit_frequency/widgets/frequency_options_list.dart';
 import 'edit_frequency/widgets/specific_dates_config_card.dart';
 import 'edit_frequency/widgets/weekly_pattern_config_card.dart';
@@ -110,11 +111,9 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
       case FrequencyMode.specificDates:
         durationType = TreatmentDurationType.specificDates;
         if (_selectedDates == null || _selectedDates!.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.editFrequencySelectAtLeastOneDate),
-              backgroundColor: Colors.red,
-            ),
+          SnackBarService.showError(
+            context,
+            l10n.editFrequencySelectAtLeastOneDate,
           );
           return;
         }
@@ -126,11 +125,9 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
       case FrequencyMode.weeklyPattern:
         durationType = TreatmentDurationType.weeklyPattern;
         if (_weeklyDays == null || _weeklyDays!.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.editFrequencySelectAtLeastOneDay),
-              backgroundColor: Colors.red,
-            ),
+          SnackBarService.showError(
+            context,
+            l10n.editFrequencySelectAtLeastOneDay,
           );
           return;
         }
@@ -150,12 +147,7 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
         durationType = TreatmentDurationType.intervalDays;
         final interval = int.tryParse(_intervalController.text);
         if (interval == null || interval < 2) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.editFrequencyIntervalMin),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackBarService.showError(context, l10n.editFrequencyIntervalMin);
           return;
         }
         specificDates = null;
@@ -217,25 +209,17 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editFrequencyUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editFrequencyUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editFrequencyError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editFrequencyError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {

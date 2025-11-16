@@ -4,6 +4,7 @@ import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../models/medication_type.dart';
 import '../../services/fasting_conflict_service.dart';
+import '../../services/snackbar_service.dart';
 import '../../utils/datetime_extensions.dart';
 import '../../utils/number_utils.dart';
 
@@ -271,12 +272,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
   void _removeDose(int index) {
     final l10n = AppLocalizations.of(context)!;
     if (_doseEntries.length <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.validationAtLeastOneDose),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.validationAtLeastOneDose);
       return;
     }
 

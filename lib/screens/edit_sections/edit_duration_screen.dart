@@ -5,6 +5,7 @@ import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
+import '../../services/snackbar_service.dart';
 import '../specific_dates_selector_screen.dart';
 import 'edit_duration/widgets/duration_type_info_card.dart';
 import 'edit_duration/widgets/treatment_dates_card.dart';
@@ -70,12 +71,7 @@ class _EditDurationScreenState extends State<EditDurationScreen> {
     if (_durationType == TreatmentDurationType.everyday ||
         _durationType == TreatmentDurationType.untilFinished) {
       if (_startDate == null || _endDate == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.editDurationSelectDates),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.editDurationSelectDates);
         return;
       }
     }
@@ -133,25 +129,17 @@ class _EditDurationScreenState extends State<EditDurationScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editDurationUpdated),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-        ),
+      SnackBarService.showSuccess(
+        context,
+        l10n.editDurationUpdated,
+        duration: const Duration(seconds: 2),
       );
 
       Navigator.pop(context, updatedMedication);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.editDurationError(e.toString())),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBarService.showError(context, l10n.editDurationError(e.toString()));
     } finally {
       if (mounted) {
         setState(() {

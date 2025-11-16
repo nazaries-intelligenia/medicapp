@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
+import '../services/snackbar_service.dart';
 import 'specific_dates_selector_screen.dart';
 import 'medication_dates_screen.dart';
 import 'medication_quantity_screen.dart';
@@ -73,12 +74,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
     // Si se seleccionaron fechas específicas, validar
     if (_selectedDurationType == TreatmentDurationType.specificDates) {
       if (_specificDates == null || _specificDates!.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.validationSelectDates),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBarService.showError(context, l10n.validationSelectDates);
         return;
       }
     }
