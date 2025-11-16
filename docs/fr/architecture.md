@@ -453,6 +453,122 @@ class FastingConflictService {
 - Génère des descriptions localisées des conflits détectés
 - Aide à prévenir les incompatibilités dans les horaires de prise avec jeûne
 
+**Cas d'usage :**
+- Lors de l'ajout d'un nouvel horaire de dose dans `DoseScheduleEditor`
+- Lors de la création ou modification d'un médicament dans `EditScheduleScreen`
+- Prévient les conflits qui pourraient compromettre l'efficacité du traitement
+- Activé en V19+ après refactorisation de `EditScheduleScreen` pour recevoir `allMedications` et `personId` comme paramètres
+
+### Système de Notifications de Stock Faible
+
+MedicApp implémente un système dual d'alertes de stock qui combine des notifications réactives (au moment critique) et proactives (anticipatoires).
+
+#### Notifications Réactives (Immediate Stock Check)
+
+Le système vérifie automatiquement le stock disponible chaque fois qu'un utilisateur tente d'enregistrer une dose, que ce soit depuis :
+- L'écran principal en marquant une dose comme "prise"
+- Les actions rapides de notification (bouton "Enregistrer")
+- L'enregistrement manuel de doses occasionnelles
+
+**Implémentation dans NotificationService :**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Flux réactif :**
+1. L'utilisateur tente d'enregistrer une dose
+2. Le système vérifie : `medication.stockQuantity < doseQuantity`
+3. Si insuffisant :
+   - Affiche une notification immédiate avec priorité haute
+   - N'AUTORISE PAS l'enregistrement de la dose
+   - Indique la quantité nécessaire vs disponible
+   - Guide l'utilisateur pour réapprovisionner le stock
+
+**Plage d'IDs de notification :** 7,000,000 - 7,999,999 (générés par `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notifications Proactives (Daily Stock Monitoring)
+
+Le système peut exécuter des vérifications proactives quotidiennes qui anticipent les problèmes de rupture de stock avant qu'ils ne surviennent.
+
+**Méthode principale :**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Flux proactif :**
+1. S'exécute au maximum une fois par jour (utilise SharedPreferences pour le suivi)
+2. Itère sur toutes les personnes enregistrées
+3. Pour chaque médicament actif :
+   - Calcule la dose quotidienne totale en considérant :
+     - Toutes les personnes assignées au médicament
+     - Fréquence du traitement (quotidien, hebdomadaire, intervalle)
+     - Horaires configurés par personne
+   - Divise le stock actuel par la dose quotidienne
+   - Obtient les jours d'approvisionnement restants
+4. Si `medication.isStockLow` (utilise le seuil configurable par médicament) :
+   - Émet une notification proactive
+   - Inclut les jours approximatifs restants
+   - Ne bloque aucune action
+
+**Prévention du spam :**
+- Enregistre la dernière date de vérification dans `SharedPreferences`
+- S'exécute uniquement si `lastCheck != today`
+- Chaque médicament notifie une seule fois par jour
+- Se réinitialise lors du réapprovisionnement du stock
+
+**Intégration avec Medication.isStockLow :**
+Le calcul du stock faible utilise la propriété existante du modèle :
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configuration des Canaux de Notification
+
+Les notifications de stock utilisent un canal dédié :
+
+```dart
+// Dans NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Alertes de Stock Faible',
+  channelDescription: 'Notifications lorsque le stock de médicaments est faible',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Caractéristiques :**
+- Canal séparé des rappels de dose
+- Priorité haute (pas maximale, pour ne pas être intrusif)
+- Annulation automatique au toucher
+- Sans actions intégrées (informatives uniquement)
+
+#### Quand Utiliser Chaque Type
+
+| Type | Moment | Objectif | Bloquant |
+|------|--------|----------|----------|
+| **Réactif** | Lors de la tentative d'enregistrement de dose | Empêcher l'enregistrement avec stock insuffisant | ✅ Oui |
+| **Proactif** | Vérification quotidienne (optionnelle) | Anticiper le réapprovisionnement nécessaire | ❌ Non |
+
+**Avantage de la conception duale :**
+- Protection absolue au moment critique (réactif)
+- Planification anticipée pour éviter d'atteindre le moment critique (proactif)
+- Le système proactif est opt-in (doit être appelé explicitement depuis la logique de l'application)
+
 ---
 
 ## Couche de Vue (Screens/Widgets)

@@ -223,7 +223,62 @@ MedicApp Android 12 eta bertsio berriagorako optimizatua dago, jakinarazpen zeha
 
 ---
 
-## 9. Barazkaldiaren Konfigurazioa
+## 9. Stock Baxuko Alertak
+
+### Stock Nahiezko Jakinarazpen Erreaktiboak
+
+MedicApp-ek stock alertetako sistema adimentsu bat inplementatzen du erabiltzailea une kritikoetan sendagairik gabe geratzeko babestuz. Erabiltzaile batek dosia erregistratu nahi duenean (pantaila nagusitik zein jakinarazpenen ekintza azkarretatik), sistemak automatikoki egiaztatzen du stock nahikoa dagoen hartzea osatzeko.
+
+Stock eskuragarria dosiaren kantitate behar baino txikiagoa bada, MedicApp-ek berehalako stock nahiezko alerta erakusten du hartzea erregistratzea galarazten duena. Jakinarazpen erreaktibo honek argi adierazten du sendagai kaltetua izena, behar den kantitatea vs. eskuragarria, eta inbentarioa osatu aurretik dosia berriro erregistratzeko saiatzen aurretik proposatzen du.
+
+Babes mekanismo honek erregistro okerrak historian galarazten ditu eta inbentario kontrolaren integritatea bermatzen du, fisikoki ez dagoen stocka kendu ez dadin ekidituz. Alerta argia da, ez intrusiboak, eta erabiltzailea zuzenean ekintza zuzentzailera gidatzen du (stocka osatu).
+
+### Stock Baxuko Jakinarazpen Proaktiboak
+
+Dosia hartzeko uneko alerta erreaktiboekin ez ezik, MedicApp-ek egunkako stockaren monitoritzazio sistemak proaktibo bat barne hartzen du horniketa arazoak gerta aurretik aurreikusten dituztenak. Sistema honek egunean behin sendagai guztien inbentarioa automatikoki ebaluatzen du, kontsumoak programatuaren arabera geratzen diren hornidura egunak kalkulatuz.
+
+Kalkuluak faktore anitz kontuan hartzen ditu uneko stockak zenbat denbora iraungo duen zehaztasunez estimatzeko:
+
+**Sendagai programatuetarako** - Sistemak esleitu diren pertsona guztien egunkako dosi osoa batzen du, maiztasun patroian konfiguratutako egunekin biderkatzen du (adibidez, astelehena, asteazkena eta ostirala soilik hartzen bada, kalkulua doitzen du), eta uneko stocka eguneko konsumo eraginkor honen artean zatitzen du.
+
+**Sendagai okazionalentzat ("behar den arabera")** - Azken eguneko benetako kontsumoaren erregistroa prediktor gisa erabiltzen du, erabilerekin hobetzen den estimazio egokitzaile bat eskainiz.
+
+Sendagai baten stockak konfiguratutako atala iristen duenean (lehenetsia 3 egun, baina sendagaiaren arabera 1-10 egunen artean pertsonalizagarria), MedicApp-ek abisu jakinarazpen proaktibo bat ematen du. Jakinarazpen honek erakusten du:
+
+- Sendagaiaren izena eta mota
+- Geratzen diren hornidura egun hurbilkoatzeak
+- Kaltetutako pertsona(k)
+- Uneko stocka dagokion unitateetan
+- Ordezkatze proposamena
+
+### Jakinarazpenen Spam Prebentzioa
+
+Erabiltzailea alerta errepikatiboekin bonbardatzea saihesteko, jakinarazpen proaktiboen sistemak maiztasunaren logika adimentsua inplementatzen du. Stock baxuko alerta mota bakoitza sendagaiaren arabera egunean behin gehienez ematen da. Sistemak alerta bakoitza bidali den azken data erregistratzen du eta ez du berriro jakinarazten harik eta:
+
+1. Azken alertatik 24 ordu gutxienez igaro diren arte, EDO
+2. Erabiltzaileak stocka osatu duenean (kontadorea berrezarriz)
+
+Spam prebentzioa honek ziurtatzen du jakinarazpenak baliogarriak eta garaiz kosuak direla, erabiltzailea alde batera uzteko edo desgaitzeko eramango lukeen aspaldia bihurtu gabe.
+
+### Stock Kontrol Bisualarekin Integrazioa
+
+Stock baxuko alertak ez dira modu isolatuan funtzionatzen, pilularien semaforo bisual sistemekin sakonki integratuak daude baizik. Sendagai batek stock baxua duenean:
+
+- Botikinan gorriz edo anbarrez markatuta agertzen da zerrendan
+- Pantaila nagusian abisu ikonoa erakusten du
+- Jakinarazpen proaktiboa bisual seinaletxe hauek osatzen ditu
+
+Informazio geruza anitz hau (bisuala + jakinarazpenak) bermatzen du erabiltzailea inbentarioaren egoeraren jakitun dela aplikazioarekin kontaktu puntu anitztatik.
+
+### Konfigurazioa eta Pertsonalizazioa
+
+Sendagai bakoitzak alerta atala pertsonalizatua izan dezake stocka "baxua" denean zehazten duena. Insulina edo antikoagulanteak bezalako sendagai kritikoak 7-10 eguneko atalekin konfiguratu daitezke ordezkatzerako denbora nahikoa izateko, bitartean premiako suplementuek 1-2 eguneko atalak erabili ditzakete.
+
+Sistemak konfigurazio indibidual hauek errespetatzen ditu, sendagai bakoitzak bere alerta politika propioa izateko aukera emanez bere kritikotasunera eta farmazietako eskuragarritasunera egokitua.
+
+---
+
+## 10. Barazkaldiaren Konfigurazioa
 
 ### Motak: Before (Aurretik) eta After (Ondoren)
 
@@ -266,7 +321,7 @@ Granulartasun honek erregimen konplexuak kudeatzeko aukera ematen du, non sendag
 
 ---
 
-## 10. Dosien Historiala
+## 11. Dosien Historiala
 
 ### Erregistro Automatiko Osoa
 
@@ -310,7 +365,7 @@ Datuen formatua erlazio eta normalizatua da, sendagaiak, pertsonak eta historial
 
 ---
 
-## 11. Lokalizazioa eta Nazioartekotzea
+## 12. Lokalizazioa eta Nazioartekotzea
 
 ### 8 Hizkuntza Osoki Onartuta
 
@@ -360,7 +415,7 @@ Hizkuntza xehetasun arreta honek MedicApp natural eta natiboaren sentitzen dela 
 
 ---
 
-## 12. Interfaze Irisgarria eta Erabilgarria
+## 13. Interfaze Irisgarria eta Erabilgarria
 
 ### Material Design 3
 

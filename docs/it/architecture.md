@@ -447,6 +447,122 @@ class FastingConflictService {
 - Previene programmazione di dosi con conflitti di digiuno
 - Fornisce informazioni dettagliate sui conflitti rilevati
 
+**Casi d'uso:**
+- All'aggiungere un nuovo orario di dose in `DoseScheduleEditor`
+- Al creare o modificare un farmaco in `EditScheduleScreen`
+- Previene conflitti che potrebbero compromettere l'efficacia del trattamento
+- Attivato in V19+ dopo la refactorizzazione di `EditScheduleScreen` per ricevere `allMedications` e `personId` come parametri
+
+### Sistema di Notifiche per Scorte Basse
+
+MedicApp implementa un sistema duale di avvisi di scorta che combina notifiche reattive (nel momento critico) e proattive (anticipatorie).
+
+#### Notifiche Reattive (Immediate Stock Check)
+
+Il sistema verifica automaticamente lo stock disponibile ogni volta che un utente tenta di registrare una dose, sia da:
+- La schermata principale quando si marca una dose come "assunta"
+- Le azioni rapide di notifica (pulsante "Assumere")
+- La registrazione manuale di dosi occasionali
+
+**Implementazione in NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Flusso reattivo:**
+1. L'utente tenta di registrare una dose
+2. Il sistema verifica: `medication.stockQuantity < doseQuantity`
+3. Se è insufficiente:
+   - Mostra notifica immediata con priorità alta
+   - NON permette la registrazione della dose
+   - Indica la quantità necessaria vs disponibile
+   - Guida l'utente a rifornire lo stock
+
+**Intervallo di ID notifiche:** 7.000.000 - 7.999.999 (generati da `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notifiche Proattive (Daily Stock Monitoring)
+
+Il sistema può eseguire controlli proattivi giornalieri che anticipano problemi di esaurimento scorte prima che si verifichino.
+
+**Metodo principale:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Flusso proattivo:**
+1. Si esegue massimo una volta al giorno (utilizza SharedPreferences per il tracking)
+2. Itera su tutte le persone registrate
+3. Per ogni farmaco attivo:
+   - Calcola la dose giornaliera totale considerando:
+     - Tutte le persone assegnate al farmaco
+     - Frequenza del trattamento (giornaliero, settimanale, intervallo)
+     - Orari configurati per persona
+   - Divide lo stock attuale per la dose giornaliera
+   - Ottiene i giorni di scorta rimanenti
+4. Se `medication.isStockLow` (utilizza la soglia configurabile per farmaco):
+   - Emette notifica proattiva
+   - Include i giorni approssimativi rimanenti
+   - Non blocca alcuna azione
+
+**Prevenzione dello spam:**
+- Registra l'ultima data di controllo in `SharedPreferences`
+- Si esegue solo se `lastCheck != today`
+- Ogni farmaco notifica solo una volta al giorno
+- Si resetta quando si ricarica lo stock
+
+**Integrazione con Medication.isStockLow:**
+Il calcolo dello stock basso utilizza la proprietà esistente del modello:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configurazione dei Canali di Notifica
+
+Le notifiche di stock utilizzano un canale dedicato:
+
+```dart
+// In NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Avvisi di Scorta Bassa',
+  channelDescription: 'Notifiche quando lo stock di farmaci è basso',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Caratteristiche:**
+- Canale separato dai promemoria di dose
+- Priorità alta (non massima, per non essere invasivo)
+- Auto-cancellazione al tocco
+- Senza azioni integrate (solo informative)
+
+#### Quando Usare Ogni Tipo
+
+| Tipo | Momento | Scopo | Bloccante |
+|------|---------|-------|-----------|
+| **Reattivo** | Quando si tenta di registrare una dose | Prevenire la registrazione con stock insufficiente | ✅ Sì |
+| **Proattivo** | Controllo giornaliero (opzionale) | Anticipare la necessità di rifornimento | ❌ No |
+
+**Vantaggio del design duale:**
+- Protezione assoluta nel momento critico (reattivo)
+- Pianificazione anticipata per evitare di raggiungere il momento critico (proattivo)
+- Il sistema proattivo è opt-in (deve essere chiamato esplicitamente dalla logica dell'app)
+
 ---
 
 ## Livello delle Viste (Screens/Widgets)

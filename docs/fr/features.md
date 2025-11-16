@@ -223,7 +223,62 @@ MedicApp est optimisé pour Android 12 et versions supérieures, nécessitant et
 
 ---
 
-## 9. Configuration du Jeûne
+## 9. Alertes de Stock Faible
+
+### Notifications Réactives de Stock Insuffisant
+
+MedicApp implémente un système intelligent d'alertes de stock qui protège l'utilisateur contre le risque de se retrouver sans médication aux moments critiques. Lorsqu'un utilisateur tente d'enregistrer une dose (que ce soit depuis l'écran principal ou depuis les actions rapides de notification), le système vérifie automatiquement s'il y a suffisamment de stock pour compléter la prise.
+
+Si le stock disponible est inférieur à la quantité requise pour la dose, MedicApp affiche immédiatement une alerte de stock insuffisant qui empêche l'enregistrement de la prise. Cette notification réactive indique clairement le nom du médicament concerné, la quantité nécessaire versus celle disponible, et suggère de réapprovisionner l'inventaire avant de tenter d'enregistrer la dose à nouveau.
+
+Ce mécanisme de protection prévient les enregistrements incorrects dans l'historique et garantit l'intégrité du contrôle d'inventaire, évitant de décrémenter du stock qui n'existe pas physiquement. L'alerte est claire, non intrusive, et guide l'utilisateur directement vers l'action corrective (réapprovisionner le stock).
+
+### Notifications Proactives de Stock Faible
+
+En plus des alertes réactives au moment de prendre une dose, MedicApp inclut un système proactif de surveillance quotidienne du stock qui anticipe les problèmes d'approvisionnement avant qu'ils ne surviennent. Ce système évalue automatiquement l'inventaire de tous les médicaments une fois par jour, calculant les jours d'approvisionnement restants selon la consommation programmée.
+
+Le calcul considère plusieurs facteurs pour estimer avec précision combien de temps durera le stock actuel :
+
+**Pour les médicaments programmés** - Le système additionne la dose quotidienne totale de toutes les personnes assignées, multiplie par les jours configurés dans le schéma de fréquence (par exemple, si pris uniquement lundi, mercredi et vendredi, il ajuste le calcul), et divise le stock actuel par cette consommation quotidienne effective.
+
+**Pour les médicaments occasionnels ("selon besoin")** - Il utilise l'enregistrement du dernier jour de consommation réelle comme prédicteur, fournissant une estimation adaptative qui s'améliore avec l'usage.
+
+Lorsque le stock d'un médicament atteint le seuil configuré (par défaut 3 jours, mais personnalisable entre 1-10 jours par médicament), MedicApp émet une notification proactive d'avertissement. Cette notification affiche :
+
+- Nom du médicament et type
+- Jours approximatifs d'approvisionnement restants
+- Personne(s) concernée(s)
+- Stock actuel en unités correspondantes
+- Suggestion de réapprovisionnement
+
+### Prévention du Spam de Notifications
+
+Pour éviter de bombarder l'utilisateur avec des alertes répétitives, le système de notifications proactives implémente une logique intelligente de fréquence. Chaque type d'alerte de stock faible est émis au maximum une fois par jour par médicament. Le système enregistre la dernière date à laquelle chaque alerte a été envoyée et ne notifie plus jusqu'à ce que :
+
+1. Au moins 24 heures se soient écoulées depuis la dernière alerte, OU
+2. L'utilisateur ait réapprovisionné le stock (réinitialisant le compteur)
+
+Cette prévention du spam assure que les notifications soient utiles et opportunes sans devenir une nuisance qui conduirait l'utilisateur à les ignorer ou les désactiver.
+
+### Intégration avec le Contrôle de Stock Visuel
+
+Les alertes de stock faible ne fonctionnent pas de manière isolée, mais sont profondément intégrées avec le système de feux de signalisation visuels du pilulier. Lorsqu'un médicament a un stock faible :
+
+- Il apparaît marqué en rouge ou ambre dans la liste de l'armoire à pharmacie
+- Il affiche une icône d'avertissement sur l'écran principal
+- La notification proactive complète ces signaux visuels
+
+Cette approche multicouche d'information (visuelle + notifications) garantit que l'utilisateur soit conscient de l'état de l'inventaire depuis plusieurs points de contact avec l'application.
+
+### Configuration et Personnalisation
+
+Chaque médicament peut avoir un seuil d'alerte personnalisé qui détermine quand le stock est considéré comme "faible". Les médicaments critiques comme l'insuline ou les anticoagulants peuvent être configurés avec des seuils de 7-10 jours pour permettre un temps suffisant de réapprovisionnement, tandis que les suppléments moins urgents peuvent utiliser des seuils de 1-2 jours.
+
+Le système respecte ces configurations individuelles, permettant à chaque médicament d'avoir sa propre politique d'alertes adaptée à sa criticité et sa disponibilité en pharmacie.
+
+---
+
+## 10. Configuration du Jeûne
 
 ### Types : Before (Avant) et After (Après)
 
@@ -266,7 +321,7 @@ Cette granularité permet de gérer des régimes complexes où certains médicam
 
 ---
 
-## 10. Historique des Doses
+## 11. Historique des Doses
 
 ### Enregistrement Automatique Complet
 
@@ -310,7 +365,7 @@ Le format des données est relationnel et normalisé, avec des clés étrangère
 
 ---
 
-## 11. Localisation et Internationalisation
+## 12. Localisation et Internationalisation
 
 ### 8 Langues Complètement Supportées
 
@@ -360,7 +415,7 @@ Cette attention au détail linguistique fait que MedicApp se sent naturelle et n
 
 ---
 
-## 12. Interface Accessible et Utilisable
+## 13. Interface Accessible et Utilisable
 
 ### Material Design 3
 

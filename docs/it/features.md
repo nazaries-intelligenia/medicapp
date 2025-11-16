@@ -223,7 +223,62 @@ MedicApp è ottimizzata per Android 12 e versioni superiori, richiedendo e geste
 
 ---
 
-## 9. Configurazione del Digiuno
+## 9. Avvisi di Scorte Basse
+
+### Notifiche Reattive di Stock Insufficiente
+
+MedicApp implementa un sistema intelligente di avvisi di stock che protegge l'utente dal rimanere senza farmaci in momenti critici. Quando un utente tenta di registrare una dose (sia dalla schermata principale che dalle azioni rapide di notifica), il sistema verifica automaticamente se c'è scorta sufficiente per completare l'assunzione.
+
+Se la scorta disponibile è inferiore alla quantità richiesta per la dose, MedicApp mostra immediatamente un avviso di stock insufficiente che impedisce la registrazione dell'assunzione. Questa notifica reattiva indica chiaramente il nome del farmaco interessato, la quantità necessaria rispetto a quella disponibile, e suggerisce di ripristinare l'inventario prima di tentare nuovamente di registrare la dose.
+
+Questo meccanismo di protezione previene registrazioni incorrette nella cronologia e garantisce l'integrità del controllo dell'inventario, evitando che venga decrementata scorta che fisicamente non esiste. L'avviso è chiaro, non intrusivo, e guida l'utente direttamente verso l'azione correttiva (ripristinare lo stock).
+
+### Notifiche Proattive di Stock Basso
+
+Oltre agli avvisi reattivi nel momento di assumere una dose, MedicApp include un sistema proattivo di monitoraggio giornaliero dello stock che anticipa problemi di esaurimento prima che si verifichino. Questo sistema valuta automaticamente l'inventario di tutti i farmaci una volta al giorno, calcolando i giorni di fornitura rimanenti secondo il consumo programmato.
+
+Il calcolo considera molteplici fattori per stimare con precisione quanto durerà la scorta attuale:
+
+**Per farmaci programmati** - Il sistema somma la dose giornaliera totale di tutte le persone assegnate, moltiplica per i giorni configurati nel pattern di frequenza (ad esempio, se si assume solo lunedì, mercoledì e venerdì, aggiusta il calcolo), e divide la scorta attuale per questo consumo giornaliero effettivo.
+
+**Per farmaci occasionali ("secondo necessità")** - Utilizza il registro dell'ultimo giorno di consumo reale come predittore, fornendo una stima adattativa che migliora con l'uso.
+
+Quando la scorta di un farmaco raggiunge la soglia configurata (per default 3 giorni, ma personalizzabile tra 1-10 giorni per farmaco), MedicApp emette una notifica proattiva di avvertimento. Questa notifica mostra:
+
+- Nome del farmaco e tipo
+- Giorni approssimativi di fornitura rimanente
+- Persona/e interessata/e
+- Scorta attuale in unità corrispondenti
+- Suggerimento di rifornimento
+
+### Prevenzione dello Spam di Notifiche
+
+Per evitare di bombardare l'utente con avvisi ripetitivi, il sistema di notifiche proattive implementa una logica intelligente di frequenza. Ogni tipo di avviso di stock basso viene emesso massimo una volta al giorno per farmaco. Il sistema registra l'ultima data in cui è stato inviato ogni avviso e non notifica nuovamente finché:
+
+1. Non sono trascorse almeno 24 ore dall'ultimo avviso, O
+2. L'utente non ha rifornito lo stock (reimpostando il contatore)
+
+Questa prevenzione dello spam assicura che le notifiche siano utili e tempestive senza diventare un fastidio che porti l'utente a ignorarle o disabilitarle.
+
+### Integrazione con Controllo di Stock Visuale
+
+Gli avvisi di stock basso non funzionano in modo isolato, ma sono profondamente integrati con il sistema di semafori visuali dell'armadietto. Quando un farmaco ha stock basso:
+
+- Appare contrassegnato in rosso o ambra nella lista dell'armadietto
+- Mostra un'icona di avvertimento nella schermata principale
+- La notifica proattiva complementa questi segnali visuali
+
+Questo strato multiplo di informazioni (visuale + notifiche) garantisce che l'utente sia consapevole dello stato dell'inventario da più punti di contatto con l'applicazione.
+
+### Configurazione e Personalizzazione
+
+Ogni farmaco può avere una soglia di avviso personalizzata che determina quando si considera lo stock "basso". Farmaci critici come insulina o anticoagulanti possono essere configurati con soglie di 7-10 giorni per permettere un tempo ampio di rifornimento, mentre integratori meno urgenti possono usare soglie di 1-2 giorni.
+
+Il sistema rispetta queste configurazioni individuali, permettendo che ogni farmaco abbia la propria politica di avvisi adattata alla sua criticità e disponibilità nelle farmacie.
+
+---
+
+## 10. Configurazione del Digiuno
 
 ### Tipi: Before (Prima) e After (Dopo)
 
@@ -266,7 +321,7 @@ Questa granularità permette di gestire regimi complessi dove alcuni farmaci si 
 
 ---
 
-## 10. Cronologia delle Dosi
+## 11. Cronologia delle Dosi
 
 ### Registrazione Automatica Completa
 
@@ -310,7 +365,7 @@ Il formato dei dati è relazionale e normalizzato, con chiavi esterne che colleg
 
 ---
 
-## 11. Localizzazione e Internazionalizzazione
+## 12. Localizzazione e Internazionalizzazione
 
 ### 8 Lingue Completamente Supportate
 
@@ -360,7 +415,7 @@ Questa attenzione al dettaglio linguistico fa sì che MedicApp si senta naturale
 
 ---
 
-## 12. Interfaccia Accessibile e Usabile
+## 13. Interfaccia Accessibile e Usabile
 
 ### Material Design 3
 

@@ -223,7 +223,62 @@ MedicApp está optimizado para Android 12 e versións superiores, requirindo e x
 
 ---
 
-## 9. Configuración de Xaxún
+## 9. Alertas de Stock Baixo
+
+### Notificacións Reactivas de Stock Insuficiente
+
+MedicApp implementa un sistema intelixente de alertas de stock que protexe ao usuario de quedarse sen medicación en momentos críticos. Cando un usuario intenta rexistrar unha dose (xa sexa desde a pantalla principal ou desde as accións rápidas de notificación), o sistema verifica automaticamente se hai stock suficiente para completar a toma.
+
+Se o stock dispoñible é menor que a cantidade requirida para a dose, MedicApp mostra inmediatamente unha alerta de stock insuficiente que impide o rexistro da toma. Esta notificación reactiva indica claramente o nome do medicamento afectado, a cantidade necesaria versus a dispoñible, e suxire repor o inventario antes de intentar rexistrar a dose novamente.
+
+Este mecanismo de protección prevén rexistros incorrectos no historial e garante a integridade do control de inventario, evitando que se desconte stock que fisicamente non existe. A alerta é clara, non intrusiva, e guía ao usuario directamente cara á acción correctiva (repor stock).
+
+### Notificacións Proactivas de Stock Baixo
+
+Ademais das alertas reactivas no momento de tomar unha dose, MedicApp inclúe un sistema proactivo de monitorización diaria de stock que anticipa problemas de desabastecemento antes de que ocorran. Este sistema avalía automaticamente o inventario de todos os medicamentos unha vez ao día, calculando os días de subministración restantes segundo o consumo programado.
+
+O cálculo considera múltiples factores para estimar con precisión canto durará o stock actual:
+
+**Para medicamentos programados** - O sistema suma a dose diaria total de todas as persoas asignadas, multiplica polos días configurados no patrón de frecuencia (por exemplo, se se toma só luns, mércores e venres, axusta o cálculo), e divide o stock actual entre este consumo diario efectivo.
+
+**Para medicamentos ocasionais ("segundo necesidade")** - Utiliza o rexistro do último día de consumo real como preditor, proporcionando unha estimación adaptativa que mellora co uso.
+
+Cando o stock dun medicamento alcanza o limiar configurado (por defecto 3 días, pero personalizable entre 1-10 días por medicamento), MedicApp emite unha notificación proactiva de advertencia. Esta notificación mostra:
+
+- Nome do medicamento e tipo
+- Días aproximados de subministración restantes
+- Persoa(s) afectada(s)
+- Stock actual en unidades correspondentes
+- Suxestión de reposición
+
+### Prevención de Spam de Notificacións
+
+Para evitar bombardear ao usuario con alertas repetitivas, o sistema de notificacións proactivas implementa lóxica intelixente de frecuencia. Cada tipo de alerta de stock baixo emítese máximo unha vez ao día por medicamento. O sistema rexistra a última data na que se enviou cada alerta e non volve a notificar ata que:
+
+1. Pasase polo menos 24 horas desde a última alerta, OU
+2. O usuario repuxese o stock (restablecendo o contador)
+
+Esta prevención de spam asegura que as notificacións sexan útiles e oportunas sen converterse nunha molestia que leve ao usuario a ignorialas ou deshabitalas.
+
+### Integración con Control de Stock Visual
+
+As alertas de stock baixo non funcionan de forma illada, senón que están profundamente integradas co sistema de semáforos visuais do pastilleiro. Cando un medicamento ten stock baixo:
+
+- Aparece marcado en vermello ou ámbar na lista do botiquín
+- Mostra un icono de advertencia na pantalla principal
+- A notificación proactiva complementa estas sinais visuais
+
+Esta multicapa de información (visual + notificacións) garante que o usuario sexa consciente do estado do inventario desde múltiples puntos de contacto coa aplicación.
+
+### Configuración e Personalización
+
+Cada medicamento pode ter un limiar de alerta personalizado que determina cando se considera o stock "baixo". Medicamentos críticos como insulina ou anticoagulantes poden configurarse con limiares de 7-10 días para permitir tempo amplo de reposición, mentres que suplementos menos urxentes poden usar limiares de 1-2 días.
+
+O sistema respecta estas configuracións individuais, permitindo que cada medicamento teña a súa propia política de alertas adaptada á súa criticidade e dispoñibilidade en farmacias.
+
+---
+
+## 10. Configuración de Xaxún
 
 ### Tipos: Before (Antes) e After (Despois)
 
@@ -266,7 +321,7 @@ Esta granularidade permite xestionar réximes complexos onde algúns medicamento
 
 ---
 
-## 10. Historial de Doses
+## 11. Historial de Doses
 
 ### Rexistro Automático Completo
 
@@ -310,7 +365,7 @@ O formato dos datos é relacional e normalizado, con claves foráneas que vincul
 
 ---
 
-## 11. Localización e Internacionalización
+## 12. Localización e Internacionalização
 
 ### 8 Idiomas Completamente Soportados
 
@@ -360,7 +415,7 @@ Esta atención ao detalle lingüístico fai que MedicApp se sinta natural e nati
 
 ---
 
-## 12. Interface Accesible e Usable
+## 13. Interface Accesible e Usable
 
 ### Material Design 3
 

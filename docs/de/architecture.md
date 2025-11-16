@@ -455,8 +455,116 @@ class FastingConflictService {
 - Beim Hinzufügen einer neuen Dosiszeit in `DoseScheduleEditor`
 - Beim Erstellen oder Bearbeiten eines Medikaments in `EditScheduleScreen`
 - Verhindert Konflikte, die die Wirksamkeit der Behandlung beeinträchtigen könnten
+- Aktiviert in V19+ nach Refaktorierung von `EditScheduleScreen` zum Empfang von `allMedications` und `personId` als Parameter
 
-**Hinweis:** Derzeit ist die Fastenvalidierung in `EditScheduleScreen` deaktiviert, um Timer-Probleme in Tests zu vermeiden, aber die Infrastruktur ist bereit, bei Bedarf aktiviert zu werden.
+### System für Benachrichtigungen bei niedrigem Bestand
+
+MedicApp implementiert ein duales Bestandswarnsystem, das reaktive Benachrichtigungen (zum kritischen Zeitpunkt) und proaktive Benachrichtigungen (vorausschauend) kombiniert.
+
+#### Reaktive Benachrichtigungen (Immediate Stock Check)
+
+Das System überprüft automatisch den verfügbaren Bestand jedes Mal, wenn ein Benutzer versucht, eine Dosis zu registrieren, sei es von:
+- Dem Hauptbildschirm aus, indem eine Dosis als "eingenommen" markiert wird
+- Schnellaktionen von Benachrichtigungen ("Registrieren"-Button)
+- Manueller Registrierung von gelegentlichen Dosen
+
+**Implementierung in NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Reaktiver Ablauf:**
+1. Benutzer versucht, eine Dosis zu registrieren
+2. System prüft: `medication.stockQuantity < doseQuantity`
+3. Falls unzureichend:
+   - Zeigt sofortige Benachrichtigung mit hoher Priorität
+   - Erlaubt die Registrierung der Dosis NICHT
+   - Gibt erforderliche vs. verfügbare Menge an
+   - Leitet Benutzer zur Bestandsauffüllung
+
+**Benachrichtigungs-ID-Bereich:** 7,000,000 - 7,999,999 (generiert durch `NotificationIdGenerator.generateLowStockId()`)
+
+#### Proaktive Benachrichtigungen (Daily Stock Monitoring)
+
+Das System kann proaktive tägliche Überprüfungen durchführen, die Versorgungsengpässe vorhersehen, bevor sie auftreten.
+
+**Hauptmethode:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Proaktiver Ablauf:**
+1. Wird maximal einmal täglich ausgeführt (verwendet SharedPreferences für Tracking)
+2. Iteriert über alle registrierten Personen
+3. Für jedes aktive Medikament:
+   - Berechnet tägliche Gesamtdosis unter Berücksichtigung von:
+     - Allen dem Medikament zugewiesenen Personen
+     - Behandlungsfrequenz (täglich, wöchentlich, Intervall)
+     - Konfigurierte Zeitpläne pro Person
+   - Teilt aktuellen Bestand durch tägliche Dosis
+   - Erhält verbleibende Versorgungstage
+4. Falls `medication.isStockLow` (verwendet konfigurierbaren Schwellenwert pro Medikament):
+   - Sendet proaktive Benachrichtigung
+   - Enthält ungefähre verbleibende Tage
+   - Blockiert keine Aktion
+
+**Spam-Prävention:**
+- Zeichnet letztes Überprüfungsdatum in `SharedPreferences` auf
+- Führt nur aus, wenn `lastCheck != today`
+- Jedes Medikament benachrichtigt nur einmal täglich
+- Wird beim Auffüllen des Bestands zurückgesetzt
+
+**Integration mit Medication.isStockLow:**
+Die Berechnung des niedrigen Bestands verwendet die vorhandene Eigenschaft des Modells:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Konfiguration der Benachrichtigungskanäle
+
+Bestandsbenachrichtigungen verwenden einen dedizierten Kanal:
+
+```dart
+// In NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Bestandswarnungen',
+  channelDescription: 'Benachrichtigungen bei niedrigem Medikamentenbestand',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Eigenschaften:**
+- Separater Kanal von Dosiserinnerungen
+- Hohe Priorität (nicht maximal, um nicht aufdringlich zu sein)
+- Automatische Stornierung beim Antippen
+- Keine integrierten Aktionen (nur informativ)
+
+#### Wann welchen Typ verwenden
+
+| Typ | Zeitpunkt | Zweck | Blockierend |
+|-----|-----------|-------|-------------|
+| **Reaktiv** | Beim Versuch, Dosis zu registrieren | Registrierung mit unzureichendem Bestand verhindern | ✅ Ja |
+| **Proaktiv** | Tägliche Überprüfung (optional) | Notwendige Auffüllung vorhersehen | ❌ Nein |
+
+**Vorteil des dualen Designs:**
+- Absoluter Schutz zum kritischen Zeitpunkt (reaktiv)
+- Vorausschauende Planung zur Vermeidung des kritischen Zeitpunkts (proaktiv)
 
 ---
 

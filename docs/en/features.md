@@ -223,7 +223,62 @@ MedicApp is optimized for Android 12 and higher versions, requiring and managing
 
 ---
 
-## 9. Fasting Configuration
+## 9. Low Stock Alerts
+
+### Reactive Insufficient Stock Notifications
+
+MedicApp implements an intelligent stock alert system that protects users from running out of medication at critical moments. When a user attempts to record a dose (either from the main screen or from notification quick actions), the system automatically verifies if there is sufficient stock to complete the dose.
+
+If available stock is less than the amount required for the dose, MedicApp immediately displays an insufficient stock alert that prevents recording the dose. This reactive notification clearly indicates the affected medication name, the required quantity versus the available amount, and suggests replenishing the inventory before attempting to record the dose again.
+
+This protection mechanism prevents incorrect entries in the history and guarantees inventory control integrity, avoiding deductions of stock that physically doesn't exist. The alert is clear, non-intrusive, and guides the user directly toward corrective action (replenish stock).
+
+### Proactive Low Stock Notifications
+
+In addition to reactive alerts at the moment of taking a dose, MedicApp includes a proactive daily stock monitoring system that anticipates supply problems before they occur. This system automatically evaluates the inventory of all medications once a day, calculating remaining days of supply based on scheduled consumption.
+
+The calculation considers multiple factors to accurately estimate how long current stock will last:
+
+**For scheduled medications** - The system adds up the total daily dose of all assigned people, multiplies by the days configured in the frequency pattern (for example, if taken only Monday, Wednesday and Friday, it adjusts the calculation), and divides current stock by this effective daily consumption.
+
+**For occasional medications ("as needed")** - Uses the record of the last day of actual consumption as a predictor, providing an adaptive estimate that improves with use.
+
+When a medication's stock reaches the configured threshold (default 3 days, but customizable between 1-10 days per medication), MedicApp issues a proactive warning notification. This notification displays:
+
+- Medication name and type
+- Approximate days of remaining supply
+- Affected person(s)
+- Current stock in corresponding units
+- Replenishment suggestion
+
+### Notification Spam Prevention
+
+To avoid bombarding the user with repetitive alerts, the proactive notification system implements intelligent frequency logic. Each type of low stock alert is issued maximum once per day per medication. The system records the last date each alert was sent and doesn't notify again until:
+
+1. At least 24 hours have passed since the last alert, OR
+2. The user has replenished the stock (resetting the counter)
+
+This spam prevention ensures notifications are useful and timely without becoming an annoyance that leads the user to ignore or disable them.
+
+### Integration with Visual Stock Control
+
+Low stock alerts don't function in isolation, but are deeply integrated with the medicine cabinet's visual traffic light system. When a medication has low stock:
+
+- It appears marked in red or amber in the medicine cabinet list
+- Shows a warning icon on the main screen
+- The proactive notification complements these visual signals
+
+This multilayer of information (visual + notifications) guarantees the user is aware of inventory status from multiple contact points with the application.
+
+### Configuration and Customization
+
+Each medication can have a personalized alert threshold that determines when stock is considered "low". Critical medications like insulin or anticoagulants can be configured with thresholds of 7-10 days to allow ample replenishment time, while less urgent supplements can use thresholds of 1-2 days.
+
+The system respects these individual configurations, allowing each medication to have its own alert policy adapted to its criticality and pharmacy availability.
+
+---
+
+## 10. Fasting Configuration
 
 ### Types: Before and After
 
@@ -266,7 +321,7 @@ This granularity allows managing complex regimens where some medications are tak
 
 ---
 
-## 10. Dose History
+## 11. Dose History
 
 ### Complete Automatic Recording
 
@@ -310,7 +365,7 @@ The data format is relational and normalized, with foreign keys linking medicati
 
 ---
 
-## 11. Localization and Internationalization
+## 12. Localization and Internationalization
 
 ### 8 Fully Supported Languages
 
@@ -360,7 +415,7 @@ This attention to linguistic detail makes MedicApp feel natural and native in ea
 
 ---
 
-## 12. Accessible and Usable Interface
+## 13. Accessible and Usable Interface
 
 ### Material Design 3
 

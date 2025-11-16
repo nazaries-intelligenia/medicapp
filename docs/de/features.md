@@ -14,8 +14,9 @@ Diese Dokumentation beschreibt detailliert alle Funktionen von **MedicApp**, ein
 - [6. Vollständiger Einnahmeverlauf](#6-vollständiger-einnahmeverlauf)
 - [7. Mehrsprachige Oberfläche](#7-mehrsprachige-oberfläche)
 - [8. Material Design 3](#8-material-design-3)
-- [9. Robuste Datenbank](#9-robuste-datenbank)
-- [10. Umfassende Tests](#10-umfassende-tests)
+- [9. Benachrichtigungen bei niedrigem Bestand](#9-benachrichtigungen-bei-niedrigem-bestand)
+- [10. Robuste Datenbank](#10-robuste-datenbank)
+- [11. Umfassende Tests](#11-umfassende-tests)
 
 ---
 
@@ -242,6 +243,61 @@ const channels = [
   ),
 ];
 ```
+
+---
+
+## 9. Benachrichtigungen bei niedrigem Bestand
+
+### Reaktive Benachrichtigungen bei unzureichendem Bestand
+
+MedicApp implementiert ein intelligentes Bestandswarnsystem, das den Benutzer davor schützt, in kritischen Momenten ohne Medikamente dazustehen. Wenn ein Benutzer versucht, eine Dosis zu registrieren (entweder über den Hauptbildschirm oder über Schnellaktionen in Benachrichtigungen), überprüft das System automatisch, ob ausreichend Bestand vorhanden ist, um die Einnahme abzuschließen.
+
+Wenn der verfügbare Bestand geringer ist als die für die Dosis benötigte Menge, zeigt MedicApp sofort eine Warnung über unzureichenden Bestand an, die die Registrierung der Einnahme verhindert. Diese reaktive Benachrichtigung gibt klar den Namen des betroffenen Medikaments, die benötigte versus die verfügbare Menge an und schlägt vor, den Bestand aufzufüllen, bevor erneut versucht wird, die Dosis zu registrieren.
+
+Dieser Schutzmechanismus verhindert fehlerhafte Einträge im Verlauf und garantiert die Integrität der Bestandskontrolle, indem verhindert wird, dass Bestand abgezogen wird, der physisch nicht vorhanden ist. Die Warnung ist klar, nicht aufdringlich und leitet den Benutzer direkt zur Korrekturmaßnahme (Bestand auffüllen).
+
+### Proaktive Benachrichtigungen bei niedrigem Bestand
+
+Zusätzlich zu den reaktiven Warnungen zum Zeitpunkt der Einnahme einer Dosis verfügt MedicApp über ein proaktives System zur täglichen Bestandsüberwachung, das Versorgungsengpässe antizipiert, bevor sie auftreten. Dieses System bewertet automatisch einmal täglich den Bestand aller Medikamente und berechnet die verbleibenden Versorgungstage basierend auf dem geplanten Verbrauch.
+
+Die Berechnung berücksichtigt mehrere Faktoren, um genau abzuschätzen, wie lange der aktuelle Bestand ausreicht:
+
+**Für geplante Medikamente** - Das System addiert die gesamte Tagesdosis aller zugewiesenen Personen, multipliziert mit den im Häufigkeitsmuster konfigurierten Tagen (zum Beispiel, wenn das Medikament nur montags, mittwochs und freitags eingenommen wird, passt es die Berechnung an) und dividiert den aktuellen Bestand durch diesen effektiven Tagesverbrauch.
+
+**Für gelegentliche Medikamente ("nach Bedarf")** - Verwendet den Protokolleintrag des letzten Tages des tatsächlichen Verbrauchs als Prädiktor und bietet eine adaptive Schätzung, die sich mit der Nutzung verbessert.
+
+Wenn der Bestand eines Medikaments den konfigurierten Schwellenwert erreicht (standardmäßig 3 Tage, aber pro Medikament zwischen 1-10 Tagen anpassbar), sendet MedicApp eine proaktive Warnbenachrichtigung. Diese Benachrichtigung zeigt:
+
+- Name des Medikaments und Typ
+- Ungefähr verbleibende Versorgungstage
+- Betroffene Person(en)
+- Aktueller Bestand in entsprechenden Einheiten
+- Aufstellungsvorschlag
+
+### Vermeidung von Benachrichtigungs-Spam
+
+Um zu vermeiden, dass der Benutzer mit wiederholten Warnungen bombardiert wird, implementiert das proaktive Benachrichtigungssystem intelligente Häufigkeitslogik. Jede Art von Warnung bei niedrigem Bestand wird maximal einmal täglich pro Medikament gesendet. Das System registriert das letzte Datum, an dem jede Warnung gesendet wurde, und benachrichtigt nicht erneut, bis:
+
+1. Mindestens 24 Stunden seit der letzten Warnung vergangen sind, ODER
+2. Der Benutzer den Bestand aufgefüllt hat (wodurch der Zähler zurückgesetzt wird)
+
+Diese Spam-Vermeidung stellt sicher, dass Benachrichtigungen nützlich und zeitgerecht sind, ohne zu einer Belästigung zu werden, die den Benutzer dazu bringt, sie zu ignorieren oder zu deaktivieren.
+
+### Integration mit visueller Bestandskontrolle
+
+Die Warnungen bei niedrigem Bestand funktionieren nicht isoliert, sondern sind tief in das visuelle Ampelsystem der Medikamentenbox integriert. Wenn ein Medikament einen niedrigen Bestand hat:
+
+- Erscheint es in der Liste der Hausapotheke rot oder gelb markiert
+- Zeigt ein Warnsymbol auf dem Hauptbildschirm an
+- Die proaktive Benachrichtigung ergänzt diese visuellen Signale
+
+Diese mehrschichtige Information (visuell + Benachrichtigungen) garantiert, dass der Benutzer sich des Bestandsstatus von mehreren Kontaktpunkten mit der Anwendung aus bewusst ist.
+
+### Konfiguration und Personalisierung
+
+Jedes Medikament kann einen personalisierten Warnschwellenwert haben, der bestimmt, wann der Bestand als "niedrig" betrachtet wird. Kritische Medikamente wie Insulin oder Antikoagulantien können mit Schwellenwerten von 7-10 Tagen konfiguriert werden, um ausreichend Zeit zum Auffüllen zu ermöglichen, während weniger dringende Nahrungsergänzungsmittel Schwellenwerte von 1-2 Tagen verwenden können.
+
+Das System respektiert diese individuellen Konfigurationen und ermöglicht es jedem Medikament, seine eigene an Kritikalität und Verfügbarkeit in Apotheken angepasste Warnrichtlinie zu haben.
 
 ---
 
@@ -739,14 +795,14 @@ Hero(
 
 ---
 
-## 9. Robuste Datenbank
+## 10. Robuste Datenbank
 
 ### Beschreibung
 SQLite-Datenbank V19 mit automatischen Migrationen, optimierten Indizes und Trigger-System.
 
 ### Hauptmerkmale
 
-#### 9.1. Automatisches Migrationssystem
+#### 10.1. Automatisches Migrationssystem
 ```dart
 // Datenbank: lib/services/database_helper.dart
 class DatabaseHelper {
@@ -774,7 +830,7 @@ class DatabaseHelper {
 }
 ```
 
-#### 9.2. Optimierte Indizes
+#### 10.2. Optimierte Indizes
 ```sql
 -- Indizes für schnelle Abfragen
 CREATE INDEX idx_medications_person ON medications(person_id);
@@ -784,7 +840,7 @@ CREATE INDEX idx_intakes_scheduled_time ON intakes(scheduled_time);
 CREATE INDEX idx_fastings_medication ON fastings(medication_id);
 ```
 
-#### 9.3. Trigger-System
+#### 10.3. Trigger-System
 ```sql
 -- Trigger: Löscht zugehörige Daten
 CREATE TRIGGER delete_person_cascade
@@ -807,7 +863,7 @@ BEGIN
 END;
 ```
 
-#### 9.4. Referenzielle Integrität
+#### 10.4. Referenzielle Integrität
 ```sql
 -- Fremdschlüssel mit Kaskadierung
 CREATE TABLE medications (
@@ -833,14 +889,14 @@ CREATE TABLE intakes (
 
 ---
 
-## 10. Umfassende Tests
+## 11. Umfassende Tests
 
 ### Beschreibung
 Umfassende Test-Suite mit über 432 automatisierten Tests und 75-80% Codeabdeckung.
 
 ### Testtypen
 
-#### 10.1. Unit-Tests
+#### 11.1. Unit-Tests
 ```dart
 // Test: test/models/medication_test.dart
 void main() {
@@ -871,7 +927,7 @@ void main() {
 }
 ```
 
-#### 10.2. Widget-Tests
+#### 11.2. Widget-Tests
 ```dart
 // Test: test/widgets/medication_card_test.dart
 void main() {
@@ -893,7 +949,7 @@ void main() {
 }
 ```
 
-#### 10.3. Integrationstests
+#### 11.3. Integrationstests
 ```dart
 // Test: test/integration/medication_flow_test.dart
 void main() {
@@ -915,7 +971,7 @@ void main() {
 }
 ```
 
-#### 10.4. Spezifische Tests für Grenzfälle
+#### 11.4. Spezifische Tests für Grenzfälle
 ```dart
 // Test: test/notification_midnight_edge_cases_test.dart
 void main() {

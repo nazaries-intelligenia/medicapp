@@ -454,8 +454,117 @@ class FastingConflictService {
 - `DoseScheduleEditor`-en dosi ordutegi berri bat gehitzean
 - `EditScheduleScreen`-en sendagaia sortu edo editatzean
 - Tratamenduaren eraginkortasuna arriskuan jar dezaketen gatazkak saihesten ditu
+- V19+ bertsioan aktibatuta `EditScheduleScreen`-ek `allMedications` eta `personId` parametroak jaso ondoren
 
-**Oharra:** Gaur egun balidazioa desaktibatuta dago `EditScheduleScreen`-en testetan timers-ekin arazorik ez izateko, baina azpiegitura prest dago behar denean aktibatzeko.
+### Stock Baxuko Jakinarazpen Sistema
+
+MedicApp-ek stock alerten sistema duala inplementatzen du, jakinarazpen erreaktiboak (une kritikoan) eta proaktiboak (aurreikuspenezkoak) konbinatzen dituena.
+
+#### Jakinarazpen Erreaktiboak (Immediate Stock Check)
+
+Sistemak automatikoki egiaztatzen du eskuragarri dagoen stocka erabiltzaile batek dosia erregistratzen saiatzen den bakoitzean, hemendik:
+- Pantaila nagusitik dosia "hartuta" markatzerakoan
+- Jakinarazpenen ekintza azkarretatik ("Erregistratu" botoia)
+- Aldizkako dosien erregistro eskuzkotik
+
+**NotificationService-en inplementazioa:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Fluxu erreaktiboa:**
+1. Erabiltzaileak dosia erregistratzen saiatzen da
+2. Sistemak egiaztatzen du: `medication.stockQuantity < doseQuantity`
+3. Ez bada nahikoa:
+   - Lehentasun altuko jakinarazpen berehalakoa erakusten du
+   - EZ du dosien erregistroa ahalbidetzen
+   - Beharrezko vs eskuragarri kantitatea adierazten du
+   - Erabiltzailea stocka berritzera gidatzen du
+
+**ID-en tartea:** 7,000,000 - 7,999,999 (`NotificationIdGenerator.generateLowStockId()`-k sortuta)
+
+#### Jakinarazpen Proaktiboak (Daily Stock Monitoring)
+
+Sistemak eguneko egiaztapen proaktiboak exekutatu ditzake, hornidura arazoak gertatu aurretik aurreikusten dituztenak.
+
+**Metodo nagusia:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Fluxu proaktiboa:**
+1. Gehienez egunean behin exekutatzen da (SharedPreferences erabiltzen du jarraipenerako)
+2. Erregistratutako pertsona guztien artean iteratzen du
+3. Sendagai aktibo bakoitzerako:
+   - Eguneko dosi totala kalkulatzen du kontuan hartuz:
+     - Sendagaiari esleitutako pertsona guztiak
+     - Tratamenduaren maiztasuna (egunero, astero, tartea)
+     - Pertsonaren araberako konfiguratutako orduak
+   - Uneko stocka eguneko dosiaren artean zatitzen du
+   - Geratzen diren hornidura egunak lortzen ditu
+4. `medication.isStockLow` bada (sendagaiaren arabera konfiguragarri den atalasea erabiltzen du):
+   - Jakinarazpen proaktiboa igortzen du
+   - Gutxi gorabehera geratzen diren egunak barne hartzen ditu
+   - Ez du ekintzarik blokeatzen
+
+**Spam-aren prebentzioa:**
+- Azken egiaztapen data SharedPreferences-en erregistratzen du
+- `lastCheck != today` bada soilik exekutatzen du
+- Sendagai bakoitzak egunean behin soilik jakinarazten du
+- Stocka berritzerakoan berrabiarazten da
+
+**Medication.isStockLow-rekin integrazioa:**
+Stock baxuaren kalkuluak modeloaren lehendik dagoen propietatea erabiltzen du:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Jakinarazpen Kanalen Konfigurazioa
+
+Stock jakinarazpenek kanal dedikatu bat erabiltzen dute:
+
+```dart
+// NotificationConfig.getStockAlertAndroidDetails()-en
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Stock Baxuko Alertak',
+  channelDescription: 'Sendagaien stocka baxuan dagoeneko jakinarazpenak',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Ezaugarriak:**
+- Dosi oroigarrietatik bereizitako kanala
+- Lehentasun altua (ez maximoa, intrusibo ez izateko)
+- Auto-ezeztapena ukitzerakoan
+- Integraturiko ekintzarik gabe (soilik informagarriak)
+
+#### Noiz Erabili Mota Bakoitza
+
+| Mota | Unea | Helburua | Blokeatzailea |
+|------|------|----------|---------------|
+| **Erreaktiboa** | Dosia erregistratzen saiatzerakoan | Eragotzi erregistroa stock nahikorik gabe | ✅ Bai |
+| **Proaktiboa** | Eguneko egiaztapena (aukerakoa) | Aurreikusi beharrezko berritze beharra | ❌ Ez |
+
+**Diseinu dualaren abantaila:**
+- Babes absolutua une kritikoan (erreaktiboa)
+- Aurreratutako plangintza une kritikoetara iristea saihesteko (proaktiboa)
+- Sistema proaktiboa opt-in da (aplikazioaren logikak esplizituki deitu behar du)
 
 ---
 

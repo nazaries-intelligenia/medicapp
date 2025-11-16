@@ -456,8 +456,117 @@ class FastingConflictService {
 - En afegir un nou horari de dosi a `DoseScheduleEditor`
 - En crear o editar un medicament a `EditScheduleScreen`
 - Prevé conflictes que podrien comprometre l'efectivitat del tractament
+- Activat a V19+ després de la refactorització d'`EditScheduleScreen` per rebre `allMedications` i `personId` com a paràmetres
 
-**Nota:** Actualment la validació està desactivada a `EditScheduleScreen` per evitar problemes amb timers en tests, però la infraestructura està llesta per activar-se quan calgui.
+### Sistema de Notificacions d'Estoc Baix
+
+MedicApp implementa un sistema dual d'alertes d'estoc que combina notificacions reactives (en el moment crític) i proactives (anticipatòries).
+
+#### Notificacions Reactives (Immediate Stock Check)
+
+El sistema verifica automàticament l'estoc disponible cada vegada que un usuari intenta registrar una dosi, ja sigui des de:
+- La pantalla principal en marcar una dosi com a "presa"
+- Les accions ràpides de notificació (botó "Registrar")
+- El registre manual de dosis ocasionals
+
+**Implementació a NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Flux reactiu:**
+1. Usuari intenta registrar una dosi
+2. Sistema verifica: `medication.stockQuantity < doseQuantity`
+3. Si és insuficient:
+   - Mostra notificació immediata amb prioritat alta
+   - NO permet el registre de la dosi
+   - Indica quantitat necessària vs disponible
+   - Guia l'usuari a reposar estoc
+
+**Rang d'IDs de notificació:** 7,000,000 - 7,999,999 (generats per `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notificacions Proactives (Daily Stock Monitoring)
+
+El sistema pot executar xecs proactius diaris que anticipen problemes de desabastiment abans que ocorrin.
+
+**Mètode principal:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Flux proactiu:**
+1. S'executa màxim una vegada al dia (utilitza SharedPreferences per a tracking)
+2. Itera sobre totes les persones registrades
+3. Per a cada medicament actiu:
+   - Calcula dosi diària total considerant:
+     - Totes les persones assignades al medicament
+     - Freqüència de tractament (diari, setmanal, interval)
+     - Horaris configurats per persona
+   - Divideix estoc actual entre dosi diària
+   - Obté dies de subministrament restants
+4. Si `medication.isStockLow` (utilitza el llindar configurable per medicament):
+   - Emet notificació proactiva
+   - Inclou dies aproximats restants
+   - No bloqueja cap acció
+
+**Prevenció de spam:**
+- Registra última data de xec a `SharedPreferences`
+- Només executa si `lastCheck != today`
+- Cada medicament només notifica una vegada al dia
+- Es reinicia en reposar estoc
+
+**Integració amb Medication.isStockLow:**
+El càlcul d'estoc baix utilitza la propietat existent del model:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configuració de Canals de Notificació
+
+Les notificacions d'estoc utilitzen un canal dedicat:
+
+```dart
+// A NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Alertes d'Estoc Baix',
+  channelDescription: 'Notificacions quan l'estoc de medicaments està baix',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Característiques:**
+- Canal separat de recordatoris de dosi
+- Prioritat alta (no màxima, per a no ser intrusiu)
+- Auto-cancel·lació en tocar
+- Sense accions integrades (només informatives)
+
+#### Quan Utilitzar Cada Tipus
+
+| Tipus | Moment | Propòsit | Bloquejant |
+|------|---------|-----------|------------|
+| **Reactiu** | En intentar registrar dosi | Prevenir registre amb estoc insuficient | ✅ Sí |
+| **Proactiu** | Xec diari (opcional) | Anticipar reposició necessària | ❌ No |
+
+**Avantatge del disseny dual:**
+- Protecció absoluta en el moment crític (reactiu)
+- Planificació anticipada per a evitar arribar al moment crític (proactiu)
+- El sistema proactiu és opt-in (s'ha de cridar explícitament des de lògica d'app)
 
 ---
 
