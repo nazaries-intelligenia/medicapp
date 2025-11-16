@@ -107,7 +107,60 @@ Each recording action automatically generates a complete history entry that incl
 
 ---
 
-## 5. Stock Control (Medicine Cabinet)
+## 5. Expiration Date Management
+
+### Medication Expiration Control
+
+MedicApp allows recording and monitoring medication expiration dates to ensure treatment safety. This functionality is especially important for as-needed and suspended medications that remain stored for extended periods.
+
+The system uses a simplified MM/YYYY (month/year) format that matches the standard format printed on medication packages. This makes data entry easy without needing to know the exact expiration day.
+
+### Automatic Status Detection
+
+MedicApp automatically evaluates each medication's expiration status:
+
+- **Expired**: The medication has passed its expiration date and displays a red warning label with an alert icon.
+- **Near expiration**: 30 days or less until expiration, displays an orange caution label with a clock icon.
+- **Good condition**: More than 30 days until expiration, no special warning is shown.
+
+Visual alerts appear directly on the medication card in the medicine cabinet, next to the suspension status if applicable, allowing quick identification of medications requiring attention.
+
+### Expiration Date Entry
+
+The system requests the expiration date at three specific moments:
+
+1. **When creating as-needed medication**: As the last step of the creation process (step 2/2), an optional dialog appears to enter the expiration date before saving the medication.
+
+2. **When suspending medication**: When suspending any medication for all users sharing it, the expiration date is requested. This allows recording the date of the package that will remain stored.
+
+3. **When refilling as-needed medication**: After adding stock to an as-needed medication, the system offers to update the expiration date to reflect the date of the newly acquired package.
+
+In all cases, the field is optional and can be skipped. The user can cancel the operation or simply leave the field empty.
+
+### Format and Validations
+
+The expiration date input dialog provides two separate fields:
+- Month field (MM): accepts values from 01 to 12
+- Year field (YYYY): accepts values from 2000 to 2100
+
+The system automatically validates that the month is in the correct range and that the year is valid. Upon completing the month (2 digits), focus automatically moves to the year field to streamline data entry.
+
+The date is stored in "MM/YYYY" format (example: "03/2025") and is interpreted as the last day of that month for expiration comparisons. This means a medication with date "03/2025" will be considered expired starting April 1, 2025.
+
+### System Benefits
+
+This functionality helps to:
+- Prevent use of expired medications that could be ineffective or dangerous
+- Efficiently manage stock by identifying medications near expiration
+- Prioritize medication use according to expiration date
+- Maintain a safe medicine cabinet with visual status control of each medication
+- Avoid waste by reminding to check medications before they expire
+
+The system does not prevent dose registration with expired medications, but it provides clear visual warnings so the user can make informed decisions.
+
+---
+
+## 6. Stock Control (Medicine Cabinet)
 
 ### Intuitive Visual Indicators
 
@@ -131,7 +184,7 @@ When stock reaches the configured threshold, MedicApp displays prominent visual 
 
 ---
 
-## 6. Medicine Cabinet
+## 7. Medicine Cabinet
 
 ### Organized Alphabetical List
 
@@ -159,7 +212,7 @@ The medicine cabinet also facilitates person-medication assignment management. Y
 
 ---
 
-## 7. Temporal Navigation
+## 8. Temporal Navigation
 
 ### Horizontal Day Swiping
 
@@ -185,7 +238,7 @@ This functionality is especially valuable for verifying if a medication was take
 
 ---
 
-## 8. Smart Notifications
+## 9. Smart Notifications
 
 ### Direct Actions from Notification
 
@@ -223,7 +276,7 @@ MedicApp is optimized for Android 12 and higher versions, requiring and managing
 
 ---
 
-## 9. Low Stock Alerts
+## 10. Low Stock Alerts
 
 ### Reactive Insufficient Stock Notifications
 
@@ -278,7 +331,7 @@ The system respects these individual configurations, allowing each medication to
 
 ---
 
-## 10. Fasting Configuration
+## 11. Fasting Configuration
 
 ### Types: Before and After
 
@@ -321,7 +374,7 @@ This granularity allows managing complex regimens where some medications are tak
 
 ---
 
-## 11. Dose History
+## 12. Dose History
 
 ### Complete Automatic Recording
 
@@ -365,7 +418,7 @@ The data format is relational and normalized, with foreign keys linking medicati
 
 ---
 
-## 12. Localization and Internationalization
+## 13. Localization and Internationalization
 
 ### 8 Fully Supported Languages
 
@@ -415,7 +468,7 @@ This attention to linguistic detail makes MedicApp feel natural and native in ea
 
 ---
 
-## 13. Accessible and Usable Interface
+## 14. Accessible and Usable Interface
 
 ### Material Design 3
 

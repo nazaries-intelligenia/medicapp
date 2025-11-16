@@ -107,7 +107,60 @@ Cada acción de rexistro xera automaticamente unha entrada completa no historial
 
 ---
 
-## 5. Control de Stock (Pastilleiro)
+## 5. Xestión de Datas de Caducidade
+
+### Control de Caducidade de Medicamentos
+
+MedicApp permite rexistrar e monitorizar as datas de caducidade dos medicamentos para garantir a seguridade do tratamento. Esta funcionalidade é especialmente importante para medicamentos ocasionais e suspendidos que permanecen almacenados durante períodos prolongados.
+
+O sistema utiliza un formato simplificado MM/AAAA (mes/ano) que coincide co formato estándar impreso nas embalaxes de medicamentos. Isto facilita a introdución de datos sen necesidade de coñecer o día exacto de caducidade.
+
+### Detección Automática de Estado
+
+MedicApp avalía automaticamente o estado de caducidade de cada medicamento:
+
+- **Caducado**: O medicamento superou a súa data de caducidade e móstrase cunha etiqueta vermella de advertencia con icona de alerta.
+- **Próximo a caducar**: Faltan 30 días ou menos para a caducidade, móstrase cunha etiqueta laranxa de precaución con icona de reloxo.
+- **En bo estado**: Máis de 30 días ata a caducidade, non se mostra advertencia especial.
+
+As alertas visuais aparecen directamente na tarxeta do medicamento no botiquín, xunto ao estado de suspensión se é aplicable, permitindo identificar rapidamente medicamentos que requiren atención.
+
+### Rexistro de Data de Caducidade
+
+O sistema solicita a data de caducidade en tres momentos específicos:
+
+1. **Ao crear medicamento ocasional**: Como último paso do proceso de creación (paso 2/2), móstrase un diálogo opcional para introducir a data de caducidade antes de gardar o medicamento.
+
+2. **Ao suspender medicamento**: Cando se suspende calquera medicamento para todos os usuarios que o comparten, solicítase a data de caducidade. Isto permite rexistrar a data da embalaxe que quedará almacenada.
+
+3. **Ao recargar medicamento ocasional**: Despois de engadir stock a un medicamento ocasional, ofrécese actualizar a data de caducidade para reflectir a data da nova embalaxe adquirida.
+
+En todos os casos, o campo é opcional e pódese omitir. O usuario pode cancelar a operación ou simplemente deixar o campo baleiro.
+
+### Formato e Validacións
+
+O diálogo de entrada de data de caducidade proporciona dous campos separados:
+- Campo de mes (MM): acepta valores de 01 a 12
+- Campo de ano (AAAA): acepta valores de 2000 a 2100
+
+O sistema valida automaticamente que o mes estea no rango correcto e que o ano sexa válido. Ao completar o mes (2 díxitos), o foco móvese automaticamente ao campo de ano para axilizar a entrada de datos.
+
+A data almacénase en formato "MM/AAAA" (exemplo: "03/2025") e interprétase como o último día dese mes para as comparacións de caducidade. Isto significa que un medicamento con data "03/2025" considerarase caducado a partir do 1 de abril de 2025.
+
+### Beneficios do Sistema
+
+Esta funcionalidade axuda a:
+- Previr o uso de medicamentos caducados que poderían ser inefectivos ou perigosos
+- Xestionar eficientemente o stock identificando medicamentos próximos a caducar
+- Priorizar o uso de medicamentos segundo a súa data de caducidade
+- Manter un botiquín seguro con control visual do estado de cada medicamento
+- Evitar desperdicios recordando revisar medicamentos antes de que caduquen
+
+O sistema non impide o rexistro de doses con medicamentos caducados, pero si proporciona advertencias visuais claras para que o usuario tome decisións informadas.
+
+---
+
+## 6. Control de Stock (Pastilleiro)
 
 ### Indicadores Visuais Intuitivos
 
@@ -131,7 +184,7 @@ Cando o stock alcanza o limiar configurado, MedicApp mostra alertas visuais dest
 
 ---
 
-## 6. Botiquín
+## 7. Botiquín
 
 ### Lista Alfabética Organizada
 
@@ -159,7 +212,7 @@ O botiquín tamén facilita a xestión de asignacións persoa-medicamento. Póde
 
 ---
 
-## 7. Navegación Temporal
+## 8. Navegación Temporal
 
 ### Deslizar Horizontal por Días
 
@@ -185,7 +238,7 @@ Esta funcionalidade é especialmente valiosa para verificar se se tomou un medic
 
 ---
 
-## 8. Notificacións Intelixentes
+## 9. Notificacións Intelixentes
 
 ### Accións Directas desde Notificación
 
@@ -223,7 +276,7 @@ MedicApp está optimizado para Android 12 e versións superiores, requirindo e x
 
 ---
 
-## 9. Alertas de Stock Baixo
+## 10. Alertas de Stock Baixo
 
 ### Notificacións Reactivas de Stock Insuficiente
 
@@ -278,7 +331,7 @@ O sistema respecta estas configuracións individuais, permitindo que cada medica
 
 ---
 
-## 10. Configuración de Xaxún
+## 11. Configuración de Xaxún
 
 ### Tipos: Before (Antes) e After (Despois)
 
@@ -321,7 +374,7 @@ Esta granularidade permite xestionar réximes complexos onde algúns medicamento
 
 ---
 
-## 11. Historial de Doses
+## 12. Historial de Doses
 
 ### Rexistro Automático Completo
 
@@ -365,7 +418,7 @@ O formato dos datos é relacional e normalizado, con claves foráneas que vincul
 
 ---
 
-## 12. Localización e Internacionalização
+## 13. Localización e Internacionalización
 
 ### 8 Idiomas Completamente Soportados
 
@@ -415,7 +468,7 @@ Esta atención ao detalle lingüístico fai que MedicApp se sinta natural e nati
 
 ---
 
-## 13. Interface Accesible e Usable
+## 14. Interface Accesible e Usable
 
 ### Material Design 3
 

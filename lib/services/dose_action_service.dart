@@ -1,3 +1,4 @@
+import 'package:uuid/uuid.dart';
 import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
@@ -62,7 +63,7 @@ class DoseActionService {
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -125,7 +126,7 @@ class DoseActionService {
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -211,7 +212,7 @@ class DoseActionService {
     }
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -294,7 +295,7 @@ class DoseActionService {
 
     // Save to history with isExtraDose=true
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,

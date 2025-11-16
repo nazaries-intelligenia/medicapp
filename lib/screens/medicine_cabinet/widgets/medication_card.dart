@@ -9,6 +9,7 @@ import '../../edit_medication_menu_screen.dart';
 import 'medication_options_modal.dart';
 import '../../medication_list/dialogs/refill_input_dialog.dart';
 import '../../medication_list/dialogs/manual_dose_input_dialog.dart';
+import '../../medication_list/dialogs/expiration_date_dialog.dart';
 import '../medication_person_assignment_screen.dart';
 
 class MedicationCard extends StatefulWidget {
@@ -89,6 +90,24 @@ class _MedicationCardState extends State<MedicationCard> {
           duration: const Duration(seconds: 3),
         ),
       );
+
+      // For as-needed medications, ask for expiration date after refill
+      if (widget.medication.allowsManualDoseRegistration && mounted) {
+        final expirationDate = await ExpirationDateDialog.show(
+          context,
+          currentExpirationDate: widget.medication.expirationDate,
+          isOptional: true,
+        );
+
+        // If user provided or updated expiration date, update medication
+        if (expirationDate != null && expirationDate.isNotEmpty && expirationDate != widget.medication.expirationDate) {
+          final updatedMedicationWithExpiration = updatedMedication.copyWith(
+            expirationDate: expirationDate,
+          );
+          await DatabaseHelper.instance.updateMedication(updatedMedicationWithExpiration);
+          widget.onMedicationUpdated();
+        }
+      }
     }
   }
 
@@ -323,6 +342,72 @@ class _MedicationCardState extends State<MedicationCard> {
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              // Expiration badge
+              if (widget.medication.isExpired) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red.shade700,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.warning,
+                        size: 14,
+                        color: Colors.red.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.expirationDateExpired,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (widget.medication.isNearExpiration) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.orange.shade700,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: Colors.orange.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.expirationDateNearExpiration,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange.shade700,
                         ),
                       ),
                     ],

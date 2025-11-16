@@ -75,6 +75,9 @@ class AppLocalizationsEu extends AppLocalizations {
   String get btnAccept => 'Onartu';
 
   @override
+  String get btnSkip => 'Saltatu';
+
+  @override
   String get medicationTypePill => 'Pilula';
 
   @override
@@ -2224,4 +2227,70 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get fastingConflictOverride => 'Omitir y continuar';
+
+  @override
+  String get expirationDateLabel => 'Kaducitate data';
+
+  @override
+  String get expirationDateHint => 'HH/UUUU (ad: 03/2025)';
+
+  @override
+  String get expirationDateOptional => 'Kaducitate data (hautazkoa)';
+
+  @override
+  String get expirationDateRequired => 'Mesedez, sartu kaducitate data';
+
+  @override
+  String get expirationDateInvalidFormat =>
+      'Baliogabeko formatua. Erabili HH/UUUU (ad: 03/2025)';
+
+  @override
+  String get expirationDateInvalidMonth =>
+      'Hila 01 eta 12 artean egon behar du';
+
+  @override
+  String get expirationDateInvalidYear => 'Urtea baliozkoa egon behar du';
+
+  @override
+  String get expirationDateExpired => 'Botika hau kaducitua dago';
+
+  @override
+  String expirationDateExpiredOn(String date) {
+    return 'Kaducitua ${date}ean';
+  }
+
+  @override
+  String get expirationDateNearExpiration => 'Kaducitate data hurbila';
+
+  @override
+  String expirationDateExpiresOn(String date) {
+    return 'Kaduzitzen ${date}ean';
+  }
+
+  @override
+  String expirationDateExpiresIn(int days) {
+    return 'Kaduzitzen $days egunean';
+  }
+
+  @override
+  String get expirationDateExpiredWarning =>
+      'Botika hau kaducitua dago. Mesedez, egiaztatu bere kaducitate data erabili aurretik.';
+
+  @override
+  String get expirationDateNearExpirationWarning =>
+      'Botika hau kaducitate data hurbila du. Kontuan hartu ordezkaritza.';
+
+  @override
+  String get expirationDateDialogTitle => 'Botikoaren kaducitate data';
+
+  @override
+  String get expirationDateDialogMessage =>
+      'Sartu botikoaren kaducitate data (enbalajean dago).';
+
+  @override
+  String get expirationDateUpdateTitle => 'Eguneratu kaducitate data';
+
+  @override
+  String get expirationDateUpdateMessage =>
+      'Botkia kargatu duzu. Kaducitate data eguneratu nahi duzu?';
 }

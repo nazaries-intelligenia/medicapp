@@ -26,6 +26,7 @@
   "btnClose": "Cerrar",
   "btnConfirm": "Confirmar",
   "btnAccept": "Aceptar",
+  "btnSkip": "Omitir",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pastilla",
@@ -1555,5 +1556,46 @@
       }
     }
   },
-  "fastingConflictOverride": "Omitir y continuar"
+  "fastingConflictOverride": "Omitir y continuar",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Fecha de caducidad",
+  "expirationDateHint": "MM/AAAA (ej: 03/2025)",
+  "expirationDateOptional": "Fecha de caducidad (opcional)",
+  "expirationDateRequired": "Por favor, introduce la fecha de caducidad",
+  "expirationDateInvalidFormat": "Formato inválido. Usa MM/AAAA (ej: 03/2025)",
+  "expirationDateInvalidMonth": "El mes debe estar entre 01 y 12",
+  "expirationDateInvalidYear": "El año debe ser válido",
+  "expirationDateExpired": "Este medicamento ha caducado",
+  "expirationDateExpiredOn": "Caducado en {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Caduca pronto",
+  "expirationDateExpiresOn": "Caduca en {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Caduca en {days} días",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Este medicamento ha caducado. Por favor, verifica su fecha de caducidad antes de usarlo.",
+  "expirationDateNearExpirationWarning": "Este medicamento caduca pronto. Considera reemplazarlo.",
+  "expirationDateDialogTitle": "Fecha de caducidad del medicamento",
+  "expirationDateDialogMessage": "Introduce la fecha de caducidad del medicamento (se encuentra en el envase).",
+  "expirationDateUpdateTitle": "Actualizar fecha de caducidad",
+  "expirationDateUpdateMessage": "Has recargado el medicamento. ¿Deseas actualizar la fecha de caducidad?"
 }

@@ -107,7 +107,60 @@ Ogni azione di registrazione genera automaticamente una voce completa nella cron
 
 ---
 
-## 5. Controllo della Scorta (Armadietto)
+## 5. Gestione delle Date di Scadenza
+
+### Controllo della Scadenza dei Farmaci
+
+MedicApp consente di registrare e monitorare le date di scadenza dei farmaci per garantire la sicurezza del trattamento. Questa funzionalità è particolarmente importante per i farmaci al bisogno e sospesi che rimangono conservati per periodi prolungati.
+
+Il sistema utilizza un formato semplificato MM/AAAA (mese/anno) che corrisponde al formato standard stampato sulle confezioni dei farmaci. Ciò facilita l'inserimento dei dati senza dover conoscere il giorno esatto di scadenza.
+
+### Rilevamento Automatico dello Stato
+
+MedicApp valuta automaticamente lo stato di scadenza di ogni farmaco:
+
+- **Scaduto**: Il farmaco ha superato la sua data di scadenza e viene visualizzato con un'etichetta rossa di avvertimento con icona di allerta.
+- **Prossimo alla scadenza**: 30 giorni o meno fino alla scadenza, viene visualizzato con un'etichetta arancione di precauzione con icona di orologio.
+- **In buono stato**: Più di 30 giorni fino alla scadenza, non viene visualizzato alcun avvertimento speciale.
+
+Gli avvisi visivi appaiono direttamente sulla scheda del farmaco nell'armadietto, accanto allo stato di sospensione se applicabile, consentendo di identificare rapidamente i farmaci che richiedono attenzione.
+
+### Registrazione della Data di Scadenza
+
+Il sistema richiede la data di scadenza in tre momenti specifici:
+
+1. **Durante la creazione di un farmaco al bisogno**: Come ultimo passo del processo di creazione (passo 2/2), viene visualizzata una finestra di dialogo opzionale per inserire la data di scadenza prima di salvare il farmaco.
+
+2. **Durante la sospensione del farmaco**: Quando si sospende qualsiasi farmaco per tutti gli utenti che lo condividono, viene richiesta la data di scadenza. Ciò consente di registrare la data della confezione che rimarrà conservata.
+
+3. **Durante il rifornimento di un farmaco al bisogno**: Dopo aver aggiunto scorte a un farmaco al bisogno, il sistema offre di aggiornare la data di scadenza per riflettere la data della nuova confezione acquisita.
+
+In tutti i casi, il campo è facoltativo e può essere omesso. L'utente può annullare l'operazione o semplicemente lasciare il campo vuoto.
+
+### Formato e Validazioni
+
+La finestra di dialogo per l'inserimento della data di scadenza fornisce due campi separati:
+- Campo del mese (MM): accetta valori da 01 a 12
+- Campo dell'anno (AAAA): accetta valori da 2000 a 2100
+
+Il sistema valida automaticamente che il mese sia nell'intervallo corretto e che l'anno sia valido. Al completamento del mese (2 cifre), il focus si sposta automaticamente al campo dell'anno per velocizzare l'inserimento dei dati.
+
+La data viene memorizzata nel formato "MM/AAAA" (esempio: "03/2025") e viene interpretata come l'ultimo giorno di quel mese per i confronti di scadenza. Ciò significa che un farmaco con data "03/2025" sarà considerato scaduto a partire dal 1° aprile 2025.
+
+### Vantaggi del Sistema
+
+Questa funzionalità aiuta a:
+- Prevenire l'uso di farmaci scaduti che potrebbero essere inefficaci o pericolosi
+- Gestire efficacemente le scorte identificando i farmaci prossimi alla scadenza
+- Dare priorità all'uso dei farmaci in base alla loro data di scadenza
+- Mantenere un armadietto sicuro con controllo visivo dello stato di ogni farmaco
+- Evitare sprechi ricordando di controllare i farmaci prima che scadano
+
+Il sistema non impedisce la registrazione delle dosi con farmaci scaduti, ma fornisce avvisi visivi chiari in modo che l'utente possa prendere decisioni informate.
+
+---
+
+## 6. Controllo della Scorta (Armadietto)
 
 ### Indicatori Visuali Intuitivi
 
@@ -131,7 +184,7 @@ Quando la scorta raggiunge la soglia configurata, MedicApp mostra allerte visual
 
 ---
 
-## 6. Armadietto
+## 7. Armadietto
 
 ### Lista Alfabetica Organizzata
 
@@ -159,7 +212,7 @@ L'armadietto facilita anche la gestione delle assegnazioni persona-farmaco. Si p
 
 ---
 
-## 7. Navigazione Temporale
+## 8. Navigazione Temporale
 
 ### Scorrimento Orizzontale per Giorni
 
@@ -185,7 +238,7 @@ Questa funzionalità è particolarmente preziosa per verificare se è stato assu
 
 ---
 
-## 8. Notifiche Intelligenti
+## 9. Notifiche Intelligenti
 
 ### Azioni Dirette dalla Notifica
 
@@ -223,7 +276,7 @@ MedicApp è ottimizzata per Android 12 e versioni superiori, richiedendo e geste
 
 ---
 
-## 9. Avvisi di Scorte Basse
+## 10. Avvisi di Scorte Basse
 
 ### Notifiche Reattive di Stock Insufficiente
 
@@ -278,7 +331,7 @@ Il sistema rispetta queste configurazioni individuali, permettendo che ogni farm
 
 ---
 
-## 10. Configurazione del Digiuno
+## 11. Configurazione del Digiuno
 
 ### Tipi: Before (Prima) e After (Dopo)
 
@@ -321,7 +374,7 @@ Questa granularità permette di gestire regimi complessi dove alcuni farmaci si 
 
 ---
 
-## 11. Cronologia delle Dosi
+## 12. Cronologia delle Dosi
 
 ### Registrazione Automatica Completa
 
@@ -365,7 +418,7 @@ Il formato dei dati è relazionale e normalizzato, con chiavi esterne che colleg
 
 ---
 
-## 12. Localizzazione e Internazionalizzazione
+## 13. Localizzazione e Internazionalizzazione
 
 ### 8 Lingue Completamente Supportate
 
@@ -415,7 +468,7 @@ Questa attenzione al dettaglio linguistico fa sì che MedicApp si senta naturale
 
 ---
 
-## 13. Interfaccia Accessibile e Usabile
+## 14. Interfaccia Accessibile e Usabile
 
 ### Material Design 3
 

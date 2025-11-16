@@ -26,6 +26,7 @@
   "btnClose": "Schließen",
   "btnConfirm": "Bestätigen",
   "btnAccept": "Akzeptieren",
+  "btnSkip": "Überspringen",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Tablette",
@@ -1502,5 +1503,46 @@
   "done": "Erledigt",
   "suspended": "Ausgesetzt",
   "activeFastingPeriodsTitle": "Aktive Nüchternheit",
-  "fastingCompleted": "Fasten beendet! Du kannst jetzt essen"
+  "fastingCompleted": "Fasten beendet! Du kannst jetzt essen",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Verfallsdatum",
+  "expirationDateHint": "MM/JJJJ (z.B.: 03/2025)",
+  "expirationDateOptional": "Verfallsdatum (optional)",
+  "expirationDateRequired": "Bitte geben Sie das Verfallsdatum ein",
+  "expirationDateInvalidFormat": "Ungültiges Format. Verwenden Sie MM/JJJJ (z.B.: 03/2025)",
+  "expirationDateInvalidMonth": "Der Monat muss zwischen 01 und 12 liegen",
+  "expirationDateInvalidYear": "Das Jahr muss gültig sein",
+  "expirationDateExpired": "Dieses Medikament ist abgelaufen",
+  "expirationDateExpiredOn": "Abgelaufen am {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Läuft bald ab",
+  "expirationDateExpiresOn": "Läuft ab am {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Läuft in {days} Tagen ab",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Dieses Medikament ist abgelaufen. Bitte überprüfen Sie das Verfallsdatum, bevor Sie es verwenden.",
+  "expirationDateNearExpirationWarning": "Dieses Medikament läuft bald ab. Erwägen Sie, es zu ersetzen.",
+  "expirationDateDialogTitle": "Verfallsdatum des Medikaments",
+  "expirationDateDialogMessage": "Geben Sie das Verfallsdatum des Medikaments ein (befindet sich auf der Verpackung).",
+  "expirationDateUpdateTitle": "Verfallsdatum aktualisieren",
+  "expirationDateUpdateMessage": "Sie haben das Medikament nachgefüllt. Möchten Sie das Verfallsdatum aktualisieren?"
 }

@@ -26,6 +26,7 @@
   "btnClose": "Fermer",
   "btnConfirm": "Confirmer",
   "btnAccept": "Accepter",
+  "btnSkip": "Passer",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pilule",
@@ -1502,5 +1503,46 @@
   "done": "Terminé",
   "suspended": "Suspendu",
   "activeFastingPeriodsTitle": "Jeûnes Actifs",
-  "fastingCompleted": "Jeûne terminé ! Vous pouvez manger maintenant"
+  "fastingCompleted": "Jeûne terminé ! Vous pouvez manger maintenant",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Date d'expiration",
+  "expirationDateHint": "MM/AAAA (ex: 03/2025)",
+  "expirationDateOptional": "Date d'expiration (optionnel)",
+  "expirationDateRequired": "Veuillez entrer la date d'expiration",
+  "expirationDateInvalidFormat": "Format invalide. Utilisez MM/AAAA (ex: 03/2025)",
+  "expirationDateInvalidMonth": "Le mois doit être entre 01 et 12",
+  "expirationDateInvalidYear": "L'année doit être valide",
+  "expirationDateExpired": "Ce médicament a expiré",
+  "expirationDateExpiredOn": "Expiré le {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Expire bientôt",
+  "expirationDateExpiresOn": "Expire le {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Expire dans {days} jours",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Ce médicament a expiré. Veuillez vérifier sa date d'expiration avant utilisation.",
+  "expirationDateNearExpirationWarning": "Ce médicament expire bientôt. Envisagez de le remplacer.",
+  "expirationDateDialogTitle": "Date d'expiration du médicament",
+  "expirationDateDialogMessage": "Entrez la date d'expiration du médicament (elle se trouve sur l'emballage).",
+  "expirationDateUpdateTitle": "Mettre à jour la date d'expiration",
+  "expirationDateUpdateMessage": "Vous avez recharché le médicament. Souhaitez-vous mettre à jour la date d'expiration?"
 }

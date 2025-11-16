@@ -107,7 +107,60 @@ Erregistro ekintza bakoitzak automatikoki sarrera oso bat sortzen du historian h
 
 ---
 
-## 5. Stock Kontrola (Pilulariak)
+## 5. Iraungitze Dataren Kudeaketa
+
+### Sendagaien Iraungitze Kontrola
+
+MedicApp-ek sendagaien iraungitze datak erregistratzea eta monitorizatzea ahalbidetzen du tratamenduaren segurtasuna bermatzeko. Funtzionalitate hau bereziki garrantzitsua da behar denean erabiltzeko sendagaietarako eta etendako sendagaietarako, denbora luzez gordetzen baitira.
+
+Sistemak HH/UUUU (hilabetea/urtea) formatu sinplifikatu bat erabiltzen du, sendagaien ontzietako formatu estandarrarekin bat datorrena. Honek datuak sartzea errazten du iraungitze eguna zehazki jakin beharrik gabe.
+
+### Egoeraren Detekzio Automatikoa
+
+MedicApp-ek automatikoki ebaluatzen du sendagai bakoitzaren iraungitze egoera:
+
+- **Iraungia**: Sendagaiak bere iraungitze data gainditu du eta abisu gorri bat erakusten da alerta ikonoaz.
+- **Laster iraungi**: 30 egun edo gutxiago falta dira iraungi arte, laranja koloreko abisu bat erakusten da erloju ikonoaz.
+- **Egoera onean**: 30 egun baino gehiago falta dira iraungi arte, abisu berezirik ez da erakusten.
+
+Ikusizko abisuak zuzenean agertzen dira botikaren sendagai txartelean, etendako egoeraren ondoan aplikatzen bada, arreta behar duten sendagaiak azkar identifikatzeko aukera emanez.
+
+### Iraungitze Dataren Erregistroa
+
+Sistemak iraungitze data hiru une espezifikotan eskatzen du:
+
+1. **Behar deneko sendagaia sortzean**: Sorrera prozesuaren azken pausu gisa (2/2 pausua), elkarrizketa-koadro aukera bat agertzen da iraungitze data sartzeko sendagaia gorde aurretik.
+
+2. **Sendagaia eteten denean**: Partekatzen duten erabiltzaile guztientzako edozein sendagai eteten denean, iraungitze data eskatzen da. Honek gordetako ontziaren data erregistratzeko aukera ematen du.
+
+3. **Behar deneko sendagaia birkargatzen denean**: Behar deneko sendagai bati stocka gehitu ondoren, sistemak iraungitze data eguneratzeko aukera eskaintzen du erositako ontzi berriaren data islatzeko.
+
+Kasu guztietan, eremua hautazkoa da eta saltatu egin daiteke. Erabiltzaileak eragiketa bertan behera utzi edo eremua hutsik utzi dezake.
+
+### Formatua eta Balidazioak
+
+Iraungitze dataren sarrera elkarrizketa-koadroak bi eremu bereizi eskaintzen ditu:
+- Hilabete eremua (HH): 01-12 balioak onartzen ditu
+- Urte eremua (UUUU): 2000-2100 balioak onartzen ditu
+
+Sistemak automatikoki balidatzen du hilabetea tarte egokian dagoela eta urtea baliozkoa dela. Hilabetea osatzerakoan (2 digitu), fokua automatikoki urte eremura mugitzen da datuen sarrera bizkortzeko.
+
+Data "HH/UUUU" formatuan gordetzen da (adibidez: "03/2025") eta hilabete horren azken eguna gisa interpretatzen da iraungitze konparaketarako. Honek esan nahi du "03/2025" data duen sendagai bat iraungi gisa hartuko dela 2025eko apirilaren 1etik aurrera.
+
+### Sistemaren Onurak
+
+Funtzionalitate honek laguntzen du:
+- Eraginkortasunik ez edo arriskutsuak izan daitezkeen iraungi sendagaien erabilera saihesteko
+- Stocka modu eraginkorrean kudeatzeko laster iraungi behar duten sendagaiak identifikatuz
+- Sendagaien erabilera iraungitze dataren arabera lehenetsi
+- Botika seguru bat mantendu sendagai bakoitzaren egoeraren ikusizko kontrolaz
+- Hondakina saihesteko sendagaiak iraungi aurretik berrikusteko gogoraraziz
+
+Sistemak ez du galarazten iraungi sendagaiekin dosiak erregistratzea, baina ikusizko abisu argiak eskaintzen ditu erabiltzaileak erabaki informatuak har ditzan.
+
+---
+
+## 6. Stock Kontrola (Pilulariak)
 
 ### Ikur Bisual Intuitiboak
 
@@ -131,7 +184,7 @@ Stocka konfiguratutako atalasea iristen duenean, MedicApp-ek alerta bisualak nab
 
 ---
 
-## 6. Botikina
+## 7. Botikina
 
 ### Zerrenda Alfabetiko Antolatua
 
@@ -159,7 +212,7 @@ Botikinak pertsona-sendagai esleipenen kudeaketa ere errazten du. Sendagai zer p
 
 ---
 
-## 7. Denbora Nabigazioa
+## 8. Denbora Nabigazioa
 
 ### Egun Artean Horizontal Lerrata
 
@@ -185,7 +238,7 @@ Funtzionalitate hau bereziki baliotsua da iraganaaldiko egun batean sendagai bat
 
 ---
 
-## 8. Jakinarazpen Adimendun
+## 9. Jakinarazpen Adimendun
 
 ### Jakinarazpenetik Ekintza Zuzenak
 
@@ -223,7 +276,7 @@ MedicApp Android 12 eta bertsio berriagorako optimizatua dago, jakinarazpen zeha
 
 ---
 
-## 9. Stock Baxuko Alertak
+## 10. Stock Baxuko Alertak
 
 ### Stock Nahiezko Jakinarazpen Erreaktiboak
 
@@ -278,7 +331,7 @@ Sistemak konfigurazio indibidual hauek errespetatzen ditu, sendagai bakoitzak be
 
 ---
 
-## 10. Barazkaldiaren Konfigurazioa
+## 11. Barazkaldiaren Konfigurazioa
 
 ### Motak: Before (Aurretik) eta After (Ondoren)
 
@@ -321,7 +374,7 @@ Granulartasun honek erregimen konplexuak kudeatzeko aukera ematen du, non sendag
 
 ---
 
-## 11. Dosien Historiala
+## 12. Dosien Historiala
 
 ### Erregistro Automatiko Osoa
 
@@ -365,7 +418,7 @@ Datuen formatua erlazio eta normalizatua da, sendagaiak, pertsonak eta historial
 
 ---
 
-## 12. Lokalizazioa eta Nazioartekotzea
+## 13. Lokalizazioa eta Nazioartekotzea
 
 ### 8 Hizkuntza Osoki Onartuta
 
@@ -415,7 +468,7 @@ Hizkuntza xehetasun arreta honek MedicApp natural eta natiboaren sentitzen dela 
 
 ---
 
-## 13. Interfaze Irisgarria eta Erabilgarria
+## 14. Interfaze Irisgarria eta Erabilgarria
 
 ### Material Design 3
 

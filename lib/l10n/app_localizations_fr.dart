@@ -75,6 +75,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get btnAccept => 'Accepter';
 
   @override
+  String get btnSkip => 'Passer';
+
+  @override
   String get medicationTypePill => 'Pilule';
 
   @override
@@ -2232,4 +2235,69 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fastingConflictOverride => 'Omitir y continuar';
+
+  @override
+  String get expirationDateLabel => 'Date d\'expiration';
+
+  @override
+  String get expirationDateHint => 'MM/AAAA (ex: 03/2025)';
+
+  @override
+  String get expirationDateOptional => 'Date d\'expiration (optionnel)';
+
+  @override
+  String get expirationDateRequired => 'Veuillez entrer la date d\'expiration';
+
+  @override
+  String get expirationDateInvalidFormat =>
+      'Format invalide. Utilisez MM/AAAA (ex: 03/2025)';
+
+  @override
+  String get expirationDateInvalidMonth => 'Le mois doit être entre 01 et 12';
+
+  @override
+  String get expirationDateInvalidYear => 'L\'année doit être valide';
+
+  @override
+  String get expirationDateExpired => 'Ce médicament a expiré';
+
+  @override
+  String expirationDateExpiredOn(String date) {
+    return 'Expiré le $date';
+  }
+
+  @override
+  String get expirationDateNearExpiration => 'Expire bientôt';
+
+  @override
+  String expirationDateExpiresOn(String date) {
+    return 'Expire le $date';
+  }
+
+  @override
+  String expirationDateExpiresIn(int days) {
+    return 'Expire dans $days jours';
+  }
+
+  @override
+  String get expirationDateExpiredWarning =>
+      'Ce médicament a expiré. Veuillez vérifier sa date d\'expiration avant utilisation.';
+
+  @override
+  String get expirationDateNearExpirationWarning =>
+      'Ce médicament expire bientôt. Envisagez de le remplacer.';
+
+  @override
+  String get expirationDateDialogTitle => 'Date d\'expiration du médicament';
+
+  @override
+  String get expirationDateDialogMessage =>
+      'Entrez la date d\'expiration du médicament (elle se trouve sur l\'emballage).';
+
+  @override
+  String get expirationDateUpdateTitle => 'Mettre à jour la date d\'expiration';
+
+  @override
+  String get expirationDateUpdateMessage =>
+      'Vous avez recharché le médicament. Souhaitez-vous mettre à jour la date d\'expiration?';
 }

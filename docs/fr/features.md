@@ -107,7 +107,60 @@ Chaque action d'enregistrement génère automatiquement une entrée complète da
 
 ---
 
-## 5. Contrôle de Stock (Pilulier)
+## 5. Gestion des Dates de Péremption
+
+### Contrôle de Péremption des Médicaments
+
+MedicApp permet d'enregistrer et de surveiller les dates de péremption des médicaments pour garantir la sécurité du traitement. Cette fonctionnalité est particulièrement importante pour les médicaments occasionnels et suspendus qui restent stockés pendant de longues périodes.
+
+Le système utilise un format simplifié MM/AAAA (mois/année) qui correspond au format standard imprimé sur les emballages de médicaments. Cela facilite la saisie des données sans avoir besoin de connaître le jour exact de péremption.
+
+### Détection Automatique de l'État
+
+MedicApp évalue automatiquement l'état de péremption de chaque médicament :
+
+- **Périmé** : Le médicament a dépassé sa date de péremption et s'affiche avec une étiquette rouge d'avertissement avec icône d'alerte.
+- **Proche de la péremption** : 30 jours ou moins avant la péremption, s'affiche avec une étiquette orange de précaution avec icône d'horloge.
+- **En bon état** : Plus de 30 jours avant la péremption, aucun avertissement spécial n'est affiché.
+
+Les alertes visuelles apparaissent directement sur la carte du médicament dans l'armoire à pharmacie, à côté du statut de suspension le cas échéant, permettant d'identifier rapidement les médicaments nécessitant une attention.
+
+### Enregistrement de la Date de Péremption
+
+Le système demande la date de péremption à trois moments spécifiques :
+
+1. **Lors de la création d'un médicament occasionnel** : Comme dernière étape du processus de création (étape 2/2), une boîte de dialogue optionnelle apparaît pour saisir la date de péremption avant d'enregistrer le médicament.
+
+2. **Lors de la suspension d'un médicament** : Lors de la suspension d'un médicament pour tous les utilisateurs qui le partagent, la date de péremption est demandée. Cela permet d'enregistrer la date de l'emballage qui restera stocké.
+
+3. **Lors du réapprovisionnement d'un médicament occasionnel** : Après avoir ajouté du stock à un médicament occasionnel, le système propose de mettre à jour la date de péremption pour refléter la date du nouvel emballage acquis.
+
+Dans tous les cas, le champ est optionnel et peut être ignoré. L'utilisateur peut annuler l'opération ou simplement laisser le champ vide.
+
+### Format et Validations
+
+La boîte de dialogue de saisie de date de péremption fournit deux champs séparés :
+- Champ du mois (MM) : accepte des valeurs de 01 à 12
+- Champ de l'année (AAAA) : accepte des valeurs de 2000 à 2100
+
+Le système valide automatiquement que le mois est dans la plage correcte et que l'année est valide. En complétant le mois (2 chiffres), le focus se déplace automatiquement vers le champ de l'année pour accélérer la saisie des données.
+
+La date est stockée au format "MM/AAAA" (exemple : "03/2025") et est interprétée comme le dernier jour de ce mois pour les comparaisons de péremption. Cela signifie qu'un médicament avec la date "03/2025" sera considéré comme périmé à partir du 1er avril 2025.
+
+### Avantages du Système
+
+Cette fonctionnalité aide à :
+- Prévenir l'utilisation de médicaments périmés qui pourraient être inefficaces ou dangereux
+- Gérer efficacement le stock en identifiant les médicaments proches de la péremption
+- Prioriser l'utilisation des médicaments selon leur date de péremption
+- Maintenir une armoire à pharmacie sûre avec un contrôle visuel de l'état de chaque médicament
+- Éviter le gaspillage en rappelant de vérifier les médicaments avant qu'ils ne périment
+
+Le système n'empêche pas l'enregistrement de doses avec des médicaments périmés, mais fournit des avertissements visuels clairs pour que l'utilisateur puisse prendre des décisions éclairées.
+
+---
+
+## 6. Contrôle de Stock (Pilulier)
 
 ### Indicateurs Visuels Intuitifs
 
@@ -131,7 +184,7 @@ Lorsque le stock atteint le seuil configuré, MedicApp affiche des alertes visue
 
 ---
 
-## 6. Armoire à Pharmacie
+## 7. Armoire à Pharmacie
 
 ### Liste Alphabétique Organisée
 
@@ -159,7 +212,7 @@ L'armoire à pharmacie facilite également la gestion des assignations personne-
 
 ---
 
-## 7. Navigation Temporelle
+## 8. Navigation Temporelle
 
 ### Glisser Horizontal par Jours
 
@@ -185,7 +238,7 @@ Cette fonctionnalité est particulièrement précieuse pour vérifier si un méd
 
 ---
 
-## 8. Notifications Intelligentes
+## 9. Notifications Intelligentes
 
 ### Actions Directes depuis la Notification
 
@@ -223,7 +276,7 @@ MedicApp est optimisé pour Android 12 et versions supérieures, nécessitant et
 
 ---
 
-## 9. Alertes de Stock Faible
+## 10. Alertes de Stock Faible
 
 ### Notifications Réactives de Stock Insuffisant
 
@@ -278,7 +331,7 @@ Le système respecte ces configurations individuelles, permettant à chaque méd
 
 ---
 
-## 10. Configuration du Jeûne
+## 11. Configuration du Jeûne
 
 ### Types : Before (Avant) et After (Après)
 
@@ -321,7 +374,7 @@ Cette granularité permet de gérer des régimes complexes où certains médicam
 
 ---
 
-## 11. Historique des Doses
+## 12. Historique des Doses
 
 ### Enregistrement Automatique Complet
 
@@ -365,7 +418,7 @@ Le format des données est relationnel et normalisé, avec des clés étrangère
 
 ---
 
-## 12. Localisation et Internationalisation
+## 13. Localisation et Internationalisation
 
 ### 8 Langues Complètement Supportées
 
@@ -415,7 +468,7 @@ Cette attention au détail linguistique fait que MedicApp se sent naturelle et n
 
 ---
 
-## 13. Interface Accessible et Utilisable
+## 14. Interface Accessible et Utilisable
 
 ### Material Design 3
 

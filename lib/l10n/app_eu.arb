@@ -26,6 +26,7 @@
   "btnClose": "Itxi",
   "btnConfirm": "Baieztatu",
   "btnAccept": "Onartu",
+  "btnSkip": "Saltatu",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pilula",
@@ -1488,5 +1489,46 @@
   },
   "settingsShowPersonTabsTitle": "Ikusi pertsonak fitxa bereizitan",
   "settingsShowPersonTabsSubtitle": "Pertsona bakoitza fitxa bereizi batean erakusten du. Desaktibatuta badago, pertsona guztiak zerrenda bakarrean nahasten dira etikekin",
-  "selectPerson": "Hautatu pertsona"
+  "selectPerson": "Hautatu pertsona",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Kaducitate data",
+  "expirationDateHint": "HH/UUUU (ad: 03/2025)",
+  "expirationDateOptional": "Kaducitate data (hautazkoa)",
+  "expirationDateRequired": "Mesedez, sartu kaducitate data",
+  "expirationDateInvalidFormat": "Baliogabeko formatua. Erabili HH/UUUU (ad: 03/2025)",
+  "expirationDateInvalidMonth": "Hila 01 eta 12 artean egon behar du",
+  "expirationDateInvalidYear": "Urtea baliozkoa egon behar du",
+  "expirationDateExpired": "Botika hau kaducitua dago",
+  "expirationDateExpiredOn": "Kaducitua {date}ean",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Kaducitate data hurbila",
+  "expirationDateExpiresOn": "Kaduzitzen {date}ean",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Kaduzitzen {days} egunean",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Botika hau kaducitua dago. Mesedez, egiaztatu bere kaducitate data erabili aurretik.",
+  "expirationDateNearExpirationWarning": "Botika hau kaducitate data hurbila du. Kontuan hartu ordezkaritza.",
+  "expirationDateDialogTitle": "Botikoaren kaducitate data",
+  "expirationDateDialogMessage": "Sartu botikoaren kaducitate data (enbalajean dago).",
+  "expirationDateUpdateTitle": "Eguneratu kaducitate data",
+  "expirationDateUpdateMessage": "Botkia kargatu duzu. Kaducitate data eguneratu nahi duzu?"
 }

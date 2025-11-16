@@ -26,6 +26,7 @@
   "btnClose": "Pechar",
   "btnConfirm": "Confirmar",
   "btnAccept": "Aceptar",
+  "btnSkip": "Omitir",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pastilla",
@@ -1488,5 +1489,46 @@
   },
   "settingsShowPersonTabsTitle": "Ver persoas separadas por pestanas",
   "settingsShowPersonTabsSubtitle": "Mostra cada persoa nunha pestana separada. Se se desactiva, todas as persoas mestúranse nunha soa lista con etiquetas",
-  "selectPerson": "Seleccionar persoa"
+  "selectPerson": "Seleccionar persoa",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Data de caducidade",
+  "expirationDateHint": "MM/AAAA (ex: 03/2025)",
+  "expirationDateOptional": "Data de caducidade (opcional)",
+  "expirationDateRequired": "Por favor, introduce a data de caducidade",
+  "expirationDateInvalidFormat": "Formato inválido. Usa MM/AAAA (ex: 03/2025)",
+  "expirationDateInvalidMonth": "O mes debe estar entre 01 e 12",
+  "expirationDateInvalidYear": "O ano debe ser válido",
+  "expirationDateExpired": "Este medicamento caducou",
+  "expirationDateExpiredOn": "Caducou en {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Caduca pronto",
+  "expirationDateExpiresOn": "Caduca en {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Caduca en {days} días",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Este medicamento caducou. Por favor, verifica a súa data de caducidade antes de usalo.",
+  "expirationDateNearExpirationWarning": "Este medicamento caduca pronto. Considera reemplazalo.",
+  "expirationDateDialogTitle": "Data de caducidade do medicamento",
+  "expirationDateDialogMessage": "Introduce a data de caducidade do medicamento (atópase no envase).",
+  "expirationDateUpdateTitle": "Actualizar data de caducidade",
+  "expirationDateUpdateMessage": "Recargaches o medicamento. Desexas actualizar a data de caducidade?"
 }

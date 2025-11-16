@@ -9,6 +9,7 @@ import 'medication_quantity/widgets/stock_input_card.dart';
 import 'medication_quantity/widgets/medication_summary_card.dart';
 import '../widgets/action_buttons.dart';
 import '../utils/number_utils.dart';
+import 'medication_list/dialogs/expiration_date_dialog.dart';
 
 /// Pantalla 7: Cantidad de medicamentos (última pantalla del flujo)
 class MedicationQuantityScreen extends StatefulWidget {
@@ -95,6 +96,24 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
       _isSaving = true;
     });
 
+    // For as-needed medications, ask for expiration date as the final step
+    String? expirationDate;
+    if (widget.durationType == TreatmentDurationType.asNeeded && mounted) {
+      expirationDate = await ExpirationDateDialog.show(
+        context,
+        currentExpirationDate: _existingMedication?.expirationDate,
+        isOptional: true,
+      );
+
+      // User cancelled the dialog
+      if (expirationDate == null) {
+        setState(() {
+          _isSaving = false;
+        });
+        return;
+      }
+    }
+
     // Create medication object with schedule data
     // Note: If medication already exists, we reuse its ID and update stock
     final newMedication = Medication(
@@ -115,6 +134,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
       fastingType: widget.fastingType,
       fastingDurationMinutes: widget.fastingDurationMinutes,
       notifyFasting: widget.notifyFasting,
+      expirationDate: expirationDate?.isNotEmpty == true ? expirationDate : null,
     );
 
     // Don't save to database here - let the ViewModel handle it with createMedicationForPerson
