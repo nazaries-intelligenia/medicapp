@@ -419,6 +419,152 @@ void main() {
     });
   });
 
+  group('DoseActionService - calculateDailyConsumption', () {
+    test('should return zero for medication with no doses today', () async {
+      final medication = MedicationBuilder()
+          .withId('med-calc-1')
+          .withAsNeeded()
+          .withStock(10.0)
+          .build();
+
+      await insertMedicationWithPerson(medication);
+
+      final consumption = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+      );
+
+      expect(consumption, 0.0);
+    });
+
+    test('should sum all taken doses for today', () async {
+      final medication = MedicationBuilder()
+          .withId('med-calc-2')
+          .withAsNeeded()
+          .withStock(20.0)
+          .build();
+
+      await insertMedicationWithPerson(medication);
+
+      // Register multiple doses (use returned medication for accurate stock)
+      final med1 = await DoseActionService.registerManualDose(
+        medication: medication,
+        quantity: 1.5,
+      );
+
+      final med2 = await DoseActionService.registerManualDose(
+        medication: med1,
+        quantity: 2.0,
+      );
+
+      await DoseActionService.registerManualDose(
+        medication: med2,
+        quantity: 0.5,
+      );
+
+      final consumption = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+      );
+
+      expect(consumption, 4.0); // 1.5 + 2.0 + 0.5
+    });
+
+    test('should only count taken doses, not skipped ones', () async {
+      final medication = MedicationBuilder()
+          .withId('med-calc-3')
+          .withMultipleDoses(['08:00', '14:00', '20:00'], 1.0)
+          .withStock(10.0)
+          .build();
+
+      await insertMedicationWithPerson(medication);
+
+      // Register one taken and one skipped
+      await DoseActionService.registerTakenDose(
+        medication: medication,
+        doseTime: '08:00',
+      );
+
+      final med2 = medication.copyWith(
+        stockQuantity: medication.stockQuantity - 1.0,
+        takenDosesToday: ['08:00'],
+      );
+
+      await DoseActionService.registerSkippedDose(
+        medication: med2,
+        doseTime: '14:00',
+      );
+
+      final consumption = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+      );
+
+      expect(consumption, 1.0); // Only the taken dose
+    });
+
+    test('should return consumption for specific past date', () async {
+      final medication = MedicationBuilder()
+          .withId('med-calc-4')
+          .withAsNeeded()
+          .withStock(20.0)
+          .build();
+
+      await insertMedicationWithPerson(medication);
+
+      // Register a dose today
+      await DoseActionService.registerManualDose(
+        medication: medication,
+        quantity: 3.0,
+      );
+
+      // Calculate for yesterday (should be 0)
+      final yesterday = DateTime.now().subtract(const Duration(days: 1));
+      final consumptionYesterday = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+        date: yesterday,
+      );
+
+      expect(consumptionYesterday, 0.0);
+
+      // Calculate for today (should be 3.0)
+      final consumptionToday = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+      );
+
+      expect(consumptionToday, 3.0);
+    });
+
+    test('should handle fractional doses correctly', () async {
+      final medication = MedicationBuilder()
+          .withId('med-calc-5')
+          .withAsNeeded()
+          .withStock(10.0)
+          .build();
+
+      await insertMedicationWithPerson(medication);
+
+      // Register fractional doses (use returned medication for accurate stock)
+      final med1 = await DoseActionService.registerManualDose(
+        medication: medication,
+        quantity: 0.25,
+      );
+
+      final med2 = await DoseActionService.registerManualDose(
+        medication: med1,
+        quantity: 0.5,
+      );
+
+      await DoseActionService.registerManualDose(
+        medication: med2,
+        quantity: 0.75,
+      );
+
+      final consumption = await DoseActionService.calculateDailyConsumption(
+        medicationId: medication.id,
+      );
+
+      expect(consumption, 1.5); // 0.25 + 0.5 + 0.75
+    });
+  });
+
   group('InsufficientStockException', () {
     test('should contain all required information', () {
       final exception = InsufficientStockException(

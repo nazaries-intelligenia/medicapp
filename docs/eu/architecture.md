@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Automatikoki kudeatzen du `Medication` eguneraketa sarrera gaurko bada
 - Stocka berreskuratzen du hartze bat ezabatzen bada
 
+### DoseActionService
+
+Dosien erregistrorako logika zentralizatzen du, UI osagaien arteko kode bikoizketa saihesteko.
+
+```dart
+class DoseActionService {
+  // Programatutako dosien erregistroa
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Eskuzko dosien erregistroa
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Eguneko kontsumoaren kalkulua
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Erantzukizunak:**
+- Dosia erregistratu aurretik stock nahikoa balioztatu
+- Harturiko/omititutako dosien eguneko egoera eguneratu
+- Stocka automatikoki deskontatzen du
+- Dosien historian sarrerak sortu
+- Jakinarazpen erlazionatuak kudeatu (ezeztatu, berprogramatu, baraualdia)
+- "Behar den arabera" sendagaientzat eguneko kontsumoa kalkulatu
+
+**`calculateDailyConsumption` metodoa:**
+Eguneko kontsumoaren kalkulua zentralizatzeko gehitua, "behar den arabera" sendagaientzat batez ere erabilgarria. Egun espezifiko batean harturiko dosi guztiak biltzen ditu, omititutako dosiak baztertuz. Balio hau `lastDailyConsumption` eguneratzeko eta geratzen diren stock egunak aurreikusteko erabiltzen da.
+
+**Salbuespenak:**
+- `InsufficientStockException`: Dosia osatzeko stock nahikorik ez dagoenean jaurtitzen da
+
 ### DoseCalculationService
 
 Hurrengo dosiak kalkulatzeko negozio logika:
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Hurrengo dosia maiztasunaren arabera detektatu
 - Lokalizatutako mezuak formateatu ("Gaur 18:00etan", "Bihar 08:00etan")
 - Tratamenduaren hasiera/amaiera datak errespetatu
+
+### MedicationUpdateService
+
+Sendagaien eguneraketa eragiketa ohikoak zentralizatzen ditu, kode bikoizketa saihesteko eta portaera koherentea bermatzeko.
+
+```dart
+class MedicationUpdateService {
+  // Stockaren berritzea
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Etendako egoeraren kudeaketa
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Erantzukizunak:**
+- **refillMedication**: Stocka eguneratu eta `lastRefillAmount` gorde etorkizuneko erreferentziarako
+- **resumeMedication**: Etendako sendagaia aktibatu eta jakinarazpenak berprogramatu esleitutako pertsona guztientzat
+- **suspendMedication**: Sendagaia desaktibatu eta programatutako jakinarazpen guztiak ezeztatu
+
+**Zentralizazioaren abantailak:**
+- `copyWith`-ekin eskuzko `Medication` objektuen sorkuntza errepikakorra ezabatzen du
+- `person_medications` taula (V19+) behar bezala kudeatzen du, non `isSuspended` kokatuta dagoen
+- Egoera aldatzean jakinarazpenak automatikoki koordinatzen ditu
+- UI osagaietako kodea murrizten du 493 lerrotik 419ra (adibidez: `MedicationCard`)
+
+**V19+ arkitektura oharra:**
+`resumeMedication` eta `suspendMedication` metodoak `person_medications` taula eguneratzen dute esleitutako pertsona bakoitzarentzat, `isSuspended` pertsona-sendagai erlazioaren eremu espezifikoa baita, ez sendagai partekatuaren propietatea.
 
 ### FastingConflictService
 

@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Automatically handles `Medication` update if entry is from today
 - Restores stock if a dose is deleted
 
+### DoseActionService
+
+Centralizes dose registration logic to avoid code duplication across UI components.
+
+```dart
+class DoseActionService {
+  // Scheduled dose registration
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Manual dose registration
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Daily consumption calculation
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsibilities:**
+- Validate sufficient stock before registering doses
+- Update daily taken/skipped dose status
+- Automatically deduct stock
+- Create entries in dose history
+- Manage related notifications (cancel, reschedule, fasting)
+- Calculate total daily consumption for "as-needed" medications
+
+**`calculateDailyConsumption` method:**
+Added to centralize daily consumption calculation, especially useful for "as-needed" medications. Sums all doses taken on a specific day, excluding skipped doses. This value is used to update `lastDailyConsumption` and predict remaining stock days.
+
+**Exceptions:**
+- `InsufficientStockException`: Thrown when there is insufficient stock to complete a dose
+
 ### DoseCalculationService
 
 Business logic for calculating next doses.
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Detects next dose according to frequency
 - Formats localized messages ("Today at 6:00 PM", "Tomorrow at 8:00 AM")
 - Respects treatment start/end dates
+
+### MedicationUpdateService
+
+Centralizes common medication update operations to avoid code duplication and ensure consistent behavior.
+
+```dart
+class MedicationUpdateService {
+  // Stock refill
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Suspended state management
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsibilities:**
+- **refillMedication**: Updates stock and saves `lastRefillAmount` for future reference
+- **resumeMedication**: Activates suspended medication and reschedules notifications for all assigned persons
+- **suspendMedication**: Deactivates medication and cancels all scheduled notifications
+
+**Advantages of centralization:**
+- Eliminates repetitive manual creation of `Medication` objects with `copyWith`
+- Correctly handles `person_medications` table (V19+) where `isSuspended` resides
+- Automatically coordinates notifications when changing state
+- Reduces UI component code from 493 to 419 lines (e.g., `MedicationCard`)
+
+**V19+ architectural note:**
+The `resumeMedication` and `suspendMedication` methods update the `person_medications` table for each assigned person, since `isSuspended` is a field specific to the person-medication relationship, not the shared medication.
 
 ### FastingConflictService
 

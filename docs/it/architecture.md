@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Gestisce automaticamente l'aggiornamento di `Medication` se la voce è di oggi
 - Ripristina la scorta se si elimina un'assunzione
 
+### DoseActionService
+
+Centralizza la logica di registrazione dosi per evitare duplicazione di codice tra componenti UI.
+
+```dart
+class DoseActionService {
+  // Registrazione dosi programmate
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Registrazione dosi manuali
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Calcolo consumo giornaliero
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsabilità:**
+- Validare scorta sufficiente prima di registrare dosi
+- Aggiornare stato di dosi assunte/omesse per giorno
+- Scontare automaticamente scorta
+- Creare voci nella cronologia di dosi
+- Gestire notifiche correlate (cancellare, riprogrammare, digiuno)
+- Calcolare consumo giornaliero totale per farmaci "secondo necessità"
+
+**Metodo `calculateDailyConsumption`:**
+Aggiunto per centralizzare il calcolo del consumo giornaliero, particolarmente utile per farmaci "secondo necessità". Somma tutte le dosi assunte in un giorno specifico, escludendo dosi omesse. Questo valore viene utilizzato per aggiornare `lastDailyConsumption` e predire i giorni di scorta rimanenti.
+
+**Eccezioni:**
+- `InsufficientStockException`: Si lancia quando non c'è scorta sufficiente per completare una dose
+
 ### DoseCalculationService
 
 Logica di business per calcolare prossime dosi.
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Rileva prossima dose secondo frequenza
 - Formatta messaggi localizzati ("Oggi alle 18:00", "Domani alle 08:00")
 - Rispetta date di inizio/fine trattamento
+
+### MedicationUpdateService
+
+Centralizza operazioni comuni di aggiornamento farmaci per evitare duplicazione di codice e assicurare comportamento consistente.
+
+```dart
+class MedicationUpdateService {
+  // Ricarica scorta
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Gestione stato suspended
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsabilità:**
+- **refillMedication**: Aggiorna scorta e salva `lastRefillAmount` per riferimento futuro
+- **resumeMedication**: Attiva farmaco sospeso e riprogramma notifiche per tutte le persone assegnate
+- **suspendMedication**: Disattiva farmaco e cancella tutte le notifiche programmate
+
+**Vantaggi della centralizzazione:**
+- Elimina creazione manuale ripetitiva di oggetti `Medication` con `copyWith`
+- Gestisce correttamente la tabella `person_medications` (V19+) dove risiede `isSuspended`
+- Coordina automaticamente notifiche al cambiare stato
+- Riduce codice nei componenti UI da 493 a 419 linee (es: `MedicationCard`)
+
+**Nota architettonica V19+:**
+I metodi `resumeMedication` e `suspendMedication` aggiornano la tabella `person_medications` per ogni persona assegnata, poiché `isSuspended` è un campo specifico della relazione persona-farmaco, non del farmaco condiviso.
 
 ### FastingConflictService
 

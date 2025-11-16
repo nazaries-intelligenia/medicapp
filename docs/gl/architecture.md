@@ -426,6 +426,57 @@ class DoseCalculationService {
 - Formatea mensaxes localizadas ("Hoxe ás 18:00", "Mañá ás 08:00")
 - Respecta datas de inicio/fin de tratamento
 
+### DoseActionService
+
+Centraliza a lóxica de rexistro de doses para evitar duplicación de código entre compoñentes UI.
+
+```dart
+class DoseActionService {
+  // Rexistro de doses programadas
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Rexistro de doses manuais
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Cálculo de consumo diario
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsabilidades:**
+- Validar stock suficiente antes de rexistrar doses
+- Actualizar estado de doses tomadas/omitidas por día
+- Descontar stock automaticamente
+- Crear entradas en historial de doses
+- Xestionar notificacións relacionadas (cancelar, reprogramar, xaxún)
+- Calcular consumo diario total para medicamentos "segundo necesidade"
+
+**Método `calculateDailyConsumption`:**
+Engadido para centralizar o cálculo de consumo diario, especialmente útil para medicamentos "segundo necesidade". Suma todas as doses tomadas nun día específico, excluíndo doses omitidas. Este valor úsase para actualizar `lastDailyConsumption` e predecir días de stock restantes.
+
+**Excepcións:**
+- `InsufficientStockException`: Lánzase cando non hai stock suficiente para completar unha dose
+
 ### FastingConflictService
 
 Xestión de conflitos entre períodos de xaxún de diferentes medicamentos.
@@ -561,6 +612,43 @@ AndroidNotificationDetails(
 - Protección absoluta no momento crítico (reactivo)
 - Planificación anticipada para evitar chegar ao momento crítico (proactivo)
 - O sistema proactivo é opt-in (debe chamarse explícitamente desde lóxica de app)
+
+### MedicationUpdateService
+
+Centraliza operacións comúns de actualización de medicamentos para evitar duplicación de código e asegurar comportamento consistente.
+
+```dart
+class MedicationUpdateService {
+  // Reabastecemento de stock
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Xestión de estado suspended
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsabilidades:**
+- **refillMedication**: Actualiza stock e garda `lastRefillAmount` para referencia futura
+- **resumeMedication**: Activa medicamento suspendido e reprograma notificacións para todas as persoas asignadas
+- **suspendMedication**: Desactiva medicamento e cancela todas as notificacións programadas
+
+**Vantaxes de centralización:**
+- Elimina creación manual repetitiva de obxectos `Medication` con `copyWith`
+- Manexa correctamente a táboa `person_medications` (V19+) onde reside `isSuspended`
+- Coordina automaticamente notificacións ao cambiar estado
+- Reduce código en compoñentes UI de 493 a 419 liñas (ex: `MedicationCard`)
+
+**Nota arquitectónica V19+:**
+Os métodos `resumeMedication` e `suspendMedication` actualizan a táboa `person_medications` para cada persoa asignada, xa que `isSuspended` é un campo específico da relación persoa-medicamento, non do medicamento compartido.
 
 ---
 

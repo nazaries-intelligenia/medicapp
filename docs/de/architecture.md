@@ -44,9 +44,13 @@ Die Entscheidung gegen komplexes State-Management basiert auf:
 ┌─────────────────────────────────────────────────────────┐
 │                  Service Layer                          │
 │  ┌────────────┐  ┌────────────┐  ┌────────────────┐   │
-│  │Notification│  │DoseHistory │  │DoseCalculation │   │
+│  │Notification│  │DoseHistory │  │  DoseAction    │   │
 │  │  Service   │  │  Service   │  │    Service     │   │
 │  └────────────┘  └────────────┘  └────────────────┘   │
+│  ┌────────────┐  ┌────────────┐                        │
+│  │Medication  │  │DoseCalcula │                        │
+│  │Update Serv.│  │tion Service│                        │
+│  └────────────┘  └────────────┘                        │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -411,6 +415,57 @@ class DoseHistoryService {
 - Verwaltet automatisch Aktualisierung von `Medication` wenn Eintrag von heute ist
 - Stellt Bestand wieder her wenn eine Einnahme gelöscht wird
 
+### DoseActionService
+
+Zentralisiert die Logik der Dosisregistrierung, um Code-Duplikation zwischen UI-Komponenten zu vermeiden.
+
+```dart
+class DoseActionService {
+  // Registrierung geplanter Dosen
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Registrierung manueller Dosen
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Berechnung des täglichen Verbrauchs
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Verantwortlichkeiten:**
+- Validiert ausreichenden Bestand vor Dosisregistrierung
+- Aktualisiert Status der eingenommenen/ausgelassenen Dosen pro Tag
+- Reduziert Bestand automatisch
+- Erstellt Einträge in der Dosishistorie
+- Verwaltet zugehörige Benachrichtigungen (Stornieren, Umplanen, Fasten)
+- Berechnet täglichen Gesamtverbrauch für "nach Bedarf"-Medikamente
+
+**Methode `calculateDailyConsumption`:**
+Hinzugefügt zur Zentralisierung der Berechnung des täglichen Verbrauchs, besonders nützlich für "nach Bedarf"-Medikamente. Summiert alle an einem bestimmten Tag eingenommenen Dosen, unter Ausschluss ausgelassener Dosen. Dieser Wert wird verwendet, um `lastDailyConsumption` zu aktualisieren und die verbleibenden Bestandstage vorherzusagen.
+
+**Ausnahmen:**
+- `InsufficientStockException`: Wird ausgelöst, wenn nicht genügend Bestand vorhanden ist, um eine Dosis zu erfüllen
+
 ### DoseCalculationService
 
 Geschäftslogik zur Berechnung nächster Dosen.
@@ -426,6 +481,43 @@ class DoseCalculationService {
 - Erkennt nächste Dosis entsprechend Frequenz
 - Formatiert lokalisierte Nachrichten ("Heute um 18:00", "Morgen um 08:00")
 - Respektiert Start-/Enddaten der Behandlung
+
+### MedicationUpdateService
+
+Zentralisiert allgemeine Medikamentenaktualisierungsoperationen, um Code-Duplikation zu vermeiden und konsistentes Verhalten sicherzustellen.
+
+```dart
+class MedicationUpdateService {
+  // Bestandsauffüllung
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Verwaltung des suspended-Status
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Verantwortlichkeiten:**
+- **refillMedication**: Aktualisiert Bestand und speichert `lastRefillAmount` für zukünftige Referenz
+- **resumeMedication**: Aktiviert ausgesetztes Medikament und plant Benachrichtigungen für alle zugewiesenen Personen neu
+- **suspendMedication**: Deaktiviert Medikament und storniert alle geplanten Benachrichtigungen
+
+**Vorteile der Zentralisierung:**
+- Eliminiert repetitive manuelle Erstellung von `Medication`-Objekten mit `copyWith`
+- Handhabt korrekt die `person_medications`-Tabelle (V19+), wo `isSuspended` gespeichert ist
+- Koordiniert automatisch Benachrichtigungen bei Statusänderung
+- Reduziert Code in UI-Komponenten von 493 auf 419 Zeilen (z.B.: `MedicationCard`)
+
+**Architektonischer Hinweis V19+:**
+Die Methoden `resumeMedication` und `suspendMedication` aktualisieren die `person_medications`-Tabelle für jede zugewiesene Person, da `isSuspended` ein spezifisches Feld der Person-Medikament-Beziehung ist, nicht des geteilten Medikaments.
 
 ### FastingConflictService
 
