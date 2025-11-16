@@ -15,11 +15,13 @@ import 'edit_medication_menu/widgets/edit_menu_option.dart';
 class EditMedicationMenuScreen extends StatelessWidget {
   final Medication medication;
   final List<Medication> existingMedications;
+  final String? personId; // Person context for validation
 
   const EditMedicationMenuScreen({
     super.key,
     required this.medication,
     required this.existingMedications,
+    this.personId,
   });
 
   @override
@@ -133,6 +135,8 @@ class EditMedicationMenuScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (context) => EditScheduleScreen(
                         medication: medication,
+                        allMedications: existingMedications,
+                        personId: personId,
                       ),
                     ),
                   );

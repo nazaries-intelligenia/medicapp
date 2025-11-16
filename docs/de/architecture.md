@@ -44,9 +44,13 @@ Die Entscheidung gegen komplexes State-Management basiert auf:
 ┌─────────────────────────────────────────────────────────┐
 │                  Service Layer                          │
 │  ┌────────────┐  ┌────────────┐  ┌────────────────┐   │
-│  │Notification│  │DoseHistory │  │DoseCalculation │   │
+│  │Notification│  │DoseHistory │  │  DoseAction    │   │
 │  │  Service   │  │  Service   │  │    Service     │   │
 │  └────────────┘  └────────────┘  └────────────────┘   │
+│  ┌────────────┐  ┌────────────┐                        │
+│  │Medication  │  │DoseCalcula │                        │
+│  │Update Serv.│  │tion Service│                        │
+│  └────────────┘  └────────────┘                        │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -411,6 +415,57 @@ class DoseHistoryService {
 - Verwaltet automatisch Aktualisierung von `Medication` wenn Eintrag von heute ist
 - Stellt Bestand wieder her wenn eine Einnahme gelöscht wird
 
+### DoseActionService
+
+Zentralisiert die Logik der Dosisregistrierung, um Code-Duplikation zwischen UI-Komponenten zu vermeiden.
+
+```dart
+class DoseActionService {
+  // Registrierung geplanter Dosen
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Registrierung manueller Dosen
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Berechnung des täglichen Verbrauchs
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Verantwortlichkeiten:**
+- Validiert ausreichenden Bestand vor Dosisregistrierung
+- Aktualisiert Status der eingenommenen/ausgelassenen Dosen pro Tag
+- Reduziert Bestand automatisch
+- Erstellt Einträge in der Dosishistorie
+- Verwaltet zugehörige Benachrichtigungen (Stornieren, Umplanen, Fasten)
+- Berechnet täglichen Gesamtverbrauch für "nach Bedarf"-Medikamente
+
+**Methode `calculateDailyConsumption`:**
+Hinzugefügt zur Zentralisierung der Berechnung des täglichen Verbrauchs, besonders nützlich für "nach Bedarf"-Medikamente. Summiert alle an einem bestimmten Tag eingenommenen Dosen, unter Ausschluss ausgelassener Dosen. Dieser Wert wird verwendet, um `lastDailyConsumption` zu aktualisieren und die verbleibenden Bestandstage vorherzusagen.
+
+**Ausnahmen:**
+- `InsufficientStockException`: Wird ausgelöst, wenn nicht genügend Bestand vorhanden ist, um eine Dosis zu erfüllen
+
 ### DoseCalculationService
 
 Geschäftslogik zur Berechnung nächster Dosen.
@@ -426,6 +481,43 @@ class DoseCalculationService {
 - Erkennt nächste Dosis entsprechend Frequenz
 - Formatiert lokalisierte Nachrichten ("Heute um 18:00", "Morgen um 08:00")
 - Respektiert Start-/Enddaten der Behandlung
+
+### MedicationUpdateService
+
+Zentralisiert allgemeine Medikamentenaktualisierungsoperationen, um Code-Duplikation zu vermeiden und konsistentes Verhalten sicherzustellen.
+
+```dart
+class MedicationUpdateService {
+  // Bestandsauffüllung
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Verwaltung des suspended-Status
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Verantwortlichkeiten:**
+- **refillMedication**: Aktualisiert Bestand und speichert `lastRefillAmount` für zukünftige Referenz
+- **resumeMedication**: Aktiviert ausgesetztes Medikament und plant Benachrichtigungen für alle zugewiesenen Personen neu
+- **suspendMedication**: Deaktiviert Medikament und storniert alle geplanten Benachrichtigungen
+
+**Vorteile der Zentralisierung:**
+- Eliminiert repetitive manuelle Erstellung von `Medication`-Objekten mit `copyWith`
+- Handhabt korrekt die `person_medications`-Tabelle (V19+), wo `isSuspended` gespeichert ist
+- Koordiniert automatisch Benachrichtigungen bei Statusänderung
+- Reduziert Code in UI-Komponenten von 493 auf 419 Zeilen (z.B.: `MedicationCard`)
+
+**Architektonischer Hinweis V19+:**
+Die Methoden `resumeMedication` und `suspendMedication` aktualisieren die `person_medications`-Tabelle für jede zugewiesene Person, da `isSuspended` ein spezifisches Feld der Person-Medikament-Beziehung ist, nicht des geteilten Medikaments.
 
 ### FastingConflictService
 
@@ -455,8 +547,116 @@ class FastingConflictService {
 - Beim Hinzufügen einer neuen Dosiszeit in `DoseScheduleEditor`
 - Beim Erstellen oder Bearbeiten eines Medikaments in `EditScheduleScreen`
 - Verhindert Konflikte, die die Wirksamkeit der Behandlung beeinträchtigen könnten
+- Aktiviert in V19+ nach Refaktorierung von `EditScheduleScreen` zum Empfang von `allMedications` und `personId` als Parameter
 
-**Hinweis:** Derzeit ist die Fastenvalidierung in `EditScheduleScreen` deaktiviert, um Timer-Probleme in Tests zu vermeiden, aber die Infrastruktur ist bereit, bei Bedarf aktiviert zu werden.
+### System für Benachrichtigungen bei niedrigem Bestand
+
+MedicApp implementiert ein duales Bestandswarnsystem, das reaktive Benachrichtigungen (zum kritischen Zeitpunkt) und proaktive Benachrichtigungen (vorausschauend) kombiniert.
+
+#### Reaktive Benachrichtigungen (Immediate Stock Check)
+
+Das System überprüft automatisch den verfügbaren Bestand jedes Mal, wenn ein Benutzer versucht, eine Dosis zu registrieren, sei es von:
+- Dem Hauptbildschirm aus, indem eine Dosis als "eingenommen" markiert wird
+- Schnellaktionen von Benachrichtigungen ("Registrieren"-Button)
+- Manueller Registrierung von gelegentlichen Dosen
+
+**Implementierung in NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Reaktiver Ablauf:**
+1. Benutzer versucht, eine Dosis zu registrieren
+2. System prüft: `medication.stockQuantity < doseQuantity`
+3. Falls unzureichend:
+   - Zeigt sofortige Benachrichtigung mit hoher Priorität
+   - Erlaubt die Registrierung der Dosis NICHT
+   - Gibt erforderliche vs. verfügbare Menge an
+   - Leitet Benutzer zur Bestandsauffüllung
+
+**Benachrichtigungs-ID-Bereich:** 7,000,000 - 7,999,999 (generiert durch `NotificationIdGenerator.generateLowStockId()`)
+
+#### Proaktive Benachrichtigungen (Daily Stock Monitoring)
+
+Das System kann proaktive tägliche Überprüfungen durchführen, die Versorgungsengpässe vorhersehen, bevor sie auftreten.
+
+**Hauptmethode:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Proaktiver Ablauf:**
+1. Wird maximal einmal täglich ausgeführt (verwendet SharedPreferences für Tracking)
+2. Iteriert über alle registrierten Personen
+3. Für jedes aktive Medikament:
+   - Berechnet tägliche Gesamtdosis unter Berücksichtigung von:
+     - Allen dem Medikament zugewiesenen Personen
+     - Behandlungsfrequenz (täglich, wöchentlich, Intervall)
+     - Konfigurierte Zeitpläne pro Person
+   - Teilt aktuellen Bestand durch tägliche Dosis
+   - Erhält verbleibende Versorgungstage
+4. Falls `medication.isStockLow` (verwendet konfigurierbaren Schwellenwert pro Medikament):
+   - Sendet proaktive Benachrichtigung
+   - Enthält ungefähre verbleibende Tage
+   - Blockiert keine Aktion
+
+**Spam-Prävention:**
+- Zeichnet letztes Überprüfungsdatum in `SharedPreferences` auf
+- Führt nur aus, wenn `lastCheck != today`
+- Jedes Medikament benachrichtigt nur einmal täglich
+- Wird beim Auffüllen des Bestands zurückgesetzt
+
+**Integration mit Medication.isStockLow:**
+Die Berechnung des niedrigen Bestands verwendet die vorhandene Eigenschaft des Modells:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Konfiguration der Benachrichtigungskanäle
+
+Bestandsbenachrichtigungen verwenden einen dedizierten Kanal:
+
+```dart
+// In NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Bestandswarnungen',
+  channelDescription: 'Benachrichtigungen bei niedrigem Medikamentenbestand',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Eigenschaften:**
+- Separater Kanal von Dosiserinnerungen
+- Hohe Priorität (nicht maximal, um nicht aufdringlich zu sein)
+- Automatische Stornierung beim Antippen
+- Keine integrierten Aktionen (nur informativ)
+
+#### Wann welchen Typ verwenden
+
+| Typ | Zeitpunkt | Zweck | Blockierend |
+|-----|-----------|-------|-------------|
+| **Reaktiv** | Beim Versuch, Dosis zu registrieren | Registrierung mit unzureichendem Bestand verhindern | ✅ Ja |
+| **Proaktiv** | Tägliche Überprüfung (optional) | Notwendige Auffüllung vorhersehen | ❌ Nein |
+
+**Vorteil des dualen Designs:**
+- Absoluter Schutz zum kritischen Zeitpunkt (reaktiv)
+- Vorausschauende Planung zur Vermeidung des kritischen Zeitpunkts (proaktiv)
 
 ---
 

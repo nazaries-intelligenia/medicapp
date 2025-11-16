@@ -107,7 +107,60 @@ Cada acción de registro genera automáticamente una entrada completa en el hist
 
 ---
 
-## 5. Control de Stock (Pastillero)
+## 5. Gestión de Fechas de Caducidad
+
+### Control de Caducidad de Medicamentos
+
+MedicApp permite registrar y monitorizar las fechas de caducidad de los medicamentos para garantizar la seguridad del tratamiento. Esta funcionalidad es especialmente importante para medicamentos ocasionales y suspendidos que permanecen almacenados durante períodos prolongados.
+
+El sistema utiliza un formato simplificado MM/AAAA (mes/año) que coincide con el formato estándar impreso en los envases de medicamentos. Esto facilita la introducción de datos sin necesidad de conocer el día exacto de caducidad.
+
+### Detección Automática de Estado
+
+MedicApp evalúa automáticamente el estado de caducidad de cada medicamento:
+
+- **Caducado**: El medicamento ha superado su fecha de caducidad y se muestra con una etiqueta roja de advertencia con icono de alerta.
+- **Próximo a caducar**: Faltan 30 días o menos para la caducidad, se muestra con una etiqueta naranja de precaución con icono de reloj.
+- **En buen estado**: Más de 30 días hasta la caducidad, no se muestra advertencia especial.
+
+Las alertas visuales aparecen directamente en la tarjeta del medicamento en el botiquín, junto al estado de suspensión si aplica, permitiendo identificar rápidamente medicamentos que requieren atención.
+
+### Registro de Fecha de Caducidad
+
+El sistema solicita la fecha de caducidad en tres momentos específicos:
+
+1. **Al crear medicamento ocasional**: Como último paso del proceso de creación (paso 2/2), se muestra un diálogo opcional para ingresar la fecha de caducidad antes de guardar el medicamento.
+
+2. **Al suspender medicamento**: Cuando se suspende cualquier medicamento para todos los usuarios que lo comparten, se solicita la fecha de caducidad. Esto permite registrar la fecha del envase que quedará almacenado.
+
+3. **Al recargar medicamento ocasional**: Después de añadir stock a un medicamento ocasional, se ofrece actualizar la fecha de caducidad para reflejar la fecha del nuevo envase adquirido.
+
+En todos los casos, el campo es opcional y se puede omitir. El usuario puede cancelar la operación o simplemente dejar el campo vacío.
+
+### Formato y Validaciones
+
+El diálogo de entrada de fecha de caducidad proporciona dos campos separados:
+- Campo de mes (MM): acepta valores de 01 a 12
+- Campo de año (AAAA): acepta valores de 2000 a 2100
+
+El sistema valida automáticamente que el mes esté en el rango correcto y que el año sea válido. Al completar el mes (2 dígitos), el foco se mueve automáticamente al campo de año para agilizar la entrada de datos.
+
+La fecha se almacena en formato "MM/AAAA" (ejemplo: "03/2025") y se interpreta como el último día de ese mes para las comparaciones de caducidad. Esto significa que un medicamento con fecha "03/2025" se considerará caducado a partir del 1 de abril de 2025.
+
+### Beneficios del Sistema
+
+Esta funcionalidad ayuda a:
+- Prevenir el uso de medicamentos caducados que podrían ser inefectivos o peligrosos
+- Gestionar eficientemente el stock identificando medicamentos próximos a caducar
+- Priorizar el uso de medicamentos según su fecha de caducidad
+- Mantener un botiquín seguro con control visual del estado de cada medicamento
+- Evitar desperdicios recordando revisar medicamentos antes de que caduquen
+
+El sistema no impide el registro de dosis con medicamentos caducados, pero sí proporciona advertencias visuales claras para que el usuario tome decisiones informadas.
+
+---
+
+## 6. Control de Stock (Pastillero)
 
 ### Indicadores Visuales Intuitivos
 
@@ -131,7 +184,7 @@ Cuando el stock alcanza el umbral configurado, MedicApp muestra alertas visuales
 
 ---
 
-## 6. Botiquín
+## 7. Botiquín
 
 ### Lista Alfabética Organizada
 
@@ -159,7 +212,7 @@ El botiquín también facilita la gestión de asignaciones persona-medicamento. 
 
 ---
 
-## 7. Navegación Temporal
+## 8. Navegación Temporal
 
 ### Deslizar Horizontal por Días
 
@@ -185,7 +238,7 @@ Esta funcionalidad es especialmente valiosa para verificar si se tomó un medica
 
 ---
 
-## 8. Notificaciones Inteligentes
+## 9. Notificaciones Inteligentes
 
 ### Acciones Directas desde Notificación
 
@@ -223,7 +276,62 @@ MedicApp está optimizado para Android 12 y versiones superiores, requiriendo y 
 
 ---
 
-## 9. Configuración de Ayuno
+## 10. Alertas de Stock Bajo
+
+### Notificaciones Reactivas de Stock Insuficiente
+
+MedicApp implementa un sistema inteligente de alertas de stock que protege al usuario de quedarse sin medicación en momentos críticos. Cuando un usuario intenta registrar una dosis (ya sea desde la pantalla principal o desde las acciones rápidas de notificación), el sistema verifica automáticamente si hay stock suficiente para completar la toma.
+
+Si el stock disponible es menor que la cantidad requerida para la dosis, MedicApp muestra inmediatamente una alerta de stock insuficiente que impide el registro de la toma. Esta notificación reactiva indica claramente el nombre del medicamento afectado, la cantidad necesaria versus la disponible, y sugiere reponer el inventario antes de intentar registrar la dosis nuevamente.
+
+Este mecanismo de protección previene registros incorrectos en el historial y garantiza la integridad del control de inventario, evitando que se descuente stock que físicamente no existe. La alerta es clara, no intrusiva, y guía al usuario directamente hacia la acción correctiva (reponer stock).
+
+### Notificaciones Proactivas de Stock Bajo
+
+Además de las alertas reactivas en el momento de tomar una dosis, MedicApp incluye un sistema proactivo de monitoreo diario de stock que anticipa problemas de desabastecimiento antes de que ocurran. Este sistema evalúa automáticamente el inventario de todos los medicamentos una vez al día, calculando los días de suministro restantes según el consumo programado.
+
+El cálculo considera múltiples factores para estimar con precisión cuánto durará el stock actual:
+
+**Para medicamentos programados** - El sistema suma la dosis diaria total de todas las personas asignadas, multiplica por los días configurados en el patrón de frecuencia (por ejemplo, si se toma solo lunes, miércoles y viernes, ajusta el cálculo), y divide el stock actual entre este consumo diario efectivo.
+
+**Para medicamentos ocasionales ("según necesidad")** - Utiliza el registro del último día de consumo real como predictor, proporcionando una estimación adaptativa que mejora con el uso.
+
+Cuando el stock de un medicamento alcanza el umbral configurado (por defecto 3 días, pero personalizable entre 1-10 días por medicamento), MedicApp emite una notificación proactiva de advertencia. Esta notificación muestra:
+
+- Nombre del medicamento y tipo
+- Días aproximados de suministro restantes
+- Persona(s) afectada(s)
+- Stock actual en unidades correspondientes
+- Sugerencia de reposición
+
+### Prevención de Spam de Notificaciones
+
+Para evitar bombardear al usuario con alertas repetitivas, el sistema de notificaciones proactivas implementa lógica inteligente de frecuencia. Cada tipo de alerta de stock bajo se emite máximo una vez al día por medicamento. El sistema registra la última fecha en que se envió cada alerta y no vuelve a notificar hasta que:
+
+1. Haya pasado al menos 24 horas desde la última alerta, O
+2. El usuario haya repuesto el stock (restableciendo el contador)
+
+Esta prevención de spam asegura que las notificaciones sean útiles y oportunas sin convertirse en una molestia que lleve al usuario a ignorarlas o deshabilitarlas.
+
+### Integración con Control de Stock Visual
+
+Las alertas de stock bajo no funcionan de forma aislada, sino que están profundamente integradas con el sistema de semáforos visuales del pastillero. Cuando un medicamento tiene stock bajo:
+
+- Aparece marcado en rojo o ámbar en la lista del botiquín
+- Muestra un icono de advertencia en la pantalla principal
+- La notificación proactiva complementa estas señales visuales
+
+Esta multicapa de información (visual + notificaciones) garantiza que el usuario sea consciente del estado del inventario desde múltiples puntos de contacto con la aplicación.
+
+### Configuración y Personalización
+
+Cada medicamento puede tener un umbral de alerta personalizado que determina cuándo se considera el stock "bajo". Medicamentos críticos como insulina o anticoagulantes pueden configurarse con umbrales de 7-10 días para permitir tiempo amplio de reposición, mientras que suplementos menos urgentes pueden usar umbrales de 1-2 días.
+
+El sistema respeta estas configuraciones individuales, permitiendo que cada medicamento tenga su propia política de alertas adaptada a su criticidad y disponibilidad en farmacias.
+
+---
+
+## 11. Configuración de Ayuno
 
 ### Tipos: Before (Antes) y After (Después)
 
@@ -266,7 +374,7 @@ Esta granularidad permite gestionar regímenes complejos donde algunos medicamen
 
 ---
 
-## 10. Historial de Dosis
+## 12. Historial de Dosis
 
 ### Registro Automático Completo
 
@@ -310,7 +418,7 @@ El formato de los datos es relacional y normalizado, con claves foráneas que vi
 
 ---
 
-## 11. Localización e Internacionalización
+## 13. Localización e Internacionalización
 
 ### 8 Idiomas Completamente Soportados
 
@@ -360,7 +468,7 @@ Esta atención al detalle lingüístico hace que MedicApp se sienta natural y na
 
 ---
 
-## 12. Interfaz Accesible y Usable
+## 14. Interfaz Accesible y Usable
 
 ### Material Design 3
 

@@ -26,6 +26,7 @@
   "btnClose": "Close",
   "btnConfirm": "Confirm",
   "btnAccept": "Accept",
+  "btnSkip": "Skip",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pill",
@@ -654,5 +655,46 @@
   "done": "Done",
   "suspended": "Suspended",
   "activeFastingPeriodsTitle": "Active Fasting Periods",
-  "fastingCompleted": "Fasting completed! You can eat now"
+  "fastingCompleted": "Fasting completed! You can eat now",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Expiration date",
+  "expirationDateHint": "MM/YYYY (e.g: 03/2025)",
+  "expirationDateOptional": "Expiration date (optional)",
+  "expirationDateRequired": "Please enter the expiration date",
+  "expirationDateInvalidFormat": "Invalid format. Use MM/YYYY (e.g: 03/2025)",
+  "expirationDateInvalidMonth": "Month must be between 01 and 12",
+  "expirationDateInvalidYear": "Year must be valid",
+  "expirationDateExpired": "This medication has expired",
+  "expirationDateExpiredOn": "Expired on {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Expires soon",
+  "expirationDateExpiresOn": "Expires on {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Expires in {days} days",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "This medication has expired. Please verify its expiration date before using it.",
+  "expirationDateNearExpirationWarning": "This medication expires soon. Consider replacing it.",
+  "expirationDateDialogTitle": "Medication expiration date",
+  "expirationDateDialogMessage": "Enter the medication's expiration date (found on the package).",
+  "expirationDateUpdateTitle": "Update expiration date",
+  "expirationDateUpdateMessage": "You have refilled the medication. Do you want to update the expiration date?"
 }

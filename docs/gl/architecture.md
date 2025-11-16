@@ -426,6 +426,57 @@ class DoseCalculationService {
 - Formatea mensaxes localizadas ("Hoxe ás 18:00", "Mañá ás 08:00")
 - Respecta datas de inicio/fin de tratamento
 
+### DoseActionService
+
+Centraliza a lóxica de rexistro de doses para evitar duplicación de código entre compoñentes UI.
+
+```dart
+class DoseActionService {
+  // Rexistro de doses programadas
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Rexistro de doses manuais
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Cálculo de consumo diario
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsabilidades:**
+- Validar stock suficiente antes de rexistrar doses
+- Actualizar estado de doses tomadas/omitidas por día
+- Descontar stock automaticamente
+- Crear entradas en historial de doses
+- Xestionar notificacións relacionadas (cancelar, reprogramar, xaxún)
+- Calcular consumo diario total para medicamentos "segundo necesidade"
+
+**Método `calculateDailyConsumption`:**
+Engadido para centralizar o cálculo de consumo diario, especialmente útil para medicamentos "segundo necesidade". Suma todas as doses tomadas nun día específico, excluíndo doses omitidas. Este valor úsase para actualizar `lastDailyConsumption` e predecir días de stock restantes.
+
+**Excepcións:**
+- `InsufficientStockException`: Lánzase cando non hai stock suficiente para completar unha dose
+
 ### FastingConflictService
 
 Xestión de conflitos entre períodos de xaxún de diferentes medicamentos.
@@ -441,10 +492,163 @@ class FastingConflictService {
 ```
 
 **Responsabilidades:**
-- Detecta solapamentos entre períodos de xaxún de diferentes medicamentos
-- Calcula conflitos entre doses con xaxún previo e posterior
-- Formatea mensaxes de advertencia localizadas para o usuario
-- Suxire axustes de horarios para evitar conflitos
+- Verifica se un horario proposto coincide cun período de xaxún doutro medicamento
+- Calcula períodos de xaxún activos (antes/despois de tomar medicamentos)
+- Suxire horarios alternativos que eviten conflitos
+- Soporta xaxún "before" (antes de tomar) e "after" (despois de tomar)
+
+**Casos de uso:**
+- Ao engadir un novo horario de dose en `DoseScheduleEditor`
+- Ao crear ou editar un medicamento en `EditScheduleScreen`
+- Prevén conflitos que poderían comprometer a efectividade do tratamento
+- Activado en V19+ tras refactorización de `EditScheduleScreen` para recibir `allMedications` e `personId` como parámetros
+
+### Sistema de Notificacións de Stock Baixo
+
+MedicApp implementa un sistema dual de alertas de stock que combina notificacións reactivas (no momento crítico) e proactivas (anticipatorias).
+
+#### Notificacións Reactivas (Immediate Stock Check)
+
+O sistema verifica automaticamente o stock dispoñible cada vez que un usuario intenta rexistrar unha dose, xa sexa desde:
+- A pantalla principal ao marcar unha dose como "tomada"
+- As accións rápidas de notificación (botón "Rexistrar")
+- O rexistro manual de doses ocasionais
+
+**Implementación en NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Fluxo reactivo:**
+1. Usuario intenta rexistrar unha dose
+2. Sistema verifica: `medication.stockQuantity < doseQuantity`
+3. Se é insuficiente:
+   - Mostra notificación inmediata con prioridade alta
+   - NON permite o rexistro da dose
+   - Indica cantidade necesaria vs dispoñible
+   - Guía ao usuario a repoñer stock
+
+**Rango de IDs de notificación:** 7,000,000 - 7,999,999 (xerados por `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notificacións Proactivas (Daily Stock Monitoring)
+
+O sistema pode executar chequeos proactivos diarios que anticipan problemas de desabastecemento antes de que ocorran.
+
+**Método principal:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Fluxo proactivo:**
+1. Execútase máximo unha vez ao día (utiliza SharedPreferences para tracking)
+2. Itera sobre todas as persoas rexistradas
+3. Para cada medicamento activo:
+   - Calcula dose diaria total considerando:
+     - Todas as persoas asignadas ao medicamento
+     - Frecuencia de tratamento (diario, semanal, intervalo)
+     - Horarios configurados por persoa
+   - Divide stock actual entre dose diaria
+   - Obtén días de subministración restantes
+4. Se `medication.isStockLow` (utiliza o limiar configurable por medicamento):
+   - Emite notificación proactiva
+   - Inclúe días aproximados restantes
+   - Non bloquea ningunha acción
+
+**Prevención de spam:**
+- Rexistra última data de chequeo en `SharedPreferences`
+- Só executa se `lastCheck != today`
+- Cada medicamento só notifica unha vez ao día
+- Reiníciase ao repoñer stock
+
+**Integración con Medication.isStockLow:**
+O cálculo de stock baixo utiliza a propiedade existente do modelo:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configuración de Canles de Notificación
+
+As notificacións de stock utilizan unha canle dedicada:
+
+```dart
+// En NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Alertas de Stock Baixo',
+  channelDescription: 'Notificacións cando o stock de medicamentos está baixo',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Características:**
+- Canle separada de recordatorios de dose
+- Prioridade alta (non máxima, para non ser intrusivo)
+- Auto-cancelación ao tocar
+- Sen accións integradas (só informativas)
+
+#### Cando Usar Cada Tipo
+
+| Tipo | Momento | Propósito | Bloqueante |
+|------|---------|-----------|------------|
+| **Reactivo** | Ao intentar rexistrar dose | Previr rexistro con stock insuficiente | ✅ Si |
+| **Proactivo** | Chequeo diario (opcional) | Anticipar reposición necesaria | ❌ Non |
+
+**Vantaxe do deseño dual:**
+- Protección absoluta no momento crítico (reactivo)
+- Planificación anticipada para evitar chegar ao momento crítico (proactivo)
+- O sistema proactivo é opt-in (debe chamarse explícitamente desde lóxica de app)
+
+### MedicationUpdateService
+
+Centraliza operacións comúns de actualización de medicamentos para evitar duplicación de código e asegurar comportamento consistente.
+
+```dart
+class MedicationUpdateService {
+  // Reabastecemento de stock
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Xestión de estado suspended
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsabilidades:**
+- **refillMedication**: Actualiza stock e garda `lastRefillAmount` para referencia futura
+- **resumeMedication**: Activa medicamento suspendido e reprograma notificacións para todas as persoas asignadas
+- **suspendMedication**: Desactiva medicamento e cancela todas as notificacións programadas
+
+**Vantaxes de centralización:**
+- Elimina creación manual repetitiva de obxectos `Medication` con `copyWith`
+- Manexa correctamente a táboa `person_medications` (V19+) onde reside `isSuspended`
+- Coordina automaticamente notificacións ao cambiar estado
+- Reduce código en compoñentes UI de 493 a 419 liñas (ex: `MedicationCard`)
+
+**Nota arquitectónica V19+:**
+Os métodos `resumeMedication` e `suspendMedication` actualizan a táboa `person_medications` para cada persoa asignada, xa que `isSuspended` é un campo específico da relación persoa-medicamento, non do medicamento compartido.
 
 ---
 

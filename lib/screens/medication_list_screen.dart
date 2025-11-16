@@ -22,6 +22,7 @@ import 'medication_list/dialogs/manual_dose_input_dialog.dart';
 import 'medication_list/dialogs/refill_input_dialog.dart';
 import 'medication_list/dialogs/edit_today_dose_dialog.dart';
 import 'medication_list/dialogs/notification_permission_dialog.dart';
+import 'medication_list/dialogs/expiration_date_dialog.dart';
 import 'debug_notifications_screen.dart';
 import 'medication_list/services/dose_calculation_service.dart';
 import 'medication_list/medication_list_viewmodel.dart';
@@ -308,6 +309,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
         builder: (context) => EditMedicationMenuScreen(
           medication: medication,
           existingMedications: _viewModel.medications,
+          personId: _viewModel.selectedPerson?.id,
         ),
       ),
     );
@@ -517,16 +519,40 @@ class MedicationListScreenState extends State<MedicationListScreen>
     Navigator.pop(context);
 
     try {
-      final result = await _viewModel.toggleSuspendMedication(medication);
+      final l10n = AppLocalizations.of(context)!;
+      Medication medicationToUpdate = medication;
+
+      // If suspending (not resuming), ask for expiration date
+      if (!medication.isSuspended) {
+        final expirationDate = await ExpirationDateDialog.show(
+          context,
+          currentExpirationDate: medication.expirationDate,
+          isOptional: true,
+        );
+
+        // User cancelled the dialog
+        if (expirationDate == null) {
+          return;
+        }
+
+        // If user provided or updated expiration date, update medication first
+        if (expirationDate.isNotEmpty && expirationDate != medication.expirationDate) {
+          medicationToUpdate = medication.copyWith(
+            expirationDate: expirationDate,
+          );
+          await DatabaseHelper.instance.updateMedication(medicationToUpdate);
+        }
+      }
+
+      final result = await _viewModel.toggleSuspendMedication(medicationToUpdate);
       if (!mounted) return;
 
-      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             result == 'suspended'
-                ? l10n.medicationSuspended(medication.name)
-                : l10n.medicationReactivated(medication.name),
+                ? l10n.medicationSuspended(medicationToUpdate.name)
+                : l10n.medicationReactivated(medicationToUpdate.name),
           ),
           duration: const Duration(seconds: 3),
         ),
@@ -573,6 +599,24 @@ class MedicationListScreenState extends State<MedicationListScreen>
           duration: const Duration(seconds: 3),
         ),
       );
+
+      // For as-needed medications, ask for expiration date after refill
+      if (medication.allowsManualDoseRegistration && mounted) {
+        final expirationDate = await ExpirationDateDialog.show(
+          context,
+          currentExpirationDate: medication.expirationDate,
+          isOptional: true,
+        );
+
+        // If user provided or updated expiration date, update medication
+        if (expirationDate != null && expirationDate.isNotEmpty && expirationDate != medication.expirationDate) {
+          final updatedMedication = medication.copyWith(
+            expirationDate: expirationDate,
+          );
+          await DatabaseHelper.instance.updateMedication(updatedMedication);
+          await _viewModel.loadMedications();
+        }
+      }
     }
   }
 

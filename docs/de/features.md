@@ -10,12 +10,14 @@ Diese Dokumentation beschreibt detailliert alle Funktionen von **MedicApp**, ein
 - [2. Medikamententypen](#2-medikamententypen)
 - [3. Intelligentes Benachrichtigungssystem](#3-intelligentes-benachrichtigungssystem)
 - [4. Erweiterte Bestandskontrolle](#4-erweiterte-bestandskontrolle)
-- [5. Verwaltung von Fastenzeiten](#5-verwaltung-von-fastenzeiten)
-- [6. Vollständiger Einnahmeverlauf](#6-vollständiger-einnahmeverlauf)
-- [7. Mehrsprachige Oberfläche](#7-mehrsprachige-oberfläche)
-- [8. Material Design 3](#8-material-design-3)
-- [9. Robuste Datenbank](#9-robuste-datenbank)
-- [10. Umfassende Tests](#10-umfassende-tests)
+- [5. Verwaltung von Verfallsdaten](#5-verwaltung-von-verfallsdaten)
+- [6. Verwaltung von Fastenzeiten](#6-verwaltung-von-fastenzeiten)
+- [7. Vollständiger Einnahmeverlauf](#7-vollständiger-einnahmeverlauf)
+- [8. Mehrsprachige Oberfläche](#8-mehrsprachige-oberfläche)
+- [9. Material Design 3](#9-material-design-3)
+- [10. Benachrichtigungen bei niedrigem Bestand](#10-benachrichtigungen-bei-niedrigem-bestand)
+- [11. Robuste Datenbank](#11-robuste-datenbank)
+- [12. Umfassende Tests](#12-umfassende-tests)
 
 ---
 
@@ -245,6 +247,61 @@ const channels = [
 
 ---
 
+## 10. Benachrichtigungen bei niedrigem Bestand
+
+### Reaktive Benachrichtigungen bei unzureichendem Bestand
+
+MedicApp implementiert ein intelligentes Bestandswarnsystem, das den Benutzer davor schützt, in kritischen Momenten ohne Medikamente dazustehen. Wenn ein Benutzer versucht, eine Dosis zu registrieren (entweder über den Hauptbildschirm oder über Schnellaktionen in Benachrichtigungen), überprüft das System automatisch, ob ausreichend Bestand vorhanden ist, um die Einnahme abzuschließen.
+
+Wenn der verfügbare Bestand geringer ist als die für die Dosis benötigte Menge, zeigt MedicApp sofort eine Warnung über unzureichenden Bestand an, die die Registrierung der Einnahme verhindert. Diese reaktive Benachrichtigung gibt klar den Namen des betroffenen Medikaments, die benötigte versus die verfügbare Menge an und schlägt vor, den Bestand aufzufüllen, bevor erneut versucht wird, die Dosis zu registrieren.
+
+Dieser Schutzmechanismus verhindert fehlerhafte Einträge im Verlauf und garantiert die Integrität der Bestandskontrolle, indem verhindert wird, dass Bestand abgezogen wird, der physisch nicht vorhanden ist. Die Warnung ist klar, nicht aufdringlich und leitet den Benutzer direkt zur Korrekturmaßnahme (Bestand auffüllen).
+
+### Proaktive Benachrichtigungen bei niedrigem Bestand
+
+Zusätzlich zu den reaktiven Warnungen zum Zeitpunkt der Einnahme einer Dosis verfügt MedicApp über ein proaktives System zur täglichen Bestandsüberwachung, das Versorgungsengpässe antizipiert, bevor sie auftreten. Dieses System bewertet automatisch einmal täglich den Bestand aller Medikamente und berechnet die verbleibenden Versorgungstage basierend auf dem geplanten Verbrauch.
+
+Die Berechnung berücksichtigt mehrere Faktoren, um genau abzuschätzen, wie lange der aktuelle Bestand ausreicht:
+
+**Für geplante Medikamente** - Das System addiert die gesamte Tagesdosis aller zugewiesenen Personen, multipliziert mit den im Häufigkeitsmuster konfigurierten Tagen (zum Beispiel, wenn das Medikament nur montags, mittwochs und freitags eingenommen wird, passt es die Berechnung an) und dividiert den aktuellen Bestand durch diesen effektiven Tagesverbrauch.
+
+**Für gelegentliche Medikamente ("nach Bedarf")** - Verwendet den Protokolleintrag des letzten Tages des tatsächlichen Verbrauchs als Prädiktor und bietet eine adaptive Schätzung, die sich mit der Nutzung verbessert.
+
+Wenn der Bestand eines Medikaments den konfigurierten Schwellenwert erreicht (standardmäßig 3 Tage, aber pro Medikament zwischen 1-10 Tagen anpassbar), sendet MedicApp eine proaktive Warnbenachrichtigung. Diese Benachrichtigung zeigt:
+
+- Name des Medikaments und Typ
+- Ungefähr verbleibende Versorgungstage
+- Betroffene Person(en)
+- Aktueller Bestand in entsprechenden Einheiten
+- Aufstellungsvorschlag
+
+### Vermeidung von Benachrichtigungs-Spam
+
+Um zu vermeiden, dass der Benutzer mit wiederholten Warnungen bombardiert wird, implementiert das proaktive Benachrichtigungssystem intelligente Häufigkeitslogik. Jede Art von Warnung bei niedrigem Bestand wird maximal einmal täglich pro Medikament gesendet. Das System registriert das letzte Datum, an dem jede Warnung gesendet wurde, und benachrichtigt nicht erneut, bis:
+
+1. Mindestens 24 Stunden seit der letzten Warnung vergangen sind, ODER
+2. Der Benutzer den Bestand aufgefüllt hat (wodurch der Zähler zurückgesetzt wird)
+
+Diese Spam-Vermeidung stellt sicher, dass Benachrichtigungen nützlich und zeitgerecht sind, ohne zu einer Belästigung zu werden, die den Benutzer dazu bringt, sie zu ignorieren oder zu deaktivieren.
+
+### Integration mit visueller Bestandskontrolle
+
+Die Warnungen bei niedrigem Bestand funktionieren nicht isoliert, sondern sind tief in das visuelle Ampelsystem der Medikamentenbox integriert. Wenn ein Medikament einen niedrigen Bestand hat:
+
+- Erscheint es in der Liste der Hausapotheke rot oder gelb markiert
+- Zeigt ein Warnsymbol auf dem Hauptbildschirm an
+- Die proaktive Benachrichtigung ergänzt diese visuellen Signale
+
+Diese mehrschichtige Information (visuell + Benachrichtigungen) garantiert, dass der Benutzer sich des Bestandsstatus von mehreren Kontaktpunkten mit der Anwendung aus bewusst ist.
+
+### Konfiguration und Personalisierung
+
+Jedes Medikament kann einen personalisierten Warnschwellenwert haben, der bestimmt, wann der Bestand als "niedrig" betrachtet wird. Kritische Medikamente wie Insulin oder Antikoagulantien können mit Schwellenwerten von 7-10 Tagen konfiguriert werden, um ausreichend Zeit zum Auffüllen zu ermöglichen, während weniger dringende Nahrungsergänzungsmittel Schwellenwerte von 1-2 Tagen verwenden können.
+
+Das System respektiert diese individuellen Konfigurationen und ermöglicht es jedem Medikament, seine eigene an Kritikalität und Verfügbarkeit in Apotheken angepasste Warnrichtlinie zu haben.
+
+---
+
 ## 4. Erweiterte Bestandskontrolle
 
 ### Beschreibung
@@ -331,14 +388,67 @@ String getRefillSuggestion(Medication medication) {
 
 ---
 
-## 5. Verwaltung von Fastenzeiten
+## 5. Verwaltung von Verfallsdaten
+
+### Kontrolle des Medikamentenverfalls
+
+MedicApp ermöglicht die Erfassung und Überwachung von Verfallsdaten von Medikamenten, um die Behandlungssicherheit zu gewährleisten. Diese Funktionalität ist besonders wichtig für Bedarfsmedikamente und suspendierte Medikamente, die über längere Zeiträume gelagert werden.
+
+Das System verwendet ein vereinfachtes Format MM/JJJJ (Monat/Jahr), das dem Standardformat auf Medikamentenverpackungen entspricht. Dies erleichtert die Dateneingabe, ohne den genauen Verfallstag kennen zu müssen.
+
+### Automatische Statuserkennung
+
+MedicApp bewertet automatisch den Verfallsstatus jedes Medikaments:
+
+- **Abgelaufen**: Das Medikament hat sein Verfallsdatum überschritten und wird mit einem roten Warnetikett mit Warnsymbol angezeigt.
+- **Bald ablaufend**: 30 Tage oder weniger bis zum Ablauf, wird mit einem orangefarbenen Vorsichtsetikett mit Uhrsymbol angezeigt.
+- **In gutem Zustand**: Mehr als 30 Tage bis zum Ablauf, keine besondere Warnung wird angezeigt.
+
+Visuelle Warnungen erscheinen direkt auf der Medikamentenkarte im Medizinschrank, neben dem Aussetzungsstatus falls zutreffend, und ermöglichen die schnelle Identifizierung von Medikamenten, die Aufmerksamkeit erfordern.
+
+### Eingabe des Verfallsdatums
+
+Das System fordert das Verfallsdatum zu drei bestimmten Zeitpunkten an:
+
+1. **Beim Erstellen von Bedarfsmedikamenten**: Als letzter Schritt des Erstellungsprozesses (Schritt 2/2) erscheint ein optionaler Dialog zur Eingabe des Verfallsdatums vor dem Speichern des Medikaments.
+
+2. **Beim Aussetzen von Medikamenten**: Beim Aussetzen eines Medikaments für alle Benutzer, die es teilen, wird das Verfallsdatum angefordert. Dies ermöglicht die Erfassung des Datums der Verpackung, die gelagert bleibt.
+
+3. **Beim Nachfüllen von Bedarfsmedikamenten**: Nach dem Hinzufügen von Bestand zu einem Bedarfsmedikament bietet das System an, das Verfallsdatum zu aktualisieren, um das Datum der neu erworbenen Verpackung widerzuspiegeln.
+
+In allen Fällen ist das Feld optional und kann übersprungen werden. Der Benutzer kann den Vorgang abbrechen oder das Feld einfach leer lassen.
+
+### Format und Validierungen
+
+Der Eingabedialog für das Verfallsdatum bietet zwei separate Felder:
+- Monatsfeld (MM): akzeptiert Werte von 01 bis 12
+- Jahresfeld (JJJJ): akzeptiert Werte von 2000 bis 2100
+
+Das System validiert automatisch, dass der Monat im korrekten Bereich liegt und das Jahr gültig ist. Nach Abschluss des Monats (2 Ziffern) wechselt der Fokus automatisch zum Jahresfeld, um die Dateneingabe zu beschleunigen.
+
+Das Datum wird im Format "MM/JJJJ" gespeichert (Beispiel: "03/2025") und für Verfallsvergleiche als letzter Tag dieses Monats interpretiert. Dies bedeutet, dass ein Medikament mit Datum "03/2025" ab dem 1. April 2025 als abgelaufen gilt.
+
+### Systemvorteile
+
+Diese Funktionalität hilft:
+- Die Verwendung abgelaufener Medikamente zu verhindern, die unwirksam oder gefährlich sein könnten
+- Den Bestand effizient zu verwalten, indem Medikamente identifiziert werden, die bald ablaufen
+- Die Verwendung von Medikamenten nach Verfallsdatum zu priorisieren
+- Einen sicheren Medizinschrank mit visueller Statuskontrolle jedes Medikaments zu pflegen
+- Verschwendung zu vermeiden, indem daran erinnert wird, Medikamente vor Ablauf zu überprüfen
+
+Das System verhindert nicht die Dosisregistrierung mit abgelaufenen Medikamenten, bietet aber klare visuelle Warnungen, damit der Benutzer informierte Entscheidungen treffen kann.
+
+---
+
+## 6. Verwaltung von Fastenzeiten
 
 ### Beschreibung
 System zur Verwaltung von Fastenzeiten vor und nach der Medikamenteneinnahme mit Validierung, Benachrichtigungen und intelligenten Warnungen.
 
 ### Hauptmerkmale
 
-#### 5.1. Konfiguration von Fastenzeiten
+#### 6.1. Konfiguration von Fastenzeiten
 ```dart
 // Modell: lib/models/fasting.dart
 class Fasting {
@@ -365,7 +475,7 @@ enum FastingType {
 }
 ```
 
-#### 5.2. Validierung von Zeitplänen
+#### 6.2. Validierung von Zeitplänen
 ```dart
 // Prüft, ob ein Zeitplan von Fastenzeiten betroffen ist
 Future<List<FastingConflict>> validateScheduleWithFasting(
@@ -388,7 +498,7 @@ Future<List<FastingConflict>> validateScheduleWithFasting(
 }
 ```
 
-#### 5.3. Fortlaufende Benachrichtigungen
+#### 6.3. Fortlaufende Benachrichtigungen
 ```dart
 // Startet fortlaufende Benachrichtigung für Fastenzeit
 Future<void> startFastingNotification(Fasting fasting) async {
@@ -410,7 +520,7 @@ Future<void> startFastingNotification(Fasting fasting) async {
 }
 ```
 
-#### 5.4. Intelligente Warnungen
+#### 6.4. Intelligente Warnungen
 - **Nur laufende oder zukünftige Fastenzeiten anzeigen**: Fastenzeiten, die bereits beendet sind, werden nicht angezeigt
 - **Automatische Aktualisierung**: Entfernt beendete Fastenzeiten beim Öffnen der App
 - **Benachrichtigung bei Abschluss**: Warnt, wenn die Fastenzeit endet
@@ -435,14 +545,14 @@ Future<List<Fasting>> getActiveFastings(int personId) async {
 
 ---
 
-## 6. Vollständiger Einnahmeverlauf
+## 7. Vollständiger Einnahmeverlauf
 
 ### Beschreibung
 Detailliertes Aufzeichnungssystem aller Medikamenteneinnahmen mit Status, Zeitstempeln und Statistiken.
 
 ### Hauptmerkmale
 
-#### 6.1. Einnahmestatus
+#### 7.1. Einnahmestatus
 ```dart
 // Modell: lib/models/intake.dart
 class Intake {
@@ -472,7 +582,7 @@ enum IntakeStatus {
 }
 ```
 
-#### 6.2. Einnahmestatistiken
+#### 7.2. Einnahmestatistiken
 ```dart
 // Berechnet Therapietreue-Metriken
 class IntakeStatistics {
@@ -503,7 +613,7 @@ Future<IntakeStatistics> getStatistics(
 }
 ```
 
-#### 6.3. Verlaufsansicht
+#### 7.3. Verlaufsansicht
 ```dart
 // UI: lib/screens/history_screen.dart
 class HistoryScreen extends StatelessWidget {
@@ -537,7 +647,7 @@ class HistoryScreen extends StatelessWidget {
 
 ---
 
-## 7. Mehrsprachige Oberfläche
+## 8. Mehrsprachige Oberfläche
 
 ### Beschreibung
 Vollständige Unterstützung für 8 Sprachen mit dynamischem Wechsel und vollständiger Lokalisierung.
@@ -626,14 +736,14 @@ lib/l10n/
 
 ---
 
-## 8. Material Design 3
+## 9. Material Design 3
 
 ### Beschreibung
 Moderne Oberfläche mit Material Design 3, dynamischen Farben und adaptiven Komponenten.
 
 ### Hauptmerkmale
 
-#### 8.1. Dynamisches Farbschema
+#### 9.1. Dynamisches Farbschema
 ```dart
 // Theme: lib/theme/app_theme.dart
 class AppTheme {
@@ -665,7 +775,7 @@ class AppTheme {
 }
 ```
 
-#### 8.2. Material 3 Komponenten
+#### 9.2. Material 3 Komponenten
 - **Cards**: Mit erhöhtem/füllendem Stil
 - **Buttons**: FAB, FilledButton, OutlinedButton, TextButton
 - **Navigation**: NavigationBar, NavigationRail, NavigationDrawer
@@ -690,7 +800,7 @@ Card(
 )
 ```
 
-#### 8.3. Adaptives Design
+#### 9.3. Adaptives Design
 ```dart
 // Responsive Layout
 class AdaptiveLayout extends StatelessWidget {
@@ -711,7 +821,7 @@ class AdaptiveLayout extends StatelessWidget {
 }
 ```
 
-#### 8.4. Animationen und Übergänge
+#### 9.4. Animationen und Übergänge
 ```dart
 // Sanfte Übergänge
 PageRouteBuilder(
@@ -739,14 +849,14 @@ Hero(
 
 ---
 
-## 9. Robuste Datenbank
+## 11. Robuste Datenbank
 
 ### Beschreibung
 SQLite-Datenbank V19 mit automatischen Migrationen, optimierten Indizes und Trigger-System.
 
 ### Hauptmerkmale
 
-#### 9.1. Automatisches Migrationssystem
+#### 11.1. Automatisches Migrationssystem
 ```dart
 // Datenbank: lib/services/database_helper.dart
 class DatabaseHelper {
@@ -774,7 +884,7 @@ class DatabaseHelper {
 }
 ```
 
-#### 9.2. Optimierte Indizes
+#### 11.2. Optimierte Indizes
 ```sql
 -- Indizes für schnelle Abfragen
 CREATE INDEX idx_medications_person ON medications(person_id);
@@ -784,7 +894,7 @@ CREATE INDEX idx_intakes_scheduled_time ON intakes(scheduled_time);
 CREATE INDEX idx_fastings_medication ON fastings(medication_id);
 ```
 
-#### 9.3. Trigger-System
+#### 11.3. Trigger-System
 ```sql
 -- Trigger: Löscht zugehörige Daten
 CREATE TRIGGER delete_person_cascade
@@ -807,7 +917,7 @@ BEGIN
 END;
 ```
 
-#### 9.4. Referenzielle Integrität
+#### 11.4. Referenzielle Integrität
 ```sql
 -- Fremdschlüssel mit Kaskadierung
 CREATE TABLE medications (
@@ -833,14 +943,14 @@ CREATE TABLE intakes (
 
 ---
 
-## 10. Umfassende Tests
+## 12. Umfassende Tests
 
 ### Beschreibung
 Umfassende Test-Suite mit über 432 automatisierten Tests und 75-80% Codeabdeckung.
 
 ### Testtypen
 
-#### 10.1. Unit-Tests
+#### 12.1. Unit-Tests
 ```dart
 // Test: test/models/medication_test.dart
 void main() {
@@ -871,7 +981,7 @@ void main() {
 }
 ```
 
-#### 10.2. Widget-Tests
+#### 12.2. Widget-Tests
 ```dart
 // Test: test/widgets/medication_card_test.dart
 void main() {
@@ -893,7 +1003,7 @@ void main() {
 }
 ```
 
-#### 10.3. Integrationstests
+#### 12.3. Integrationstests
 ```dart
 // Test: test/integration/medication_flow_test.dart
 void main() {
@@ -915,7 +1025,7 @@ void main() {
 }
 ```
 
-#### 10.4. Spezifische Tests für Grenzfälle
+#### 12.4. Spezifische Tests für Grenzfälle
 ```dart
 // Test: test/notification_midnight_edge_cases_test.dart
 void main() {

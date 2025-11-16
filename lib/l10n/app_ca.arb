@@ -26,6 +26,7 @@
   "btnClose": "Tancar",
   "btnConfirm": "Confirmar",
   "btnAccept": "Acceptar",
+  "btnSkip": "Ometre",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pastilla",
@@ -1488,5 +1489,46 @@
   },
   "settingsShowPersonTabsTitle": "Veure persones separades per pestanyes",
   "settingsShowPersonTabsSubtitle": "Mostra cada persona en una pestanya separada. Si es desactiva, totes les persones es barregen en una sola llista amb etiquetes",
-  "selectPerson": "Seleccionar persona"
+  "selectPerson": "Seleccionar persona",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Data de caducitat",
+  "expirationDateHint": "MM/AAAA (p.ex: 03/2025)",
+  "expirationDateOptional": "Data de caducitat (opcional)",
+  "expirationDateRequired": "Si us plau, introdueix la data de caducitat",
+  "expirationDateInvalidFormat": "Format invàlid. Utilitza MM/AAAA (p.ex: 03/2025)",
+  "expirationDateInvalidMonth": "El mes ha d'estar entre 01 i 12",
+  "expirationDateInvalidYear": "L'any ha de ser vàlid",
+  "expirationDateExpired": "Aquest medicament ha caducat",
+  "expirationDateExpiredOn": "Caducat en {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Caduca aviat",
+  "expirationDateExpiresOn": "Caduca en {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Caduca en {days} dies",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Aquest medicament ha caducat. Si us plau, verifica la seva data de caducitat abans d'utilitzar-lo.",
+  "expirationDateNearExpirationWarning": "Aquest medicament caduca aviat. Considera substituir-lo.",
+  "expirationDateDialogTitle": "Data de caducitat del medicament",
+  "expirationDateDialogMessage": "Introdueix la data de caducitat del medicament (es troba a l'envàs).",
+  "expirationDateUpdateTitle": "Actualitzar data de caducitat",
+  "expirationDateUpdateMessage": "Has recarregat el medicament. Vols actualitzar la data de caducitat?"
 }

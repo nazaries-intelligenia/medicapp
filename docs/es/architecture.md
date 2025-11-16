@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Maneja automáticamente actualización de `Medication` si la entrada es de hoy
 - Restaura stock si se elimina una toma
 
+### DoseActionService
+
+Centraliza la lógica de registro de dosis para evitar duplicación de código entre componentes UI.
+
+```dart
+class DoseActionService {
+  // Registro de dosis programadas
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Registro de dosis manuales
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Cálculo de consumo diario
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsabilidades:**
+- Validar stock suficiente antes de registrar dosis
+- Actualizar estado de dosis tomadas/omitidas por día
+- Descontar stock automáticamente
+- Crear entradas en historial de dosis
+- Gestionar notificaciones relacionadas (cancelar, reprogramar, ayuno)
+- Calcular consumo diario total para medicamentos "según necesidad"
+
+**Método `calculateDailyConsumption`:**
+Añadido para centralizar el cálculo de consumo diario, especialmente útil para medicamentos "según necesidad". Suma todas las dosis tomadas en un día específico, excluyendo dosis omitidas. Este valor se usa para actualizar `lastDailyConsumption` y predecir días de stock restantes.
+
+**Excepciones:**
+- `InsufficientStockException`: Se lanza cuando no hay stock suficiente para completar una dosis
+
 ### DoseCalculationService
 
 Lógica de negocio para calcular próximas dosis.
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Detecta próxima dosis según frecuencia
 - Formatea mensajes localizados ("Hoy a las 18:00", "Mañana a las 08:00")
 - Respeta fechas de inicio/fin de tratamiento
+
+### MedicationUpdateService
+
+Centraliza operaciones comunes de actualización de medicamentos para evitar duplicación de código y asegurar comportamiento consistente.
+
+```dart
+class MedicationUpdateService {
+  // Reabastecimiento de stock
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Gestión de estado suspended
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsabilidades:**
+- **refillMedication**: Actualiza stock y guarda `lastRefillAmount` para referencia futura
+- **resumeMedication**: Activa medicamento suspendido y reprograma notificaciones para todas las personas asignadas
+- **suspendMedication**: Desactiva medicamento y cancela todas las notificaciones programadas
+
+**Ventajas de centralización:**
+- Elimina creación manual repetitiva de objetos `Medication` con `copyWith`
+- Maneja correctamente la tabla `person_medications` (V19+) donde reside `isSuspended`
+- Coordina automáticamente notificaciones al cambiar estado
+- Reduce código en componentes UI de 493 a 419 líneas (ej: `MedicationCard`)
+
+**Nota arquitectónica V19+:**
+Los métodos `resumeMedication` y `suspendMedication` actualizan la tabla `person_medications` para cada persona asignada, ya que `isSuspended` es un campo específico de la relación persona-medicamento, no del medicamento compartido.
 
 ### FastingConflictService
 
@@ -454,8 +542,117 @@ class FastingConflictService {
 - Al añadir un nuevo horario de dosis en `DoseScheduleEditor`
 - Al crear o editar un medicamento en `EditScheduleScreen`
 - Previene conflictos que podrían comprometer la efectividad del tratamiento
+- Activado en V19+ tras refactorización de `EditScheduleScreen` para recibir `allMedications` y `personId` como parámetros
 
-**Nota:** Actualmente la validación está desactivada en `EditScheduleScreen` para evitar problemas con timers en tests, pero la infraestructura está lista para activarse cuando sea necesario.
+### Sistema de Notificaciones de Stock Bajo
+
+MedicApp implementa un sistema dual de alertas de stock que combina notificaciones reactivas (en el momento crítico) y proactivas (anticipatorias).
+
+#### Notificaciones Reactivas (Immediate Stock Check)
+
+El sistema verifica automáticamente el stock disponible cada vez que un usuario intenta registrar una dosis, ya sea desde:
+- La pantalla principal al marcar una dosis como "tomada"
+- Las acciones rápidas de notificación ("Registrar" button)
+- El registro manual de dosis ocasionales
+
+**Implementación en NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Flujo reactivo:**
+1. Usuario intenta registrar una dosis
+2. Sistema verifica: `medication.stockQuantity < doseQuantity`
+3. Si es insuficiente:
+   - Muestra notificación inmediata con prioridad alta
+   - NO permite el registro de la dosis
+   - Indica cantidad necesaria vs disponible
+   - Guía al usuario a reponer stock
+
+**Rango de IDs de notificación:** 7,000,000 - 7,999,999 (generados por `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notificaciones Proactivas (Daily Stock Monitoring)
+
+El sistema puede ejecutar chequeos proactivos diarios que anticipan problemas de desabastecimiento antes de que ocurran.
+
+**Método principal:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Flujo proactivo:**
+1. Se ejecuta máximo una vez al día (utiliza SharedPreferences para tracking)
+2. Itera sobre todas las personas registradas
+3. Para cada medicamento activo:
+   - Calcula dosis diaria total considerando:
+     - Todas las personas asignadas al medicamento
+     - Frecuencia de tratamiento (diario, semanal, intervalo)
+     - Horarios configurados por persona
+   - Divide stock actual entre dosis diaria
+   - Obtiene días de suministro restantes
+4. Si `medication.isStockLow` (utiliza el umbral configurable por medicamento):
+   - Emite notificación proactiva
+   - Incluye días aproximados restantes
+   - No bloquea ninguna acción
+
+**Prevención de spam:**
+- Registra última fecha de chequeo en `SharedPreferences`
+- Solo ejecuta si `lastCheck != today`
+- Cada medicamento solo notifica una vez al día
+- Se reinicia al reponer stock
+
+**Integración con Medication.isStockLow:**
+El cálculo de stock bajo utiliza la propiedad existente del modelo:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configuración de Canales de Notificación
+
+Las notificaciones de stock utilizan un canal dedicado:
+
+```dart
+// En NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Alertas de Stock Bajo',
+  channelDescription: 'Notificaciones cuando el stock de medicamentos está bajo',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Características:**
+- Canal separado de recordatorios de dosis
+- Prioridad alta (no máxima, para no ser intrusivo)
+- Auto-cancelación al tocar
+- Sin acciones integradas (solo informativas)
+
+#### Cuándo Usar Cada Tipo
+
+| Tipo | Momento | Propósito | Bloqueante |
+|------|---------|-----------|------------|
+| **Reactivo** | Al intentar registrar dosis | Prevenir registro con stock insuficiente | ✅ Sí |
+| **Proactivo** | Chequeo diario (opcional) | Anticipar reposición necesaria | ❌ No |
+
+**Ventaja del diseño dual:**
+- Protección absoluta en el momento crítico (reactivo)
+- Planificación anticipada para evitar llegar al momento crítico (proactivo)
+- El sistema proactivo es opt-in (debe llamarse explícitamente desde lógica de app)
 
 ---
 

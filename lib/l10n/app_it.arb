@@ -26,6 +26,7 @@
   "btnClose": "Chiudi",
   "btnConfirm": "Conferma",
   "btnAccept": "Accetta",
+  "btnSkip": "Salta",
 
   "@_MEDICATION_TYPES": {},
   "medicationTypePill": "Pillola",
@@ -1502,5 +1503,46 @@
   "done": "Fatto",
   "suspended": "Sospeso",
   "activeFastingPeriodsTitle": "Digiuni Attivi",
-  "fastingCompleted": "Digiuno completato! Ora puoi mangiare"
+  "fastingCompleted": "Digiuno completato! Ora puoi mangiare",
+
+  "@_EXPIRATION_DATE": {},
+  "expirationDateLabel": "Data di scadenza",
+  "expirationDateHint": "MM/AAAA (es: 03/2025)",
+  "expirationDateOptional": "Data di scadenza (facoltativa)",
+  "expirationDateRequired": "Per favore, inserisci la data di scadenza",
+  "expirationDateInvalidFormat": "Formato non valido. Usa MM/AAAA (es: 03/2025)",
+  "expirationDateInvalidMonth": "Il mese deve essere tra 01 e 12",
+  "expirationDateInvalidYear": "L'anno deve essere valido",
+  "expirationDateExpired": "Questo medicinale è scaduto",
+  "expirationDateExpiredOn": "Scaduto il {date}",
+  "@expirationDateExpiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateNearExpiration": "Scade a breve",
+  "expirationDateExpiresOn": "Scade il {date}",
+  "@expirationDateExpiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expirationDateExpiresIn": "Scade tra {days} giorni",
+  "@expirationDateExpiresIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "expirationDateExpiredWarning": "Questo medicinale è scaduto. Per favore, verifica la sua data di scadenza prima di usarlo.",
+  "expirationDateNearExpirationWarning": "Questo medicinale scade a breve. Considera di sostituirlo.",
+  "expirationDateDialogTitle": "Data di scadenza del medicinale",
+  "expirationDateDialogMessage": "Inserisci la data di scadenza del medicinale (si trova sulla confezione).",
+  "expirationDateUpdateTitle": "Aggiorna data di scadenza",
+  "expirationDateUpdateMessage": "Hai ricaricato il medicinale. Desideri aggiornare la data di scadenza?"
 }

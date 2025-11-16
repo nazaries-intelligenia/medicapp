@@ -75,6 +75,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get btnAccept => 'Akzeptieren';
 
   @override
+  String get btnSkip => 'Überspringen';
+
+  @override
   String get medicationTypePill => 'Tablette';
 
   @override
@@ -2234,4 +2237,70 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get fastingConflictOverride => 'Omitir y continuar';
+
+  @override
+  String get expirationDateLabel => 'Verfallsdatum';
+
+  @override
+  String get expirationDateHint => 'MM/JJJJ (z.B.: 03/2025)';
+
+  @override
+  String get expirationDateOptional => 'Verfallsdatum (optional)';
+
+  @override
+  String get expirationDateRequired => 'Bitte geben Sie das Verfallsdatum ein';
+
+  @override
+  String get expirationDateInvalidFormat =>
+      'Ungültiges Format. Verwenden Sie MM/JJJJ (z.B.: 03/2025)';
+
+  @override
+  String get expirationDateInvalidMonth =>
+      'Der Monat muss zwischen 01 und 12 liegen';
+
+  @override
+  String get expirationDateInvalidYear => 'Das Jahr muss gültig sein';
+
+  @override
+  String get expirationDateExpired => 'Dieses Medikament ist abgelaufen';
+
+  @override
+  String expirationDateExpiredOn(String date) {
+    return 'Abgelaufen am $date';
+  }
+
+  @override
+  String get expirationDateNearExpiration => 'Läuft bald ab';
+
+  @override
+  String expirationDateExpiresOn(String date) {
+    return 'Läuft ab am $date';
+  }
+
+  @override
+  String expirationDateExpiresIn(int days) {
+    return 'Läuft in $days Tagen ab';
+  }
+
+  @override
+  String get expirationDateExpiredWarning =>
+      'Dieses Medikament ist abgelaufen. Bitte überprüfen Sie das Verfallsdatum, bevor Sie es verwenden.';
+
+  @override
+  String get expirationDateNearExpirationWarning =>
+      'Dieses Medikament läuft bald ab. Erwägen Sie, es zu ersetzen.';
+
+  @override
+  String get expirationDateDialogTitle => 'Verfallsdatum des Medikaments';
+
+  @override
+  String get expirationDateDialogMessage =>
+      'Geben Sie das Verfallsdatum des Medikaments ein (befindet sich auf der Verpackung).';
+
+  @override
+  String get expirationDateUpdateTitle => 'Verfallsdatum aktualisieren';
+
+  @override
+  String get expirationDateUpdateMessage =>
+      'Sie haben das Medikament nachgefüllt. Möchten Sie das Verfallsdatum aktualisieren?';
 }

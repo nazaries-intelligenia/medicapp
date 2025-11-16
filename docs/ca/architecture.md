@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Gestiona automàticament actualització de `Medication` si l'entrada és d'avui
 - Restaura estoc si s'elimina una presa
 
+### DoseActionService
+
+Centralitza la lògica de registre de dosis per evitar duplicació de codi entre components UI.
+
+```dart
+class DoseActionService {
+  // Registre de dosis programades
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Registre de dosis manuals
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Càlcul de consum diari
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsabilitats:**
+- Validar estoc suficient abans de registrar dosis
+- Actualitzar estat de dosis preses/omeses per dia
+- Descomptar estoc automàticament
+- Crear entrades a l'historial de dosis
+- Gestionar notificacions relacionades (cancel·lar, reprogramar, dejuni)
+- Calcular consum diari total per a medicaments "segons necessitat"
+
+**Mètode `calculateDailyConsumption`:**
+Afegit per centralitzar el càlcul de consum diari, especialment útil per a medicaments "segons necessitat". Suma totes les dosis preses en un dia específic, excloent dosis omeses. Aquest valor s'utilitza per actualitzar `lastDailyConsumption` i predir dies d'estoc restants.
+
+**Excepcions:**
+- `InsufficientStockException`: Es llança quan no hi ha estoc suficient per completar una dosi
+
 ### DoseCalculationService
 
 Lògica de negoci per calcular properes dosis.
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Detecta propera dosi segons freqüència
 - Formata missatges localitzats ("Avui a les 18:00", "Demà a les 08:00")
 - Respecta dates d'inici/fi de tractament
+
+### MedicationUpdateService
+
+Centralitza operacions comunes d'actualització de medicaments per evitar duplicació de codi i assegurar comportament consistent.
+
+```dart
+class MedicationUpdateService {
+  // Reabastiment d'estoc
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Gestió d'estat suspended
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsabilitats:**
+- **refillMedication**: Actualitza estoc i guarda `lastRefillAmount` per a referència futura
+- **resumeMedication**: Activa medicament suspès i reprograma notificacions per a totes les persones assignades
+- **suspendMedication**: Desactiva medicament i cancel·la totes les notificacions programades
+
+**Avantatges de centralització:**
+- Elimina creació manual repetitiva d'objectes `Medication` amb `copyWith`
+- Gestiona correctament la taula `person_medications` (V19+) on resideix `isSuspended`
+- Coordina automàticament notificacions en canviar estat
+- Redueix codi en components UI de 493 a 419 línies (ex: `MedicationCard`)
+
+**Nota arquitectònica V19+:**
+Els mètodes `resumeMedication` i `suspendMedication` actualitzen la taula `person_medications` per a cada persona assignada, ja que `isSuspended` és un camp específic de la relació persona-medicament, no del medicament compartit.
 
 ---
 
@@ -456,8 +544,117 @@ class FastingConflictService {
 - En afegir un nou horari de dosi a `DoseScheduleEditor`
 - En crear o editar un medicament a `EditScheduleScreen`
 - Prevé conflictes que podrien comprometre l'efectivitat del tractament
+- Activat a V19+ després de la refactorització d'`EditScheduleScreen` per rebre `allMedications` i `personId` com a paràmetres
 
-**Nota:** Actualment la validació està desactivada a `EditScheduleScreen` per evitar problemes amb timers en tests, però la infraestructura està llesta per activar-se quan calgui.
+### Sistema de Notificacions d'Estoc Baix
+
+MedicApp implementa un sistema dual d'alertes d'estoc que combina notificacions reactives (en el moment crític) i proactives (anticipatòries).
+
+#### Notificacions Reactives (Immediate Stock Check)
+
+El sistema verifica automàticament l'estoc disponible cada vegada que un usuari intenta registrar una dosi, ja sigui des de:
+- La pantalla principal en marcar una dosi com a "presa"
+- Les accions ràpides de notificació (botó "Registrar")
+- El registre manual de dosis ocasionals
+
+**Implementació a NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Flux reactiu:**
+1. Usuari intenta registrar una dosi
+2. Sistema verifica: `medication.stockQuantity < doseQuantity`
+3. Si és insuficient:
+   - Mostra notificació immediata amb prioritat alta
+   - NO permet el registre de la dosi
+   - Indica quantitat necessària vs disponible
+   - Guia l'usuari a reposar estoc
+
+**Rang d'IDs de notificació:** 7,000,000 - 7,999,999 (generats per `NotificationIdGenerator.generateLowStockId()`)
+
+#### Notificacions Proactives (Daily Stock Monitoring)
+
+El sistema pot executar xecs proactius diaris que anticipen problemes de desabastiment abans que ocorrin.
+
+**Mètode principal:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Flux proactiu:**
+1. S'executa màxim una vegada al dia (utilitza SharedPreferences per a tracking)
+2. Itera sobre totes les persones registrades
+3. Per a cada medicament actiu:
+   - Calcula dosi diària total considerant:
+     - Totes les persones assignades al medicament
+     - Freqüència de tractament (diari, setmanal, interval)
+     - Horaris configurats per persona
+   - Divideix estoc actual entre dosi diària
+   - Obté dies de subministrament restants
+4. Si `medication.isStockLow` (utilitza el llindar configurable per medicament):
+   - Emet notificació proactiva
+   - Inclou dies aproximats restants
+   - No bloqueja cap acció
+
+**Prevenció de spam:**
+- Registra última data de xec a `SharedPreferences`
+- Només executa si `lastCheck != today`
+- Cada medicament només notifica una vegada al dia
+- Es reinicia en reposar estoc
+
+**Integració amb Medication.isStockLow:**
+El càlcul d'estoc baix utilitza la propietat existent del model:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Configuració de Canals de Notificació
+
+Les notificacions d'estoc utilitzen un canal dedicat:
+
+```dart
+// A NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Alertes d'Estoc Baix',
+  channelDescription: 'Notificacions quan l'estoc de medicaments està baix',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Característiques:**
+- Canal separat de recordatoris de dosi
+- Prioritat alta (no màxima, per a no ser intrusiu)
+- Auto-cancel·lació en tocar
+- Sense accions integrades (només informatives)
+
+#### Quan Utilitzar Cada Tipus
+
+| Tipus | Moment | Propòsit | Bloquejant |
+|------|---------|-----------|------------|
+| **Reactiu** | En intentar registrar dosi | Prevenir registre amb estoc insuficient | ✅ Sí |
+| **Proactiu** | Xec diari (opcional) | Anticipar reposició necessària | ❌ No |
+
+**Avantatge del disseny dual:**
+- Protecció absoluta en el moment crític (reactiu)
+- Planificació anticipada per a evitar arribar al moment crític (proactiu)
+- El sistema proactiu és opt-in (s'ha de cridar explícitament des de lògica d'app)
 
 ---
 

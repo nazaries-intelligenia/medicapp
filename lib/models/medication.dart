@@ -36,6 +36,9 @@ class Medication {
   // For "as needed" medications: amount consumed on the last day it was used
   final double? lastDailyConsumption; // Used to calculate low stock warning for occasional medications
 
+  // Expiration date in MM/YYYY format (shared across all users)
+  final String? expirationDate; // Format: "MM/YYYY" (e.g., "03/2025")
+
   Medication({
     required this.id,
     required this.name,
@@ -61,6 +64,7 @@ class Medication {
     this.notifyFasting = false, // Default to no notifications
     this.isSuspended = false, // Default to not suspended
     this.lastDailyConsumption, // Last day consumption for "as needed" medications
+    this.expirationDate, // Expiration date in MM/YYYY format
   }) : doseSchedule = doseSchedule ?? {};
 
   /// Legacy compatibility: get list of dose times (keys from doseSchedule)
@@ -93,6 +97,7 @@ class Medication {
       'notifyFasting': notifyFasting ? 1 : 0, // Store as integer
       'isSuspended': isSuspended ? 1 : 0, // Store as integer
       'lastDailyConsumption': lastDailyConsumption, // Last day consumption for "as needed" medications
+      'expirationDate': expirationDate, // Expiration date in MM/YYYY format
     };
   }
 
@@ -179,6 +184,9 @@ class Medication {
     // Parse lastDailyConsumption
     final lastDailyConsumption = (json['lastDailyConsumption'] as num?)?.toDouble();
 
+    // Parse expirationDate
+    final expirationDate = json['expirationDate'] as String?;
+
     return Medication(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -210,6 +218,7 @@ class Medication {
       notifyFasting: notifyFasting,
       isSuspended: isSuspended,
       lastDailyConsumption: lastDailyConsumption,
+      expirationDate: expirationDate,
     );
   }
 
@@ -468,6 +477,7 @@ class Medication {
     bool? notifyFasting,
     bool? isSuspended,
     double? lastDailyConsumption,
+    String? expirationDate,
   }) {
     return Medication(
       id: id ?? this.id,
@@ -494,6 +504,69 @@ class Medication {
       notifyFasting: notifyFasting ?? this.notifyFasting,
       isSuspended: isSuspended ?? this.isSuspended,
       lastDailyConsumption: lastDailyConsumption ?? this.lastDailyConsumption,
+      expirationDate: expirationDate ?? this.expirationDate,
     );
   }
+
+  // ==================== Expiration Date Management ====================
+
+  /// Parse expiration date from MM/YYYY format to DateTime (last day of that month)
+  DateTime? get expirationDateTime {
+    if (expirationDate == null || expirationDate!.isEmpty) return null;
+
+    try {
+      final parts = expirationDate!.split('/');
+      if (parts.length != 2) return null;
+
+      final month = int.parse(parts[0]);
+      final year = int.parse(parts[1]);
+
+      // Return the last day of that month
+      return DateTime(year, month + 1, 0); // Day 0 of next month = last day of current month
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// Check if medication has expired (current date is after expiration month)
+  bool get isExpired {
+    final expDate = expirationDateTime;
+    if (expDate == null) return false;
+
+    final now = DateTime.now();
+    return now.isAfter(expDate);
+  }
+
+  /// Check if medication is near expiration (within 30 days)
+  bool get isNearExpiration {
+    final expDate = expirationDateTime;
+    if (expDate == null) return false;
+
+    final now = DateTime.now();
+    final daysUntilExpiration = expDate.difference(now).inDays;
+
+    return daysUntilExpiration >= 0 && daysUntilExpiration <= 30;
+  }
+
+  /// Get expiration status
+  ExpirationStatus get expirationStatus {
+    if (expirationDate == null || expirationDate!.isEmpty) {
+      return ExpirationStatus.none;
+    }
+    if (isExpired) {
+      return ExpirationStatus.expired;
+    }
+    if (isNearExpiration) {
+      return ExpirationStatus.nearExpiration;
+    }
+    return ExpirationStatus.ok;
+  }
+}
+
+/// Expiration status enum
+enum ExpirationStatus {
+  none, // No expiration date set
+  ok, // Not expired, not near expiration
+  nearExpiration, // Within 30 days of expiration
+  expired, // Past expiration date
 }

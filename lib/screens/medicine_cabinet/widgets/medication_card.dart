@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
 import '../../../models/treatment_duration_type.dart';
-import '../../../models/dose_history_entry.dart';
 import '../../../database/database_helper.dart';
-import '../../../services/notification_service.dart';
 import '../../../services/dose_action_service.dart';
+import '../../../services/medication_update_service.dart';
 import '../../edit_medication_menu_screen.dart';
 import 'medication_options_modal.dart';
 import '../../medication_list/dialogs/refill_input_dialog.dart';
 import '../../medication_list/dialogs/manual_dose_input_dialog.dart';
+import '../../medication_list/dialogs/expiration_date_dialog.dart';
 import '../medication_person_assignment_screen.dart';
 
 class MedicationCard extends StatefulWidget {
@@ -65,35 +65,11 @@ class _MedicationCardState extends State<MedicationCard> {
     );
 
     if (refillAmount != null && refillAmount > 0) {
-      // Update medication with new stock and save refill amount
-      final updatedMedication = Medication(
-        id: widget.medication.id,
-        name: widget.medication.name,
-        type: widget.medication.type,
-        dosageIntervalHours: widget.medication.dosageIntervalHours,
-        durationType: widget.medication.durationType,
-        doseSchedule: widget.medication.doseSchedule,
-        stockQuantity: widget.medication.stockQuantity + refillAmount,
-        takenDosesToday: widget.medication.takenDosesToday,
-        skippedDosesToday: widget.medication.skippedDosesToday,
-        takenDosesDate: widget.medication.takenDosesDate,
-        lastRefillAmount: refillAmount,
-        lowStockThresholdDays: widget.medication.lowStockThresholdDays,
-        selectedDates: widget.medication.selectedDates,
-        weeklyDays: widget.medication.weeklyDays,
-        dayInterval: widget.medication.dayInterval,
-        startDate: widget.medication.startDate,
-        endDate: widget.medication.endDate,
-        requiresFasting: widget.medication.requiresFasting,
-        fastingType: widget.medication.fastingType,
-        fastingDurationMinutes: widget.medication.fastingDurationMinutes,
-        notifyFasting: widget.medication.notifyFasting,
-        isSuspended: widget.medication.isSuspended,
-        lastDailyConsumption: widget.medication.lastDailyConsumption,
+      // Use service to refill medication
+      final updatedMedication = await MedicationUpdateService.refillMedication(
+        medication: widget.medication,
+        refillAmount: refillAmount,
       );
-
-      // Update in database
-      await DatabaseHelper.instance.updateMedication(updatedMedication);
 
       // Reload medications
       widget.onMedicationUpdated();
@@ -114,6 +90,24 @@ class _MedicationCardState extends State<MedicationCard> {
           duration: const Duration(seconds: 3),
         ),
       );
+
+      // For as-needed medications, ask for expiration date after refill
+      if (widget.medication.allowsManualDoseRegistration && mounted) {
+        final expirationDate = await ExpirationDateDialog.show(
+          context,
+          currentExpirationDate: widget.medication.expirationDate,
+          isOptional: true,
+        );
+
+        // If user provided or updated expiration date, update medication
+        if (expirationDate != null && expirationDate.isNotEmpty && expirationDate != widget.medication.expirationDate) {
+          final updatedMedicationWithExpiration = updatedMedication.copyWith(
+            expirationDate: expirationDate,
+          );
+          await DatabaseHelper.instance.updateMedication(updatedMedicationWithExpiration);
+          widget.onMedicationUpdated();
+        }
+      }
     }
   }
 
@@ -142,16 +136,9 @@ class _MedicationCardState extends State<MedicationCard> {
         // Calculate daily consumption if needed
         double? lastDailyConsumption;
         if (widget.medication.durationType == TreatmentDurationType.asNeeded) {
-          final now = DateTime.now();
-          final todayHistory = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+          final existingConsumption = await DoseActionService.calculateDailyConsumption(
             medicationId: widget.medication.id,
-            startDate: DateTime(now.year, now.month, now.day),
-            endDate: DateTime(now.year, now.month, now.day, 23, 59, 59),
           );
-
-          final existingConsumption = todayHistory
-              .where((entry) => entry.status == DoseStatus.taken)
-              .fold(0.0, (sum, entry) => sum + entry.quantity);
           lastDailyConsumption = existingConsumption + doseQuantity;
         }
 
@@ -255,12 +242,14 @@ class _MedicationCardState extends State<MedicationCard> {
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
     // Navigate to edit medication menu
+    // Note: personId is null here - medicine cabinet should be refactored to be person-aware
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditMedicationMenuScreen(
           medication: widget.medication,
           existingMedications: allMedications,
+          personId: null, // TODO: Get person context from medicine cabinet
         ),
       ),
     );
@@ -271,53 +260,11 @@ class _MedicationCardState extends State<MedicationCard> {
 
   void _resumeMedication() async {
     final l10n = AppLocalizations.of(context)!;
-    // Resume medication (set isSuspended to false)
-    final updatedMedication = Medication(
-      id: widget.medication.id,
-      name: widget.medication.name,
-      type: widget.medication.type,
-      dosageIntervalHours: widget.medication.dosageIntervalHours,
-      durationType: widget.medication.durationType,
-      doseSchedule: widget.medication.doseSchedule,
-      stockQuantity: widget.medication.stockQuantity,
-      takenDosesToday: widget.medication.takenDosesToday,
-      skippedDosesToday: widget.medication.skippedDosesToday,
-      takenDosesDate: widget.medication.takenDosesDate,
-      lastRefillAmount: widget.medication.lastRefillAmount,
-      lowStockThresholdDays: widget.medication.lowStockThresholdDays,
-      selectedDates: widget.medication.selectedDates,
-      weeklyDays: widget.medication.weeklyDays,
-      dayInterval: widget.medication.dayInterval,
-      startDate: widget.medication.startDate,
-      endDate: widget.medication.endDate,
-      requiresFasting: widget.medication.requiresFasting,
-      fastingType: widget.medication.fastingType,
-      fastingDurationMinutes: widget.medication.fastingDurationMinutes,
-      notifyFasting: widget.medication.notifyFasting,
-      isSuspended: false, // Resume medication
-      lastDailyConsumption: widget.medication.lastDailyConsumption,
+
+    // Use service to resume medication
+    await MedicationUpdateService.resumeMedication(
+      medication: widget.medication,
     );
-
-    // Update in database
-    await DatabaseHelper.instance.updateMedication(updatedMedication);
-
-    // V19+: Reschedule notifications for all persons assigned to this medication
-    final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
-
-    // Cancel all existing notifications once before rescheduling
-    await NotificationService.instance.cancelMedicationNotifications(
-      updatedMedication.id,
-      medication: updatedMedication,
-    );
-
-    // Then schedule for all persons with skipCancellation=true
-    for (final person in persons) {
-      await NotificationService.instance.scheduleMedicationNotifications(
-        updatedMedication,
-        personId: person.id,
-        skipCancellation: true,
-      );
-    }
 
     // Reload medications
     widget.onMedicationUpdated();
@@ -395,6 +342,72 @@ class _MedicationCardState extends State<MedicationCard> {
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              // Expiration badge
+              if (widget.medication.isExpired) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.red.shade700,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.warning,
+                        size: 14,
+                        color: Colors.red.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.expirationDateExpired,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else if (widget.medication.isNearExpiration) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.orange.shade700,
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.schedule,
+                        size: 14,
+                        color: Colors.orange.shade700,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        l10n.expirationDateNearExpiration,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.orange.shade700,
                         ),
                       ),
                     ],

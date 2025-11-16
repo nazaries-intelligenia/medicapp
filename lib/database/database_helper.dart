@@ -53,7 +53,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 19,
+      version: 20,
       onCreate: _createDB,
       onUpgrade: _upgradeDB,
       onOpen: (db) async {
@@ -87,7 +87,8 @@ class DatabaseHelper {
         stockQuantity $realType,
         lastRefillAmount REAL,
         lowStockThresholdDays $integerType DEFAULT 3,
-        lastDailyConsumption REAL
+        lastDailyConsumption REAL,
+        expirationDate $textNullableType
       )
     ''');
 
@@ -502,6 +503,14 @@ class DatabaseHelper {
 
       print('=== Migration to v19 complete ===');
     }
+
+    if (oldVersion < 20) {
+      // Add expirationDate column for version 20 (medication expiration tracking)
+      await db.execute('''
+        ALTER TABLE medications ADD COLUMN expirationDate TEXT
+      ''');
+      print('Migration to v20: Added expirationDate column');
+    }
   }
 
   // === NEW V19 METHODS ===
@@ -541,6 +550,7 @@ class DatabaseHelper {
           'lastRefillAmount': medication.lastRefillAmount,
           'lowStockThresholdDays': medication.lowStockThresholdDays,
           'lastDailyConsumption': medication.lastDailyConsumption,
+          'expirationDate': medication.expirationDate,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -597,6 +607,7 @@ class DatabaseHelper {
         'lastRefillAmount': medication.lastRefillAmount,
         'lowStockThresholdDays': medication.lowStockThresholdDays,
         'lastDailyConsumption': medication.lastDailyConsumption,
+        'expirationDate': medication.expirationDate,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -654,6 +665,7 @@ class DatabaseHelper {
         m.lastRefillAmount,
         m.lowStockThresholdDays,
         m.lastDailyConsumption,
+        m.expirationDate,
         pm.durationType,
         pm.dosageIntervalHours,
         pm.doseSchedule,
@@ -699,6 +711,7 @@ class DatabaseHelper {
         'lastRefillAmount': medication.lastRefillAmount,
         'lowStockThresholdDays': medication.lowStockThresholdDays,
         'lastDailyConsumption': medication.lastDailyConsumption,
+        'expirationDate': medication.expirationDate,
       },
       where: 'id = ?',
       whereArgs: [medication.id],
@@ -743,6 +756,7 @@ class DatabaseHelper {
         'lastRefillAmount': medication.lastRefillAmount,
         'lowStockThresholdDays': medication.lowStockThresholdDays,
         'lastDailyConsumption': medication.lastDailyConsumption,
+        'expirationDate': medication.expirationDate,
       },
       where: 'id = ?',
       whereArgs: [medication.id],

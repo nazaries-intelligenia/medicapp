@@ -75,6 +75,9 @@ class AppLocalizationsCa extends AppLocalizations {
   String get btnAccept => 'Acceptar';
 
   @override
+  String get btnSkip => 'Ometre';
+
+  @override
   String get medicationTypePill => 'Pastilla';
 
   @override
@@ -2222,4 +2225,70 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String get fastingConflictOverride => 'Omitir y continuar';
+
+  @override
+  String get expirationDateLabel => 'Data de caducitat';
+
+  @override
+  String get expirationDateHint => 'MM/AAAA (p.ex: 03/2025)';
+
+  @override
+  String get expirationDateOptional => 'Data de caducitat (opcional)';
+
+  @override
+  String get expirationDateRequired =>
+      'Si us plau, introdueix la data de caducitat';
+
+  @override
+  String get expirationDateInvalidFormat =>
+      'Format invàlid. Utilitza MM/AAAA (p.ex: 03/2025)';
+
+  @override
+  String get expirationDateInvalidMonth => 'El mes ha d\'estar entre 01 i 12';
+
+  @override
+  String get expirationDateInvalidYear => 'L\'any ha de ser vàlid';
+
+  @override
+  String get expirationDateExpired => 'Aquest medicament ha caducat';
+
+  @override
+  String expirationDateExpiredOn(String date) {
+    return 'Caducat en $date';
+  }
+
+  @override
+  String get expirationDateNearExpiration => 'Caduca aviat';
+
+  @override
+  String expirationDateExpiresOn(String date) {
+    return 'Caduca en $date';
+  }
+
+  @override
+  String expirationDateExpiresIn(int days) {
+    return 'Caduca en $days dies';
+  }
+
+  @override
+  String get expirationDateExpiredWarning =>
+      'Aquest medicament ha caducat. Si us plau, verifica la seva data de caducitat abans d\'utilitzar-lo.';
+
+  @override
+  String get expirationDateNearExpirationWarning =>
+      'Aquest medicament caduca aviat. Considera substituir-lo.';
+
+  @override
+  String get expirationDateDialogTitle => 'Data de caducitat del medicament';
+
+  @override
+  String get expirationDateDialogMessage =>
+      'Introdueix la data de caducitat del medicament (es troba a l\'envàs).';
+
+  @override
+  String get expirationDateUpdateTitle => 'Actualitzar data de caducitat';
+
+  @override
+  String get expirationDateUpdateMessage =>
+      'Has recarregat el medicament. Vols actualitzar la data de caducitat?';
 }

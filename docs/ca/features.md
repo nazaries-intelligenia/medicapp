@@ -107,7 +107,60 @@ Cada acció de registre genera automàticament una entrada completa a l'historia
 
 ---
 
-## 5. Control d'Estoc (Pastiller)
+## 5. Gestió de Dates de Caducitat
+
+### Control de Caducitat de Medicaments
+
+MedicApp permet registrar i monitoritzar les dates de caducitat dels medicaments per garantir la seguretat del tractament. Aquesta funcionalitat és especialment important per a medicaments ocasionals i suspesos que romanen emmagatzemats durant períodes prolongats.
+
+El sistema utilitza un format simplificat MM/AAAA (mes/any) que coincideix amb el format estàndard imprès en els envasos de medicaments. Això facilita la introducció de dades sense necessitat de conèixer el dia exacte de caducitat.
+
+### Detecció Automàtica d'Estat
+
+MedicApp avalua automàticament l'estat de caducitat de cada medicament:
+
+- **Caducat**: El medicament ha superat la seva data de caducitat i es mostra amb una etiqueta vermella d'advertència amb icona d'alerta.
+- **Proper a caducar**: Falten 30 dies o menys per a la caducitat, es mostra amb una etiqueta taronja de precaució amb icona de rellotge.
+- **En bon estat**: Més de 30 dies fins a la caducitat, no es mostra advertència especial.
+
+Les alertes visuals apareixen directament a la targeta del medicament al botiquí, al costat de l'estat de suspensió si escau, permetent identificar ràpidament medicaments que requereixen atenció.
+
+### Registre de Data de Caducitat
+
+El sistema sol·licita la data de caducitat en tres moments específics:
+
+1. **En crear medicament ocasional**: Com a últim pas del procés de creació (pas 2/2), es mostra un diàleg opcional per introduir la data de caducitat abans de desar el medicament.
+
+2. **En suspendre medicament**: Quan se suspèn qualsevol medicament per a tots els usuaris que el comparteixen, se sol·licita la data de caducitat. Això permet registrar la data de l'envàs que quedarà emmagatzemat.
+
+3. **En recarregar medicament ocasional**: Després d'afegir estoc a un medicament ocasional, s'ofereix actualitzar la data de caducitat per reflectir la data del nou envàs adquirit.
+
+En tots els casos, el camp és opcional i es pot ometre. L'usuari pot cancel·lar l'operació o simplement deixar el camp buit.
+
+### Format i Validacions
+
+El diàleg d'entrada de data de caducitat proporciona dos camps separats:
+- Camp de mes (MM): accepta valors de 01 a 12
+- Camp d'any (AAAA): accepta valors de 2000 a 2100
+
+El sistema valida automàticament que el mes estigui en el rang correcte i que l'any sigui vàlid. En completar el mes (2 dígits), el focus es mou automàticament al camp d'any per agilitzar l'entrada de dades.
+
+La data s'emmagatzema en format "MM/AAAA" (exemple: "03/2025") i s'interpreta com l'últim dia d'aquell mes per a les comparacions de caducitat. Això significa que un medicament amb data "03/2025" es considerarà caducat a partir de l'1 d'abril de 2025.
+
+### Beneficis del Sistema
+
+Aquesta funcionalitat ajuda a:
+- Prevenir l'ús de medicaments caducats que podrien ser inefectius o perillosos
+- Gestionar eficientment l'estoc identificant medicaments propers a caducar
+- Prioritzar l'ús de medicaments segons la seva data de caducitat
+- Mantenir un botiquí segur amb control visual de l'estat de cada medicament
+- Evitar malbarataments recordant revisar medicaments abans que caduquin
+
+El sistema no impedeix el registre de dosis amb medicaments caducats, però sí proporciona advertències visuals clares perquè l'usuari prengui decisions informades.
+
+---
+
+## 6. Control d'Estoc (Pastiller)
 
 ### Indicadors Visuals Intuïtius
 
@@ -131,7 +184,7 @@ Quan l'estoc arriba al llindar configurat, MedicApp mostra alertes visuals desta
 
 ---
 
-## 6. Armari
+## 7. Armari
 
 ### Llista Alfabètica Organitzada
 
@@ -159,7 +212,7 @@ L'armari també facilita la gestió d'assignacions persona-medicament. Es poden 
 
 ---
 
-## 7. Navegació Temporal
+## 8. Navegació Temporal
 
 ### Lliscar Horitzontal per Dies
 
@@ -185,7 +238,7 @@ Aquesta funcionalitat és especialment valuosa per verificar si es va prendre un
 
 ---
 
-## 8. Notificacions Intel·ligents
+## 9. Notificacions Intel·ligents
 
 ### Accions Directes des de Notificació
 
@@ -223,7 +276,62 @@ MedicApp està optimitzat per a Android 12 i versions superiors, requerint i ges
 
 ---
 
-## 9. Configuració de Dejuni
+## 10. Alertes d'Estoc Baix
+
+### Notificacions Reactives d'Estoc Insuficient
+
+MedicApp implementa un sistema intel·ligent d'alertes d'estoc que protegeix l'usuari de quedar-se sense medicació en moments crítics. Quan un usuari intenta registrar una dosi (ja sigui des de la pantalla principal o des de les accions ràpides de notificació), el sistema verifica automàticament si hi ha estoc suficient per completar la presa.
+
+Si l'estoc disponible és menor que la quantitat requerida per a la dosi, MedicApp mostra immediatament una alerta d'estoc insuficient que impedeix el registre de la presa. Aquesta notificació reactiva indica clarament el nom del medicament afectat, la quantitat necessària versus la disponible, i suggereix reposar l'inventari abans d'intentar registrar la dosi novament.
+
+Aquest mecanisme de protecció prevé registres incorrectes a l'historial i garanteix la integritat del control d'inventari, evitant que es descompti estoc que físicament no existeix. L'alerta és clara, no intrusiva, i guia l'usuari directament cap a l'acció correctiva (reposar estoc).
+
+### Notificacions Proactives d'Estoc Baix
+
+A més de les alertes reactives en el moment de prendre una dosi, MedicApp inclou un sistema proactiu de monitoratge diari d'estoc que anticipa problemes de desabastiment abans que ocorrin. Aquest sistema avalua automàticament l'inventari de tots els medicaments una vegada al dia, calculant els dies de subministrament restants segons el consum programat.
+
+El càlcul considera múltiples factors per estimar amb precisió quant durarà l'estoc actual:
+
+**Per a medicaments programats** - El sistema suma la dosi diària total de totes les persones assignades, multiplica pels dies configurats en el patró de freqüència (per exemple, si es pren només dilluns, dimecres i divendres, ajusta el càlcul), i divideix l'estoc actual entre aquest consum diari efectiu.
+
+**Per a medicaments ocasionals ("segons necessitat")** - Utilitza el registre de l'últim dia de consum real com a predictor, proporcionant una estimació adaptativa que millora amb l'ús.
+
+Quan l'estoc d'un medicament arriba al llindar configurat (per defecte 3 dies, però personalitzable entre 1-10 dies per medicament), MedicApp emet una notificació proactiva d'advertència. Aquesta notificació mostra:
+
+- Nom del medicament i tipus
+- Dies aproximats de subministrament restants
+- Persona(es) afectada(es)
+- Estoc actual en unitats corresponents
+- Suggeriment de reposició
+
+### Prevenció d'Spam de Notificacions
+
+Per evitar bombardejar l'usuari amb alertes repetitives, el sistema de notificacions proactives implementa lògica intel·ligent de freqüència. Cada tipus d'alerta d'estoc baix s'emet màxim una vegada al dia per medicament. El sistema registra l'última data en què es va enviar cada alerta i no torna a notificar fins que:
+
+1. Hagi passat almenys 24 hores des de l'última alerta, O
+2. L'usuari hagi reposat l'estoc (restablint el comptador)
+
+Aquesta prevenció d'spam assegura que les notificacions siguin útils i oportunes sense convertir-se en una molèstia que porti l'usuari a ignorar-les o deshabilitar-les.
+
+### Integració amb Control d'Estoc Visual
+
+Les alertes d'estoc baix no funcionen de forma aïllada, sinó que estan profundament integrades amb el sistema de semàfors visuals del pastiller. Quan un medicament té estoc baix:
+
+- Apareix marcat en vermell o ambre a la llista del pastiller
+- Mostra una icona d'advertència a la pantalla principal
+- La notificació proactiva complementa aquests senyals visuals
+
+Aquesta multicapa d'informació (visual + notificacions) garanteix que l'usuari sigui conscient de l'estat de l'inventari des de múltiples punts de contacte amb l'aplicació.
+
+### Configuració i Personalització
+
+Cada medicament pot tenir un llindar d'alerta personalitzat que determina quan es considera l'estoc "baix". Medicaments crítics com insulina o anticoagulants poden configurar-se amb llindars de 7-10 dies per permetre temps ampli de reposició, mentre que suplements menys urgents poden usar llindars d'1-2 dies.
+
+El sistema respecta aquestes configuracions individuals, permetent que cada medicament tingui la seva pròpia política d'alertes adaptada a la seva criticitat i disponibilitat a farmàcies.
+
+---
+
+## 11. Configuració de Dejuni
 
 ### Tipus: Before (Abans) i After (Després)
 
@@ -266,7 +374,7 @@ Aquesta granularitat permet gestionar règims complexos on alguns medicaments es
 
 ---
 
-## 10. Historial de Dosis
+## 12. Historial de Dosis
 
 ### Registre Automàtic Complet
 
@@ -310,7 +418,7 @@ El format de les dades és relacional i normalitzat, amb claus foranes que vincu
 
 ---
 
-## 11. Localització i Internacionalització
+## 13. Localització i Internacionalització
 
 ### 8 Idiomes Completament Suportats
 
@@ -360,7 +468,7 @@ Aquesta atenció al detall lingüístic fa que MedicApp se senti natural i nativ
 
 ---
 
-## 12. Interfície Accessible i Usable
+## 14. Interfície Accessible i Usable
 
 ### Material Design 3
 

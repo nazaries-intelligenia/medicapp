@@ -410,6 +410,57 @@ class DoseHistoryService {
 - Automatically handles `Medication` update if entry is from today
 - Restores stock if a dose is deleted
 
+### DoseActionService
+
+Centralizes dose registration logic to avoid code duplication across UI components.
+
+```dart
+class DoseActionService {
+  // Scheduled dose registration
+  static Future<Medication> registerTakenDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  static Future<Medication> registerSkippedDose({
+    required Medication medication,
+    required String doseTime,
+  });
+
+  // Manual dose registration
+  static Future<Medication> registerManualDose({
+    required Medication medication,
+    required double quantity,
+    double? lastDailyConsumption,
+  });
+
+  static Future<Medication> registerExtraDose({
+    required Medication medication,
+    required double quantity,
+  });
+
+  // Daily consumption calculation
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  });
+}
+```
+
+**Responsibilities:**
+- Validate sufficient stock before registering doses
+- Update daily taken/skipped dose status
+- Automatically deduct stock
+- Create entries in dose history
+- Manage related notifications (cancel, reschedule, fasting)
+- Calculate total daily consumption for "as-needed" medications
+
+**`calculateDailyConsumption` method:**
+Added to centralize daily consumption calculation, especially useful for "as-needed" medications. Sums all doses taken on a specific day, excluding skipped doses. This value is used to update `lastDailyConsumption` and predict remaining stock days.
+
+**Exceptions:**
+- `InsufficientStockException`: Thrown when there is insufficient stock to complete a dose
+
 ### DoseCalculationService
 
 Business logic for calculating next doses.
@@ -425,6 +476,43 @@ class DoseCalculationService {
 - Detects next dose according to frequency
 - Formats localized messages ("Today at 6:00 PM", "Tomorrow at 8:00 AM")
 - Respects treatment start/end dates
+
+### MedicationUpdateService
+
+Centralizes common medication update operations to avoid code duplication and ensure consistent behavior.
+
+```dart
+class MedicationUpdateService {
+  // Stock refill
+  static Future<Medication> refillMedication({
+    required Medication medication,
+    required double refillAmount,
+  });
+
+  // Suspended state management
+  static Future<Medication> resumeMedication({
+    required Medication medication,
+  });
+
+  static Future<Medication> suspendMedication({
+    required Medication medication,
+  });
+}
+```
+
+**Responsibilities:**
+- **refillMedication**: Updates stock and saves `lastRefillAmount` for future reference
+- **resumeMedication**: Activates suspended medication and reschedules notifications for all assigned persons
+- **suspendMedication**: Deactivates medication and cancels all scheduled notifications
+
+**Advantages of centralization:**
+- Eliminates repetitive manual creation of `Medication` objects with `copyWith`
+- Correctly handles `person_medications` table (V19+) where `isSuspended` resides
+- Automatically coordinates notifications when changing state
+- Reduces UI component code from 493 to 419 lines (e.g., `MedicationCard`)
+
+**V19+ architectural note:**
+The `resumeMedication` and `suspendMedication` methods update the `person_medications` table for each assigned person, since `isSuspended` is a field specific to the person-medication relationship, not the shared medication.
 
 ### FastingConflictService
 
@@ -454,8 +542,117 @@ class FastingConflictService {
 - When adding a new dose time in `DoseScheduleEditor`
 - When creating or editing a medication in `EditScheduleScreen`
 - Prevents conflicts that could compromise treatment effectiveness
+- Activated in V19+ after `EditScheduleScreen` refactoring to receive `allMedications` and `personId` as parameters
 
-**Note:** Currently fasting validation is disabled in `EditScheduleScreen` to avoid timer issues in tests, but the infrastructure is ready to be activated when needed.
+### Low Stock Notification System
+
+MedicApp implements a dual stock alert system that combines reactive (at critical moment) and proactive (anticipatory) notifications.
+
+#### Reactive Notifications (Immediate Stock Check)
+
+The system automatically verifies available stock every time a user attempts to register a dose, whether from:
+- The main screen when marking a dose as "taken"
+- Notification quick actions ("Register" button)
+- Manual registration of occasional doses
+
+**Implementation in NotificationService:**
+
+```dart
+Future<void> showLowStockNotification({
+  required Medication medication,
+  required String personName,
+  bool isInsufficientForDose = false,
+  int? daysRemaining,
+}) async
+```
+
+**Reactive flow:**
+1. User attempts to register a dose
+2. System verifies: `medication.stockQuantity < doseQuantity`
+3. If insufficient:
+   - Shows immediate notification with high priority
+   - Does NOT allow dose registration
+   - Indicates required vs available quantity
+   - Guides user to refill stock
+
+**Notification ID range:** 7,000,000 - 7,999,999 (generated by `NotificationIdGenerator.generateLowStockId()`)
+
+#### Proactive Notifications (Daily Stock Monitoring)
+
+The system can execute proactive daily checks that anticipate supply problems before they occur.
+
+**Main method:**
+
+```dart
+Future<void> checkLowStockForAllMedications() async
+```
+
+**Proactive flow:**
+1. Executes at most once per day (uses SharedPreferences for tracking)
+2. Iterates over all registered persons
+3. For each active medication:
+   - Calculates total daily dose considering:
+     - All persons assigned to the medication
+     - Treatment frequency (daily, weekly, interval)
+     - Schedules configured per person
+   - Divides current stock by daily dose
+   - Gets remaining supply days
+4. If `medication.isStockLow` (uses configurable threshold per medication):
+   - Issues proactive notification
+   - Includes approximate remaining days
+   - Does not block any action
+
+**Spam prevention:**
+- Records last check date in `SharedPreferences`
+- Only executes if `lastCheck != today`
+- Each medication only notifies once per day
+- Resets upon stock refill
+
+**Integration with Medication.isStockLow:**
+The low stock calculation uses the model's existing property:
+```dart
+bool get isStockLow {
+  if (stockQuantity <= 0) return true;
+  final dailyDose = doseSchedule.values.fold(0.0, (sum, dose) => sum + dose);
+  if (dailyDose <= 0) return false;
+  final daysRemaining = stockQuantity / dailyDose;
+  return daysRemaining <= lowStockThresholdDays;
+}
+```
+
+#### Notification Channel Configuration
+
+Stock notifications use a dedicated channel:
+
+```dart
+// In NotificationConfig.getStockAlertAndroidDetails()
+AndroidNotificationDetails(
+  'stock_alerts',
+  'Low Stock Alerts',
+  channelDescription: 'Notifications when medication stock is low',
+  importance: Importance.high,
+  priority: Priority.high,
+  autoCancel: true,
+)
+```
+
+**Features:**
+- Separate channel from dose reminders
+- High priority (not max, to avoid being intrusive)
+- Auto-cancel on tap
+- No integrated actions (informational only)
+
+#### When to Use Each Type
+
+| Type | Timing | Purpose | Blocking |
+|------|--------|---------|----------|
+| **Reactive** | When attempting to register dose | Prevent registration with insufficient stock | ✅ Yes |
+| **Proactive** | Daily check (optional) | Anticipate necessary refill | ❌ No |
+
+**Advantage of dual design:**
+- Absolute protection at critical moment (reactive)
+- Advanced planning to avoid reaching the critical moment (proactive)
+- The proactive system is opt-in (must be explicitly called from app logic)
 
 ---
 

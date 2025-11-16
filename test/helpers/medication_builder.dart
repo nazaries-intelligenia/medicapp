@@ -37,6 +37,7 @@ class MedicationBuilder {
   List<String>? _selectedDates;
   int? _dayInterval;
   double? _lastDailyConsumption;
+  String? _expirationDate;
 
   /// Constructor por defecto
   MedicationBuilder();
@@ -116,6 +117,11 @@ class MedicationBuilder {
 
   MedicationBuilder withLastDailyConsumption(double consumption) {
     _lastDailyConsumption = consumption;
+    return this;
+  }
+
+  MedicationBuilder withExpirationDate(String? date) {
+    _expirationDate = date;
     return this;
   }
 
@@ -265,6 +271,7 @@ class MedicationBuilder {
     _selectedDates = medication.selectedDates;
     _dayInterval = medication.dayInterval;
     _lastDailyConsumption = medication.lastDailyConsumption;
+    _expirationDate = medication.expirationDate;
   }
 
   Medication build() {
@@ -293,6 +300,7 @@ class MedicationBuilder {
       selectedDates: _selectedDates,
       dayInterval: _dayInterval,
       lastDailyConsumption: _lastDailyConsumption,
+      expirationDate: _expirationDate,
     );
   }
 

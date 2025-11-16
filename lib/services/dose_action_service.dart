@@ -1,3 +1,4 @@
+import 'package:uuid/uuid.dart';
 import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
@@ -62,7 +63,7 @@ class DoseActionService {
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -125,7 +126,7 @@ class DoseActionService {
     final scheduledDateTime = _parseDoseDateTime(today, doseTime);
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${DateTime.now().millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -142,6 +143,36 @@ class DoseActionService {
     await _handleSkippedDoseNotifications(updatedMedication, doseTime, personId);
 
     return updatedMedication;
+  }
+
+  /// Calculates the total daily consumption for a medication on a specific date
+  ///
+  /// This is particularly useful for "as needed" medications to track
+  /// how much was consumed in a given day.
+  ///
+  /// Parameters:
+  /// - [medicationId]: The medication ID to query
+  /// - [date]: The date to calculate consumption for (defaults to today)
+  ///
+  /// Returns the total quantity consumed on that date
+  static Future<double> calculateDailyConsumption({
+    required String medicationId,
+    DateTime? date,
+  }) async {
+    final targetDate = date ?? DateTime.now();
+    final startOfDay = DateTime(targetDate.year, targetDate.month, targetDate.day);
+    final endOfDay = DateTime(targetDate.year, targetDate.month, targetDate.day, 23, 59, 59);
+
+    final historyEntries = await DatabaseHelper.instance.getDoseHistoryForDateRange(
+      medicationId: medicationId,
+      startDate: startOfDay,
+      endDate: endOfDay,
+    );
+
+    // Sum all taken doses for the day
+    return historyEntries
+        .where((entry) => entry.status == DoseStatus.taken)
+        .fold<double>(0.0, (sum, entry) => sum + entry.quantity);
   }
 
   /// Register a manual dose for "as needed" medications
@@ -181,7 +212,7 @@ class DoseActionService {
     }
 
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,
@@ -264,7 +295,7 @@ class DoseActionService {
 
     // Save to history with isExtraDose=true
     final historyEntry = DoseHistoryEntry(
-      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      id: const Uuid().v4(),
       medicationId: medication.id,
       medicationName: medication.name,
       medicationType: medication.type,

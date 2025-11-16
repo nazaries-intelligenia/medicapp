@@ -242,6 +242,12 @@ abstract class AppLocalizations {
   /// **'Aceptar'**
   String get btnAccept;
 
+  /// No description provided for @btnSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'Omitir'**
+  String get btnSkip;
+
   /// No description provided for @medicationTypePill.
   ///
   /// In es, this message translates to:
@@ -3811,6 +3817,114 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Omitir y continuar'**
   String get fastingConflictOverride;
+
+  /// No description provided for @expirationDateLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de caducidad'**
+  String get expirationDateLabel;
+
+  /// No description provided for @expirationDateHint.
+  ///
+  /// In es, this message translates to:
+  /// **'MM/AAAA (ej: 03/2025)'**
+  String get expirationDateHint;
+
+  /// No description provided for @expirationDateOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de caducidad (opcional)'**
+  String get expirationDateOptional;
+
+  /// No description provided for @expirationDateRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Por favor, introduce la fecha de caducidad'**
+  String get expirationDateRequired;
+
+  /// No description provided for @expirationDateInvalidFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'Formato inválido. Usa MM/AAAA (ej: 03/2025)'**
+  String get expirationDateInvalidFormat;
+
+  /// No description provided for @expirationDateInvalidMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'El mes debe estar entre 01 y 12'**
+  String get expirationDateInvalidMonth;
+
+  /// No description provided for @expirationDateInvalidYear.
+  ///
+  /// In es, this message translates to:
+  /// **'El año debe ser válido'**
+  String get expirationDateInvalidYear;
+
+  /// No description provided for @expirationDateExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Este medicamento ha caducado'**
+  String get expirationDateExpired;
+
+  /// No description provided for @expirationDateExpiredOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Caducado en {date}'**
+  String expirationDateExpiredOn(String date);
+
+  /// No description provided for @expirationDateNearExpiration.
+  ///
+  /// In es, this message translates to:
+  /// **'Caduca pronto'**
+  String get expirationDateNearExpiration;
+
+  /// No description provided for @expirationDateExpiresOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Caduca en {date}'**
+  String expirationDateExpiresOn(String date);
+
+  /// No description provided for @expirationDateExpiresIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Caduca en {days} días'**
+  String expirationDateExpiresIn(int days);
+
+  /// No description provided for @expirationDateExpiredWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Este medicamento ha caducado. Por favor, verifica su fecha de caducidad antes de usarlo.'**
+  String get expirationDateExpiredWarning;
+
+  /// No description provided for @expirationDateNearExpirationWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Este medicamento caduca pronto. Considera reemplazarlo.'**
+  String get expirationDateNearExpirationWarning;
+
+  /// No description provided for @expirationDateDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de caducidad del medicamento'**
+  String get expirationDateDialogTitle;
+
+  /// No description provided for @expirationDateDialogMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Introduce la fecha de caducidad del medicamento (se encuentra en el envase).'**
+  String get expirationDateDialogMessage;
+
+  /// No description provided for @expirationDateUpdateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar fecha de caducidad'**
+  String get expirationDateUpdateTitle;
+
+  /// No description provided for @expirationDateUpdateMessage.
+  ///
+  /// In es, this message translates to:
+  /// **'Has recargado el medicamento. ¿Deseas actualizar la fecha de caducidad?'**
+  String get expirationDateUpdateMessage;
 }
 
 class _AppLocalizationsDelegate
