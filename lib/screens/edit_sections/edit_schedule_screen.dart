@@ -9,8 +9,15 @@ import '../../widgets/action_buttons.dart';
 /// Pantalla para editar horarios y cantidades de las tomas
 class EditScheduleScreen extends StatefulWidget {
   final Medication medication;
+  final List<Medication>? allMedications; // For fasting conflict validation
+  final String? personId; // Person context for validation
 
-  const EditScheduleScreen({super.key, required this.medication});
+  const EditScheduleScreen({
+    super.key,
+    required this.medication,
+    this.allMedications,
+    this.personId,
+  });
 
   @override
   State<EditScheduleScreen> createState() => _EditScheduleScreenState();
@@ -19,11 +26,6 @@ class EditScheduleScreen extends StatefulWidget {
 class _EditScheduleScreenState extends State<EditScheduleScreen> {
   final _editorKey = GlobalKey<DoseScheduleEditorState>();
   bool _isSaving = false;
-
-  // Note: Fasting conflict validation is currently disabled to avoid
-  // timer issues in tests. To re-enable, load medications here and pass
-  // to DoseScheduleEditor's allMedications parameter.
-  // See: _getMedicationsForFirstPerson() method below for loading logic.
 
   Future<void> _saveChanges() async {
     final l10n = AppLocalizations.of(context)!;
@@ -140,30 +142,6 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
     _editorKey.currentState?.addDose();
   }
 
-  /// Get all medications for the first person assigned to this medication
-  /// This is used for fasting conflict validation
-  Future<List<Medication>> _getMedicationsForFirstPerson() async {
-    try {
-      final persons = await DatabaseHelper.instance.getPersonsForMedication(
-        widget.medication.id,
-      );
-
-      if (persons.isEmpty) {
-        return [];
-      }
-
-      // Get medications for the first person
-      final medications = await DatabaseHelper.instance.getMedicationsForPerson(
-        persons.first.id,
-      );
-
-      return medications;
-    } catch (e) {
-      print('Error loading medications for fasting validation: $e');
-      return [];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -192,8 +170,10 @@ class _EditScheduleScreenState extends State<EditScheduleScreen> {
                 widget.medication.doseSchedule.length,
               ),
               subtitleText: l10n.editScheduleAdjustTimeAndQuantity,
-              // Fasting conflict validation is disabled (allMedications: null)
-              // to avoid async loading issues in this screen
+              // Enable fasting conflict validation if medications are provided
+              allMedications: widget.allMedications,
+              personId: widget.personId,
+              medicationId: widget.medication.id,
             ),
           ),
 

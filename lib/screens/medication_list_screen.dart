@@ -308,6 +308,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
         builder: (context) => EditMedicationMenuScreen(
           medication: medication,
           existingMedications: _viewModel.medications,
+          personId: _viewModel.selectedPerson?.id,
         ),
       ),
     );

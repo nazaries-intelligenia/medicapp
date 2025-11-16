@@ -20,6 +20,9 @@ enum NotificationIdType {
 
   /// Dynamic fasting notifications (range: 6,000,000-6,999,999)
   dynamicFasting,
+
+  /// Low stock notifications (range: 7,000,000-7,999,999)
+  lowStock,
 }
 
 /// Unified notification ID generator for MedicApp
@@ -78,6 +81,9 @@ class NotificationIdGenerator {
 
       case NotificationIdType.dynamicFasting:
         return _generateDynamicFastingId(medicationId, actualDoseTime!, personId);
+
+      case NotificationIdType.lowStock:
+        return _generateLowStockId(medicationId);
     }
   }
 
@@ -161,5 +167,19 @@ class NotificationIdGenerator {
     final combinedString = '$medicationId-dynamic-fasting-$timeString-$personId';
     final hash = combinedString.hashCode.abs();
     return 6000000 + (hash % 1000000);
+  }
+
+  /// Generate ID for low stock notifications
+  /// Range: 7,000,000-7,999,999
+  ///
+  /// Uses medication ID hash to ensure unique IDs per medication
+  static int _generateLowStockId(String medicationId) {
+    final hash = medicationId.hashCode.abs();
+    return 7000000 + (hash % 1000000);
+  }
+
+  /// Convenience method to generate low stock notification ID
+  static int generateLowStockId(String medicationId) {
+    return _generateLowStockId(medicationId);
   }
 }

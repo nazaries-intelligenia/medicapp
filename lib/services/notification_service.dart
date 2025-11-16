@@ -599,7 +599,18 @@ class NotificationService {
       // Check if there's enough stock
       if (medication.stockQuantity < doseQuantity) {
         print('⚠️  Insufficient stock');
-        // TODO: Show a notification about insufficient stock
+
+        // Get person information for notification
+        final person = await DatabaseHelper.instance.getPerson(personId);
+        final personName = person?.name ?? 'Usuario';
+
+        // Show notification about insufficient stock
+        await showLowStockNotification(
+          medication: medication,
+          personName: personName,
+          isInsufficientForDose: true,
+        );
+
         return;
       }
 
@@ -1460,6 +1471,46 @@ class NotificationService {
   /// Cancel all ongoing fasting countdown notifications
   Future<void> cancelOngoingFastingNotification() async {
     await _fastingScheduler.cancelOngoingFastingNotification();
+  }
+
+  // ========== Low Stock Notifications ==========
+
+  /// Show a notification when medication stock is low or insufficient
+  Future<void> showLowStockNotification({
+    required Medication medication,
+    required String personName,
+    bool isInsufficientForDose = false,
+  }) async {
+    if (_isTestMode) return;
+
+    try {
+      // Generate a unique notification ID for low stock
+      final notificationId = NotificationIdGenerator.generateLowStockId(
+        medication.id,
+      );
+
+      final title = isInsufficientForDose
+          ? '⚠️ Stock insuficiente: ${medication.name}'
+          : '📦 Stock bajo: ${medication.name}';
+
+      final body = isInsufficientForDose
+          ? 'No hay suficiente ${medication.type.unit} para la próxima dosis. Stock actual: ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.unit}.'
+          : 'Quedan ${medication.stockQuantity.toStringAsFixed(1)} ${medication.type.unit}. Considera reabastecer pronto.';
+
+      await _notificationsPlugin.show(
+        notificationId,
+        title,
+        body,
+        NotificationConfig.stockAlert(
+          personName: personName,
+          medicationName: medication.name,
+        ),
+      );
+
+      print('📦 Low stock notification shown for ${medication.name}');
+    } catch (e) {
+      print('Error showing low stock notification: $e');
+    }
   }
 
   // ========== Notification History (Debug) ==========

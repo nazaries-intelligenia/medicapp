@@ -97,4 +97,31 @@ class NotificationConfig {
       iOS: getDarwinNotificationDetails(),
     );
   }
+
+  /// Get Android notification details for low stock alerts
+  static fln.AndroidNotificationDetails getStockAlertAndroidDetails() {
+    return const fln.AndroidNotificationDetails(
+      'stock_alerts', // Unique channel ID for stock alerts
+      'Alertas de Stock Bajo',
+      channelDescription: 'Notificaciones cuando el stock de medicamentos está bajo',
+      importance: fln.Importance.high,
+      priority: fln.Priority.high,
+      ticker: 'Stock bajo de medicamento',
+      icon: '@drawable/ic_notification',
+      enableVibration: true,
+      playSound: true,
+      autoCancel: true,
+    );
+  }
+
+  /// Create NotificationDetails for low stock alerts
+  static fln.NotificationDetails stockAlert({
+    required String personName,
+    required String medicationName,
+  }) {
+    return fln.NotificationDetails(
+      android: getStockAlertAndroidDetails(),
+      iOS: getDarwinNotificationDetails(),
+    );
+  }
 }

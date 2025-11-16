@@ -255,12 +255,14 @@ class _MedicationCardState extends State<MedicationCard> {
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
     // Navigate to edit medication menu
+    // Note: personId is null here - medicine cabinet should be refactored to be person-aware
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditMedicationMenuScreen(
           medication: widget.medication,
           existingMedications: allMedications,
+          personId: null, // TODO: Get person context from medicine cabinet
         ),
       ),
     );
