@@ -372,8 +372,10 @@ adb shell run-as com.medicapp.app rm -r /data/data/com.medicapp.app/databases/
 
 2. Verifica la versión actual de la base de datos:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 final db = await DatabaseHelper.instance.database;
-print('Database version: ${await db.getVersion()}');
+LoggerService.info('Database version: ${await db.getVersion()}');
 ```
 
 3. Si es desarrollo, resetea la base de datos:
@@ -398,8 +400,10 @@ print('Database version: ${await db.getVersion()}');
 
 2. Verifica que las operaciones de insert/update retornen éxito:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 final id = await db.insert('medications', medication.toMap());
-print('Inserted medication with id: $id');
+LoggerService.info('Inserted medication with id: $id');
 ```
 
 3. Asegúrate de que no haya excepciones silenciosas
@@ -486,9 +490,11 @@ flutter run
 
 3. Verifica que las notificaciones estén programadas:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 final pendingNotifications = await flutterLocalNotificationsPlugin
     .pendingNotificationRequests();
-print('Pending notifications: ${pendingNotifications.length}');
+LoggerService.info('Pending notifications: ${pendingNotifications.length}');
 ```
 
 4. Revisa los logs para errores de programación
@@ -633,7 +639,7 @@ flutter pub global activate devtools
 flutter pub global run devtools
 ```
 
-3. Verifica que no haya `print()` statements excesivos en hot paths
+3. Verifica que no haya `LoggerService` statements excesivos en hot paths
 
 4. Nunca evalúes el rendimiento en modo debug
 
@@ -787,7 +793,9 @@ MaterialApp(
 
 4. Para debug, imprime los colores actuales:
 ```dart
-print('Primary: ${Theme.of(context).colorScheme.primary}');
+import 'package:medicapp/services/logger_service.dart';
+
+LoggerService.debug('Primary: ${Theme.of(context).colorScheme.primary}');
 ```
 
 ---
@@ -1399,10 +1407,12 @@ adb logcat | grep -i flutter
 
 5. Asegúrate de manejar estos errores gracefully:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 try {
   await somePluginMethod();
 } on PlatformException catch (e) {
-  print('Error: ${e.code} - ${e.message}');
+  LoggerService.error('Error: ${e.code} - ${e.message}');
   // Manejar apropiadamente
 }
 ```
@@ -1426,10 +1436,12 @@ try {
 
 3. Verifica el query SQL:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 try {
   await db.query('medications', where: 'id = ?', whereArgs: [id]);
 } on DatabaseException catch (e) {
-  print('Database error: ${e.toString()}');
+  LoggerService.error('Database error: ${e.toString()}');
 }
 ```
 
@@ -1519,6 +1531,8 @@ final length = nullableString?.length;
 
 ### Cómo Habilitar Logs
 
+**Nota**: MedicApp utiliza `LoggerService` en lugar de `print()` para registrar eventos. Se recomienda utilizar LoggerService.info(), LoggerService.error(), LoggerService.debug() y otros métodos en lugar de print() para mantener consistencia con el sistema de logging centralizado.
+
 **Descripción**: Necesitas ver logs detallados para depurar un problema.
 
 **Solución**:
@@ -1528,18 +1542,15 @@ final length = nullableString?.length;
 flutter run --verbose
 ```
 
-2. **Logs solo de la app**:
+2. **Logs solo de la app** (alternativa: usar LoggerService):
 ```dart
-import 'package:logging/logging.dart';
+import 'package:medicapp/services/logger_service.dart';
 
-final logger = Logger('MedicApp');
+// LoggerService proporciona una forma centralizada de logging
+// Usa LoggerService.info(), LoggerService.error(), LoggerService.debug(), etc.
 
 void main() {
-  Logger.root.level = Level.ALL;
-  Logger.root.onRecord.listen((record) {
-    print('${record.level.name}: ${record.time}: ${record.message}');
-  });
-
+  LoggerService.info('MedicApp iniciando');
   runApp(MyApp());
 }
 ```
@@ -1566,7 +1577,9 @@ adb logcat
 
 1. Agrega logs en el código de notificaciones:
 ```dart
-print('Scheduling notification at: $scheduledTime');
+import 'package:medicapp/services/logger_service.dart';
+
+LoggerService.info('Scheduling notification at: $scheduledTime');
 await flutterLocalNotificationsPlugin.zonedSchedule(
   id,
   title,
@@ -1574,15 +1587,17 @@ await flutterLocalNotificationsPlugin.zonedSchedule(
   scheduledTime,
   notificationDetails,
 );
-print('Notification scheduled successfully');
+LoggerService.info('Notification scheduled successfully');
 ```
 
 2. Lista notificaciones pendientes:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+
 final pending = await flutterLocalNotificationsPlugin
     .pendingNotificationRequests();
 for (var notification in pending) {
-  print('Pending: ${notification.id} - ${notification.title}');
+  LoggerService.info('Pending: ${notification.id} - ${notification.title}');
 }
 ```
 
@@ -1610,13 +1625,18 @@ void main() {
 
 2. Agrega logs en tus queries:
 ```dart
-print('Executing query: SELECT * FROM medications WHERE id = $id');
+import 'package:medicapp/services/logger_service.dart';
+
+LoggerService.debug('Executing query: SELECT * FROM medications WHERE id = $id');
 final result = await db.query('medications', where: 'id = ?', whereArgs: [id]);
-print('Query returned ${result.length} rows');
+LoggerService.debug('Query returned ${result.length} rows');
 ```
 
 3. Wrapper para logging automático:
 ```dart
+import 'package:medicapp/services/logger_service.dart';
+import 'package:sqflite/sqflite.dart';
+
 class LoggedDatabase {
   final Database db;
   LoggedDatabase(this.db);
@@ -1626,9 +1646,9 @@ class LoggedDatabase {
     String? where,
     List<Object?>? whereArgs,
   }) async {
-    print('Query: $table WHERE $where ARGS $whereArgs');
+    LoggerService.debug('Query: $table WHERE $where ARGS $whereArgs');
     final result = await db.query(table, where: where, whereArgs: whereArgs);
-    print('Result: ${result.length} rows');
+    LoggerService.debug('Result: ${result.length} rows');
     return result;
   }
 }
@@ -1664,7 +1684,9 @@ void someFunction() {
 
 4. **Inspect variables**:
 ```dart
-print('Value: $value');  // Logging simple
+import 'package:medicapp/services/logger_service.dart';
+
+LoggerService.debug('Value: $value');  // Logging centralizado con LoggerService
 debugPrint('Value: $value');  // Logging que respeta rate limits
 ```
 
@@ -2000,12 +2022,13 @@ version: 1.0.0+1
 2. **Información del dispositivo**:
 ```dart
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:medicapp/services/logger_service.dart';
 
 final deviceInfo = DeviceInfoPlugin();
 if (Platform.isAndroid) {
   final androidInfo = await deviceInfo.androidInfo;
-  print('Android ${androidInfo.version.sdkInt}');
-  print('Model: ${androidInfo.model}');
+  LoggerService.info('Android ${androidInfo.version.sdkInt}');
+  LoggerService.info('Model: ${androidInfo.model}');
 }
 ```
 

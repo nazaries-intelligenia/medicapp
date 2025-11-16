@@ -790,7 +790,228 @@ MedicApp-erako, **Database as Single Source of Truth + StatefulWidget + setState
 
 ---
 
-## 6. Biltegi Lokala
+## 6. Erregistroak eta Arazketa
+
+### logger ^2.0.0
+
+**Erabilitako bertsioa:** `^2.0.0` (bateragarria `2.0.0` etik `< 3.0.0` arte)
+
+**Helburua:**
+logger Dart-en erregistro-sistema profesionala da, log-ak egituratuak, konfigurazgarriak eta behin-behinean aniztasun-mailak dituzten sistema eskaintzen du. `print()` erabileraren ordez zintzo-sistemaren ordezkoa da, produkzio-aplikazioetarako egokia.
+
+**Erregistraren mailaak:**
+
+MedicApp-ek 6 erregistro-maila erabiltzen ditu asaldura-mailaren arabera:
+
+1. **VERBOSE (trace):** Diagnostiko-informazio oso zehatza (garapena)
+2. **DEBUG:** Garapen-bitartean baliozko informazioa
+3. **INFO:** Aplikazioaren fluxuari buruzko informatiboak mezuak
+4. **WARNING:** Abisua funtzionamendua ekiditzen ez duten
+5. **ERROR:** Errore atentzioa behar duten baina aplikazioa berreskuratu ahal denean
+6. **WTF (What a Terrible Failure):** Inoiz gertatuko ez litzatekeela errore larrioak
+
+**MedicApp-en inplementazioa:**
+
+**`lib/services/logger_service.dart`:**
+```dart
+import 'package:logger/logger.dart';
+
+class LoggerService {
+  LoggerService._();
+
+  static Logger? _logger;
+  static bool _isTestMode = false;
+
+  static Logger get instance {
+    _logger ??= _createLogger();
+    return _logger!;
+  }
+
+  static Logger _createLogger() {
+    return Logger(
+      filter: _LogFilter(),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 5,
+        lineLength: 80,
+        colors: true,
+        printEmojis: true,
+        dateTimeFormat: DateTimeFormat.onlyTime,
+      ),
+      output: ConsoleOutput(),
+    );
+  }
+
+  // Komeniketsia metodoak
+  static void debug(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.d(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void info(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.i(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void error(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.e(message, error: error, stackTrace: stackTrace);
+    }
+  }
+}
+
+class _LogFilter extends LogFilter {
+  @override
+  bool shouldLog(LogEvent event) {
+    if (LoggerService.isTestMode) return false;
+    if (kReleaseMode) {
+      return event.level.index >= Level.warning.index;
+    }
+    return true;
+  }
+}
+```
+
+**Kodean erabilera:**
+
+```dart
+// AURRETIK (print-ekin)
+print('Scheduling notification for ${medication.name}');
+print('Error al guardar: $e');
+
+// ONDOREN (LoggerService-rekin)
+LoggerService.info('Scheduling notification for ${medication.name}');
+LoggerService.error('Error al guardar', e);
+```
+
+**Erabilera adibideak maila bakoitzean:**
+
+```dart
+// Normal fluxu informatzioa
+LoggerService.info('Medikamentua sortu: ${medication.name}');
+
+// Garapenean debug
+LoggerService.debug('Query exekutatua: SELECT * FROM medications WHERE id = ${id}');
+
+// Ez-kritikoak abisu
+LoggerService.warning('Stock baxua ${medication.name}-rentzat: ${stock} unitateak');
+
+// Berreskuragarri erroreak
+LoggerService.error('Errorea jakinarazpena programatzean', e, stackTrace);
+
+// Errore larrioak
+LoggerService.wtf('Inconsistentea egoera: medikamenturik ID gabe', error);
+```
+
+**Erabilitako ezaugarriak:**
+
+1. **PrettyPrinter:** Irakurgarri formatoa koloreak, emoji eta timestamp-ekin:
+```
+💡 INFO 14:23:45 | Medikamentua sortu: Ibuprofeno
+⚠️  WARNING 14:24:10 | Stock baxua: Paracetamol
+❌ ERROR 14:25:33 | Errorea gordetzean
+```
+
+2. **Automatiko iragazketa:** Argalpenean, bakarrik abisu eta errore erakusten:
+```dart
+// Debug modua: erregistro guztiak erakusten
+// Release modua: soilik WARNING, ERROR, WTF
+```
+
+3. **Test modua:** Testing-bitartean erregistroak ez du:
+```dart
+LoggerService.enableTestMode();  // tests setUp-en
+```
+
+4. **Stack trace automatikoak:** Erroreetan, osoa stack trace inprimatzen:
+```dart
+LoggerService.error('Database error', e, stackTrace);
+// Output formateatutako stack trace barne
+```
+
+5. **BuildContext mendekotasunik gabe:** Kodean edozein tokitan erabili daiteke:
+```dart
+// Zerbitzuetan
+class NotificationService {
+  void scheduleNotification() {
+    LoggerService.info('Scheduling notification...');
+  }
+}
+
+// Modeloetan
+class Medication {
+  void validate() {
+    if (stock < 0) {
+      LoggerService.warning('Stock negatiboa: $stock');
+    }
+  }
+}
+```
+
+**Zergatik logger:**
+
+1. **Profesionala:** Produkziorako diseinatuta, ez soilik garapena
+2. **Konfigurazgarria:** Berbera mailaak, iragazkiak, formatuak
+3. **Errendimendua:** Adimendunaren iragazketa argalenean modua
+4. **Debug hobea:** Koloreak, emoji, timestamp-ak, stack trace-ak
+5. **Testing egokia:** Test modua testing-bitartean erregistroak ez du
+6. **Zero konfigurazioa:** Out-of-the-box funtzionatzen zentzuzko konfigurazio-rekin
+
+**print()-tik LoggerService-ra migrazioa:**
+
+MedicApp-ek **279 print() statements** migratu zituen **15 fitxategitan** LoggerService sistematara:
+
+| Fitxategia | Prints migratua | Nagusitako maila |
+|---------|----------------|-------------------|
+| notification_service.dart | 112 | info, error, warning |
+| database_helper.dart | 26 | debug, info, error |
+| fasting_notification_scheduler.dart | 32 | info, warning |
+| daily_notification_scheduler.dart | 25 | info, warning |
+| dose_calculation_service.dart | 25 | debug, info |
+| medication_list_viewmodel.dart | 7 | info, error |
+| **Guztira** | **279** | - |
+
+**Alderaketa alternatibarik:**
+
+| Ezaugarria | logger | print() | logging paketea | kustom irtenbidea |
+|----------------|--------|---------|----------------|-----------------|
+| **Erregistro-mailaak** | ✅ 6 mailaak | ❌ Ez da | ✅ 7 mailaak | ⚠️ Manualean |
+| **Koloreak** | ✅ Bai | ❌ Ez | ⚠️ Oinarrizkoa | ⚠️ Manualean |
+| **Timestamp-ak** | ✅ Konfigurazgarria | ❌ Ez | ✅ Bai | ⚠️ Manualean |
+| **Iragazketa** | ✅ Automatikoa | ❌ Ez | ✅ Manualean | ⚠️ Manualean |
+| **Stack trace** | ✅ Automatikoa | ❌ Manualean | ⚠️ Manualean | ⚠️ Manualean |
+| **Ederki inprimatu** | ✅ Bikaina | ❌ Oinarrizkoa | ⚠️ Oinarrizkoa | ⚠️ Manualean |
+| **Tamaina** | ✅ ~50KB | ✅ 0KB | ⚠️ ~100KB | ✅ Aldagarria |
+
+**Zergatik EZ print():**
+
+- ❌ Debug, info, warning, error artean ez du bereizten
+- ❌ Timestamp-arik gabe, debug zailtzen
+- ❌ Kolorearik gabe, kontsolan irakurtzea zaila
+- ❌ Ez da produkzioan iragazka daiteke
+- ❌ Aplikazio profesiionaletarako ez da egokia
+
+**Zergatik EZ logging paketea (dart:logging):**
+
+- ⚠️ Konfiguratzea konplexuagoa
+- ⚠️ Ederki inprimatua kustom inplementazioa behar
+- ⚠️ Gutxiago ergonomikoa (boilerplate gehiago)
+- ⚠️ Koloreak/emoji ez du defektuan
+
+**Logger konpromisoak:**
+
+- ✅ **Aldekoak:** Ezarpen sinplea, irteera ederra, adimendunaren iragazketa, produkzioagatik egokia
+- ❌ **Kontra:** ~50KB gehitzen APK-an (irrelebanetia), mendekotasun bat gehiago
+
+**Erabakia:** MedicApp-erako, non debugging eta monitoring kritikoak diren (medical aplikazioa da), logger sinplekotasun eta profesional-funtzionaltasunaren arteko oreketa perfektua eskaintzen du. 50KB gehigarria debug-ari eta kodearen mantenibilitateari buruzko onuakarekin alderatuta insignifikantea da.
+
+**Dokumentazio ofiziala:** https://pub.dev/packages/logger
+
+---
+
+## 7. Biltegi Lokala
 
 ### shared_preferences ^2.2.2
 
@@ -871,7 +1092,7 @@ class PreferencesService {
 
 ---
 
-## 7. Fitxategi Eragiketak
+## 8. Fitxategi Eragiketak
 
 ### file_picker ^8.0.0+1
 
@@ -991,7 +1212,7 @@ Future<void> exportDatabase() async {
 
 ---
 
-## 8. Testing
+## 9. Testing
 
 ### flutter_test (SDK)
 
@@ -1215,7 +1436,7 @@ class MedicationFactory {
 
 ---
 
-## 9. Garapen Tresnak
+## 10. Garapen Tresnak
 
 ### flutter_launcher_icons ^0.14.4
 
@@ -1360,7 +1581,7 @@ final medication = Medication(
 
 ---
 
-## 10. Plataformaren Mendekotasunak
+## 11. Plataformaren Mendekotasunak
 
 ### Android
 
@@ -1448,7 +1669,7 @@ dependencies {
 
 ---
 
-## 11. Bertsioak eta Bateragarritasuna
+## 12. Bertsioak eta Bateragarritasuna
 
 ### Mendekotasunen Taula
 
@@ -1468,14 +1689,15 @@ dependencies {
 | **share_plus** | `^10.1.4` | Fitxategiak partekatu | Fitxategiak |
 | **path_provider** | `^2.1.5` | Sistemaren direktorioak | Iraunkortasuna |
 | **uuid** | `^4.0.0` | UUID sortzailea | Utilitatea |
+| **logger** | `^2.0.0` | Erregistro-sistema profesionala | Logging |
 | **sqflite_common_ffi** | `^2.3.0` | SQLite Testing | Testing (dev) |
 | **flutter_launcher_icons** | `^0.14.4` | Ikono sortzea | Tresna (dev) |
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Tresna (dev) |
 | **flutter_lints** | `^6.0.0` | Analisi estatikoa | Tresna (dev) |
 
-**Produkzioko mendekotasun osoa:** 14
+**Produkzioko mendekotasun osoa:** 15
 **Garapeneko mendekotasun osoa:** 4
-**Guztira:** 18
+**Guztira:** 19
 
 ---
 
@@ -1503,9 +1725,9 @@ dependencies {
 
 ---
 
-## 12. Alderaketoak eta Erabakiak
+## 13. Alderaketoak eta Erabakiak
 
-### 12.1. Datu-Basea: SQLite vs Hive vs Isar vs Drift
+### 13.1. Datu-Basea: SQLite vs Hive vs Isar vs Drift
 
 **Erabakia:** SQLite (sqflite)
 
@@ -1575,7 +1797,7 @@ MedicApp-erako, non N:M erlazioak funts ezkoak diren, migrazioak maiztruak izan 
 
 ---
 
-### 12.2. Jakinarazpenak: flutter_local_notifications vs awesome_notifications vs Firebase
+### 13.2. Jakinarazpenak: flutter_local_notifications vs awesome_notifications vs Firebase
 
 **Erabakia:** flutter_local_notifications
 
@@ -1631,7 +1853,7 @@ MedicApp bezalako aplikazioetarako (kudeaketa personala, erabiltzaile anitzeko e
 
 ---
 
-### 12.3. Egoeraren Kudeaketa: Vanilla Flutter vs Provider vs BLoC vs Riverpod
+### 13.3. Egoeraren Kudeaketa: Vanilla Flutter vs Provider vs BLoC vs Riverpod
 
 **Erabakia:** Vanilla Flutter (egoera kudeaketa liburutegik gabe)
 
@@ -1806,6 +2028,7 @@ MedicApp-ek teknologia-stack **sinple, sendo eta egokia** erabiltzen du platafor
 - **Jakinarazpen lokalak:** Pribatutasun osoa eta offline funtzionamendua.
 - **ARB lokalizazioa:** 8 hizkuntza Unicode CLDR pluralizazioarekin.
 - **Vanilla Flutter:** Egoera kudeaketa beharrezkoa ez.
+- **Logger paketea:** Erregistro-sistema profesionala 6 mailarekin eta iragazki adimendunarekin.
 - **432+ test:** %75-80ko estaldura unit, widget eta integrazio testetan.
 
 Erabaki teknologiko bakoitza **eskakizun errealetatik justifikatua** dago, ez hype edo joeratatik. Emaitza aplikazio mantenigarri, fidagarri eta zehazki egiten duena konplexutasun artifiziala gabe.

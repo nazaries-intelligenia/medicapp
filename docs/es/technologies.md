@@ -788,7 +788,228 @@ Para MedicApp, la arquitectura **Database as Single Source of Truth + StatefulWi
 
 ---
 
-## 6. Almacenamiento Local
+## 6. Logging y Depuración
+
+### logger ^2.0.0
+
+**Versión utilizada:** `^2.0.0` (compatible con `2.0.0` hasta `< 3.0.0`)
+
+**Propósito:**
+logger es una biblioteca de logging profesional para Dart que proporciona un sistema de logs estructurado, configurable y con múltiples niveles de severidad. Reemplaza el uso de `print()` statements con un sistema de logging robusto apropiado para aplicaciones en producción.
+
+**Niveles de logging:**
+
+MedicApp utiliza 6 niveles de log según su severidad:
+
+1. **VERBOSE (trace):** Información de diagnóstico muy detallada (desarrollo)
+2. **DEBUG:** Información útil durante desarrollo
+3. **INFO:** Mensajes informacionales sobre flujo de la aplicación
+4. **WARNING:** Advertencias que no impiden el funcionamiento
+5. **ERROR:** Errores que requieren atención pero la app puede recuperarse
+6. **WTF (What a Terrible Failure):** Errores graves que no deberían ocurrir nunca
+
+**Implementación en MedicApp:**
+
+**`lib/services/logger_service.dart`:**
+```dart
+import 'package:logger/logger.dart';
+
+class LoggerService {
+  LoggerService._();
+
+  static Logger? _logger;
+  static bool _isTestMode = false;
+
+  static Logger get instance {
+    _logger ??= _createLogger();
+    return _logger!;
+  }
+
+  static Logger _createLogger() {
+    return Logger(
+      filter: _LogFilter(),
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 5,
+        lineLength: 80,
+        colors: true,
+        printEmojis: true,
+        dateTimeFormat: DateTimeFormat.onlyTime,
+      ),
+      output: ConsoleOutput(),
+    );
+  }
+
+  // Métodos de conveniencia
+  static void debug(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.d(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void info(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.i(message, error: error, stackTrace: stackTrace);
+    }
+  }
+
+  static void error(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    if (!_isTestMode) {
+      instance.e(message, error: error, stackTrace: stackTrace);
+    }
+  }
+}
+
+class _LogFilter extends LogFilter {
+  @override
+  bool shouldLog(LogEvent event) {
+    if (LoggerService.isTestMode) return false;
+    if (kReleaseMode) {
+      return event.level.index >= Level.warning.index;
+    }
+    return true;
+  }
+}
+```
+
+**Uso en el código:**
+
+```dart
+// ANTES (con print)
+print('Scheduling notification for ${medication.name}');
+print('Error al guardar: $e');
+
+// DESPUÉS (con LoggerService)
+LoggerService.info('Scheduling notification for ${medication.name}');
+LoggerService.error('Error al guardar', e);
+```
+
+**Ejemplos de uso por nivel:**
+
+```dart
+// Información de flujo normal
+LoggerService.info('Medicamento creado: ${medication.name}');
+
+// Debugging durante desarrollo
+LoggerService.debug('Query ejecutado: SELECT * FROM medications WHERE id = ${id}');
+
+// Advertencias no críticas
+LoggerService.warning('Stock bajo para ${medication.name}: ${stock} unidades');
+
+// Errores recuperables
+LoggerService.error('Error al programar notificación', e, stackTrace);
+
+// Errores graves
+LoggerService.wtf('Estado inconsistente: medicamento sin ID', error);
+```
+
+**Características utilizadas:**
+
+1. **PrettyPrinter:** Formato legible con colores, emojis y timestamps:
+```
+💡 INFO 14:23:45 | Medicamento creado: Ibuprofeno
+⚠️  WARNING 14:24:10 | Stock bajo: Paracetamol
+❌ ERROR 14:25:33 | Error al guardar
+```
+
+2. **Filtrado automático:** En release, solo muestra warnings y errors:
+```dart
+// Debug mode: muestra todos los logs
+// Release mode: solo WARNING, ERROR, WTF
+```
+
+3. **Test mode:** Suprime todos los logs durante testing:
+```dart
+LoggerService.enableTestMode();  // En setUp de tests
+```
+
+4. **Stack traces automáticos:** Para errores, imprime stack trace completo:
+```dart
+LoggerService.error('Database error', e, stackTrace);
+// Output incluye stack trace formateado
+```
+
+5. **Sin dependencia de BuildContext:** Puede usarse en cualquier parte del código:
+```dart
+// En servicios
+class NotificationService {
+  void scheduleNotification() {
+    LoggerService.info('Scheduling notification...');
+  }
+}
+
+// En modelos
+class Medication {
+  void validate() {
+    if (stock < 0) {
+      LoggerService.warning('Stock negativo: $stock');
+    }
+  }
+}
+```
+
+**Por qué logger:**
+
+1. **Profesional:** Diseñado para producción, no solo desarrollo
+2. **Configurable:** Diferentes niveles, filtros, formatos
+3. **Rendimiento:** Filtrado inteligente en release mode
+4. **Debugging mejorado:** Colores, emojis, timestamps, stack traces
+5. **Testing friendly:** Modo test para suprimir logs
+6. **Zero configuration:** Funciona out-of-the-box con configuración sensata
+
+**Migración de print() a LoggerService:**
+
+MedicApp migró **279 print() statements** en **15 archivos** al sistema LoggerService:
+
+| Archivo | Prints migrados | Nivel predominante |
+|---------|----------------|-------------------|
+| notification_service.dart | 112 | info, error, warning |
+| database_helper.dart | 26 | debug, info, error |
+| fasting_notification_scheduler.dart | 32 | info, warning |
+| daily_notification_scheduler.dart | 25 | info, warning |
+| dose_calculation_service.dart | 25 | debug, info |
+| medication_list_viewmodel.dart | 7 | info, error |
+| **Total** | **279** | - |
+
+**Comparativa con alternativas:**
+
+| Característica | logger | print() | logging package | custom solution |
+|----------------|--------|---------|----------------|-----------------|
+| **Niveles de log** | ✅ 6 niveles | ❌ Ninguno | ✅ 7 niveles | ⚠️ Manual |
+| **Colores** | ✅ Sí | ❌ No | ⚠️ Básico | ⚠️ Manual |
+| **Timestamps** | ✅ Configurable | ❌ No | ✅ Sí | ⚠️ Manual |
+| **Filtrado** | ✅ Automático | ❌ No | ✅ Manual | ⚠️ Manual |
+| **Stack traces** | ✅ Automático | ❌ Manual | ⚠️ Manual | ⚠️ Manual |
+| **Pretty print** | ✅ Excelente | ❌ Básico | ⚠️ Básico | ⚠️ Manual |
+| **Tamaño** | ✅ ~50KB | ✅ 0KB | ⚠️ ~100KB | ✅ Variable |
+
+**Por qué NO print():**
+
+- ❌ No diferencia entre debug, info, warning, error
+- ❌ Sin timestamps, dificulta debugging
+- ❌ Sin colores, difícil de leer en consola
+- ❌ No se puede filtrar en producción
+- ❌ No apropiado para aplicaciones profesionales
+
+**Por qué NO logging package (dart:logging):**
+
+- ⚠️ Más complejo de configurar
+- ⚠️ Pretty printing requiere implementación custom
+- ⚠️ Menos ergonómico (más boilerplate)
+- ⚠️ No incluye colores/emojis by default
+
+**Trade-offs de logger:**
+
+- ✅ **Pros:** Setup simple, output hermoso, filtrado inteligente, apropiado para producción
+- ❌ **Contras:** Añade ~50KB al APK (irrelevante), una dependencia más
+
+**Decisión:** Para MedicApp, donde el debugging y monitoring son críticos (es una app médica), logger proporciona el balance perfecto entre simplicidad y funcionalidad profesional. Los 50KB adicionales son insignificantes comparados con los beneficios de debugging y el código más mantenible.
+
+**Documentación oficial:** https://pub.dev/packages/logger
+
+---
+
+## 7. Almacenamiento Local
 
 ### shared_preferences ^2.2.2
 
@@ -869,7 +1090,7 @@ class PreferencesService {
 
 ---
 
-## 7. Operaciones de Archivos
+## 8. Operaciones de Archivos
 
 ### file_picker ^8.0.0+1
 
@@ -989,7 +1210,7 @@ Future<void> exportDatabase() async {
 
 ---
 
-## 8. Testing
+## 9. Testing
 
 ### flutter_test (SDK)
 
@@ -1213,7 +1434,7 @@ class MedicationFactory {
 
 ---
 
-## 9. Herramientas de Desarrollo
+## 10. Herramientas de Desarrollo
 
 ### flutter_launcher_icons ^0.14.4
 
@@ -1358,7 +1579,7 @@ final medication = Medication(
 
 ---
 
-## 10. Dependencias de Plataforma
+## 11. Dependencias de Plataforma
 
 ### Android
 
@@ -1446,7 +1667,7 @@ dependencies {
 
 ---
 
-## 11. Versiones y Compatibilidad
+## 12. Versiones y Compatibilidad
 
 ### Tabla de Dependencias
 
@@ -1466,6 +1687,7 @@ dependencies {
 | **share_plus** | `^10.1.4` | Compartir archivos | Archivos |
 | **path_provider** | `^2.1.5` | Directorios del sistema | Persistencia |
 | **uuid** | `^4.0.0` | Generador de UUIDs | Utilidad |
+| **logger** | `^2.0.0` | Sistema de logging profesional | Logging |
 | **sqflite_common_ffi** | `^2.3.0` | Testing de SQLite | Testing (dev) |
 | **flutter_launcher_icons** | `^0.14.4` | Generación de iconos | Herramienta (dev) |
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Herramienta (dev) |
@@ -1501,7 +1723,7 @@ dependencies {
 
 ---
 
-## 12. Comparativas y Decisiones
+## 13. Comparativas y Decisiones
 
 ### 12.1. Base de Datos: SQLite vs Hive vs Isar vs Drift
 
@@ -1803,6 +2025,7 @@ MedicApp utiliza un stack tecnológico **simple, robusto y apropiado** para una 
 - **Notificaciones locales:** Privacidad total y funcionamiento offline.
 - **Localización ARB:** 8 idiomas con pluralización Unicode CLDR.
 - **Vanilla Flutter:** Sin gestión de estado innecesaria.
+- **Logger package:** Sistema de logging profesional con 6 niveles y filtrado inteligente.
 - **432+ tests:** Cobertura del 75-80% con tests unitarios, de widget e integración.
 
 Cada decisión tecnológica está **justificada por requisitos reales**, no por hype o tendencias. El resultado es una aplicación mantenible, confiable y que hace exactamente lo que promete sin complejidad artificial.
