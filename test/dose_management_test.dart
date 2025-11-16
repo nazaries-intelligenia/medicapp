@@ -4,6 +4,7 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
+import 'package:medicapp/models/person.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/test_helpers.dart';
@@ -47,6 +48,14 @@ void main() {
   setUp(() async {
     // Ensure default person exists (V19+ requirement)
     await DatabaseTestHelper.ensureDefaultPerson();
+
+    // Create test person for dose history foreign key constraints
+    final testPerson = Person(
+      id: 'test-person-id',
+      name: 'Test User',
+      isDefault: false,
+    );
+    await DatabaseHelper.instance.insertPerson(testPerson);
   });
 
   group('Dose History Management Tests', () {

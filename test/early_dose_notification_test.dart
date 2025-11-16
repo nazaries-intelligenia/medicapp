@@ -2,20 +2,35 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/services/dose_action_service.dart';
 import 'package:medicapp/models/medication.dart';
+import 'package:medicapp/models/person.dart';
+import 'package:medicapp/database/database_helper.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/database_test_helper.dart';
 
 /// Test to verify that when a dose is taken early (before scheduled time),
 /// the next notification is NOT rescheduled for the same day
 void main() {
   late NotificationService notificationService;
 
-  setUp(() {
+  // Initialize database for tests
+  DatabaseTestHelper.setupAll();
+
+  setUp(() async {
     notificationService = NotificationService.instance;
     notificationService.enableTestMode();
+
+    // Create test person first (required for foreign key constraints)
+    final testPerson = Person(
+      id: 'test-person-id',
+      name: 'Test User',
+      isDefault: false,
+    );
+    await DatabaseHelper.instance.insertPerson(testPerson);
   });
 
-  tearDown(() {
+  tearDown(() async {
     notificationService.disableTestMode();
+    await DatabaseTestHelper.cleanDatabase();
   });
 
   group('Early Dose Notification Rescheduling', () {

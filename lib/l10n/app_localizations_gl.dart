@@ -2181,4 +2181,45 @@ class AppLocalizationsGl extends AppLocalizations {
 
   @override
   String get fastingCompleted => 'Xaxún completado! Xa podes comer';
+
+  @override
+  String get fastingConflictTitle => 'Conflicto con Período de Ayuno';
+
+  @override
+  String fastingConflictMessage(String medicationName) {
+    return 'Esta hora coincide con el período de ayuno del medicamento $medicationName';
+  }
+
+  @override
+  String get fastingConflictSelectedTime => 'Hora seleccionada';
+
+  @override
+  String get fastingConflictPeriod => 'Período de ayuno';
+
+  @override
+  String get fastingConflictType => 'Tipo de ayuno';
+
+  @override
+  String get fastingTypeBefore => 'Antes de tomar';
+
+  @override
+  String get fastingTypeAfter => 'Después de tomar';
+
+  @override
+  String fastingConflictExplanationBefore(String medicationName) {
+    return 'Durante este período, no debes comer antes de tomar $medicationName. Si tomas otro medicamento en esta hora, podrías tener comida en el estómago.';
+  }
+
+  @override
+  String fastingConflictExplanationAfter(String medicationName) {
+    return 'Durante este período, no debes comer después de tomar $medicationName. Si tomas otro medicamento en esta hora, no podrías comer.';
+  }
+
+  @override
+  String fastingConflictUseSuggested(String time) {
+    return 'Usar hora sugerida ($time)';
+  }
+
+  @override
+  String get fastingConflictOverride => 'Omitir y continuar';
 }

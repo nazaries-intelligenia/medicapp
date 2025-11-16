@@ -8,12 +8,14 @@ import 'package:medicapp/services/dose_action_service.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/person_test_helper.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   DatabaseTestHelper.setup();
 
-  setUp(() {
+  setUp(() async {
+    await DatabaseTestHelper.ensureDefaultPerson();
     NotificationService.instance.enableTestMode();
   });
 
@@ -25,7 +27,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       await DoseActionService.registerExtraDose(
         medication: medication,
@@ -52,7 +54,7 @@ void main() {
           .withTakenDoses(['08:00'], todayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       final updatedMed = await DoseActionService.registerExtraDose(
         medication: medication,
@@ -72,7 +74,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Register first extra dose
       var updatedMed = await DoseActionService.registerExtraDose(
@@ -109,7 +111,7 @@ void main() {
           .withExtraDoses(['10:30', '15:45'], yesterdayString)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication);
+      await insertMedicationWithPerson(medication);
 
       // Register extra dose today
       final updatedMed = await DoseActionService.registerExtraDose(
@@ -133,7 +135,7 @@ void main() {
           .withStock(10.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication1);
+      await insertMedicationWithPerson(medication1);
 
       final updatedMed1 = await DoseActionService.registerExtraDose(
         medication: medication1,
@@ -149,7 +151,7 @@ void main() {
           .withStock(20.0)
           .build();
 
-      await DatabaseHelper.instance.insertMedication(medication2);
+      await insertMedicationWithPerson(medication2);
 
       final updatedMed2 = await DoseActionService.registerExtraDose(
         medication: medication2,

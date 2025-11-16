@@ -192,8 +192,9 @@ class NotificationService {
     await _createNotificationChannels();
   }
 
-  /// Create Android notification channels explicitly with actions configured
+  /// Create Android notification channels explicitly
   /// This ensures that notification actions work correctly on Android 8.0+ (API 26+)
+  /// Note: Actions are defined per-notification in AndroidNotificationDetails, not at channel level
   Future<void> _createNotificationChannels() async {
     final androidPlugin = _notificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -201,26 +202,8 @@ class NotificationService {
         >();
 
     if (androidPlugin != null) {
-      // Define the actions that will be available on notifications
-      const actions = <fln.AndroidNotificationAction>[
-        fln.AndroidNotificationAction(
-          'register_dose',
-          'Registrar',
-          showsUserInterface: false,
-        ),
-        fln.AndroidNotificationAction(
-          'skip_dose',
-          'No tomada',
-          showsUserInterface: false,
-        ),
-        fln.AndroidNotificationAction(
-          'snooze_dose',
-          'Posponer 10min',
-          showsUserInterface: false,
-        ),
-      ];
-
-      // Create medication reminders channel with actions
+      // Create medication reminders channel
+      // Actions are configured in AndroidNotificationDetails (notification_config.dart)
       const medicationChannel = fln.AndroidNotificationChannel(
         'medication_reminders', // Must match the channel ID in NotificationConfig
         'Recordatorios de Medicamentos',
@@ -228,7 +211,6 @@ class NotificationService {
         importance: fln.Importance.high,
         playSound: true,
         enableVibration: true,
-        actions: actions, // Enable actions on this channel
       );
 
       // Create fasting completion channel (no actions needed)
@@ -246,7 +228,7 @@ class NotificationService {
       await androidPlugin.createNotificationChannel(medicationChannel);
       await androidPlugin.createNotificationChannel(fastingChannel);
 
-      print('✅ Notification channels created successfully with actions');
+      print('✅ Notification channels created successfully');
     }
   }
 

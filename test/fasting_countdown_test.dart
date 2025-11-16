@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
+import 'package:medicapp/models/person.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/screens/medication_list/services/dose_calculation_service.dart';
 import 'helpers/medication_builder.dart';
@@ -33,6 +34,14 @@ void main() {
   // V19+: Ensure default person exists before each test
   setUp(() async {
     await DatabaseTestHelper.ensureDefaultPerson();
+
+    // Create test person (required for foreign key constraints)
+    final testPerson = Person(
+      id: 'test-person-id',
+      name: 'Test User',
+      isDefault: false,
+    );
+    await DatabaseHelper.instance.insertPerson(testPerson);
   });
 
   group('Fasting Countdown Display - DoseCalculationService.getActiveFastingPeriod', () {
