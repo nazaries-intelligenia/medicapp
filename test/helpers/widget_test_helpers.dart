@@ -456,7 +456,17 @@ Future<void> setupIntegrationTest() async {
 /// Helper function to tear down integration tests with common cleanup.
 /// This should be called in tearDown() for integration tests.
 Future<void> tearDownIntegrationTest() async {
+  // Wait for any pending async operations to complete before cleanup
+  // This prevents "Cannot close sink while adding stream" errors
+  await Future.delayed(const Duration(milliseconds: 500));
+
+  try {
+    await DatabaseHelper.resetDatabase();
+  } catch (e) {
+    // Ignore errors during cleanup - database may already be closed
+  }
+
+  // Clear test values after database cleanup
   final binding = TestWidgetsFlutterBinding.instance;
   binding.platformDispatcher.clearAllTestValues();
-  await DatabaseHelper.resetDatabase();
 }
