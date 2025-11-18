@@ -16,171 +16,90 @@ enum MedicationType {
   drops,
   other;
 
-  String get displayName {
-    switch (this) {
-      case MedicationType.pill:
-        return 'Pastilla';
-      case MedicationType.capsule:
-        return 'Cápsula';
-      case MedicationType.injection:
-        return 'Inyección';
-      case MedicationType.syrup:
-        return 'Jarabe';
-      case MedicationType.ovule:
-        return 'Óvulo';
-      case MedicationType.suppository:
-        return 'Supositorio';
-      case MedicationType.inhaler:
-        return 'Inhalador';
-      case MedicationType.sachet:
-        return 'Sobre';
-      case MedicationType.spray:
-        return 'Spray';
-      case MedicationType.ointment:
-        return 'Pomada';
-      case MedicationType.lotion:
-        return 'Loción';
-      case MedicationType.bandage:
-        return 'Apósito';
-      case MedicationType.drops:
-        return 'Gota';
-      case MedicationType.other:
-        return 'Otro';
-    }
-  }
+  String get displayName => switch (this) {
+        .pill => 'Pastilla',
+        .capsule => 'Cápsula',
+        .injection => 'Inyección',
+        .syrup => 'Jarabe',
+        .ovule => 'Óvulo',
+        .suppository => 'Supositorio',
+        .inhaler => 'Inhalador',
+        .sachet => 'Sobre',
+        .spray => 'Spray',
+        .ointment => 'Pomada',
+        .lotion => 'Loción',
+        .bandage => 'Apósito',
+        .drops => 'Gota',
+        .other => 'Otro',
+      };
 
-  IconData get icon {
-    switch (this) {
-      case MedicationType.pill:
-        return Icons.circle;
-      case MedicationType.capsule:
-        return Icons.medication;
-      case MedicationType.injection:
-        return Icons.vaccines;
-      case MedicationType.syrup:
-        return Icons.local_drink;
-      case MedicationType.ovule:
-        return Icons.egg;
-      case MedicationType.suppository:
-        return Icons.toggle_off;
-      case MedicationType.inhaler:
-        return Icons.air;
-      case MedicationType.sachet:
-        return Icons.inventory_2;
-      case MedicationType.spray:
-        return Icons.water_drop;
-      case MedicationType.ointment:
-        return Icons.opacity;
-      case MedicationType.lotion:
-        return Icons.water;
-      case MedicationType.bandage:
-        return Icons.healing;
-      case MedicationType.drops:
-        return Icons.invert_colors;
-      case MedicationType.other:
-        return Icons.category;
-    }
-  }
+  IconData get icon => switch (this) {
+        .pill => Icons.circle,
+        .capsule => Icons.medication,
+        .injection => Icons.vaccines,
+        .syrup => Icons.local_drink,
+        .ovule => Icons.egg,
+        .suppository => Icons.toggle_off,
+        .inhaler => Icons.air,
+        .sachet => Icons.inventory_2,
+        .spray => Icons.water_drop,
+        .ointment => Icons.opacity,
+        .lotion => Icons.water,
+        .bandage => Icons.healing,
+        .drops => Icons.invert_colors,
+        .other => Icons.category,
+      };
 
-  Color getColor(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    switch (this) {
-      case MedicationType.pill:
-        return Colors.blue;
-      case MedicationType.capsule:
-        return Colors.purple;
-      case MedicationType.injection:
-        return Colors.red;
-      case MedicationType.syrup:
-        return Colors.orange;
-      case MedicationType.ovule:
-        return Colors.pink;
-      case MedicationType.suppository:
-        return Colors.teal;
-      case MedicationType.inhaler:
-        return Colors.cyan;
-      case MedicationType.sachet:
-        return Colors.brown;
-      case MedicationType.spray:
-        return Colors.lightBlue;
-      case MedicationType.ointment:
-        return Colors.green;
-      case MedicationType.lotion:
-        return Colors.indigo;
-      case MedicationType.bandage:
-        return Colors.amber;
-      case MedicationType.drops:
-        return Colors.blueGrey;
-      case MedicationType.other:
-        return Colors.grey;
-    }
-  }
+  Color getColor(BuildContext context) => switch (this) {
+        .pill => Colors.blue,
+        .capsule => Colors.purple,
+        .injection => Colors.red,
+        .syrup => Colors.orange,
+        .ovule => Colors.pink,
+        .suppository => Colors.teal,
+        .inhaler => Colors.cyan,
+        .sachet => Colors.brown,
+        .spray => Colors.lightBlue,
+        .ointment => Colors.green,
+        .lotion => Colors.indigo,
+        .bandage => Colors.amber,
+        .drops => Colors.blueGrey,
+        .other => Colors.grey,
+      };
 
   /// Get the unit of measurement for the medication type
-  String get stockUnit {
-    switch (this) {
-      case MedicationType.pill:
-        return 'pastillas';
-      case MedicationType.capsule:
-        return 'cápsulas';
-      case MedicationType.injection:
-        return 'inyecciones';
-      case MedicationType.syrup:
-        return 'ml';
-      case MedicationType.ovule:
-        return 'óvulos';
-      case MedicationType.suppository:
-        return 'supositorios';
-      case MedicationType.inhaler:
-        return 'inhalaciones';
-      case MedicationType.sachet:
-        return 'sobres';
-      case MedicationType.spray:
-        return 'ml';
-      case MedicationType.ointment:
-        return 'gramos';
-      case MedicationType.lotion:
-        return 'ml';
-      case MedicationType.bandage:
-        return 'apósitos';
-      case MedicationType.drops:
-        return 'gotas';
-      case MedicationType.other:
-        return 'unidades';
-    }
-  }
+  String get stockUnit => switch (this) {
+        .pill => 'pastillas',
+        .capsule => 'cápsulas',
+        .injection => 'inyecciones',
+        .syrup => 'ml',
+        .ovule => 'óvulos',
+        .suppository => 'supositorios',
+        .inhaler => 'inhalaciones',
+        .sachet => 'sobres',
+        .spray => 'ml',
+        .ointment => 'gramos',
+        .lotion => 'ml',
+        .bandage => 'apósitos',
+        .drops => 'gotas',
+        .other => 'unidades',
+      };
 
   /// Get the singular unit of measurement for the medication type
-  String get stockUnitSingular {
-    switch (this) {
-      case MedicationType.pill:
-        return 'pastilla';
-      case MedicationType.capsule:
-        return 'cápsula';
-      case MedicationType.injection:
-        return 'inyección';
-      case MedicationType.syrup:
-        return 'ml';
-      case MedicationType.ovule:
-        return 'óvulo';
-      case MedicationType.suppository:
-        return 'supositorio';
-      case MedicationType.inhaler:
-        return 'inhalación';
-      case MedicationType.sachet:
-        return 'sobre';
-      case MedicationType.spray:
-        return 'ml';
-      case MedicationType.ointment:
-        return 'gramo';
-      case MedicationType.lotion:
-        return 'ml';
-      case MedicationType.bandage:
-        return 'apósito';
-      case MedicationType.drops:
-        return 'gota';
-      case MedicationType.other:
-        return 'unidad';
-    }
-  }
+  String get stockUnitSingular => switch (this) {
+        .pill => 'pastilla',
+        .capsule => 'cápsula',
+        .injection => 'inyección',
+        .syrup => 'ml',
+        .ovule => 'óvulo',
+        .suppository => 'supositorio',
+        .inhaler => 'inhalación',
+        .sachet => 'sobre',
+        .spray => 'ml',
+        .ointment => 'gramo',
+        .lotion => 'ml',
+        .bandage => 'apósito',
+        .drops => 'gota',
+        .other => 'unidad',
+      };
 }

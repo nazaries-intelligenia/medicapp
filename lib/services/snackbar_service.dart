@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../utils/widget_extensions.dart';
 
 /// Centralized service for managing SnackBar messages throughout the app
 ///
@@ -14,21 +15,85 @@ import 'package:flutter/material.dart';
 /// SnackBarService.showSuccess(context, 'Operation completed successfully');
 /// SnackBarService.showError(context, 'An error occurred');
 /// ```
+/// Internal enum for SnackBar types
+enum _SnackBarType {
+  success,
+  error,
+  info,
+  warning;
+
+  IconData get icon => switch (this) {
+        .success => Icons.check_circle,
+        .error => Icons.error,
+        .info => Icons.info,
+        .warning => Icons.warning,
+      };
+
+  Duration get defaultDuration => switch (this) {
+        .success => const Duration(seconds: 3),
+        .error => const Duration(seconds: 3),
+        .info => const Duration(seconds: 2),
+        .warning => const Duration(seconds: 3),
+      };
+
+  Color backgroundColor(ColorScheme colorScheme) => switch (this) {
+        .success => Colors.green.shade700,
+        .error => colorScheme.error,
+        .info => Colors.blue.shade700,
+        .warning => Colors.orange.shade600,
+      };
+
+  Color contentColor(ColorScheme colorScheme) => switch (this) {
+        .success => colorScheme.onPrimary,
+        .error => colorScheme.onError,
+        .info => colorScheme.onPrimary,
+        .warning => Colors.black87,
+      };
+}
+
 class SnackBarService {
   // Private constructor to prevent instantiation
   SnackBarService._();
 
-  /// Default duration for success messages
-  static const Duration _defaultSuccessDuration = Duration(seconds: 3);
+  /// Internal method to show a SnackBar with consistent styling
+  static void _show(
+    BuildContext context,
+    String message,
+    _SnackBarType type, {
+    Duration? duration,
+    SnackBarAction? action,
+  }) {
+    if (!context.mounted) return;
 
-  /// Default duration for error messages
-  static const Duration _defaultErrorDuration = Duration(seconds: 3);
+    final colorScheme = Theme.of(context).colorScheme;
+    final contentColor = type.contentColor(colorScheme);
 
-  /// Default duration for info messages
-  static const Duration _defaultInfoDuration = Duration(seconds: 2);
-
-  /// Default duration for warning messages
-  static const Duration _defaultWarningDuration = Duration(seconds: 3);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              type.icon,
+              color: contentColor,
+              size: 20,
+            ),
+            AppSpacing.horizontalMd,
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: contentColor),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: type.backgroundColor(colorScheme),
+        duration: duration ?? type.defaultDuration,
+        action: action,
+        behavior: SnackBarBehavior.floating,
+        shape: 8.roundedShape,
+      ),
+    );
+  }
 
   /// Show a success message (green)
   ///
@@ -44,39 +109,8 @@ class SnackBarService {
     String message, {
     Duration? duration,
     SnackBarAction? action,
-  }) {
-    if (!context.mounted) return;
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.check_circle,
-              color: colorScheme.onPrimary,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(color: colorScheme.onPrimary),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.green.shade700,
-        duration: duration ?? _defaultSuccessDuration,
-        action: action,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  }) =>
+      _show(context, message, .success, duration: duration, action: action);
 
   /// Show an error message (red)
   ///
@@ -92,39 +126,8 @@ class SnackBarService {
     String message, {
     Duration? duration,
     SnackBarAction? action,
-  }) {
-    if (!context.mounted) return;
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.error,
-              color: colorScheme.onError,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(color: colorScheme.onError),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: colorScheme.error,
-        duration: duration ?? _defaultErrorDuration,
-        action: action,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  }) =>
+      _show(context, message, .error, duration: duration, action: action);
 
   /// Show an info message (blue)
   ///
@@ -140,39 +143,8 @@ class SnackBarService {
     String message, {
     Duration? duration,
     SnackBarAction? action,
-  }) {
-    if (!context.mounted) return;
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.info,
-              color: colorScheme.onPrimary,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(color: colorScheme.onPrimary),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.blue.shade700,
-        duration: duration ?? _defaultInfoDuration,
-        action: action,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  }) =>
+      _show(context, message, .info, duration: duration, action: action);
 
   /// Show a warning message (orange)
   ///
@@ -188,39 +160,8 @@ class SnackBarService {
     String message, {
     Duration? duration,
     SnackBarAction? action,
-  }) {
-    if (!context.mounted) return;
-
-    final colorScheme = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              Icons.warning,
-              color: Colors.black87,
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.black87),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.orange.shade600,
-        duration: duration ?? _defaultWarningDuration,
-        action: action,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-    );
-  }
+  }) =>
+      _show(context, message, .warning, duration: duration, action: action);
 
   /// Show a custom SnackBar with full control
   ///
@@ -249,9 +190,7 @@ class SnackBarService {
         action: action,
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: 8.roundedShape,
       ),
     );
   }

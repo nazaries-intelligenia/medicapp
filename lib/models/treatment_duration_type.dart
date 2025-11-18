@@ -12,37 +12,21 @@ enum TreatmentDurationType {
 
   const TreatmentDurationType(this.displayName);
 
-  IconData get icon {
-    switch (this) {
-      case TreatmentDurationType.everyday:
-        return Icons.event_repeat;
-      case TreatmentDurationType.untilFinished:
-        return Icons.medical_services;
-      case TreatmentDurationType.specificDates:
-        return Icons.calendar_today;
-      case TreatmentDurationType.weeklyPattern:
-        return Icons.date_range;
-      case TreatmentDurationType.intervalDays:
-        return Icons.repeat;
-      case TreatmentDurationType.asNeeded:
-        return Icons.healing;
-    }
-  }
+  IconData get icon => switch (this) {
+        .everyday => Icons.event_repeat,
+        .untilFinished => Icons.medical_services,
+        .specificDates => Icons.calendar_today,
+        .weeklyPattern => Icons.date_range,
+        .intervalDays => Icons.repeat,
+        .asNeeded => Icons.healing,
+      };
 
-  Color getColor(BuildContext context) {
-    switch (this) {
-      case TreatmentDurationType.everyday:
-        return Theme.of(context).colorScheme.primary;
-      case TreatmentDurationType.untilFinished:
-        return Theme.of(context).colorScheme.tertiary;
-      case TreatmentDurationType.specificDates:
-        return Colors.deepPurple;
-      case TreatmentDurationType.weeklyPattern:
-        return Colors.teal;
-      case TreatmentDurationType.intervalDays:
-        return Colors.orange;
-      case TreatmentDurationType.asNeeded:
-        return Colors.indigo;
-    }
-  }
+  Color getColor(BuildContext context) => switch (this) {
+        .everyday => Theme.of(context).colorScheme.primary,
+        .untilFinished => Theme.of(context).colorScheme.tertiary,
+        .specificDates => Colors.deepPurple,
+        .weeklyPattern => Colors.teal,
+        .intervalDays => Colors.orange,
+        .asNeeded => Colors.indigo,
+      };
 }
