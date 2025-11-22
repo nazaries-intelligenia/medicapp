@@ -151,6 +151,10 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── smart_cache_service.dart
+│   ├── medication_cache_service.dart
+│   ├── intelligent_reminders_service.dart
+│   ├── theme_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -471,6 +475,42 @@ Honetan oinarritutako jakinarazpenetarako ID bakarrak sortzen ditu:
 - Sendagaiaren ID-a
 - Dosiaren timestamp-a
 - Sendagaien arteko talken saihestea
+
+#### `smart_cache_service.dart`
+
+Cache generikoa TTL (Time-To-Live) eta LRU algoritmo batekin:
+
+- Iraungi automatikoa minuturo
+- Sarrera bakarra `getOrCompute()` metodoaren bidez
+- Estatistikak (hits, misses, hit rate)
+- Memoria kudeaketa dinamikoa
+
+#### `medication_cache_service.dart`
+
+Sendagaien datuentzat cache espezializatuak:
+
+- Cache sendagai indibidualentzat (10min TTL)
+- Cache sendagai zerrendatentzat (5min TTL)
+- Cache dosi historialentzat (3min TTL)
+- Cache estatistiketarako (30min TTL)
+
+#### `intelligent_reminders_service.dart`
+
+Atxikipen analisia eta aurreikuspena:
+
+- Dosi historialan oinarritutako atxikipen analisia
+- Ahaztura probabilitatearen aurreikuspena
+- Orduteegi optimoaren iradokizunak
+- Asteko eguna eta orduaren araberako metrikak
+
+#### `theme_service.dart`
+
+Gai ilun natibo kudeaketa:
+
+- Gai modua (system/light/dark)
+- Lehentasunen iraunkortasuna
+- UI aldaketa berehalakoa
+- Material Design 3 onarpena
 
 #### `services/notifications/`
 
