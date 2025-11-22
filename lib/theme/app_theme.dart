@@ -18,32 +18,46 @@ class AppTheme {
   static const Color primaryLight = Color(0xFF2E8B57);
   static const Color primaryVariantLight = Color(0xFF3CB371);
   static const Color accentLight = Color(0xFF00C853);
-  static const Color primaryDark = Color(0xFF5BA3F5);
+
+  // Colores principales - Tema oscuro "Dark Forest"
+  static const Color primaryDark = Color(0xFFA5D6A7);
+  static const Color accentDark = Color(0xFF4CAF50);
 
   static const Color secondaryLight = Color(0xFF81C784);
-  static const Color secondaryDark = Color(0xFF66D98E);
+  static const Color secondaryDark = Color(0xFF819CA9);
 
   // Colores de fondo
   static const Color backgroundLight = Color(0xFFE8F5E9);
-  static const Color backgroundDark = Color(0xFF121212);
+  static const Color backgroundDark = Color(0xFF050A06);
 
   static const Color surfaceLight = Color(0xFFC8E6C9);
-  static const Color surfaceDark = Color(0xFF1E1E1E);
+  static const Color surfaceDark = Color(0xFF0D1F14);
 
   // Colores de tarjetas
   static const Color cardLight = Color(0xFFC8E6C9);
-  static const Color cardDark = Color(0xFF2C2C2C);
+  static const Color cardDark = Color(0xFF142B1E);
 
   // Colores de texto
   static const Color textPrimaryLight = Color(0xFF0D2E1C);
-  static const Color textPrimaryDark = Color(0xFFE0E0E0);
+  static const Color textPrimaryDark = Color(0xFFE8F5E9);
 
   static const Color textSecondaryLight = Color(0xFF577D6A);
-  static const Color textSecondaryDark = Color(0xFFB0B0B0);
+  static const Color textSecondaryDark = Color(0xFF819CA9);
+
+  // Iconos inactivos
+  static const Color inactiveIconLight = Color(0xFF577D6A);
+  static const Color inactiveIconDark = Color(0xFF455A64);
+
+  // Overlay y selección
+  static const Color overlayLight = Color(0xFFE8F5E9);
+  static const Color overlayDark = Color(0xFF1E3B28);
+
+  // Resplandor/Glow
+  static const Color glowDark = Color(0xFF004D40);
 
   // Colores de divisores y bordes
   static const Color dividerLight = Color(0xFFA5D6A7);
-  static const Color dividerDark = Color(0xFF424242);
+  static const Color dividerDark = Color(0xFF455A64);
 
   // Colores de estado
   static const Color success = Color(0xFF43A047);
@@ -365,8 +379,8 @@ class AppTheme {
 
       // Floating Action Button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: secondaryDark,
-        foregroundColor: Colors.black,
+        backgroundColor: accentDark,
+        foregroundColor: Colors.white,
         elevation: 4,
       ),
 

@@ -38,18 +38,22 @@ MedicApp utiliza una paleta de colores inspirada en la naturaleza con tonos verd
 | **Error** | `#F44336` | Errores críticos o acciones destructivas |
 | **Información** | `#2196F3` | Mensajes informativos generales |
 
-## Tema Oscuro
+## Tema Oscuro "Dark Forest"
 
-El tema oscuro mantiene colores que complementan la paleta "Sea Green" adaptados para ambientes con poca luz:
+El tema oscuro utiliza una paleta inspirada en un bosque nocturno con tonos verdes profundos y misteriosos:
 
-- **Primario**: `#5BA3F5` (azul claro)
-- **Secundario**: `#66D98E` (verde menta)
-- **Fondo**: `#121212` (negro profundo)
-- **Superficie**: `#1E1E1E` (gris oscuro)
-- **Tarjetas**: `#2C2C2C` (gris medio)
-- **Texto Primario**: `#E0E0E0` (gris claro)
-- **Texto Secundario**: `#B0B0B0` (gris medio)
-- **Divisor**: `#424242` (gris oscuro)
+| Rol | Muestra | Código HEX | Uso |
+|-----|---------|------------|-----|
+| **Fondo Global** | ⚫ | `#050A06` | Un verde casi imperceptiblemente negro. Profundo y misterioso. |
+| **Superficie (Nivel 1)** | ⚫ | `#0D1F14` | Un tono un poco más claro para la barra de navegación o menús. |
+| **Superficie (Nivel 2)** | ⚫ | `#142B1E` | Para tarjetas flotantes o modales. |
+| **Primario (Marca)** | 🟢 | `#A5D6A7` | Verde pálido desaturado. En dark mode, los colores pastel se ven más elegantes. |
+| **Acento Vibrante** | 🟢 | `#4CAF50` | Verde clásico para botones de llamada a la acción (CTA) importantes. |
+| **Texto Principal** | ⚪ | `#E8F5E9` | Un blanco con un tinte verdoso muy sutil (menta hielo). |
+| **Texto Secundario** | 🔘 | `#819CA9` | Gris con matiz verde/azulado para jerarquía visual. |
+| **Iconos Inactivos** | 🔘 | `#455A64` | Para elementos que están ahí pero no requieren atención. |
+| **Overlay (Capas)** | 🟢 | `#1E3B28` | Color para destacar una fila o elemento seleccionado en una lista. |
+| **Resplandor (Glow)** | 🟢 | `#004D40` | Un tono teal muy oscuro para fondos degradados sutiles. |
 
 ## Uso en el Código
 
@@ -60,19 +64,44 @@ Los colores están definidos en `lib/theme/app_theme.dart`:
 static const Color primaryLight = Color(0xFF2E8B57);
 static const Color primaryVariantLight = Color(0xFF3CB371);
 static const Color accentLight = Color(0xFF00C853);
+
+// Colores principales - Tema oscuro "Dark Forest"
+static const Color primaryDark = Color(0xFFA5D6A7);
+static const Color accentDark = Color(0xFF4CAF50);
+
 static const Color secondaryLight = Color(0xFF81C784);
+static const Color secondaryDark = Color(0xFF819CA9);
 
 // Colores de fondo
 static const Color backgroundLight = Color(0xFFE8F5E9);
+static const Color backgroundDark = Color(0xFF050A06);
+
 static const Color surfaceLight = Color(0xFFC8E6C9);
+static const Color surfaceDark = Color(0xFF0D1F14);
+
+// Colores de tarjetas
 static const Color cardLight = Color(0xFFC8E6C9);
+static const Color cardDark = Color(0xFF142B1E);
 
 // Colores de texto
 static const Color textPrimaryLight = Color(0xFF0D2E1C);
+static const Color textPrimaryDark = Color(0xFFE8F5E9);
+
 static const Color textSecondaryLight = Color(0xFF577D6A);
+static const Color textSecondaryDark = Color(0xFF819CA9);
+
+// Iconos inactivos
+static const Color inactiveIconDark = Color(0xFF455A64);
+
+// Overlay y selección
+static const Color overlayDark = Color(0xFF1E3B28);
+
+// Resplandor/Glow
+static const Color glowDark = Color(0xFF004D40);
 
 // Colores de divisores y bordes
 static const Color dividerLight = Color(0xFFA5D6A7);
+static const Color dividerDark = Color(0xFF455A64);
 
 // Colores de estado
 static const Color success = Color(0xFF43A047);
@@ -92,4 +121,5 @@ static const Color info = Color(0xFF2196F3);
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Paleta original: `Captura de pantalla 2025-11-22 101545.png`
+- Paleta tema claro: `Captura de pantalla 2025-11-22 101545.png`
+- Paleta tema oscuro: `Captura de pantalla 2025-11-22 102516.png`
