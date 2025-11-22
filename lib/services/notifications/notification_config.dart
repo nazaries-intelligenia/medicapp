@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:android_intent_plus/android_intent.dart';
 import '../../utils/platform_helper.dart';
 
 /// Shared configuration and factory methods for notification services
@@ -46,28 +47,36 @@ class NotificationConfig {
     );
   }
 
-  /// Opens the notification channel settings for Android
+  /// Opens the notification settings for the app on Android
   /// This allows users to customize sound, vibration, and other notification settings
-  /// Only works on Android 8.0+ (API 26+)
+  /// Works on Android 5.0+ (API 21+)
   static Future<void> openNotificationChannelSettings() async {
     if (!PlatformHelper.isAndroid) {
       return; // Only available on Android
     }
 
     try {
-      // Use the Flutter Local Notifications plugin to open channel settings
-      final fln.FlutterLocalNotificationsPlugin plugin =
-          fln.FlutterLocalNotificationsPlugin();
-
-      // Open the settings for the medication reminders channel
-      await plugin
-          .resolvePlatformSpecificImplementation<
-              fln.AndroidFlutterLocalNotificationsPlugin>()
-          ?.openNotificationChannelSettings(medicationChannelId);
+      // Use AndroidIntent to open app notification settings
+      // This opens the notification settings page where users can configure
+      // sound, vibration, importance, etc. for all notification channels
+      final intent = AndroidIntent(
+        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
+        arguments: <String, dynamic>{
+          'android.provider.extra.APP_PACKAGE': 'com.medicapp.medicapp',
+        },
+      );
+      await intent.launch();
     } catch (e) {
-      // If that fails, we could fallback to opening app notification settings
-      // but the channel-specific settings are preferred
-      rethrow;
+      // If that fails, try opening general app settings as fallback
+      try {
+        final fallbackIntent = AndroidIntent(
+          action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
+          data: 'package:com.medicapp.medicapp',
+        );
+        await fallbackIntent.launch();
+      } catch (e) {
+        rethrow;
+      }
     }
   }
 
