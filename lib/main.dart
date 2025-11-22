@@ -124,8 +124,8 @@ class _MedicAppState extends State<MedicApp> {
       ],
       supportedLocales: AppLocalizations.supportedLocales,
       locale: const Locale('es'),
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.getLightTheme(_themeProvider.colorPalette),
+      darkTheme: AppTheme.getDarkTheme(_themeProvider.colorPalette),
       themeMode: _themeProvider.themeMode,
       home: const MainScreen(),
     );

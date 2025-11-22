@@ -1,5 +1,35 @@
 import 'package:flutter/material.dart';
 
+/// Paletas de colores disponibles en la aplicación
+enum ColorPalette {
+  /// Paleta "Sea Green" - Verde natural con tonos bosque
+  seaGreen,
+
+  /// Paleta Material 3 por defecto - Púrpura baseline de Material Design 3
+  material3,
+}
+
+/// Extensión para obtener nombres localizados de las paletas
+extension ColorPaletteExtension on ColorPalette {
+  String get displayName {
+    switch (this) {
+      case ColorPalette.seaGreen:
+        return 'Sea Green';
+      case ColorPalette.material3:
+        return 'Material 3';
+    }
+  }
+
+  String get description {
+    switch (this) {
+      case ColorPalette.seaGreen:
+        return 'Tonos verdes naturales inspirados en el bosque';
+      case ColorPalette.material3:
+        return 'Paleta púrpura por defecto de Material Design 3';
+    }
+  }
+}
+
 /// Definición centralizada de temas de la aplicación
 ///
 /// Paleta de colores "Sea Green" para tema claro:
@@ -13,6 +43,11 @@ import 'package:flutter/material.dart';
 /// - Superficie (Tarjetas): #C8E6C9 - Fondo menta suave
 /// - Fondo Principal: #E8F5E9 - Casi blanco con tinte verde
 /// - Divisor/Borde: #A5D6A7 - Líneas sutiles para separaciones
+///
+/// Paleta "Material 3" por defecto:
+/// - Basada en el color seed púrpura #6750A4 de Material Design 3
+/// - Genera automáticamente todos los tonos y variantes
+/// - Sigue las especificaciones oficiales de Material Design 3
 class AppTheme {
   // Constantes para TabBar
   static const double tabIndicatorWeight = 4.0;
@@ -70,8 +105,239 @@ class AppTheme {
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
 
-  // Tema claro
+  // Color seed de Material 3 (púrpura baseline)
+  static const Color material3SeedColor = Color(0xFF6750A4);
+
+  /// Obtiene el tema claro según la paleta seleccionada
+  static ThemeData getLightTheme(ColorPalette palette) {
+    switch (palette) {
+      case ColorPalette.seaGreen:
+        return _buildSeaGreenLightTheme();
+      case ColorPalette.material3:
+        return _buildMaterial3LightTheme();
+    }
+  }
+
+  /// Obtiene el tema oscuro según la paleta seleccionada
+  static ThemeData getDarkTheme(ColorPalette palette) {
+    switch (palette) {
+      case ColorPalette.seaGreen:
+        return _buildSeaGreenDarkTheme();
+      case ColorPalette.material3:
+        return _buildMaterial3DarkTheme();
+    }
+  }
+
+  // Tema claro por defecto (Sea Green)
   static ThemeData get lightTheme {
+    return getLightTheme(ColorPalette.seaGreen);
+  }
+
+  // Tema oscuro por defecto (Dark Forest)
+  static ThemeData get darkTheme {
+    return getDarkTheme(ColorPalette.seaGreen);
+  }
+
+  /// Construye el tema claro con la paleta Material 3
+  static ThemeData _buildMaterial3LightTheme() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: material3SeedColor,
+      brightness: Brightness.light,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      brightness: Brightness.light,
+
+      // AppBar
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: colorScheme.onPrimaryContainer,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        iconTheme: IconThemeData(
+          color: colorScheme.onPrimaryContainer,
+        ),
+      ),
+
+      // Cards
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainerLow,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+
+      // Floating Action Button
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 3,
+      ),
+
+      // Elevated Button
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+
+      // Text Button
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+      ),
+
+      // Outlined Button
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+
+      // Input Decoration
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+
+      // Dialog
+      dialogTheme: DialogThemeData(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+
+      // Snackbar
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  /// Construye el tema oscuro con la paleta Material 3
+  static ThemeData _buildMaterial3DarkTheme() {
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: material3SeedColor,
+      brightness: Brightness.dark,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      brightness: Brightness.dark,
+
+      // AppBar
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: TextStyle(
+          color: colorScheme.onSurface,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        iconTheme: IconThemeData(
+          color: colorScheme.onSurface,
+        ),
+      ),
+
+      // Cards
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainerLow,
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+
+      // Floating Action Button
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: colorScheme.primaryContainer,
+        foregroundColor: colorScheme.onPrimaryContainer,
+        elevation: 3,
+      ),
+
+      // Elevated Button
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+
+      // Text Button
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+      ),
+
+      // Outlined Button
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      ),
+
+      // Input Decoration
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+
+      // Dialog
+      dialogTheme: DialogThemeData(
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+
+      // Snackbar
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+
+  /// Construye el tema claro con la paleta Sea Green
+  static ThemeData _buildSeaGreenLightTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -291,8 +557,8 @@ class AppTheme {
     );
   }
 
-  // Tema oscuro
-  static ThemeData get darkTheme {
+  /// Construye el tema oscuro con la paleta Sea Green (Dark Forest)
+  static ThemeData _buildSeaGreenDarkTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:medicapp/services/preferences_service.dart';
 import 'package:medicapp/services/logger_service.dart';
+import 'package:medicapp/theme/app_theme.dart';
 
 /// Provider para gestionar el tema de la aplicación
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
+  ColorPalette _colorPalette = ColorPalette.seaGreen;
 
   ThemeMode get themeMode => _themeMode;
+  ColorPalette get colorPalette => _colorPalette;
 
   bool get isDarkMode {
     if (_themeMode == ThemeMode.system) {
@@ -22,7 +25,11 @@ class ThemeProvider with ChangeNotifier {
     try {
       final savedTheme = await PreferencesService.getThemeMode();
       _themeMode = _themeModeFromString(savedTheme);
-      LoggerService.info('Theme initialized: $savedTheme');
+
+      final savedPalette = await PreferencesService.getColorPalette();
+      _colorPalette = _colorPaletteFromString(savedPalette);
+
+      LoggerService.info('Theme initialized: $savedTheme, Palette: $savedPalette');
       notifyListeners();
     } catch (e) {
       LoggerService.error('Error initializing theme: $e');
@@ -49,6 +56,18 @@ class ThemeProvider with ChangeNotifier {
     await setThemeMode(newMode);
   }
 
+  /// Cambia la paleta de colores
+  Future<void> setColorPalette(ColorPalette palette) async {
+    try {
+      _colorPalette = palette;
+      await PreferencesService.setColorPalette(_colorPaletteToString(palette));
+      LoggerService.info('Color palette changed to: ${_colorPaletteToString(palette)}');
+      notifyListeners();
+    } catch (e) {
+      LoggerService.error('Error setting color palette: $e');
+    }
+  }
+
   /// Convierte string a ThemeMode
   ThemeMode _themeModeFromString(String value) {
     switch (value) {
@@ -71,6 +90,28 @@ class ThemeProvider with ChangeNotifier {
         return 'dark';
       case ThemeMode.system:
         return 'system';
+    }
+  }
+
+  /// Convierte string a ColorPalette
+  ColorPalette _colorPaletteFromString(String value) {
+    switch (value) {
+      case 'seaGreen':
+        return ColorPalette.seaGreen;
+      case 'material3':
+        return ColorPalette.material3;
+      default:
+        return ColorPalette.seaGreen;
+    }
+  }
+
+  /// Convierte ColorPalette a string
+  String _colorPaletteToString(ColorPalette palette) {
+    switch (palette) {
+      case ColorPalette.seaGreen:
+        return 'seaGreen';
+      case ColorPalette.material3:
+        return 'material3';
     }
   }
 }

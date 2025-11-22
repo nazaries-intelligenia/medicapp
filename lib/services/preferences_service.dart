@@ -7,6 +7,7 @@ class PreferencesService {
   static const String _keyShowFastingNotification = 'show_fasting_notification';
   static const String _keyShowPersonTabs = 'show_person_tabs';
   static const String _keyThemeMode = 'theme_mode';
+  static const String _keyColorPalette = 'color_palette';
 
   /// Get the preference for showing actual time for taken doses
   /// Returns true if the user wants to see the actual time when a dose was taken
@@ -77,5 +78,19 @@ class PreferencesService {
   static Future<void> setThemeMode(String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyThemeMode, value);
+  }
+
+  /// Get the color palette preference
+  /// Returns 'seaGreen' (default) or 'material3'
+  static Future<String> getColorPalette() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyColorPalette) ?? 'seaGreen';
+  }
+
+  /// Set the color palette preference
+  /// Valid values: 'seaGreen', 'material3'
+  static Future<void> setColorPalette(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyColorPalette, value);
   }
 }
