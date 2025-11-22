@@ -13,6 +13,7 @@ import 'helpers/test_helpers.dart';
 import 'helpers/database_test_helper.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   setupTestDatabase();
 
   // Helper function to create test person
