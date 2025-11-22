@@ -694,6 +694,41 @@ class DatabaseHelper {
     return null;
   }
 
+  /// Helper: Build shared medication data map for updates
+  Map<String, dynamic> _buildSharedMedicationData(Medication medication) {
+    return {
+      'name': medication.name,
+      'type': medication.type.name,
+      'stockQuantity': medication.stockQuantity,
+      'lastRefillAmount': medication.lastRefillAmount,
+      'lowStockThresholdDays': medication.lowStockThresholdDays,
+      'lastDailyConsumption': medication.lastDailyConsumption,
+      'expirationDate': medication.expirationDate,
+    };
+  }
+
+  /// Helper: Build person-specific medication schedule data map
+  Map<String, dynamic> _buildPersonMedicationData(Medication medication) {
+    return {
+      'durationType': medication.durationType.name,
+      'dosageIntervalHours': medication.dosageIntervalHours,
+      'doseSchedule': jsonEncode(medication.doseSchedule),
+      'takenDosesToday': medication.takenDosesToday.join(','),
+      'skippedDosesToday': medication.skippedDosesToday.join(','),
+      'takenDosesDate': medication.takenDosesDate,
+      'selectedDates': medication.selectedDates?.join(','),
+      'weeklyDays': medication.weeklyDays?.join(','),
+      'dayInterval': medication.dayInterval,
+      'startDate': medication.startDate?.toIso8601String(),
+      'endDate': medication.endDate?.toIso8601String(),
+      'requiresFasting': medication.requiresFasting ? 1 : 0,
+      'fastingType': medication.fastingType,
+      'fastingDurationMinutes': medication.fastingDurationMinutes,
+      'notifyFasting': medication.notifyFasting ? 1 : 0,
+      'isSuspended': medication.isSuspended ? 1 : 0,
+    };
+  }
+
   /// Update medication data for a specific person
   /// Updates both shared data (stock) and individual schedule
   Future<int> updateMedicationForPerson({
@@ -705,15 +740,7 @@ class DatabaseHelper {
     // Update shared data (stock) in medications table
     await db.update(
       'medications',
-      {
-        'name': medication.name,
-        'type': medication.type.name,
-        'stockQuantity': medication.stockQuantity,
-        'lastRefillAmount': medication.lastRefillAmount,
-        'lowStockThresholdDays': medication.lowStockThresholdDays,
-        'lastDailyConsumption': medication.lastDailyConsumption,
-        'expirationDate': medication.expirationDate,
-      },
+      _buildSharedMedicationData(medication),
       where: 'id = ?',
       whereArgs: [medication.id],
     );
@@ -721,24 +748,7 @@ class DatabaseHelper {
     // Update individual schedule in person_medications table
     return await db.update(
       'person_medications',
-      {
-        'durationType': medication.durationType.name,
-        'dosageIntervalHours': medication.dosageIntervalHours,
-        'doseSchedule': jsonEncode(medication.doseSchedule),
-        'takenDosesToday': medication.takenDosesToday.join(','),
-        'skippedDosesToday': medication.skippedDosesToday.join(','),
-        'takenDosesDate': medication.takenDosesDate,
-        'selectedDates': medication.selectedDates?.join(','),
-        'weeklyDays': medication.weeklyDays?.join(','),
-        'dayInterval': medication.dayInterval,
-        'startDate': medication.startDate?.toIso8601String(),
-        'endDate': medication.endDate?.toIso8601String(),
-        'requiresFasting': medication.requiresFasting ? 1 : 0,
-        'fastingType': medication.fastingType,
-        'fastingDurationMinutes': medication.fastingDurationMinutes,
-        'notifyFasting': medication.notifyFasting ? 1 : 0,
-        'isSuspended': medication.isSuspended ? 1 : 0,
-      },
+      _buildPersonMedicationData(medication),
       where: 'medicationId = ? AND personId = ?',
       whereArgs: [medication.id, personId],
     );
@@ -748,21 +758,12 @@ class DatabaseHelper {
   // NOTE: In v19+, this only updates shared data (stock)
   Future<int> updateMedication(Medication medication) async {
     final db = await database;
-    final result = await db.update(
+    return await db.update(
       'medications',
-      {
-        'name': medication.name,
-        'type': medication.type.name,
-        'stockQuantity': medication.stockQuantity,
-        'lastRefillAmount': medication.lastRefillAmount,
-        'lowStockThresholdDays': medication.lowStockThresholdDays,
-        'lastDailyConsumption': medication.lastDailyConsumption,
-        'expirationDate': medication.expirationDate,
-      },
+      _buildSharedMedicationData(medication),
       where: 'id = ?',
       whereArgs: [medication.id],
     );
-    return result;
   }
 
   // Delete - Delete a medication

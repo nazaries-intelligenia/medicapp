@@ -79,6 +79,51 @@ class MedicationListViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Helper: Get fresh medication data from database
+  Future<Medication?> _getFreshMedication(String medicationId) async {
+    return _selectedPerson != null
+        ? await DatabaseHelper.instance
+            .getMedicationForPerson(medicationId, _selectedPerson!.id)
+        : await DatabaseHelper.instance.getMedication(medicationId);
+  }
+
+  /// Helper: Get person ID for current context
+  Future<String> _getPersonId() async {
+    final person = _selectedPerson ??
+                   await DatabaseHelper.instance.getDefaultPerson();
+    return person?.id ?? '';
+  }
+
+  /// Helper: Create dose history entry
+  DoseHistoryEntry _createDoseHistoryEntry({
+    required Medication medication,
+    required String doseTime,
+    required String personId,
+    required DoseStatus status,
+    required double quantity,
+  }) {
+    final now = DateTime.now();
+    final scheduledDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(doseTime.split(':')[0]),
+      int.parse(doseTime.split(':')[1]),
+    );
+
+    return DoseHistoryEntry(
+      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      medicationId: medication.id,
+      medicationName: medication.name,
+      medicationType: medication.type,
+      personId: personId,
+      scheduledDateTime: scheduledDateTime,
+      registeredDateTime: now,
+      status: status,
+      quantity: quantity,
+    );
+  }
+
   @override
   void dispose() {
     _fastingManager.dispose();
@@ -536,11 +581,7 @@ class MedicationListViewModel extends ChangeNotifier {
     required String doseTime,
   }) async {
     // Get fresh medication data
-    final freshMedication = _selectedPerson != null
-        ? await DatabaseHelper.instance
-            .getMedicationForPerson(medication.id, _selectedPerson!.id)
-        : await DatabaseHelper.instance.getMedication(medication.id);
-
+    final freshMedication = await _getFreshMedication(medication.id);
     if (freshMedication == null) {
       throw Exception('Medication not found');
     }
@@ -560,17 +601,13 @@ class MedicationListViewModel extends ChangeNotifier {
     final today = DateTime.now();
     final todayString = today.toDateString();
 
-    List<String> updatedTakenDoses;
-    List<String> updatedSkippedDoses;
+    final updatedTakenDoses = freshMedication.takenDosesDate == todayString
+        ? (List<String>.from(freshMedication.takenDosesToday)..add(doseTime))
+        : [doseTime];
 
-    if (freshMedication.takenDosesDate == todayString) {
-      updatedTakenDoses = List.from(freshMedication.takenDosesToday);
-      updatedTakenDoses.add(doseTime);
-      updatedSkippedDoses = List.from(freshMedication.skippedDosesToday);
-    } else {
-      updatedTakenDoses = [doseTime];
-      updatedSkippedDoses = [];
-    }
+    final updatedSkippedDoses = freshMedication.takenDosesDate == todayString
+        ? List<String>.from(freshMedication.skippedDosesToday)
+        : <String>[];
 
     // Update medication
     final updatedMedication = freshMedication.copyWith(
@@ -581,11 +618,11 @@ class MedicationListViewModel extends ChangeNotifier {
     );
 
     // Get person for updates
-    final defaultPerson =
-        _selectedPerson ?? await DatabaseHelper.instance.getDefaultPerson();
-    final personId = defaultPerson?.id ?? '';
+    final personId = await _getPersonId();
 
     // Update in database
+    final defaultPerson = _selectedPerson ??
+                          await DatabaseHelper.instance.getDefaultPerson();
     if (defaultPerson != null) {
       await DatabaseHelper.instance.updateMedicationForPerson(
         medication: updatedMedication,
@@ -595,28 +632,14 @@ class MedicationListViewModel extends ChangeNotifier {
       await DatabaseHelper.instance.updateMedication(updatedMedication);
     }
 
-    // Create history entry
-    final now = DateTime.now();
-    final scheduledDateTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      int.parse(doseTime.split(':')[0]),
-      int.parse(doseTime.split(':')[1]),
-    );
-
-    final historyEntry = DoseHistoryEntry(
-      id: '${freshMedication.id}_${now.millisecondsSinceEpoch}',
-      medicationId: freshMedication.id,
-      medicationName: freshMedication.name,
-      medicationType: freshMedication.type,
+    // Create and insert history entry
+    final historyEntry = _createDoseHistoryEntry(
+      medication: freshMedication,
+      doseTime: doseTime,
       personId: personId,
-      scheduledDateTime: scheduledDateTime,
-      registeredDateTime: now,
       status: DoseStatus.taken,
       quantity: doseQuantity,
     );
-
     await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
     // Reload medications FIRST (fast, UI-only)
@@ -652,7 +675,7 @@ class MedicationListViewModel extends ChangeNotifier {
             updatedMedication.notifyFasting) {
           await NotificationService.instance.scheduleDynamicFastingNotification(
             medication: updatedMedication,
-            actualDoseTime: now,
+            actualDoseTime: DateTime.now(),
             personId: personId,
           );
         }
@@ -673,11 +696,7 @@ class MedicationListViewModel extends ChangeNotifier {
     required Medication medication,
   }) async {
     // Get fresh medication data
-    final freshMedication = _selectedPerson != null
-        ? await DatabaseHelper.instance
-            .getMedicationForPerson(medication.id, _selectedPerson!.id)
-        : await DatabaseHelper.instance.getMedication(medication.id);
-
+    final freshMedication = await _getFreshMedication(medication.id);
     if (freshMedication == null) {
       throw Exception('Medication not found');
     }
@@ -763,7 +782,7 @@ class MedicationListViewModel extends ChangeNotifier {
             updatedMedication.notifyFasting) {
           await NotificationService.instance.scheduleDynamicFastingNotification(
             medication: updatedMedication,
-            actualDoseTime: now,
+            actualDoseTime: DateTime.now(),
             personId: personId,
           );
         }
