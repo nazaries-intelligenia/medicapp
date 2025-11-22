@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:medicapp/screens/settings_screen.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/preferences_service.dart';
+import 'package:medicapp/theme/theme_provider.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 
 void main() {
@@ -26,11 +28,14 @@ void main() {
   });
 
   Widget createTestApp(Widget child) {
-    return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('es', 'ES'),
-      home: child,
+    return ChangeNotifierProvider<ThemeProvider>(
+      create: (_) => ThemeProvider(),
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('es', 'ES'),
+        home: child,
+      ),
     );
   }
 
