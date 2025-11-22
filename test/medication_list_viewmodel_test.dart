@@ -8,6 +8,7 @@ import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/screens/medication_list/medication_list_viewmodel.dart';
 import 'package:medicapp/screens/medication_list/services/dose_calculation_service.dart';
 import 'package:medicapp/utils/datetime_extensions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'helpers/test_helpers.dart';
 import 'helpers/database_test_helper.dart';
@@ -15,6 +16,18 @@ import 'helpers/database_test_helper.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setupTestDatabase();
+
+  // Mock SharedPreferences for all tests
+  SharedPreferences.setMockInitialValues({});
+
+  // Helper function to get the default person (created by ensureDefaultPerson)
+  Future<Person> getDefaultPerson() async {
+    final person = await DatabaseHelper.instance.getDefaultPerson();
+    if (person == null) {
+      throw Exception('No default person found');
+    }
+    return person;
+  }
 
   // Helper function to create test person
   Future<Person> createTestPerson({
@@ -38,7 +51,7 @@ void main() {
       await DatabaseTestHelper.cleanDatabase();
       await DatabaseTestHelper.ensureDefaultPerson();
       viewModel = MedicationListViewModel();
-      testPerson = await createTestPerson(name: 'Test User', isDefault: true);
+      testPerson = await getDefaultPerson();
     });
 
     tearDown(() async {
@@ -123,7 +136,7 @@ void main() {
       await DatabaseTestHelper.cleanDatabase();
       await DatabaseTestHelper.ensureDefaultPerson();
       viewModel = MedicationListViewModel();
-      testPerson = await createTestPerson(name: 'Test User', isDefault: true);
+      testPerson = await getDefaultPerson();
 
       medication = createTestMedication(
         name: 'Test Med',
@@ -235,7 +248,7 @@ void main() {
       await DatabaseTestHelper.cleanDatabase();
       await DatabaseTestHelper.ensureDefaultPerson();
       viewModel = MedicationListViewModel();
-      testPerson = await createTestPerson(name: 'Test User', isDefault: true);
+      testPerson = await getDefaultPerson();
 
       medication = createTestMedication(
         name: 'Test Med',
@@ -306,7 +319,7 @@ void main() {
 
     test('initialize loads persons correctly', () async {
       // Arrange
-      await createTestPerson(name: 'Person 1', isDefault: true);
+      // Default person already exists from setUp
       await createTestPerson(name: 'Person 2', isDefault: false);
 
       // Act
@@ -320,7 +333,7 @@ void main() {
 
     test('initialize sets isLoading correctly', () async {
       // Arrange
-      await createTestPerson(name: 'Test User', isDefault: true);
+      // Default person already exists from setUp
       expect(viewModel.isLoading, isTrue); // Initially true
 
       // Act
@@ -340,7 +353,7 @@ void main() {
       await DatabaseTestHelper.cleanDatabase();
       await DatabaseTestHelper.ensureDefaultPerson();
       viewModel = MedicationListViewModel();
-      person1 = await createTestPerson(name: 'Person 1', isDefault: true);
+      person1 = await getDefaultPerson();
       person2 = await createTestPerson(name: 'Person 2', isDefault: false);
       await viewModel.initialize(isTestMode: true);
     });
