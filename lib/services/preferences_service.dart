@@ -6,6 +6,7 @@ class PreferencesService {
   static const String _keyShowFastingCountdown = 'show_fasting_countdown';
   static const String _keyShowFastingNotification = 'show_fasting_notification';
   static const String _keyShowPersonTabs = 'show_person_tabs';
+  static const String _keyThemeMode = 'theme_mode';
 
   /// Get the preference for showing actual time for taken doses
   /// Returns true if the user wants to see the actual time when a dose was taken
@@ -62,5 +63,19 @@ class PreferencesService {
   static Future<void> setShowPersonTabs(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_keyShowPersonTabs, value);
+  }
+
+  /// Get the theme mode preference
+  /// Returns 'system' (default), 'light', or 'dark'
+  static Future<String> getThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyThemeMode) ?? 'system';
+  }
+
+  /// Set the theme mode preference
+  /// Valid values: 'system', 'light', 'dark'
+  static Future<void> setThemeMode(String value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyThemeMode, value);
   }
 }
