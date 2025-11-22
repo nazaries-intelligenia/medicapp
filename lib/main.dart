@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'l10n/app_localizations.dart';
 import 'screens/main_screen.dart';
@@ -96,12 +97,7 @@ class _MedicAppState extends State<MedicApp> {
 
   Future<void> _initializeTheme() async {
     await _themeProvider.initialize();
-    // Escuchar cambios de tema para rebuilder
-    _themeProvider.addListener(() {
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    // El Consumer se encargará automáticamente de los rebuilds
   }
 
   @override
@@ -112,22 +108,29 @@ class _MedicAppState extends State<MedicApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MedicApp',
-      navigatorKey: navigatorKey,
-      debugShowCheckedModeBanner: false,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: const Locale('es'),
-      theme: AppTheme.getLightTheme(_themeProvider.colorPalette),
-      darkTheme: AppTheme.getDarkTheme(_themeProvider.colorPalette),
-      themeMode: _themeProvider.themeMode,
-      home: const MainScreen(),
+    return ChangeNotifierProvider<ThemeProvider>.value(
+      value: _themeProvider,
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'MedicApp',
+            navigatorKey: navigatorKey,
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('es'),
+            theme: AppTheme.getLightTheme(themeProvider.colorPalette),
+            darkTheme: AppTheme.getDarkTheme(themeProvider.colorPalette),
+            themeMode: themeProvider.themeMode,
+            home: const MainScreen(),
+          );
+        },
+      ),
     );
   }
 }
