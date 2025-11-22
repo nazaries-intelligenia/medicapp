@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../../models/dose_history_entry.dart';
@@ -80,7 +81,8 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Helper: Get fresh medication data from database
-  Future<Medication?> _getFreshMedication(String medicationId) async {
+  @visibleForTesting
+  Future<Medication?> getFreshMedication(String medicationId) async {
     return _selectedPerson != null
         ? await DatabaseHelper.instance
             .getMedicationForPerson(medicationId, _selectedPerson!.id)
@@ -88,14 +90,16 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Helper: Get person ID for current context
-  Future<String> _getPersonId() async {
+  @visibleForTesting
+  Future<String> getPersonId() async {
     final person = _selectedPerson ??
                    await DatabaseHelper.instance.getDefaultPerson();
     return person?.id ?? '';
   }
 
   /// Helper: Create dose history entry
-  DoseHistoryEntry _createDoseHistoryEntry({
+  @visibleForTesting
+  DoseHistoryEntry createDoseHistoryEntry({
     required Medication medication,
     required String doseTime,
     required String personId,
@@ -581,7 +585,7 @@ class MedicationListViewModel extends ChangeNotifier {
     required String doseTime,
   }) async {
     // Get fresh medication data
-    final freshMedication = await _getFreshMedication(medication.id);
+    final freshMedication = await getFreshMedication(medication.id);
     if (freshMedication == null) {
       throw Exception('Medication not found');
     }
@@ -618,7 +622,7 @@ class MedicationListViewModel extends ChangeNotifier {
     );
 
     // Get person for updates
-    final personId = await _getPersonId();
+    final personId = await getPersonId();
 
     // Update in database
     final defaultPerson = _selectedPerson ??
@@ -633,7 +637,7 @@ class MedicationListViewModel extends ChangeNotifier {
     }
 
     // Create and insert history entry
-    final historyEntry = _createDoseHistoryEntry(
+    final historyEntry = createDoseHistoryEntry(
       medication: freshMedication,
       doseTime: doseTime,
       personId: personId,
@@ -696,7 +700,7 @@ class MedicationListViewModel extends ChangeNotifier {
     required Medication medication,
   }) async {
     // Get fresh medication data
-    final freshMedication = await _getFreshMedication(medication.id);
+    final freshMedication = await getFreshMedication(medication.id);
     if (freshMedication == null) {
       throw Exception('Medication not found');
     }
