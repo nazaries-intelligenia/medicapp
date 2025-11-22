@@ -1,10 +1,10 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-432%2B-brightgreen)](../../test)
-[![Couverture](https://img.shields.io/badge/couverture-75--80%25-green)](../../test)
+[![Tests](https://img.shields.io/badge/tests-570%2B-brightgreen)](../../test)
+[![Couverture](https://img.shields.io/badge/couverture-%3E80%25-green)](../../test)
 [![Flutter](https://img.shields.io/badge/Flutter-3.9.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design)](https://m3.material.io)
-[![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart)](https://dart.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.10.0-0175C2?logo=dart)](https://dart.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)](https://www.sqlite.org)
 
 **MedicApp** est une application mobile complète de gestion des médicaments développée avec Flutter, conçue pour aider les utilisateurs et les soignants à organiser et contrôler l'administration de médicaments pour plusieurs personnes de manière efficace et sécurisée.
@@ -63,7 +63,22 @@ Interface moderne avec thème clair/sombre, composants adaptatifs, animations fl
 SQLite V19 avec migrations automatiques, index optimisés, validation d'intégrité référentielle, et système complet de triggers pour maintenir la cohérence des données.
 
 ### 10. **Tests Exhaustifs**
-Plus de 432 tests automatisés (couverture 75-80%) incluant des tests unitaires, de widgets, d'intégration, et des tests spécifiques pour les cas limites comme les notifications à minuit.
+Plus de 570 tests automatisés (couverture >80%) incluant des tests unitaires, de widgets, d'intégration, et des tests spécifiques pour les cas limites comme les notifications à minuit.
+
+### 11. **Système de Personnalisation de l'Apparence**
+Choisissez parmi plusieurs palettes de couleurs selon vos préférences :
+- **Sea Green** : Tons verts naturels inspirés de la forêt (par défaut)
+- **Material 3** : Palette violette de référence de Material Design 3 (#6750A4)
+- Sélecteur intuitif dans l'écran Paramètres avec aperçu
+- Persistance des préférences par utilisateur
+- Support complet pour les thèmes clair et sombre dans les deux palettes
+
+### 12. **Configuration des Notifications (Android)**
+Personnalisez entièrement le son et le comportement des notifications :
+- Accès direct aux paramètres de notification du système depuis l'application
+- Configurez la sonnerie, les vibrations, la priorité et d'autres options avancées
+- Gestion par canaux de notification (Android 8.0+)
+- Option automatiquement masquée sur les plateformes non compatibles (iOS)
 
 ---
 
@@ -77,7 +92,7 @@ _Section réservée pour les futures captures d'écran de l'application._
 
 ### Prérequis
 - Flutter 3.9.2 ou supérieur
-- Dart 3.0 ou supérieur
+- Dart 3.10.0 ou supérieur
 - Android Studio / VS Code avec extensions Flutter
 
 ### Installation
@@ -121,11 +136,13 @@ La documentation complète du projet est disponible dans le répertoire `docs/fr
 ## État du Projet
 
 - **Version Base de Données**: V19 (avec support multi-personne)
-- **Tests**: 432+ tests automatisés
-- **Couverture**: 75-80%
-- **Langues Supportées**: 8 (ES, EN, FR, DE, IT, PT, CA, EU)
+- **Tests**: 570+ tests automatisés
+- **Couverture**: >80%
+- **Langues Supportées**: 8 (ES, EN, CA, DE, EU, FR, GL, IT)
 - **Types de Médicaments**: 14
+- **Palettes de Couleurs**: 2 (Sea Green, Material 3)
 - **Flutter**: 3.9.2+
+- **Dart**: 3.10.0
 - **Material Design**: 3
 - **État**: En développement actif
 

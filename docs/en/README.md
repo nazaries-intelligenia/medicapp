@@ -1,10 +1,10 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-432%2B-brightgreen)](../../test)
-[![Coverage](https://img.shields.io/badge/coverage-75--80%25-green)](../../test)
+[![Tests](https://img.shields.io/badge/tests-570%2B-brightgreen)](../../test)
+[![Coverage](https://img.shields.io/badge/coverage-%3E80%25-green)](../../test)
 [![Flutter](https://img.shields.io/badge/Flutter-3.9.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design)](https://m3.material.io)
-[![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart)](https://dart.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.10.0-0175C2?logo=dart)](https://dart.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)](https://www.sqlite.org)
 
 **MedicApp** is a comprehensive medication management mobile application developed with Flutter, designed to help users and caregivers organize and control medication administration for multiple people efficiently and securely.
@@ -63,7 +63,22 @@ Modern interface with light/dark theme, adaptive components, smooth animations, 
 SQLite V19 with automatic migrations, optimized indexes, referential integrity validation, and complete trigger system to maintain data consistency.
 
 ### 10. **Exhaustive Testing**
-Over 432 automated tests (75-80% coverage) including unit tests, widget tests, integration tests, and specific tests for edge cases such as midnight notifications.
+Over 570 automated tests (>80% coverage) including unit tests, widget tests, integration tests, and specific tests for edge cases such as midnight notifications.
+
+### 11. **Appearance Customization System**
+Choose from multiple color palettes according to your preferences:
+- **Sea Green**: Natural green tones inspired by the forest (default)
+- **Material 3**: Material Design 3 baseline purple palette (#6750A4)
+- Intuitive selector in Settings screen with preview
+- Per-user preference persistence
+- Full support for light and dark themes in both palettes
+
+### 12. **Notification Settings (Android)**
+Fully customize notification sound and behavior:
+- Direct access to system notification settings from the app
+- Configure ringtone, vibration, priority, and more advanced options
+- Management via notification channels (Android 8.0+)
+- Option automatically hidden on incompatible platforms (iOS)
 
 ---
 
@@ -77,7 +92,7 @@ _Section reserved for future application screenshots._
 
 ### Prerequisites
 - Flutter 3.9.2 or higher
-- Dart 3.0 or higher
+- Dart 3.10.0 or higher
 - Android Studio / VS Code with Flutter extensions
 
 ### Installation
@@ -121,11 +136,13 @@ Complete project documentation is available in the `docs/en/` directory:
 ## Project Status
 
 - **Database Version**: V19 (with multi-person support)
-- **Tests**: 432+ automated tests
-- **Coverage**: 75-80%
-- **Supported Languages**: 8 (ES, EN, FR, DE, IT, PT, CA, EU)
+- **Tests**: 570+ automated tests
+- **Coverage**: >80%
+- **Supported Languages**: 8 (ES, EN, CA, DE, EU, FR, GL, IT)
 - **Medication Types**: 14
+- **Color Palettes**: 2 (Sea Green, Material 3)
 - **Flutter**: 3.9.2+
+- **Dart**: 3.10.0
 - **Material Design**: 3
 - **Status**: In active development
 

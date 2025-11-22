@@ -1,10 +1,10 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-432%2B-brightgreen)](../../test)
-[![Cobertura](https://img.shields.io/badge/cobertura-75--80%25-green)](../../test)
+[![Tests](https://img.shields.io/badge/tests-570%2B-brightgreen)](../../test)
+[![Cobertura](https://img.shields.io/badge/cobertura-%3E80%25-green)](../../test)
 [![Flutter](https://img.shields.io/badge/Flutter-3.9.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design)](https://m3.material.io)
-[![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart)](https://dart.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.10.0-0175C2?logo=dart)](https://dart.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)](https://www.sqlite.org)
 
 **MedicApp** Flutter-ekin garatutako medikamentuen kudeaketa aplikazio mugikorra da, erabiltzaileei eta zaintzaileei pertsona anitzenentzako medikamentuen administrazioa modu eraginkorrean eta seguruan antolatu eta kontrolatzeko diseinatua.
@@ -63,7 +63,22 @@ Interfaze modernoa argi/ilun gaiarekin, osagai adaptatiboekin, animazio jarioeki
 SQLite V19 migrazio automatikoekin, indize optimizatuekin, erreferentzia osotasunaren balioztapenarekin, eta datuen koherentzia mantentzeko trigger sistema osoarekin.
 
 ### 10. **Azterketa Zehatza**
-432 test automatizatu baino gehiago (75-80% estaldura) unitate testak, widget testak, integrazio testak, eta ertzeko kasuetarako test espezifikoak barne, hala nola gauerdiko jakinarazpenak.
+570 test automatizatu baino gehiago (>80% estaldura) unitate testak, widget testak, integrazio testak, eta ertzeko kasuetarako test espezifikoak barne, hala nola gauerdiko jakinarazpenak.
+
+### 11. **Itxura Pertsonalizazio Sistema**
+Aukeratu kolore-paleta anitzen artean zure lehentasunen arabera:
+- **Sea Green**: Basoan inspiratutako kolore berde naturalak (lehenetsita)
+- **Material 3**: Material Design 3-ren oinarrizko more paleta (#6750A4)
+- Ezarpenak pantailako hautatzaile intuitiboa aurrebistarekin
+- Erabiltzaileko lehentasunaren iraunkortasuna
+- Bi paletetan gai argia eta ilunaren euskarri osoa
+
+### 12. **Jakinarazpen Konfigurazioa (Android)**
+Pertsonalizatu erabat jakinarazpenen soinua eta portaera:
+- Aplikaziotik sistemaren jakinarazpen ezarpenetara zuzeneko sarbidea
+- Konfiguratu tonua, bibrazioa, lehentasuna eta beste aukera aurreratuak
+- Jakinarazpen kanal bidezko kudeaketa (Android 8.0+)
+- Aukera automatikoki ezkutatuta plataforma bateraezinetan (iOS)
 
 ---
 
@@ -77,7 +92,7 @@ _Aplikazioaren etorkizuneko pantaila-argazkietarako atala erreserbatua._
 
 ### Aurretiazko Baldintzak
 - Flutter 3.9.2 edo handiagoa
-- Dart 3.0 edo handiagoa
+- Dart 3.10.0 edo handiagoa
 - Android Studio / VS Code Flutter luzapenekin
 
 ### Instalazioa
@@ -121,11 +136,13 @@ Proiektuaren dokumentazio osoa `docs/eu/` direktorioan eskuragarri dago:
 ## Proiektuaren Egoera
 
 - **Datu Basearen Bertsioa**: V19 (pertsona anitzeko euskarriarekin)
-- **Testak**: 432+ test automatizatu
-- **Estaldura**: 75-80%
-- **Onartutako Hizkuntzak**: 8 (ES, EN, FR, DE, IT, PT, CA, EU)
+- **Testak**: 570+ test automatizatu
+- **Estaldura**: >80%
+- **Onartutako Hizkuntzak**: 8 (ES, EN, CA, DE, EU, FR, GL, IT)
 - **Medikamentu Motak**: 14
+- **Kolore Paletak**: 2 (Sea Green, Material 3)
 - **Flutter**: 3.9.2+
+- **Dart**: 3.10.0
 - **Material Design**: 3
 - **Egoera**: Garapen aktiboan
 
