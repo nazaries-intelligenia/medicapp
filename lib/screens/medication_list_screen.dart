@@ -1086,15 +1086,15 @@ class MedicationListScreenState extends State<MedicationListScreen>
                         children: [
                           Text(
                             _getTodayDate(),
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.normal,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Icon(
+                          Icon(
                             Icons.calendar_today,
                             size: 20,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ],
                       ),
@@ -1130,6 +1130,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
             TabBar(
               controller: _tabController,
               isScrollable: _viewModel.persons.length > 3,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              indicatorColor: Theme.of(context).colorScheme.primary,
               tabs: _viewModel.persons.map((person) {
                 return Tab(
                   text: person.name,
