@@ -1088,13 +1088,14 @@ class MedicationListScreenState extends State<MedicationListScreen>
                             _getTodayDate(),
                             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.normal,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Icon(
+                          const Icon(
                             Icons.calendar_today,
                             size: 20,
-                            color: Theme.of(context).colorScheme.onSurface,
+                            color: Colors.white,
                           ),
                         ],
                       ),

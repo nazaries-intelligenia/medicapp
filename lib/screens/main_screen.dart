@@ -98,25 +98,51 @@ class _MainScreenState extends State<MainScreen> {
               selectedIndex: _selectedIndex,
               onDestinationSelected: _onItemTapped,
               labelType: NavigationRailLabelType.all,
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              indicatorColor: Theme.of(context).colorScheme.primary,
               destinations: [
                 NavigationRailDestination(
-                  icon: const Icon(Icons.medical_services_outlined),
-                  selectedIcon: const Icon(Icons.medical_services),
+                  icon: Icon(
+                    Icons.medical_services_outlined,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.medical_services,
+                    color: Colors.white,
+                  ),
                   label: Text(l10n.navMedicationShort),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.inventory_2_outlined),
-                  selectedIcon: const Icon(Icons.inventory_2),
+                  icon: Icon(
+                    Icons.inventory_2_outlined,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.inventory_2,
+                    color: Colors.white,
+                  ),
                   label: Text(l10n.navInventoryShort),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.history_outlined),
-                  selectedIcon: const Icon(Icons.history),
+                  icon: Icon(
+                    Icons.history_outlined,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.history,
+                    color: Colors.white,
+                  ),
                   label: Text(l10n.navHistoryShort),
                 ),
                 NavigationRailDestination(
-                  icon: const Icon(Icons.settings_outlined),
-                  selectedIcon: const Icon(Icons.settings),
+                  icon: Icon(
+                    Icons.settings_outlined,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  ),
+                  selectedIcon: const Icon(
+                    Icons.settings,
+                    color: Colors.white,
+                  ),
                   label: Text(l10n.navSettingsShort),
                 ),
               ],
@@ -152,25 +178,52 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTapped,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        indicatorColor: Theme.of(context).colorScheme.primary,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.medical_services_outlined),
-            selectedIcon: const Icon(Icons.medical_services),
+            icon: Icon(
+              Icons.medical_services_outlined,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+            selectedIcon: const Icon(
+              Icons.medical_services,
+              color: Colors.white,
+            ),
             label: l10n.navMedicationShort,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.inventory_2_outlined),
-            selectedIcon: const Icon(Icons.inventory_2),
+            icon: Icon(
+              Icons.inventory_2_outlined,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+            selectedIcon: const Icon(
+              Icons.inventory_2,
+              color: Colors.white,
+            ),
             label: l10n.navInventoryShort,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.history_outlined),
-            selectedIcon: const Icon(Icons.history),
+            icon: Icon(
+              Icons.history_outlined,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+            selectedIcon: const Icon(
+              Icons.history,
+              color: Colors.white,
+            ),
             label: l10n.navHistoryShort,
           ),
           NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
+            icon: Icon(
+              Icons.settings_outlined,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+            ),
+            selectedIcon: const Icon(
+              Icons.settings,
+              color: Colors.white,
+            ),
             label: l10n.navSettingsShort,
           ),
         ],
