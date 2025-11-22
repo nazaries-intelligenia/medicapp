@@ -105,13 +105,57 @@ class AppTheme {
         elevation: 4,
       ),
 
-      // Bottom Navigation Bar
+      // Bottom Navigation Bar (legacy)
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: surfaceLight,
         selectedItemColor: primaryLight,
         unselectedItemColor: textSecondaryLight,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
+      ),
+
+      // Navigation Bar (Material 3)
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceLight,
+        indicatorColor: primaryLight,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: Colors.white, size: 24);
+          }
+          return IconThemeData(color: textSecondaryLight, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: primaryLight,
+            );
+          }
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            color: textSecondaryLight,
+          );
+        }),
+      ),
+
+      // Navigation Rail (Material 3)
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: surfaceLight,
+        selectedIconTheme: const IconThemeData(color: Colors.white, size: 24),
+        unselectedIconTheme: IconThemeData(color: textSecondaryLight, size: 24),
+        selectedLabelTextStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: primaryLight,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: textSecondaryLight,
+        ),
+        indicatorColor: primaryLight,
       ),
 
       // Text theme
@@ -333,6 +377,50 @@ class AppTheme {
         unselectedItemColor: textSecondaryDark,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
+      ),
+
+      // Navigation Bar (Material 3)
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surfaceDark,
+        indicatorColor: primaryDark,
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: Colors.white, size: 24);
+          }
+          return IconThemeData(color: textSecondaryDark, size: 24);
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: primaryDark,
+            );
+          }
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.normal,
+            color: textSecondaryDark,
+          );
+        }),
+      ),
+
+      // Navigation Rail (Material 3)
+      navigationRailTheme: NavigationRailThemeData(
+        backgroundColor: surfaceDark,
+        selectedIconTheme: const IconThemeData(color: Colors.white, size: 24),
+        unselectedIconTheme: IconThemeData(color: textSecondaryDark, size: 24),
+        selectedLabelTextStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: primaryDark,
+        ),
+        unselectedLabelTextStyle: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.normal,
+          color: textSecondaryDark,
+        ),
+        indicatorColor: primaryDark,
       ),
 
       // Text theme
