@@ -1,10 +1,10 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-432%2B-brightgreen)](../../test)
-[![Cobertura](https://img.shields.io/badge/cobertura-75--80%25-green)](../../test)
+[![Tests](https://img.shields.io/badge/tests-570%2B-brightgreen)](../../test)
+[![Abdeckung](https://img.shields.io/badge/abdeckung-%3E80%25-green)](../../test)
 [![Flutter](https://img.shields.io/badge/Flutter-3.9.2%2B-02569B?logo=flutter)](https://flutter.dev)
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-757575?logo=material-design)](https://m3.material.io)
-[![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?logo=dart)](https://dart.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.10.0-0175C2?logo=dart)](https://dart.dev)
 [![SQLite](https://img.shields.io/badge/SQLite-3-003B57?logo=sqlite)](https://www.sqlite.org)
 
 **MedicApp** ist eine umfassende mobile Anwendung zur Medikamentenverwaltung, entwickelt mit Flutter. Sie wurde entwickelt, um Benutzern und Pflegekräften zu helfen, die Medikamentenverwaltung für mehrere Personen effizient und sicher zu organisieren und zu kontrollieren.
@@ -63,7 +63,22 @@ Moderne Oberfläche mit hellem/dunklem Thema, adaptiven Komponenten, flüssigen 
 SQLite V19 mit automatischen Migrationen, optimierten Indizes, Validierung der referenziellen Integrität und vollständigem Trigger-System zur Aufrechterhaltung der Datenkonsistenz.
 
 ### 10. **Umfassende Tests**
-Über 432 automatisierte Tests (75-80% Abdeckung) einschließlich Unit-Tests, Widget-Tests, Integrationstests und spezifische Tests für Grenzfälle wie Benachrichtigungen um Mitternacht.
+Über 570 automatisierte Tests (>80% Abdeckung) einschließlich Unit-Tests, Widget-Tests, Integrationstests und spezifische Tests für Grenzfälle wie Benachrichtigungen um Mitternacht.
+
+### 11. **Anpassungssystem für das Erscheinungsbild**
+Wählen Sie aus mehreren Farbpaletten nach Ihren Präferenzen:
+- **Sea Green**: Natürliche grüne Töne inspiriert vom Wald (Standard)
+- **Material 3**: Baseline-Lila-Palette von Material Design 3 (#6750A4)
+- Intuitiver Selektor im Einstellungsbildschirm mit Vorschau
+- Benutzerbezogene Präferenz-Persistenz
+- Vollständige Unterstützung für helle und dunkle Themen in beiden Paletten
+
+### 12. **Benachrichtigungskonfiguration (Android)**
+Passen Sie Ton und Verhalten von Benachrichtigungen vollständig an:
+- Direkter Zugang zu Systembenachrichtigungseinstellungen aus der App
+- Konfigurieren Sie Klingelton, Vibration, Priorität und weitere erweiterte Optionen
+- Verwaltung über Benachrichtigungskanäle (Android 8.0+)
+- Option wird automatisch auf inkompatiblen Plattformen ausgeblendet (iOS)
 
 ---
 
@@ -77,7 +92,7 @@ _Abschnitt reserviert für zukünftige Screenshots der Anwendung._
 
 ### Voraussetzungen
 - Flutter 3.9.2 oder höher
-- Dart 3.0 oder höher
+- Dart 3.10.0 oder höher
 - Android Studio / VS Code mit Flutter-Erweiterungen
 
 ### Installation
@@ -121,11 +136,13 @@ Die vollständige Projektdokumentation ist im Verzeichnis `docs/de/` verfügbar:
 ## Projektstatus
 
 - **Datenbankversion**: V19 (mit Multi-Personen-Unterstützung)
-- **Tests**: 432+ automatisierte Tests
-- **Abdeckung**: 75-80%
-- **Unterstützte Sprachen**: 8 (ES, EN, FR, DE, IT, PT, CA, EU)
+- **Tests**: 570+ automatisierte Tests
+- **Abdeckung**: >80%
+- **Unterstützte Sprachen**: 8 (ES, EN, CA, DE, EU, FR, GL, IT)
 - **Medikamententypen**: 14
+- **Farbpaletten**: 2 (Sea Green, Material 3)
 - **Flutter**: 3.9.2+
+- **Dart**: 3.10.0
 - **Material Design**: 3
 - **Status**: In aktiver Entwicklung
 
