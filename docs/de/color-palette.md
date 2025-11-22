@@ -38,18 +38,22 @@ MedicApp nutzt eine Farbpalette, die von der Natur inspiriert ist und grüne Tö
 | **Fehler** | `#F44336` | Kritische Fehler oder destruktive Aktionen |
 | **Information** | `#2196F3` | Allgemeine Informationsmeldungen |
 
-## Dark-Theme
+## Dark-Theme "Dark Forest"
 
-Das Dark-Theme behält Farben bei, die die "Sea Green" Palette ergänzen und für Umgebungen mit schwachem Licht angepasst sind:
+Das Dark-Theme verwendet eine Palette, die von einem nächtlichen Wald mit tiefen und geheimnisvollen Grüntönen inspiriert ist:
 
-- **Primär**: `#5BA3F5` (helles Blau)
-- **Sekundär**: `#66D98E` (Minzgrün)
-- **Hintergrund**: `#121212` (tiefes Schwarz)
-- **Oberfläche**: `#1E1E1E` (dunkles Grau)
-- **Karten**: `#2C2C2C` (mittleres Grau)
-- **Primärtext**: `#E0E0E0` (helles Grau)
-- **Sekundärtext**: `#B0B0B0` (mittleres Grau)
-- **Teiler**: `#424242` (dunkles Grau)
+| Rolle | Muster | HEX-Code | Verwendung |
+|-------|--------|----------|-----------|
+| **Globaler Hintergrund** | ⚫ | `#050A06` | Ein fast unmerklich schwarzes Grün. Tiefgreifend und geheimnisvoll. |
+| **Oberfläche (Ebene 1)** | ⚫ | `#0D1F14` | Ein etwas hellerer Ton für die Navigationsleiste oder Menüs. |
+| **Oberfläche (Ebene 2)** | ⚫ | `#142B1E` | Für schwebende Karten oder Modals. |
+| **Primär (Marke)** | 🟢 | `#A5D6A7` | Blasses entsättigtes Grün. Im Dark-Mode wirken Pastellfarben eleganter. |
+| **Akzent Vibrierend** | 🟢 | `#4CAF50` | Klassisches Grün für wichtige Call-to-Action (CTA) Schaltflächen. |
+| **Primärtext** | ⚪ | `#E8F5E9` | Ein Weiß mit einem sehr subtilen grünlichen Farbton (Eisminte). |
+| **Sekundärtext** | 🔘 | `#819CA9` | Grau mit Grün-/Blauton für visuelle Hierarchie. |
+| **Inaktive Symbole** | 🔘 | `#455A64` | Für Elemente, die vorhanden sind, aber keine Aufmerksamkeit erfordern. |
+| **Overlay (Schichten)** | 🟢 | `#1E3B28` | Farbe zur Hervorhebung einer Zeile oder eines ausgewählten Elements in einer Liste. |
+| **Resplandor (Glow)** | 🟢 | `#004D40` | Ein sehr dunkler Teal-Ton für subtile degradierte Hintergründe. |
 
 ## Verwendung im Code
 
@@ -60,19 +64,44 @@ Die Farben sind in `lib/theme/app_theme.dart` definiert:
 static const Color primaryLight = Color(0xFF2E8B57);
 static const Color primaryVariantLight = Color(0xFF3CB371);
 static const Color accentLight = Color(0xFF00C853);
+
+// Primärfarben - Dark-Theme "Dark Forest"
+static const Color primaryDark = Color(0xFFA5D6A7);
+static const Color accentDark = Color(0xFF4CAF50);
+
 static const Color secondaryLight = Color(0xFF81C784);
+static const Color secondaryDark = Color(0xFF819CA9);
 
 // Hintergrundfarben
 static const Color backgroundLight = Color(0xFFE8F5E9);
+static const Color backgroundDark = Color(0xFF050A06);
+
 static const Color surfaceLight = Color(0xFFC8E6C9);
+static const Color surfaceDark = Color(0xFF0D1F14);
+
+// Kartenfarben
 static const Color cardLight = Color(0xFFC8E6C9);
+static const Color cardDark = Color(0xFF142B1E);
 
 // Textfarben
 static const Color textPrimaryLight = Color(0xFF0D2E1C);
+static const Color textPrimaryDark = Color(0xFFE8F5E9);
+
 static const Color textSecondaryLight = Color(0xFF577D6A);
+static const Color textSecondaryDark = Color(0xFF819CA9);
+
+// Inaktive Symbole
+static const Color inactiveIconDark = Color(0xFF455A64);
+
+// Overlay und Auswahl
+static const Color overlayDark = Color(0xFF1E3B28);
+
+// Resplandor/Glow
+static const Color glowDark = Color(0xFF004D40);
 
 // Teiler- und Randfarben
 static const Color dividerLight = Color(0xFFA5D6A7);
+static const Color dividerDark = Color(0xFF455A64);
 
 // Statusfarben
 static const Color success = Color(0xFF43A047);
@@ -92,4 +121,5 @@ static const Color info = Color(0xFF2196F3);
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Ursprüngliche Palette: `Captura de pantalla 2025-11-22 101545.png`
+- Palette Light-Theme: `Captura de pantalla 2025-11-22 101545.png`
+- Palette Dark-Theme: `Captura de pantalla 2025-11-22 102516.png`

@@ -38,18 +38,22 @@ MedicApp utilise une palette de couleurs inspirée par la nature avec des tons v
 | **Erreur** | `#F44336` | Erreurs critiques ou actions destructives |
 | **Information** | `#2196F3` | Messages informatifs généraux |
 
-## Thème Sombre
+## Thème Sombre "Dark Forest"
 
-Le thème sombre maintient des couleurs qui complètent la palette "Sea Green" adaptées pour les environnements peu éclairés :
+Le thème sombre utilise une palette inspirée d'une forêt nocturne avec des tons verts profonds et mystérieux :
 
-- **Principal** : `#5BA3F5` (bleu clair)
-- **Secondaire** : `#66D98E` (vert menthe)
-- **Fond** : `#121212` (noir profond)
-- **Surface** : `#1E1E1E` (gris foncé)
-- **Cartes** : `#2C2C2C` (gris moyen)
-- **Texte Principal** : `#E0E0E0` (gris clair)
-- **Texte Secondaire** : `#B0B0B0` (gris moyen)
-- **Diviseur** : `#424242` (gris foncé)
+| Rôle | Exemple | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Fond Global** | ⚫ | `#050A06` | Un vert presque imperceptiblement noir. Profond et mystérieux. |
+| **Surface (Niveau 1)** | ⚫ | `#0D1F14` | Un ton un peu plus clair pour la barre de navigation ou les menus. |
+| **Surface (Niveau 2)** | ⚫ | `#142B1E` | Pour les cartes flottantes ou les modales. |
+| **Principal (Marque)** | 🟢 | `#A5D6A7` | Vert pâle désaturé. En dark mode, les couleurs pastel semblent plus élégantes. |
+| **Accent Vibrant** | 🟢 | `#4CAF50` | Vert classique pour les boutons d'appel à l'action (CTA) importants. |
+| **Texte Principal** | ⚪ | `#E8F5E9` | Un blanc avec une teinte verdâtre très subtile (menthe glacée). |
+| **Texte Secondaire** | 🔘 | `#819CA9` | Gris avec une teinte verte/bleutée pour la hiérarchie visuelle. |
+| **Icônes Inactives** | 🔘 | `#455A64` | Pour les éléments qui sont là mais ne nécessitent pas d'attention. |
+| **Overlay (Couches)** | 🟢 | `#1E3B28` | Couleur pour mettre en évidence une ligne ou un élément sélectionné dans une liste. |
+| **Resplandissement (Glow)** | 🟢 | `#004D40` | Un ton teal très foncé pour les arrière-plans dégradés subtils. |
 
 ## Utilisation dans le Code
 
@@ -60,19 +64,44 @@ Les couleurs sont définies dans `lib/theme/app_theme.dart`:
 static const Color primaryLight = Color(0xFF2E8B57);
 static const Color primaryVariantLight = Color(0xFF3CB371);
 static const Color accentLight = Color(0xFF00C853);
+
+// Couleurs principales - Thème sombre "Dark Forest"
+static const Color primaryDark = Color(0xFFA5D6A7);
+static const Color accentDark = Color(0xFF4CAF50);
+
 static const Color secondaryLight = Color(0xFF81C784);
+static const Color secondaryDark = Color(0xFF819CA9);
 
 // Couleurs de fond
 static const Color backgroundLight = Color(0xFFE8F5E9);
+static const Color backgroundDark = Color(0xFF050A06);
+
 static const Color surfaceLight = Color(0xFFC8E6C9);
+static const Color surfaceDark = Color(0xFF0D1F14);
+
+// Couleurs de cartes
 static const Color cardLight = Color(0xFFC8E6C9);
+static const Color cardDark = Color(0xFF142B1E);
 
 // Couleurs de texte
 static const Color textPrimaryLight = Color(0xFF0D2E1C);
+static const Color textPrimaryDark = Color(0xFFE8F5E9);
+
 static const Color textSecondaryLight = Color(0xFF577D6A);
+static const Color textSecondaryDark = Color(0xFF819CA9);
+
+// Icônes inactives
+static const Color inactiveIconDark = Color(0xFF455A64);
+
+// Overlay et sélection
+static const Color overlayDark = Color(0xFF1E3B28);
+
+// Resplandissement/Glow
+static const Color glowDark = Color(0xFF004D40);
 
 // Couleurs de diviseurs et bordures
 static const Color dividerLight = Color(0xFFA5D6A7);
+static const Color dividerDark = Color(0xFF455A64);
 
 // Couleurs d'état
 static const Color success = Color(0xFF43A047);
@@ -92,4 +121,5 @@ static const Color info = Color(0xFF2196F3);
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Palette d'origine : `Captura de pantalla 2025-11-22 101545.png`
+- Palette thème clair : `Captura de pantalla 2025-11-22 101545.png`
+- Palette thème sombre : `Captura de pantalla 2025-11-22 102516.png`

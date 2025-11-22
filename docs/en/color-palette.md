@@ -38,18 +38,22 @@ MedicApp uses a color palette inspired by nature with green tones that convey he
 | **Error** | `#F44336` | Critical errors or destructive actions |
 | **Information** | `#2196F3` | General informational messages |
 
-## Dark Theme
+## Dark Theme "Dark Forest"
 
-The dark theme maintains colors that complement the "Sea Green" palette adapted for low-light environments:
+The dark theme uses a palette inspired by a nighttime forest with deep and mysterious green tones:
 
-- **Primary**: `#5BA3F5` (light blue)
-- **Secondary**: `#66D98E` (mint green)
-- **Background**: `#121212` (deep black)
-- **Surface**: `#1E1E1E` (dark gray)
-- **Cards**: `#2C2C2C` (medium gray)
-- **Primary Text**: `#E0E0E0` (light gray)
-- **Secondary Text**: `#B0B0B0` (medium gray)
-- **Divider**: `#424242` (dark gray)
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Global Background** | ⚫ | `#050A06` | An almost imperceptibly black green. Deep and mysterious. |
+| **Surface (Level 1)** | ⚫ | `#0D1F14` | A slightly lighter tone for the navigation bar or menus. |
+| **Surface (Level 2)** | ⚫ | `#142B1E` | For floating cards or modals. |
+| **Primary (Brand)** | 🟢 | `#A5D6A7` | Pale desaturated green. In dark mode, pastel colors look more elegant. |
+| **Vibrant Accent** | 🟢 | `#4CAF50` | Classic green for important call-to-action (CTA) buttons. |
+| **Primary Text** | ⚪ | `#E8F5E9` | A white with a very subtle greenish tint (ice mint). |
+| **Secondary Text** | 🔘 | `#819CA9` | Gray with green/bluish hue for visual hierarchy. |
+| **Inactive Icons** | 🔘 | `#455A64` | For elements that are present but don't require attention. |
+| **Overlay (Layers)** | 🟢 | `#1E3B28` | Color to highlight a row or selected element in a list. |
+| **Glow (Radiance)** | 🟢 | `#004D40` | A very dark teal tone for subtle gradient backgrounds. |
 
 ## Usage in Code
 
@@ -60,19 +64,44 @@ The colors are defined in `lib/theme/app_theme.dart`:
 static const Color primaryLight = Color(0xFF2E8B57);
 static const Color primaryVariantLight = Color(0xFF3CB371);
 static const Color accentLight = Color(0xFF00C853);
+
+// Main colors - Dark Theme "Dark Forest"
+static const Color primaryDark = Color(0xFFA5D6A7);
+static const Color accentDark = Color(0xFF4CAF50);
+
 static const Color secondaryLight = Color(0xFF81C784);
+static const Color secondaryDark = Color(0xFF819CA9);
 
 // Background colors
 static const Color backgroundLight = Color(0xFFE8F5E9);
+static const Color backgroundDark = Color(0xFF050A06);
+
 static const Color surfaceLight = Color(0xFFC8E6C9);
+static const Color surfaceDark = Color(0xFF0D1F14);
+
+// Card colors
 static const Color cardLight = Color(0xFFC8E6C9);
+static const Color cardDark = Color(0xFF142B1E);
 
 // Text colors
 static const Color textPrimaryLight = Color(0xFF0D2E1C);
+static const Color textPrimaryDark = Color(0xFFE8F5E9);
+
 static const Color textSecondaryLight = Color(0xFF577D6A);
+static const Color textSecondaryDark = Color(0xFF819CA9);
+
+// Inactive icons
+static const Color inactiveIconDark = Color(0xFF455A64);
+
+// Overlay and selection
+static const Color overlayDark = Color(0xFF1E3B28);
+
+// Glow/Radiance
+static const Color glowDark = Color(0xFF004D40);
 
 // Divider and border colors
 static const Color dividerLight = Color(0xFFA5D6A7);
+static const Color dividerDark = Color(0xFF455A64);
 
 // State colors
 static const Color success = Color(0xFF43A047);
@@ -92,4 +121,5 @@ static const Color info = Color(0xFF2196F3);
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Original palette: `Captura de pantalla 2025-11-22 101545.png`
+- Light theme palette: `Captura de pantalla 2025-11-22 101545.png`
+- Dark theme palette: `Captura de pantalla 2025-11-22 102516.png`

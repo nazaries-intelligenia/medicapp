@@ -38,18 +38,22 @@ MedicApp utilitza una paleta de colors inspirada en la natura amb tons verds que
 | **Error** | `#F44336` | Errors crítics o accions destructives |
 | **Informació** | `#2196F3` | Missatges informatius generals |
 
-## Tema Fosc
+## Tema Fosc "Dark Forest"
 
-El tema fosc manté colors que complementen la paleta "Sea Green" adaptats per a ambients amb poca llum:
+El tema fosc utilitza una paleta inspirada en un bosc nocturn amb tons verds profunds i misteriosos:
 
-- **Primari**: `#5BA3F5` (blau clar)
-- **Secundari**: `#66D98E` (verd menta)
-- **Fons**: `#121212` (negre profund)
-- **Superfície**: `#1E1E1E` (gris fosc)
-- **Targetes**: `#2C2C2C` (gris mitjà)
-- **Text Primari**: `#E0E0E0` (gris clar)
-- **Text Secundari**: `#B0B0B0` (gris mitjà)
-- **Divisor**: `#424242` (gris fosc)
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|----------|-----|
+| **Fons Global** | ⚫ | `#050A06` | Un verd gairebé imperceptiblement negre. Profund i misteriós. |
+| **Superfície (Nivell 1)** | ⚫ | `#0D1F14` | Un to una mica més clar per a la barra de navegació o menús. |
+| **Superfície (Nivell 2)** | ⚫ | `#142B1E` | Per a targetes flotants o modals. |
+| **Primari (Marca)** | 🟢 | `#A5D6A7` | Verd pàl·lid desaturat. En dark mode, els colors pastel es veuen més elegants. |
+| **Accent Vibrant** | 🟢 | `#4CAF50` | Verd clàssic per a botons de crida a l'acció (CTA) importants. |
+| **Text Principal** | ⚪ | `#E8F5E9` | Un blanc amb un tint verdós molt subtil (menta gel). |
+| **Text Secundari** | 🔘 | `#819CA9` | Gris amb matís verd/blauada per a jerarquia visual. |
+| **Icones Inactives** | 🔘 | `#455A64` | Per a elements que estan allà però no requereixen atenció. |
+| **Overlay (Capes)** | 🟢 | `#1E3B28` | Color per a destacar una fila o element seleccionat en una llista. |
+| **Resplandor (Glow)** | 🟢 | `#004D40` | Un to teal molt fosc per a fons amb degradats subtils. |
 
 ## Ús en el Codi
 
@@ -60,19 +64,44 @@ Els colors estan definits a `lib/theme/app_theme.dart`:
 static const Color primaryLight = Color(0xFF2E8B57);
 static const Color primaryVariantLight = Color(0xFF3CB371);
 static const Color accentLight = Color(0xFF00C853);
+
+// Colors principals - Tema fosc "Dark Forest"
+static const Color primaryDark = Color(0xFFA5D6A7);
+static const Color accentDark = Color(0xFF4CAF50);
+
 static const Color secondaryLight = Color(0xFF81C784);
+static const Color secondaryDark = Color(0xFF819CA9);
 
 // Colors de fons
 static const Color backgroundLight = Color(0xFFE8F5E9);
+static const Color backgroundDark = Color(0xFF050A06);
+
 static const Color surfaceLight = Color(0xFFC8E6C9);
+static const Color surfaceDark = Color(0xFF0D1F14);
+
+// Colors de targetes
 static const Color cardLight = Color(0xFFC8E6C9);
+static const Color cardDark = Color(0xFF142B1E);
 
 // Colors de text
 static const Color textPrimaryLight = Color(0xFF0D2E1C);
+static const Color textPrimaryDark = Color(0xFFE8F5E9);
+
 static const Color textSecondaryLight = Color(0xFF577D6A);
+static const Color textSecondaryDark = Color(0xFF819CA9);
+
+// Icones inactives
+static const Color inactiveIconDark = Color(0xFF455A64);
+
+// Overlay i selecció
+static const Color overlayDark = Color(0xFF1E3B28);
+
+// Resplandor/Glow
+static const Color glowDark = Color(0xFF004D40);
 
 // Colors de divisors i vores
 static const Color dividerLight = Color(0xFFA5D6A7);
+static const Color dividerDark = Color(0xFF455A64);
 
 // Colors d'estat
 static const Color success = Color(0xFF43A047);
@@ -92,4 +121,5 @@ static const Color info = Color(0xFF2196F3);
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Paleta original: `Captura de pantalla 2025-11-22 101545.png`
+- Paleta tema clar: `Captura de pantalla 2025-11-22 101545.png`
+- Paleta tema fosc: `Captura de pantalla 2025-11-22 102516.png`
