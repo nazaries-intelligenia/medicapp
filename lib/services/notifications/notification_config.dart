@@ -1,7 +1,10 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import '../../utils/platform_helper.dart';
 
 /// Shared configuration and factory methods for notification services
 class NotificationConfig {
+  /// Channel ID for medication reminders
+  static const String medicationChannelId = 'medication_reminders';
   /// Get standard Android notification details for medication reminders
   /// Pass [autoCancel] = true to auto-cancel the notification after user taps
   /// Pass [includeActions] = true to include quick actions (Register, Skip, Snooze)
@@ -29,7 +32,7 @@ class NotificationConfig {
     ] : null;
 
     return fln.AndroidNotificationDetails(
-      'medication_reminders', // channel ID
+      medicationChannelId, // channel ID
       'Recordatorios de Medicamentos', // channel name
       channelDescription: 'Notificaciones para recordarte tomar tus medicamentos',
       importance: fln.Importance.high,
@@ -41,6 +44,31 @@ class NotificationConfig {
       autoCancel: autoCancel,
       actions: actions,
     );
+  }
+
+  /// Opens the notification channel settings for Android
+  /// This allows users to customize sound, vibration, and other notification settings
+  /// Only works on Android 8.0+ (API 26+)
+  static Future<void> openNotificationChannelSettings() async {
+    if (!PlatformHelper.isAndroid) {
+      return; // Only available on Android
+    }
+
+    try {
+      // Use the Flutter Local Notifications plugin to open channel settings
+      final fln.FlutterLocalNotificationsPlugin plugin =
+          fln.FlutterLocalNotificationsPlugin();
+
+      // Open the settings for the medication reminders channel
+      await plugin
+          .resolvePlatformSpecificImplementation<
+              fln.AndroidFlutterLocalNotificationsPlugin>()
+          ?.openNotificationChannelSettings(medicationChannelId);
+    } catch (e) {
+      // If that fails, we could fallback to opening app notification settings
+      // but the channel-specific settings are preferred
+      rethrow;
+    }
   }
 
   /// Get standard iOS/Darwin notification details for medication reminders

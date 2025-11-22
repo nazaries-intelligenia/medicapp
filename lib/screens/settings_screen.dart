@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/snackbar_service.dart';
+import '../services/notifications/notification_config.dart';
 import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
@@ -295,6 +296,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// Open notification channel settings (Android only)
+  Future<void> _openNotificationSettings() async {
+    try {
+      await NotificationConfig.openNotificationChannelSettings();
+    } catch (e) {
+      if (!mounted) return;
+      SnackBarService.showError(
+        context,
+        'No se pudo abrir los ajustes de notificación: ${e.toString()}',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -357,6 +371,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
               );
             },
           ),
+
+          // Notification Sound Card (Android only)
+          if (PlatformHelper.isAndroid)
+            SettingOptionCard(
+              icon: Icons.music_note,
+              iconColor: theme.colorScheme.secondary,
+              title: 'Tono de notificación',
+              subtitle: 'Configurar sonido, vibración y más',
+              isLoading: false,
+              enabled: true,
+              onTap: _openNotificationSettings,
+            ),
 
           const SizedBox(height: 16),
 

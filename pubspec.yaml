@@ -69,6 +69,12 @@ dependencies:
   # Professional logging
   logger: ^2.0.0
 
+  # State management
+  provider: ^6.1.2
+
+  # Ringtone manager for notification sound selection (Android)
+  flutter_ringtone_manager: ^1.1.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
