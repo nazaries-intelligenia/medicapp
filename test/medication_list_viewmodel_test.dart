@@ -54,8 +54,9 @@ void main() {
         );
         await DatabaseHelper.instance.insertMedication(medication);
         await DatabaseHelper.instance.assignMedicationToPerson(
-          medication.id,
-          testPerson.id,
+          personId: testPerson.id,
+          medicationId: medication.id,
+          scheduleData: medication,
         );
 
         // Initialize viewModel with person context
@@ -123,7 +124,7 @@ void main() {
       viewModel = MedicationListViewModel();
       testPerson = await createTestPerson(name: 'Test User', isDefault: true);
 
-      medication = createTestMedicationWithBuilder(
+      medication = createTestMedication(
         name: 'Test Med',
         type: MedicationType.pill,
         doseSchedule: {'08:00': 1.0, '20:00': 1.0},
@@ -132,8 +133,9 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(medication);
       await DatabaseHelper.instance.assignMedicationToPerson(
-        medication.id,
-        testPerson.id,
+        personId: testPerson.id,
+        medicationId: medication.id,
+        scheduleData: medication,
       );
 
       await viewModel.initialize(isTestMode: true);
@@ -166,7 +168,7 @@ void main() {
 
     test('registerDose throws InsufficientStockException when stock is low', () async {
       // Arrange - Create medication with insufficient stock
-      final lowStockMed = createTestMedicationWithBuilder(
+      final lowStockMed = createTestMedication(
         name: 'Low Stock Med',
         type: MedicationType.pill,
         doseSchedule: {'08:00': 5.0},
@@ -175,8 +177,9 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(lowStockMed);
       await DatabaseHelper.instance.assignMedicationToPerson(
-        lowStockMed.id,
-        testPerson.id,
+        personId: testPerson.id,
+        medicationId: lowStockMed.id,
+        scheduleData: lowStockMed,
       );
 
       // Act & Assert
@@ -233,7 +236,7 @@ void main() {
       viewModel = MedicationListViewModel();
       testPerson = await createTestPerson(name: 'Test User', isDefault: true);
 
-      medication = createTestMedicationWithBuilder(
+      medication = createTestMedication(
         name: 'Test Med',
         type: MedicationType.pill,
         doseSchedule: {'08:00': 2.0},
@@ -242,8 +245,9 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(medication);
       await DatabaseHelper.instance.assignMedicationToPerson(
-        medication.id,
-        testPerson.id,
+        personId: testPerson.id,
+        medicationId: medication.id,
+        scheduleData: medication,
       );
 
       await viewModel.initialize(isTestMode: true);
