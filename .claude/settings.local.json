@@ -13,7 +13,18 @@
       "Bash(flutter clean:*)",
       "Bash(tee:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(timeout 30 flutter test:*)",
+      "Bash(timeout 30 /mnt/c/Users/RPO/flutter/bin/flutter test:*)",
+      "Bash(timeout 120 flutter test:*)",
+      "Bash(cat:*)",
+      "Bash(pkill:*)",
+      "Bash(timeout 60 flutter test:*)",
+      "WebFetch(domain:blog.flutter.dev)",
+      "WebSearch",
+      "Bash(timeout 60 flutter analyze:*)",
+      "Bash(dart analyze:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

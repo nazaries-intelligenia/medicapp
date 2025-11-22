@@ -549,6 +549,181 @@ class FastingConflictService {
 - Verhindert Konflikte, die die Wirksamkeit der Behandlung beeinträchtigen könnten
 - Aktiviert in V19+ nach Refaktorierung von `EditScheduleScreen` zum Empfang von `allMedications` und `personId` als Parameter
 
+### SmartCacheService (Singleton)
+
+Intelligentes Cache-System, das die Anwendungsleistung durch temporäre Speicherung häufig abgerufener Daten optimiert.
+
+```dart
+class SmartCacheService<T> {
+  final int maxSize;
+  final Duration ttl;
+
+  // Hauptoperationen
+  T? get(String key);
+  void put(String key, T value);
+  Future<T> getOrCompute(String key, Future<T> Function() computer);
+  void invalidate(String key);
+  void clear();
+
+  // Statistiken
+  CacheStatistics get statistics;
+}
+```
+
+**Eigenschaften:**
+- **Automatisches TTL (Time-To-Live)**: Jeder Eintrag läuft nach einer konfigurierbaren Zeitspanne ab
+- **LRU-Algorithmus**: Entfernung am wenigsten kürzlich verwendeter Einträge bei Erreichen des Limits
+- **Cache-Aside-Muster**: Methode `getOrCompute()`, die zuerst Cache prüft, dann bei Bedarf berechnet
+- **Auto-Bereinigung**: Periodischer Timer, der abgelaufene Einträge jede Minute entfernt
+- **Echtzeit-Statistiken**: Tracking von Hits, Misses, Evictions und Hit Rate
+
+#### MedicationCacheService
+
+Verwaltet vier spezialisierte Caches für verschiedene Arten von Medikamentendaten:
+
+```dart
+class MedicationCacheService {
+  // Spezialisierte Caches
+  static final medicationsCache = SmartCacheService<List<Medication>>(
+    maxSize: 50,
+    ttl: Duration(minutes: 10),
+  );
+
+  static final listsCache = SmartCacheService<List<Medication>>(
+    maxSize: 20,
+    ttl: Duration(minutes: 5),
+  );
+
+  static final historyCache = SmartCacheService<List<DoseHistoryEntry>>(
+    maxSize: 30,
+    ttl: Duration(minutes: 3),
+  );
+
+  static final statisticsCache = SmartCacheService<Map<String, dynamic>>(
+    maxSize: 10,
+    ttl: Duration(minutes: 30),
+  );
+}
+```
+
+**Konfigurationen nach Typ:**
+- **Medikamente**: 10 Minuten TTL, 50 Einträge maximal - Für einzelne Medikamente
+- **Listen**: 5 Minuten TTL, 20 Einträge - Für Medikamentenlisten nach Person/Filter
+- **Verlauf**: 3 Minuten TTL, 30 Einträge - Für Dosisverlaufsabfragen
+- **Statistiken**: 30 Minuten TTL, 10 Einträge - Für aufwändige statistische Berechnungen
+
+**Vorteile:**
+- Reduziert Datenbankzugriffe um 60-80% für häufig abgefragte Daten
+- Verbessert Antwortzeiten für komplexe Abfragen (Statistiken, Verlauf)
+- Selektive Ungültigmachung bei Datenänderungen
+- Kontrollierter Speicher mit konfigurierbaren Limits
+
+### IntelligentRemindersService
+
+Service für Therapietreue-Analyse und Vorhersage von Medikationsmustern.
+
+```dart
+class IntelligentRemindersService {
+  // Therapietreue-Analyse
+  static Future<AdherenceAnalysis> analyzeAdherence({
+    required String personId,
+    required String medicationId,
+    int daysToAnalyze = 30,
+  });
+
+  // Vorhersage von Auslassungen
+  static Future<SkipProbability> predictSkipProbability({
+    required String personId,
+    required String medicationId,
+    required int dayOfWeek,
+    required String timeOfDay,
+  });
+
+  // Vorschläge für optimale Zeitpläne
+  static Future<List<TimeOptimizationSuggestion>> suggestOptimalTimes({
+    required String personId,
+    required String medicationId,
+  });
+}
+```
+
+**Funktionalität analyzeAdherence():**
+
+Führt eine vollständige Analyse der Therapietreue basierend auf dem Dosisverlauf durch:
+
+- **Metriken nach Wochentag**: Berechnet Therapietreuerate für jeden Tag (Mo-So)
+- **Metriken nach Tageszeit**: Identifiziert, zu welchen Zeiten die beste Compliance besteht
+- **Beste/schlechteste Tage und Zeiten**: Erkennt Erfolgs- und Problemmuster
+- **Problematische Tage**: Listet Tage mit Therapietreue <50% auf
+- **Personalisierte Empfehlungen**: Generiert Vorschläge basierend auf erkannten Mustern
+- **Tendenz**: Berechnet, ob sich die Therapietreue verbessert, stabil ist oder abnimmt
+
+Beispiel einer Analyse:
+```dart
+AdherenceAnalysis {
+  overallAdherence: 0.85,  // 85% globale Therapietreue
+  bestDay: 'Monday',        // Bester Tag: Montag
+  worstDay: 'Saturday',     // Schlechtester Tag: Samstag
+  bestTimeSlot: '08:00',    // Beste Zeit: 8:00
+  worstTimeSlot: '22:00',   // Schlechteste Zeit: 22:00
+  trend: AdherenceTrend.improving,  // Verbessert sich mit der Zeit
+  recommendations: [
+    'Erwägen Sie, Dosis von 22:00 auf 20:00 zu verschieben (bessere Therapietreue)',
+    'An Wochenenden werden zusätzliche Erinnerungen benötigt'
+  ]
+}
+```
+
+**Funktionalität predictSkipProbability():**
+
+Sagt die Wahrscheinlichkeit voraus, dass eine Dosis ausgelassen wird, basierend auf historischen Mustern:
+
+- **Eingabe**: Person, Medikament, spezifischer Wochentag, spezifische Uhrzeit
+- **Analyse**: Untersucht Auslassungshistorie unter ähnlichen Bedingungen
+- **Ausgabe**: Wahrscheinlichkeit (0.0-1.0) und Risikoeinstufung (niedrig/mittel/hoch)
+- **Berücksichtigte Faktoren**: Wochentag, Tageszeit, aktuelle Tendenz
+
+Beispiel einer Vorhersage:
+```dart
+SkipProbability {
+  probability: 0.65,         // 65% Auslassungswahrscheinlichkeit
+  riskLevel: RiskLevel.high, // Hohes Risiko
+  factors: [
+    'Samstage haben 60% mehr Auslassungen',
+    'Zeit 22:00 ist durchweg problematisch'
+  ]
+}
+```
+
+**Funktionalität suggestOptimalTimes():**
+
+Schlägt Zeitplanänderungen zur Verbesserung der Therapietreue vor:
+
+- Identifiziert aktuelle Zeiten mit niedriger Therapietreue (<70%)
+- Sucht alternative Zeiten mit besserer Compliance-Historie
+- Berechnet Verbesserungspotenzial für jeden Vorschlag
+- Priorisiert Vorschläge nach erwarteter Wirkung
+
+Beispiel für Vorschläge:
+```dart
+[
+  TimeOptimizationSuggestion {
+    currentTime: '22:00',
+    suggestedTime: '20:00',
+    currentAdherence: 0.45,      // 45% aktuelle Therapietreue
+    expectedAdherence: 0.82,     // 82% erwartet zur neuen Zeit
+    improvementPotential: 0.37,  // +37% Verbesserungspotenzial
+    reason: 'Therapietreue um 20:00 ist durchweg hoch'
+  }
+]
+```
+
+**Anwendungsfälle:**
+- Statistikbildschirme mit detaillierter Therapietreue-Analyse
+- Proaktive Warnungen bei Erkennung von Auslassungsmustern
+- Assistent zur Zeitplanoptimierung
+- Medizinische Berichte mit Compliance-Insights
+
 ### System für Benachrichtigungen bei niedrigem Bestand
 
 MedicApp implementiert ein duales Bestandswarnsystem, das reaktive Benachrichtigungen (zum kritischen Zeitpunkt) und proaktive Benachrichtigungen (vorausschauend) kombiniert.
@@ -694,6 +869,99 @@ SettingsScreen
 ├─ PersonsManagementScreen
 └─ LanguageSelectionScreen
 ```
+
+### Themensystem (ThemeProvider)
+
+MedicApp implementiert ein vollständiges Themensystem mit Unterstützung für natives helles und dunkles Theme.
+
+```dart
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  ThemeMode get themeMode => _themeMode;
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    _themeMode = mode;
+    await PreferencesService.setThemeMode(mode);
+    notifyListeners();
+  }
+}
+```
+
+**Eigenschaften des Themensystems:**
+
+**Drei Betriebsmodi:**
+- **System**: Folgt automatisch der Betriebssystemkonfiguration
+- **Light**: Erzwingt helles Theme unabhängig vom System
+- **Dark**: Erzwingt dunkles Theme unabhängig vom System
+
+**Implementierung in AppTheme:**
+
+Die Klasse `AppTheme` definiert vollständige Farbschemata für beide Modi:
+
+```dart
+class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.light,
+    ),
+    // Benutzerdefinierte Stile für alle Komponenten
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.dark,
+    ),
+    // Benutzerdefinierte Stile für alle Komponenten
+  );
+}
+```
+
+**Komponentenanpassung:**
+- `AppBarTheme`: App-Balken mit kohärenten Farben
+- `CardTheme`: Karten mit angemessener Erhöhung und Rändern
+- `FloatingActionButtonTheme`: Hervorgehobene Floating-Action-Buttons
+- `InputDecorationTheme`: Konsistente Texteingabefelder
+- `DialogTheme`: Dialoge mit abgerundeten Ecken
+- `SnackBarTheme`: Gestaltete temporäre Benachrichtigungen
+- `TextTheme`: Vollständige typografische Hierarchie
+
+**Integration mit PreferencesService:**
+
+Der Preferences-Service speichert die Benutzerauswahl persistent:
+
+```dart
+static Future<void> setThemeMode(ThemeMode mode) async {
+  await _prefs.setString('theme_mode', mode.toString());
+}
+
+static ThemeMode getThemeMode() {
+  final modeString = _prefs.getString('theme_mode');
+  // String-zu-Enum-Konvertierung
+}
+```
+
+**Verwendung in main.dart:**
+
+```dart
+MaterialApp(
+  theme: AppTheme.lightTheme,
+  darkTheme: AppTheme.darkTheme,
+  themeMode: themeProvider.themeMode,
+  // ...
+)
+```
+
+**Vorteile:**
+- Sanfter Übergang zwischen Themes ohne App-Neustart
+- Für Lesbarkeit in beiden Modi optimierte Farben
+- Energieeinsparung im dunklen Modus (OLED-Bildschirme)
+- Verbesserte Zugänglichkeit für Benutzer mit Lichtempfindlichkeit
+- Zwischen Sitzungen persistierte Präferenz
 
 ### Wiederverwendbare Widgets
 

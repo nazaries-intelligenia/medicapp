@@ -544,6 +544,181 @@ class FastingConflictService {
 - Tratamenduaren eraginkortasuna arriskuan jar dezaketen gatazkak saihesten ditu
 - V19+ bertsioan aktibatuta `EditScheduleScreen`-ek `allMedications` eta `personId` parametroak jaso ondoren
 
+### SmartCacheService (Singleton)
+
+Cache Sistema Adimentsua aplikazioaren errendimendua optimizatzen du maiz sartzen diren datuen biltegi tenporala eginez.
+
+```dart
+class SmartCacheService<T> {
+  final int maxSize;
+  final Duration ttl;
+
+  // Eragiketa nagusiak
+  T? get(String key);
+  void put(String key, T value);
+  Future<T> getOrCompute(String key, Future<T> Function() computer);
+  void invalidate(String key);
+  void clear();
+
+  // Estatistikak
+  CacheStatistics get statistics;
+}
+```
+
+**Ezaugarriak:**
+- **TTL (Time-To-Live) automatikoa**: Sarrera bakoitzak iraungi data konfiguragarria du
+- **LRU algoritmoa**: Berriki gutxien erabili diren sarrerak automatikoki kentzen ditu muga iristen denean
+- **Cache-aside patroia**: `getOrCompute()` metodoa lehenengo cachea egiaztatzen du, gero kalkulatzen du beharrezkoa bada
+- **Auto-garbiketa**: Minuturo iraungi diren sarrerak ezabatzen dituen timer-a
+- **Denbora errealeko estatistikak**: Hits, misses, evictions eta hit rate jarraipena
+
+#### MedicationCacheService
+
+Sendagaien datu mota desberdinen lau cache espezializatu kudeatzen ditu:
+
+```dart
+class MedicationCacheService {
+  // Cache espezializatuak
+  static final medicationsCache = SmartCacheService<List<Medication>>(
+    maxSize: 50,
+    ttl: Duration(minutes: 10),
+  );
+
+  static final listsCache = SmartCacheService<List<Medication>>(
+    maxSize: 20,
+    ttl: Duration(minutes: 5),
+  );
+
+  static final historyCache = SmartCacheService<List<DoseHistoryEntry>>(
+    maxSize: 30,
+    ttl: Duration(minutes: 3),
+  );
+
+  static final statisticsCache = SmartCacheService<Map<String, dynamic>>(
+    maxSize: 10,
+    ttl: Duration(minutes: 30),
+  );
+}
+```
+
+**Mota araberako konfigurak:**
+- **Sendagaiak**: 10 minutu TTL, 50 sarrera max - Sendagai indibidualentzat
+- **Zerrendak**: 5 minutu TTL, 20 sarrera - Pertsonaren/iragazkiaren araberako sendagai zerrendak
+- **Historiala**: 3 minutu TTL, 30 sarrera - Dosi historiala kontsultetarako
+- **Estatistikak**: 30 minutu TTL, 10 sarrera - Kalkulu estatistiko astunentzat
+
+**Abantailak:**
+- Datu maizteko kontsultatu duen datu-base sarbidea %60-80 murrizten du
+- Kontsulta konplexuen erantzun denborak hobetzen ditu (estatistikak, historiala)
+- Datuak aldatzen direnean hautazko baliogabetzea
+- Konfiguragarri diren mugaekin kontrolatutako memoria
+
+### IntelligentRemindersService
+
+Atxikimen analisiaren eta sendagai patroien aurreikuspenaren zerbitzua.
+
+```dart
+class IntelligentRemindersService {
+  // Atxikipen analisia
+  static Future<AdherenceAnalysis> analyzeAdherence({
+    required String personId,
+    required String medicationId,
+    int daysToAnalyze = 30,
+  });
+
+  // Ahazturako aurreikuspena
+  static Future<SkipProbability> predictSkipProbability({
+    required String personId,
+    required String medicationId,
+    required int dayOfWeek,
+    required String timeOfDay,
+  });
+
+  // Orduteegi optimoen iradokizunak
+  static Future<List<TimeOptimizationSuggestion>> suggestOptimalTimes({
+    required String personId,
+    required String medicationId,
+  });
+}
+```
+
+**analyzeAdherence() funtzionalitatea:**
+
+Dosi historialan oinarritutako tratamendu atxikipenaren analisi osoa egiten du:
+
+- **Asteko egunen araberako metrikak**: Egun bakoitzeko (Al-Ig) atxikipen tasak kalkulatzen ditu
+- **Eguneko orduaren araberako metrikak**: Zein ordutegitan dagoen betetze hobea identifikatzen du
+- **Egun/ordu onenak/txarrenak**: Arrakasta eta arazo patronak detektatzen ditu
+- **Egun problematikoak**: <50% atxikipena duten egunak zerrendatzen ditu
+- **Gomendio pertsonalizatuak**: Detektatutako patronetan oinarritutako iradokizunak sortzen ditu
+- **Joera**: Atxikipena hobetzen, egonkor edo txikitzen ari den kalkulatzen du
+
+Adibidez analisia:
+```dart
+AdherenceAnalysis {
+  overallAdherence: 0.85,  // %85 atxikipen globala
+  bestDay: 'Monday',        // Egun onena: astelehena
+  worstDay: 'Saturday',     // Egun txarrena: larunbata
+  bestTimeSlot: '08:00',    // Ordu onena: 8:00
+  worstTimeSlot: '22:00',   // Ordu txarrena: 22:00
+  trend: AdherenceTrend.improving,  // Denboran hobetzen
+  recommendations: [
+    '22:00etako dosia 20:00etara mugitzea kontuan hartu (atxikipen hobea)',
+    'Asteburuek oroigarri gehigarriak behar dituzte'
+  ]
+}
+```
+
+**predictSkipProbability() funtzionalitatea:**
+
+Historiko patronetan oinarrituz dosi bat ahaztu daitekeenaren probabilitatea aurreikusten du:
+
+- **Sarrera**: Pertsona, sendagaia, asteko egun zehatza, ordu zehatza
+- **Analisia**: Baldintza antzetan historiako ahazturako aztertzen du
+- **Irteera**: Probabilitatea (0.0-1.0) eta arrisku sailkapena (txikia/ertaina/altua)
+- **Kontuan hartutako faktoreak**: Asteko eguna, eguneko ordua, azken joera
+
+Adibidez aurreikuspena:
+```dart
+SkipProbability {
+  probability: 0.65,         // %65 ahazturako probabilitatea
+  riskLevel: RiskLevel.high, // Arrisku altua
+  factors: [
+    'Larunbatek %60 ahaztura gehiago dituzte',
+    '22:00ko orduak etengabe problematikoak dira'
+  ]
+}
+```
+
+**suggestOptimalTimes() funtzionalitatea:**
+
+Atxikipena hobetzeko ordutegi aldaketak iradokitzen ditu:
+
+- Atxikipen baxua (<70%) duten uneko orduak identifikatzen ditu
+- Betetze historial hobeagoa duten ordutegi alternatiboak bilatzen ditu
+- Iradokizun bakoitzeko hobekuntza potentziala kalkulatzen du
+- Iradokizunak espero den inpaktuaren arabera lehenetsi
+
+Adibidez iradokizunak:
+```dart
+[
+  TimeOptimizationSuggestion {
+    currentTime: '22:00',
+    suggestedTime: '20:00',
+    currentAdherence: 0.45,      // %45 uneko atxikipena
+    expectedAdherence: 0.82,     // %82 espero dena ordutegi berrian
+    improvementPotential: 0.37,  // +%37 hobekuntza potentziala
+    reason: '20:00etako atxikipena etengabe altua da'
+  }
+]
+```
+
+**Erabilera kasuak:**
+- Atxikipen analisi xehatua duten estatistika pantailak
+- Ahaztura patronak detektatzen direnean alerta proaktiboak
+- Ordutegi optimizaziorako laguntzailea
+- Betetze insights-ekin txosten medikuak
+
 ### Stock Baxuko Jakinarazpen Sistema
 
 MedicApp-ek stock alerten sistema duala inplementatzen du, jakinarazpen erreaktiboak (une kritikoan) eta proaktiboak (aurreikuspenezkoak) konbinatzen dituena.
@@ -1587,6 +1762,72 @@ MaterialApp(
   },
 );
 ```
+
+---
+
+### ThemeService
+
+Aplikazioaren gai ilunaren eta argitze baldintzak kudeatzen dituen zerbitzua.
+
+```dart
+class ThemeService extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  ThemeMode get themeMode => _themeMode;
+
+  Future<void> setThemeMode(ThemeMode mode);
+  Future<void> toggleTheme();
+  bool get isDarkMode;
+}
+```
+
+**Ezaugarriak:**
+- **Gai Ilun Natiboa**: Material Design 3 gai ilun natiboa erabiltzen du Android 10+ eta iOS 13+ onartzen duena
+- **Modu hirukoitza**: System (sistemari jarraitzen dio), Light (argia beti), Dark (iluna beti)
+- **Lehentasun iraunkorra**: Gaia SharedPreferences-en gordetzen da aplikazioak abiaraztean mantentzeko
+- **Aldaketa berehalakoa**: UI osoaren eguneraketa animazio leunarekin aplikazioa berrabiarazi gabe
+
+**Gai Ilun Natiboan onura:**
+
+Flutter-en gai ilunaren ezarpen natiboak hainbat abantaila eskaintzen ditu eskuzko CSS/kolore kudeaketaren gainean:
+
+1. **Irisgarritasuna hobeagoa**: Gai iluna optimizatua dago OLED pantailentzat (energia aurreztea) eta ikusmen arazoak dituztentzat (tximeleta murrizketa)
+2. **Kontrastea egokitua**: Material Design 3-k automatikoki kontraste ratioak doitzen ditu modo ilunean WCAG irisgarritasun gidalerroak betetzeko
+3. **Plataforma koherentzia**: Gailuaren sistemaren ezarpenari jarraituz, aplikazioa plataformaren gainerakoarekin integratzen da
+4. **Kolore paleta adimentsua**: Gai ilunean, kolore azentuak automatikoki doitzen dira ondo ikusten direla ziurtatzeko, gorria eta berdea zorroztagoak bihurtuz
+5. **Mantentze erraza**: Framework-ak automatikoki kudeatu widget guztien kolore bihurketak argi/ilun artean
+
+**Inplementazio xehetatuak:**
+
+```dart
+// main.dart-en
+MaterialApp(
+  theme: ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.light,
+    ),
+  ),
+  darkTheme: ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.dark,
+    ),
+  ),
+  themeMode: themeService.themeMode,
+)
+```
+
+**Ezarpenen integrazioa:**
+
+Erabiltzaileak Settings pantailatik gaia kontrolatu dezake:
+- "Sistema gisa" aukera: Gailuaren ezarpenekin automatikoki sinkronizatzen da
+- "Gai argia" aukera: Beti modu argia erabiltzen du
+- "Gai iluna" aukera: Beti modu iluna erabiltzen du
+
+Hautaketa gordetzen da eta aplikazioak abiarazteko berehalako aplikatzen da, eta erabiltzaileak bere aldaketa ikusten du hurrengoa aplikazioa irekitzen duenean.
 
 ---
 

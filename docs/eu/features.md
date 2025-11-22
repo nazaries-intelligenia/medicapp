@@ -531,6 +531,167 @@ Kontuan-hartze ergonomiko honek nekea fisikoa murrizten du eta aplikazioa erosoa
 
 ---
 
+## 15. Cache Sistema Adimentsua
+
+### Errendimendua Optimizatua
+
+MedicApp-ek datu maizteko erabiliak memorian cacheatzeko sistema sofistikatu bat inplementatzen du, aplikazio osoa azkarrago eta fluidoago eginez. Cache sistema ikuskapen datuak atzitzean eta errepikaketa maila altua duten kontsultak exekutatzean esanguratsuki murrizten du datu-base sarbidea.
+
+Sendagai zerrendak berreskuratzeko, historiala kontsultatzeko eta estatistikak kalkulatzeko agindu arrunt bat exekutatzean, sistemak lehenengo cachea egiaztatzen du beharrezko datuak gordetuta badauden. Datuak cachean daude eta oraindik iraungi ez badira, datu-basea kontsultatu beharrik gabe itzultzen dira. Honek latentzia murrizten du eta aplikazioaren erantzun azkarragoa sortzen du.
+
+### TTL eta Auto-Expiraketa
+
+Datuak zaharkituak edo koherentziaga lduta ez egiteko, cache sarrera bakoitzak TTL (Time-To-Live) konfiguratua du. Datu mota espezifiko bakoitzari iraupena ezberdin bat esleitzen zaio bere aldaketa maiztasunaren arabera:
+
+**Sendagai indibidualak** - 10 minutuko TTL. Erabiltzaileak sendagai bat bisita dezakeela esperotzen denez, cacheak denbora tarte horretan datuak eskuratzeko datu-base sarbide anitz saihesten ditu.
+
+**Sendagai zerrendak** - 5 minutuko TTL. Zerrendak pertsonaren edo iragazkien araberakoak izan daitezke eta maiztasunez berrerabiltzen dira.
+
+**Dosi historiala** - 3 minutuko TTL. Historiala gehienetan soilik irakurtzen da eta erregistro berriak aurretik aldatzen ditu txarto automatikoki.
+
+**Estatistikak** - 30 minutuko TTL. Estatistika kalkuluak kalkulu konplexuak dira eta maiztasun txikiagoarekin aldatzen dira, cache iraupena luzea justifikatzen duena.
+
+Minuturo, sistema automatikoki iraungi diren cache guztiak garbitzen ditu memoria kudeaketa optimizatzeko eta memoriarik sobran erabiltzeko.
+
+### LRU Algoritmoa
+
+Cache bakoitzak tamaina maximoa du. Muga hori iristen denean, cache-ak berriki gutxien erabili diren sarrerak automatikoki ezabatzen ditu (LRU - Least Recently Used) leku egiteko sarrera berrientzat. Estrategia honek ziurtatzen du cacheak datu "beroak" soilik mantentzen dituela, maiz atzitutakoak, bitartean erabilera txikikoak ezabatzen diren.
+
+Adibidez, cache sendagai indibidualak 50 sarrera maximoa badu, sistemak gehien iristen diren 50 sendagaiak memorian mantentzen ditu. 51. sendagaia atzitu bada, azken atzituta sendagaia ezabatzen da automatikoki.
+
+### Cache-Aside Pattern
+
+Sistemak cache-aside patroia erabiltzen du `getOrCompute()` metodoan. Datu bat behar denean:
+
+1. Lehenbizi cachea egiaztatzen da
+2. Datuak cachean badaude, berriro itzultzen dira (cache hit)
+3. Datuak cachean ez badaude, datu-basetik kalkulatu/errekuperatu egiten dira (cache miss)
+4. Emaitza cachean gordetzen da etorkizuneko sarbidean azkarragoak izateko
+
+Automatizazio honek sarbide logika sinpletzen du eta kasuetan guztietako ñako koherentzia bermatzen du.
+
+### Estatistika Denbora Errealean
+
+Cache sistemak errendimendua monitorizatzeko metrikak jarraitzen ditu:
+
+- **Hits**: Datuak cachean aurkitu ziren zenbat aldiz
+- **Misses**: Datuak datu-basetik berreskuratu behar izan ziren zenbat aldiz
+- **Hit rate**: Hits-en ehuneko osoa sarbide osoetan (hits + misses)
+- **Evictions**: Zer sarrera automatikoki ezabatu diren (LRU bidez edo iraungi)
+
+Estatistika hauek debug moduan kontsultatu daitezke aplikazioaren errendimendua hobetzeko. Hit rate %80 baino handiagoa adierazle ona da cache efektibitasun ontzat.
+
+### Baliogabetze Automatikoa
+
+Cache koherentzia bermatzeko, sistemak automatikoki baliogabetutzen du dagokion cacheak datuak aldatzen direnean. Adibidez:
+
+- Sendagai bat editatzen denean, sendagai horren cachea eta zerrendetakoa automatikoki baliogabetzen dira
+- Dosi bat erregistratzen denean, historiala eta estatistiketakoa baliogabetzen dira
+- Sendagai bat ezabatzen denean, esleitutako cache guztiak garbitzen dira
+
+Baliogabetze honek ziurtatzen du erabiltzaileak beti datu freskoak ikustea kontsulten ondoren, datuak erregistratzeko gabe.
+
+---
+
+## 16. Oroigarri Adimentsuak
+
+### Tratamendu Atxikipenaren Analisi Sakona
+
+MedicApp-ek historiko dosi datuak aztertzeko eta erabiltzaile baten tratamendu atxikipena zehatzen ebaluatzeko aukera ematen du. 30 egun lehenetsiaren (pertsonalizagarria) aldietan, sistemak honako hau kalkulatzen du:
+
+**Asteko egunaren araberako atxikipena** - Zenbaki bakoitzeko (Al-Ig) atxikipen tasa, zein egun duten betetze hobea eta txarrena identifikatuz. Erabilgarria erabiltzaileak sendagaiak larunbat eta igandean ahazteko joera duten detektatzeko.
+
+**Orduaren araberako atxikipena** - Eguneko ordutegi desberdinen araberako atxikipen tasak (adibidez, 08:00, 13:00, 20:00). Honek zein ordutegitan dauden problemak handiagoak identifikatzen du.
+
+**Egun eta ordu problematikoak** - <50% atxikipena duten egun eta ordutegietan fokalizatzeko, horiek hobetzeko esku-hartzen direnean.
+
+**Atxikipen joera** - Historikoko atxikipena denboran hobetzen ari den, egonkorra edo txikitzen ari den aztertzen du, tratamenduaren eboluzioaren laburpena emanez.
+
+Analisi honek ez ditu soilik zenbakiak ematen, gomendio pertsonalizatuak ere sortzen ditu detektatutako patronetan oinarrituz. Adibidez: "22:00etako dosia 20:00etara mugitzea kontuan hartu (atxikipen hobea)" edo "Asteburuek oroigarri gehigarriak behar dituzte".
+
+### Ahazturako Aurreikuspena
+
+Historiko analisia erabiliz, MedicApp-ek zer probabilitate dagoen dosi espezifiko bat ahaztu daitekeenaren aurreikusteko gai da. Sistemak kontuan hartzen ditu:
+
+- Asteko eguna (adibidez, asteburuak ahaztura indize altuagoa dute)
+- Eguneko ordua (adibidez, 22:00ko dosiak ahazteko joera handiagoa dute)
+- Azken joera (azken egunetan ohikoa baino ahaztura gehiago?)
+
+Aurreikuspena probabilitatea (0,0-1,0) eta arrisku sailkapena (txikia/ertaina/altua) ematen du. Adibidez: "%65 larunbat gaueko 22:00etako dosia ahaztu daitekeenaren probabilitatea - Arrisku altua".
+
+Aurreikuspena honek proaktiboki erabiltzen du lagun daitekeena ohikotik kanpoko gogorazlenak sortzeko edo erabiltzailea horietaz aldatzen ari diren ordutegietan ohartarazteko.
+
+### Ordutegi Optimizazio Iradokizunak
+
+Atxikipen baxua (<70%) duten uneko ordutegietan oinarrituz, MedicApp-ek ordutegi alternatiboak proposatu ditzake betetze historial hobeagoa dutenak. Iradokizun bakoitza honako hauek barne hartzen ditu:
+
+- **Uneko ordua** eta bere atxikipena (adibidez, 22:00 → %45 atxikipena)
+- **Iradokitako ordua** eta atxikipen hobearen estimazioa (adibidez, 20:00 → %82 esperoa)
+- **Hobekuntza potentziala** (adibidez, +%37 hobekuntza)
+- **Arrazonamendua** (adibidez, "20:00etako atxikipena etengabe altua da")
+
+Iradokizunak hobekuntza potentziala handienerenetik txikienera antolatzen dira. Erabiltzaileak iradokizunak berrikusteko eta aplikatzea erabakitzeko aukera du edo oharra gisa mantendu etorkizuneko erreferentziarako.
+
+### Insights Txosten Medikuentzat
+
+Oroigarri adimentsuek sortutako datuak kontsulta medikuekin erabiltzeko eta tratamenduaren eraginkortasuna ebaluatzeko diseinatuak daude. Emaitzak honako hau barne hartzen dute:
+
+- Atxikipen tasa globala eta asteko eguna/orduaren araberakoa
+- Arrakasta eta arazo patronen identifikazioa
+- Joeren analisia (hobetzen/okerago)
+- Gomendio espezifikoak arreta puntu zentratzen
+
+Insights formato estandar batean esportatu daitezke edo aplikazio barneko pantaila bisual batean bistaratu, kontsulta mediku produktiboagoak erraztuz atxikipen datuetan oinarrituz.
+
+---
+
+## 17. Gai Ilun Natiboa
+
+### Material Design 3 Onarpena
+
+MedicApp-ek Material Design 3 (Material You) Google-ren argi eta ilun gai sistema natibo bat inplementatzen du. Honek automatikoki kolore paleta eta kontrastea egokitzen du ikusizko baldintza ezberdinen arabera, irisgarritasuna eta erabilgarritasuna hobetuz.
+
+Gai ilun natiboa ez da soilik pantaila zuria beltza aldatzea. Ikerketan oinarritutako diseinu sistemak: kontraste ratioak egokitzen ditu irakurgarritasuna ziurtatzeko, kolore azentuak doitzen ditu ikusizko irisgarritasuna hobetzeko, azal elebazioa enbor gehituz modu ilunean, eta pantaila osoan OLED energia aurreztea optimizatzen du.
+
+### Hiru Gai Modu
+
+MedicApp-ek hiru hautaketa eskaintzen ditu erabiltzaileei dagokien igartera egokitzen diren:
+
+**Sistemako gisa** - Lehenetsiaren, aplikazioa automatikoki gailuaren sistemaren gai ezarpenei jarraituko dio. Android 10+ edo iOS 13+ bada, sistemak gauaz modu iluna eta egunez argia era batzen du erabiltzaileak sistemako ezarpenak zehazten badu. Honek aplikazioa gailuaren gainerako aplikazioekin koherentea mantentzen du.
+
+**Gai argia** - Erabiltzaileak beti modu argia erabili nahi du, eguneko edo gaueko gorabehera. Erabilgarria argitze handia dagoenean lekuetan edo erabiltzaileak nahi badu interfaze garbia eta nabarmendua.
+
+**Gai iluna** - Erabiltzaileak beti modu iluna erabili nahi du, eguneko edo gaueko gorabehera. Ezinbestekoa gaueko ikusgarritasuna handiagoa edo OLED pantailetan energia aurreztea maximizatzeko.
+
+### Lehentasun Iraunkorra
+
+Hautaketa gogorarazten da SharedPreferences-en eta erabiltzaileak aplikazioak abiarazi bakoitzean bere lehen autako gaia ikusten du. Ez dago gogoangarriari edo aplikazioan bakoitzean berriz konfiguratzeko beharrik. Lehentasuna gailuaren artean babes-kopiatzen da sistema backup eta restoreatze mekanismoek onartzen badute.
+
+### Aldaketa Berehalakoa
+
+Gaia aldatzen denean ezarpenetan, aldaketa berehalako aplikatzen da aplikazio osoan berrabiarazi gabe. Interfaze osoa animazio leuna batekin gainzarritako paleta berrira trantsizionatzen da, lerro argi/ilun aldaketa brustak saihestuz. Widgetak, botoiak, txartelak eta testua guztia bere kolore doitu berriak jasotzen dituzte.
+
+Aldaketa motorearen bizkorrak erabiltzailearen gozamen denboraren onartuko du eta atsegin bat sortzeko, esperientzia interaktiboa bihurtuz.
+
+### OLED Energia Aurreztea
+
+Gai ilun natiboa OLED eta AMOLED pantailetan bateria zaintzeko optimizatua dago. Interfaze osoko pixel beltzak guztiz itzaltzen duten tegnologia hauetan, aplikazioaren energia kontsumoa erdira baino gehiago murriztu daiteke gauean erabiltzen denean.
+
+Erabiltzaile baterantz energiaren antza aplikazio osoa egiten gauean bateria %10 gutxiago kontsumitzen du gai argian konparatuz, bereziki pantaila eguneraketa maiztetan (zerrendak lerratuz, dosiako erregistratzeko). Horrek erabilera luzeagoa telefono bateria beste kargatu beharrik gabe.
+
+### Irisgarritasun Hobeagoa
+
+Gai ilunaren inplementazio natiboa hainbat irisgarritasun onura bermatzen ditu:
+
+- **Neke bisualaren murrizketa**: Gai iluna pantaila distirarik pixela murrizten du, begiak ez nekatu daitezen erabilera luzean
+- **Tximeleta murrizketa**: Kontrastearen murrizketa migrain eta fotosensibilitatearen arazo dutentzat lagungarria da
+- **Babespen kontrastea**: WCAG 2.1 AA gidalerroak betetzen ditu modu ilunean, irakurgarritasuna ikusmen arazoak dituztentzat
+- **Kolore adaptatiboa**: Kolore azentu (gorria, berdea) gai ilunean automatikoki doitzen dira ikusgarritasuna hobetzeko
+
+Sistema honek ziurtatzen du MedicApp erabiltzaile guztientzat erabilgarria dela, eguneko edo gaueko gorabehera, baldintza ezberdinen, ikusmen arazoak edo ez.
+
+---
+
 ## Funtzionalitaten Integrazioa
 
 Ezaugarri hauek guztiak ez dira isolatuki funtzionatzen, esperientzia koherentea sortzeko sakonki integratuak daude baizik. Adibidez:

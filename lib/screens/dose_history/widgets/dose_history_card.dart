@@ -146,18 +146,18 @@ class DoseHistoryCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 12, color: Colors.grey),
+                      const Icon(Icons.calendar_today, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
                       Text(
                         entry.scheduledDateFormatted,
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: const TextStyle(fontSize: 11, color: Colors.white),
                       ),
                       const SizedBox(width: 12),
-                      const Icon(Icons.access_time, size: 12, color: Colors.grey),
+                      const Icon(Icons.access_time, size: 12, color: Colors.white),
                       const SizedBox(width: 4),
                       Text(
                         entry.scheduledTimeFormatted,
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: const TextStyle(fontSize: 11, color: Colors.white),
                       ),
                     ],
                   ),

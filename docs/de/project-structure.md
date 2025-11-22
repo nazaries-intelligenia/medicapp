@@ -18,6 +18,10 @@ lib/
 │   ├── dose_history_entry.dart
 │   ├── medication_type.dart
 │   └── treatment_duration_type.dart
+├── providers/
+│   └── theme_provider.dart
+├── theme/
+│   └── app_theme.dart
 ├── screens/
 │   ├── main_screen.dart
 │   ├── medication_list_screen.dart
@@ -151,6 +155,8 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── smart_cache_service.dart
+│   ├── intelligent_reminders_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -463,6 +469,31 @@ Verwaltet Benutzereinstellungen mit SharedPreferences:
 - Benachrichtigungskonfiguration
 - UI-Einstellungen
 - Letztes Nutzungsdatum
+- Theme-Modus (hell/dunkel/system)
+
+#### `smart_cache_service.dart`
+
+Intelligentes Cache-System für häufig abgerufene Daten:
+
+- Generisches Cache mit TTL (Time-To-Live)
+- LRU-Algorithmus (Least Recently Used)
+- Automatische Ungültigmachung abgelaufener Einträge
+- Echtzeit-Statistiken (Hits, Misses, Hit Rate)
+- Spezialisierte Caches:
+  - `medicationsCache`: Einzelne Medikamente (10 Min TTL)
+  - `listsCache`: Medikamentenlisten (5 Min TTL)
+  - `historyCache`: Dosisverlauf (3 Min TTL)
+  - `statisticsCache`: Statistische Berechnungen (30 Min TTL)
+
+#### `intelligent_reminders_service.dart`
+
+Service für Therapietreue-Analyse und prädiktive Erinnerungen:
+
+- Analyse der Therapietreue nach Wochentag und Tageszeit
+- Vorhersage der Wahrscheinlichkeit, Dosen auszulassen
+- Empfehlungen für optimale Zeitpläne
+- Identifikation problematischer Muster
+- Personalisierte Verbesserungsvorschläge
 
 #### `notification_id_generator.dart`
 
@@ -481,6 +512,33 @@ Unterordner mit spezifischen Benachrichtigungsmodulen:
 - **`daily_notification_scheduler.dart`**: Tägliche Benachrichtigungen planen
 - **`weekly_notification_scheduler.dart`**: Wöchentliche Benachrichtigungen planen
 - **`fasting_notification_scheduler.dart`**: Fasten-Benachrichtigungen planen
+
+### `lib/providers/`
+
+State-Management-Provider mit ChangeNotifier:
+
+#### `theme_provider.dart`
+
+Verwaltet den Theme-Modus der Anwendung:
+
+- `ThemeMode` State (system/light/dark)
+- Methode zum Ändern des Themes
+- Persistierung der Einstellungen mit PreferencesService
+- Benachrichtigung an Widgets bei Theme-Änderung
+
+### `lib/theme/`
+
+Definition der visuellen Themen:
+
+#### `app_theme.dart`
+
+Konfiguration der hellen und dunklen Themes:
+
+- `lightTheme`: Helles Theme mit Material 3
+- `darkTheme`: Dunkles Theme mit Material 3
+- Vollständige Anpassung von Komponenten (AppBar, Cards, Buttons, etc.)
+- Vollständige typografische Hierarchie
+- Konsistentes Farbschema
 
 ### `lib/widgets/`
 

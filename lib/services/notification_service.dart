@@ -81,10 +81,8 @@ class NotificationService {
   /// Check if test mode is enabled
   bool get isTestMode => _isTestMode;
 
-  /// Enable test mode (disables actual notifications)
-  void enableTestMode() {
-    _isTestMode = true;
-    // Recreate specialized services with test mode enabled
+  /// Recreate all schedulers with current test mode setting
+  void _recreateSchedulers() {
     _dailyScheduler = DailyNotificationScheduler(
       _notificationsPlugin,
       _isTestMode,
@@ -103,26 +101,16 @@ class NotificationService {
     );
   }
 
+  /// Enable test mode (disables actual notifications)
+  void enableTestMode() {
+    _isTestMode = true;
+    _recreateSchedulers();
+  }
+
   /// Disable test mode (enables actual notifications)
   void disableTestMode() {
     _isTestMode = false;
-    // Recreate specialized services with test mode disabled
-    _dailyScheduler = DailyNotificationScheduler(
-      _notificationsPlugin,
-      _isTestMode,
-    );
-    _weeklyScheduler = WeeklyNotificationScheduler(
-      _notificationsPlugin,
-      _isTestMode,
-    );
-    _fastingScheduler = FastingNotificationScheduler(
-      _notificationsPlugin,
-      _isTestMode,
-    );
-    _cancellationManager = NotificationCancellationManager(
-      _notificationsPlugin,
-      _isTestMode,
-    );
+    _recreateSchedulers();
   }
 
   /// Helper method to generate notification title based on person
@@ -514,6 +502,60 @@ class NotificationService {
     await _navigateWithRetry(medicationId, doseTime, personId);
   }
 
+  /// Helper: Parse dose time from index string or return time string directly
+  String? _parseDoseTime(String doseIndexStr, Medication medication) {
+    if (doseIndexStr.contains(':')) {
+      return doseIndexStr; // Already a time string
+    }
+
+    final doseIndex = int.tryParse(doseIndexStr);
+    if (doseIndex == null || doseIndex >= medication.doseTimes.length) {
+      return null;
+    }
+    return medication.doseTimes[doseIndex];
+  }
+
+  /// Helper: Get medication for person
+  Future<Medication?> _getMedicationForPerson(
+    String medicationId,
+    String personId,
+  ) async {
+    final medications = await DatabaseHelper.instance.getMedicationsForPerson(
+      personId,
+    );
+    return medications.where((m) => m.id == medicationId).firstOrNull;
+  }
+
+  /// Helper: Create dose history entry
+  DoseHistoryEntry _createDoseHistoryEntry({
+    required Medication medication,
+    required String doseTime,
+    required String personId,
+    required DoseStatus status,
+    required double quantity,
+  }) {
+    final now = DateTime.now();
+    final scheduledDateTime = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(doseTime.split(':')[0]),
+      int.parse(doseTime.split(':')[1]),
+    );
+
+    return DoseHistoryEntry(
+      id: '${medication.id}_${now.millisecondsSinceEpoch}',
+      medicationId: medication.id,
+      medicationName: medication.name,
+      medicationType: medication.type,
+      personId: personId,
+      scheduledDateTime: scheduledDateTime,
+      registeredDateTime: now,
+      status: status,
+      quantity: quantity,
+    );
+  }
+
   /// Handle notification action (register, skip, snooze)
   Future<void> _handleNotificationAction({
     required String actionId,
@@ -525,31 +567,17 @@ class NotificationService {
     LoggerService.info('🎯 Handling action: $actionId for medication $medicationId');
 
     try {
-      // Get medication and dose time
-      final medications = await DatabaseHelper.instance.getMedicationsForPerson(
-        personId,
-      );
-      final medication = medications
-          .where((m) => m.id == medicationId)
-          .firstOrNull;
-
+      final medication = await _getMedicationForPerson(medicationId, personId);
       if (medication == null) {
         LoggerService.warning('❌ Medication not found');
         await _notificationsPlugin.cancel(notificationId);
         return;
       }
 
-      // Parse dose index or time
-      String doseTime;
-      if (doseIndexStr.contains(':')) {
-        doseTime = doseIndexStr; // Already a time string
-      } else {
-        final doseIndex = int.tryParse(doseIndexStr);
-        if (doseIndex == null || doseIndex >= medication.doseTimes.length) {
-          LoggerService.warning('❌ Invalid dose index');
-          return;
-        }
-        doseTime = medication.doseTimes[doseIndex];
+      final doseTime = _parseDoseTime(doseIndexStr, medication);
+      if (doseTime == null) {
+        LoggerService.warning('❌ Invalid dose time');
+        return;
       }
 
       switch (actionId) {
@@ -600,31 +628,21 @@ class NotificationService {
       // Check if there's enough stock
       if (medication.stockQuantity < doseQuantity) {
         LoggerService.warning('⚠️  Insufficient stock');
-
-        // Get person information for notification
         final person = await DatabaseHelper.instance.getPerson(personId);
-        final personName = person?.name ?? 'Usuario';
-
-        // Show notification about insufficient stock
         await showLowStockNotification(
           medication: medication,
-          personName: personName,
+          personName: person?.name ?? 'Usuario',
           isInsufficientForDose: true,
         );
-
         return;
       }
 
       // Update medication
-      final updatedTakenDoses = List<String>.from(medication.takenDosesToday);
-      if (!updatedTakenDoses.contains(doseTime)) {
-        updatedTakenDoses.add(doseTime);
-      }
-
+      final updatedTakenDoses = List<String>.from(medication.takenDosesToday)
+        ..add(doseTime);
       final updatedSkippedDoses = List<String>.from(
         medication.skippedDosesToday,
-      );
-      updatedSkippedDoses.remove(doseTime);
+      )..remove(doseTime);
 
       final updatedMedication = medication.copyWith(
         stockQuantity: medication.stockQuantity - doseQuantity,
@@ -638,28 +656,14 @@ class NotificationService {
         personId: personId,
       );
 
-      // Create history entry
-      final now = DateTime.now();
-      final scheduledDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        int.parse(doseTime.split(':')[0]),
-        int.parse(doseTime.split(':')[1]),
-      );
-
-      final historyEntry = DoseHistoryEntry(
-        id: '${medication.id}_${now.millisecondsSinceEpoch}',
-        medicationId: medication.id,
-        medicationName: medication.name,
-        medicationType: medication.type,
+      // Create and insert history entry
+      final historyEntry = _createDoseHistoryEntry(
+        medication: medication,
+        doseTime: doseTime,
         personId: personId,
-        scheduledDateTime: scheduledDateTime,
-        registeredDateTime: now,
         status: DoseStatus.taken,
         quantity: doseQuantity,
       );
-
       await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
       // Cancel notification
@@ -669,7 +673,7 @@ class NotificationService {
       if (medication.requiresFasting && medication.fastingType == 'after') {
         await _fastingScheduler.scheduleDynamicFastingNotification(
           medication: medication,
-          actualDoseTime: now,
+          actualDoseTime: DateTime.now(),
           personId: personId,
         );
       }
@@ -693,13 +697,9 @@ class NotificationService {
       // Update medication
       final updatedSkippedDoses = List<String>.from(
         medication.skippedDosesToday,
-      );
-      if (!updatedSkippedDoses.contains(doseTime)) {
-        updatedSkippedDoses.add(doseTime);
-      }
-
-      final updatedTakenDoses = List<String>.from(medication.takenDosesToday);
-      updatedTakenDoses.remove(doseTime);
+      )..add(doseTime);
+      final updatedTakenDoses = List<String>.from(medication.takenDosesToday)
+        ..remove(doseTime);
 
       final updatedMedication = medication.copyWith(
         skippedDosesToday: updatedSkippedDoses,
@@ -712,28 +712,14 @@ class NotificationService {
         personId: personId,
       );
 
-      // Create history entry
-      final now = DateTime.now();
-      final scheduledDateTime = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        int.parse(doseTime.split(':')[0]),
-        int.parse(doseTime.split(':')[1]),
-      );
-
-      final historyEntry = DoseHistoryEntry(
-        id: '${medication.id}_${now.millisecondsSinceEpoch}',
-        medicationId: medication.id,
-        medicationName: medication.name,
-        medicationType: medication.type,
+      // Create and insert history entry
+      final historyEntry = _createDoseHistoryEntry(
+        medication: medication,
+        doseTime: doseTime,
         personId: personId,
-        scheduledDateTime: scheduledDateTime,
-        registeredDateTime: now,
         status: DoseStatus.skipped,
         quantity: 0.0,
       );
-
       await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
       // Cancel notification

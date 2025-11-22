@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
 import 'medication_stock_screen.dart';
 import 'medicine_cabinet_screen.dart';
 
@@ -37,18 +38,38 @@ class _MedicationInventoryScreenState extends State<MedicationInventoryScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.navInventory),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              icon: const Icon(Icons.inventory_2),
-              text: l10n.pillOrganizerTitle,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: TabBar(
+              controller: _tabController,
+              labelColor: Theme.of(context).colorScheme.primary,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+              indicatorColor: Theme.of(context).colorScheme.primary,
+              indicatorWeight: AppTheme.tabIndicatorWeight,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelStyle: const TextStyle(
+                fontSize: AppTheme.tabFontSize,
+                fontWeight: FontWeight.bold,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontSize: AppTheme.tabFontSize,
+                fontWeight: FontWeight.normal,
+              ),
+              dividerColor: Colors.transparent,
+              tabs: [
+                Tab(
+                  icon: const Icon(Icons.inventory_2),
+                  text: l10n.pillOrganizerTitle,
+                ),
+                Tab(
+                  icon: const Icon(Icons.medical_information),
+                  text: l10n.medicineCabinetTitle,
+                ),
+              ],
             ),
-            Tab(
-              icon: const Icon(Icons.medical_information),
-              text: l10n.medicineCabinetTitle,
-            ),
-          ],
+          ),
         ),
       ),
       body: TabBarView(

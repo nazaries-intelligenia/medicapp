@@ -16,6 +16,7 @@ lib/
 │   ├── medication.dart
 │   ├── person_medication.dart
 │   ├── dose_history_entry.dart
+│   ├── adherence_analysis.dart
 │   ├── medication_type.dart
 │   └── treatment_duration_type.dart
 ├── screens/
@@ -151,6 +152,11 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── intelligent_reminders_service.dart
+│   ├── cache/
+│   │   ├── cache_entry.dart
+│   │   ├── smart_cache_service.dart
+│   │   └── medication_cache_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -164,6 +170,9 @@ lib/
 │       ├── medication_info_form.dart
 │       ├── frequency_option_card.dart
 │       └── fasting_configuration_form.dart
+├── theme/
+│   ├── app_theme.dart
+│   └── theme_provider.dart
 ├── utils/
 │   ├── datetime_extensions.dart
 │   ├── medication_sorter.dart
@@ -321,6 +330,26 @@ Links medications with persons:
 - `isActive`: If it's active for the person
 - Used to assign cabinet medications to specific persons
 
+#### `adherence_analysis.dart`
+
+Model for therapeutic adherence analysis results:
+
+- `overallAdherence`: Global adherence rate (0.0-1.0)
+- `adherenceByDayOfWeek`: Map with adherence by day of week
+- `adherenceByTimeOfDay`: Map with adherence by time of day
+- `bestDay`: Day with best adherence
+- `worstDay`: Day with worst adherence
+- `bestTimeSlot`: Time with best adherence
+- `worstTimeSlot`: Time with worst adherence
+- `problematicDays`: List of days with adherence <50%
+- `recommendations`: List of personalized suggestions
+- `trend`: Adherence trend (improving/stable/declining)
+- `totalDosesAnalyzed`: Total doses analyzed
+- `dosesTaken`: Doses taken
+- `dosesMissed`: Doses missed
+
+Used by `IntelligentRemindersService` to provide detailed insights about medication patterns.
+
 #### `dose_history_entry.dart`
 
 Record of a dose taken, skipped, or postponed:
@@ -463,6 +492,42 @@ Manages user preferences with SharedPreferences:
 - Notification settings
 - UI preferences
 - Last usage date
+- **Theme mode**: Saves and retrieves ThemeMode (system/light/dark)
+
+Theme-related methods:
+- `setThemeMode(ThemeMode mode)`: Persists theme choice
+- `getThemeMode()`: Retrieves saved theme or returns ThemeMode.system by default
+
+#### `intelligent_reminders_service.dart`
+
+Adherence analysis and pattern prediction service:
+
+**Main functionalities:**
+
+1. **analyzeAdherence()**:
+   - Analyzes dose history by person and medication
+   - Calculates metrics by day of week and time of day
+   - Identifies best/worst days and times
+   - Generates personalized recommendations based on patterns
+   - Calculates adherence trend (improving/stable/declining)
+
+2. **predictSkipProbability()**:
+   - Predicts probability of skipping dose on specific day/time
+   - Classifies risk as low (<30%), medium (30-60%), or high (>60%)
+   - Identifies risk factors based on history
+   - Useful for proactive alerts
+
+3. **suggestOptimalTimes()**:
+   - Identifies current times with low adherence
+   - Suggests alternative times with better history
+   - Calculates improvement potential for each suggestion
+   - Provides data-based reasons
+
+**Use cases:**
+- Statistics screens with detailed analysis
+- Proactive alerts for problematic patterns
+- Schedule optimization assistant
+- Medical reports with compliance insights
 
 #### `notification_id_generator.dart`
 
@@ -471,6 +536,46 @@ Generates unique IDs for notifications based on:
 - Medication ID
 - Dose timestamp
 - Avoids collisions between medications
+
+#### `services/cache/`
+
+Subfolder with intelligent caching system:
+
+**`cache_entry.dart`**
+
+Represents an individual cache entry:
+
+- `value`: Stored data (generic type T)
+- `createdAt`: Creation timestamp
+- `lastAccessedAt`: Last access timestamp (for LRU)
+- `expiresAt`: Expiration timestamp (based on TTL)
+- `isExpired`: Getter that checks if entry has expired
+
+**`smart_cache_service.dart`**
+
+Generic cache service with LRU algorithm and automatic TTL:
+
+- `maxSize`: Maximum cache entries
+- `ttl`: Time-To-Live for each entry
+- Main methods:
+  - `get(key)`: Gets value if exists and hasn't expired
+  - `put(key, value)`: Stores value with current timestamp
+  - `getOrCompute(key, computer)`: Cache-aside pattern
+  - `invalidate(key)`: Removes specific entry
+  - `clear()`: Clears entire cache
+  - `statistics`: Getter with metrics (hits, misses, hit rate, evictions)
+- Auto-cleanup every minute to remove expired entries
+- LRU algorithm evicts least used entries when reaching maxSize
+
+**`medication_cache_service.dart`**
+
+Manages four specialized caches for medication data:
+
+- `medicationsCache`: 10min TTL, 50 entries - Individual medications
+- `listsCache`: 5min TTL, 20 entries - Medication lists
+- `historyCache`: 3min TTL, 30 entries - History queries
+- `statisticsCache`: 30min TTL, 10 entries - Statistical calculations
+- Selective invalidation methods by medicationId or personId
 
 #### `services/notifications/`
 
@@ -539,6 +644,63 @@ Platform-specific helpers:
 - Detect Android/iOS
 - Open system settings
 - Request platform-specific permissions
+
+### `lib/theme/`
+
+Theme system with light and dark mode support.
+
+#### `app_theme.dart`
+
+Defines application visual themes:
+
+**Complete themes:**
+- `lightTheme`: Light theme with Material Design 3
+- `darkTheme`: Dark theme with Material Design 3
+
+**Color schemes:**
+- Primary, secondary, and tertiary colors
+- Appropriate surfaces and backgrounds
+- Contrast optimized for accessibility
+
+**Custom components:**
+- `AppBarTheme`: Cohesive app bars
+- `CardTheme`: Cards with elevation and borders
+- `FloatingActionButtonTheme`: Prominent action buttons
+- `InputDecorationTheme`: Consistent text fields
+- `DialogTheme`: Dialogs with rounded corners
+- `SnackBarTheme`: Stylized temporary notifications
+- `TextTheme`: Complete typographic hierarchy
+- `IconTheme`: Icons with appropriate colors
+
+**Benefits:**
+- Smooth transition between themes
+- Colors optimized for readability
+- Full Material Design 3 support
+- Visual consistency throughout the app
+
+#### `theme_provider.dart`
+
+State provider for theme management:
+
+```dart
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _themeMode;
+
+  Future<void> setThemeMode(ThemeMode mode);
+  ThemeMode get themeMode;
+}
+```
+
+**Responsibilities:**
+- Maintain current theme state (system/light/dark)
+- Notify subscribed widgets of changes
+- Persist choice through PreferencesService
+- Load saved theme on startup
+
+**Integration with app:**
+- Used with ChangeNotifierProvider in main.dart
+- MaterialApp listens to changes and automatically updates UI
+- Transitions without needing to restart app
 
 ### `lib/l10n/`
 

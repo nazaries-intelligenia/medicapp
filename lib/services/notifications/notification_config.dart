@@ -1,7 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
+import 'package:android_intent_plus/android_intent.dart';
+import '../../utils/platform_helper.dart';
 
 /// Shared configuration and factory methods for notification services
 class NotificationConfig {
+  /// Channel ID for medication reminders
+  static const String medicationChannelId = 'medication_reminders';
   /// Get standard Android notification details for medication reminders
   /// Pass [autoCancel] = true to auto-cancel the notification after user taps
   /// Pass [includeActions] = true to include quick actions (Register, Skip, Snooze)
@@ -29,7 +33,7 @@ class NotificationConfig {
     ] : null;
 
     return fln.AndroidNotificationDetails(
-      'medication_reminders', // channel ID
+      medicationChannelId, // channel ID
       'Recordatorios de Medicamentos', // channel name
       channelDescription: 'Notificaciones para recordarte tomar tus medicamentos',
       importance: fln.Importance.high,
@@ -41,6 +45,39 @@ class NotificationConfig {
       autoCancel: autoCancel,
       actions: actions,
     );
+  }
+
+  /// Opens the notification settings for the app on Android
+  /// This allows users to customize sound, vibration, and other notification settings
+  /// Works on Android 5.0+ (API 21+)
+  static Future<void> openNotificationChannelSettings() async {
+    if (!PlatformHelper.isAndroid) {
+      return; // Only available on Android
+    }
+
+    try {
+      // Use AndroidIntent to open app notification settings
+      // This opens the notification settings page where users can configure
+      // sound, vibration, importance, etc. for all notification channels
+      final intent = AndroidIntent(
+        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
+        arguments: <String, dynamic>{
+          'android.provider.extra.APP_PACKAGE': 'com.medicapp.medicapp',
+        },
+      );
+      await intent.launch();
+    } catch (e) {
+      // If that fails, try opening general app settings as fallback
+      try {
+        final fallbackIntent = AndroidIntent(
+          action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
+          data: 'package:com.medicapp.medicapp',
+        );
+        await fallbackIntent.launch();
+      } catch (e) {
+        rethrow;
+      }
+    }
   }
 
   /// Get standard iOS/Darwin notification details for medication reminders

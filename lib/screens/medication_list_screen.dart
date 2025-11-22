@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
 import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
@@ -56,6 +57,52 @@ class MedicationListScreenState extends State<MedicationListScreen>
   static const int _centerPageIndex = 10000; // Centro para navegación "ilimitada"
   late final PageController _pageController;
   late DateTime _selectedDate;
+
+  // Helper getters
+  AppLocalizations get _l10n => AppLocalizations.of(context)!;
+
+  bool get _isSelectedDateToday {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDay = DateTime(
+      _selectedDate.year,
+      _selectedDate.month,
+      _selectedDate.day,
+    );
+    return selectedDay == today;
+  }
+
+  /// Helper: Show SnackBar only if widget is still mounted
+  void _showSnackBarIfMounted(
+    void Function() snackBarCallback,
+  ) {
+    if (!mounted) return;
+    snackBarCallback();
+  }
+
+  /// Helper: Update expiration date if needed
+  Future<void> _updateExpirationDateIfNeeded(
+    Medication medication, {
+    bool isOptional = true,
+  }) async {
+    if (!mounted) return;
+
+    final expirationDate = await ExpirationDateDialog.show(
+      context,
+      currentExpirationDate: medication.expirationDate,
+      isOptional: isOptional,
+    );
+
+    if (expirationDate != null &&
+        expirationDate.isNotEmpty &&
+        expirationDate != medication.expirationDate) {
+      final updatedMedication = medication.copyWith(
+        expirationDate: expirationDate,
+      );
+      await DatabaseHelper.instance.updateMedication(updatedMedication);
+      await _viewModel.loadMedications();
+    }
+  }
 
   @override
   void initState() {
@@ -577,21 +624,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
       );
 
       // For as-needed medications, ask for expiration date after refill
-      if (medication.allowsManualDoseRegistration && mounted) {
-        final expirationDate = await ExpirationDateDialog.show(
-          context,
-          currentExpirationDate: medication.expirationDate,
-          isOptional: true,
-        );
-
-        // If user provided or updated expiration date, update medication
-        if (expirationDate != null && expirationDate.isNotEmpty && expirationDate != medication.expirationDate) {
-          final updatedMedication = medication.copyWith(
-            expirationDate: expirationDate,
-          );
-          await DatabaseHelper.instance.updateMedication(updatedMedication);
-          await _viewModel.loadMedications();
-        }
+      if (medication.allowsManualDoseRegistration) {
+        await _updateExpirationDateIfNeeded(medication);
       }
     }
   }
@@ -721,40 +755,33 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
   Future<void> _deleteTodayDose(
       Medication medication, String doseTime, bool wasTaken) async {
-    final l10n = AppLocalizations.of(context)!;
     try {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-
-      if (selectedDay == today) {
-        // For today, use the ViewModel method which updates medication state
+      if (_isSelectedDateToday) {
         await _viewModel.deleteTodayDose(
           medication: medication,
           doseTime: doseTime,
           wasTaken: wasTaken,
         );
       } else {
-        // For historical dates, only delete from history
         await _deleteHistoricalDose(medication, doseTime);
         await _viewModel.loadMedicationsForDate(_selectedDate);
       }
 
-      if (!mounted) return;
-
-      SnackBarService.showInfo(
-        context,
-        l10n.doseDeletedAt(doseTime),
-        duration: const Duration(seconds: 2),
-      );
+      _showSnackBarIfMounted(() {
+        SnackBarService.showInfo(
+          context,
+          _l10n.doseDeletedAt(doseTime),
+          duration: const Duration(seconds: 2),
+        );
+      });
     } catch (e) {
-      if (!mounted) return;
-
-      SnackBarService.showError(
-        context,
-        l10n.errorDeleting(e.toString()),
-        duration: const Duration(seconds: 3),
-      );
+      _showSnackBarIfMounted(() {
+        SnackBarService.showError(
+          context,
+          _l10n.errorDeleting(e.toString()),
+          duration: const Duration(seconds: 3),
+        );
+      });
     }
   }
 
@@ -781,49 +808,42 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
   Future<void> _toggleTodayDoseStatus(
       Medication medication, String doseTime, bool wasTaken) async {
-    final l10n = AppLocalizations.of(context)!;
     try {
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
-
-      if (selectedDay == today) {
-        // For today, use the ViewModel method which updates medication state
+      if (_isSelectedDateToday) {
         await _viewModel.toggleTodayDoseStatus(
           medication: medication,
           doseTime: doseTime,
           wasTaken: wasTaken,
         );
       } else {
-        // For historical dates, only update history
         await _toggleHistoricalDoseStatus(medication, doseTime, wasTaken);
         await _viewModel.loadMedicationsForDate(_selectedDate);
       }
 
-      if (!mounted) return;
-
-      SnackBarService.showInfo(
-        context,
-        l10n.doseMarkedAs(
-            doseTime, wasTaken ? l10n.skippedStatus : l10n.takenStatus),
-        duration: const Duration(seconds: 2),
-      );
-    } catch (e) {
-      if (!mounted) return;
-
-      if (e is InsufficientStockException) {
-        SnackBarService.showError(
+      _showSnackBarIfMounted(() {
+        SnackBarService.showInfo(
           context,
-          l10n.insufficientStockForDose,
+          _l10n.doseMarkedAs(
+              doseTime, wasTaken ? _l10n.skippedStatus : _l10n.takenStatus),
           duration: const Duration(seconds: 2),
         );
-      } else {
-        SnackBarService.showError(
-          context,
-          l10n.errorChangingStatus(e.toString()),
-          duration: const Duration(seconds: 3),
-        );
-      }
+      });
+    } catch (e) {
+      _showSnackBarIfMounted(() {
+        if (e is InsufficientStockException) {
+          SnackBarService.showError(
+            context,
+            _l10n.insufficientStockForDose,
+            duration: const Duration(seconds: 2),
+          );
+        } else {
+          SnackBarService.showError(
+            context,
+            _l10n.errorChangingStatus(e.toString()),
+            duration: const Duration(seconds: 3),
+          );
+        }
+      });
     }
   }
 
@@ -1067,15 +1087,16 @@ class MedicationListScreenState extends State<MedicationListScreen>
                         children: [
                           Text(
                             _getTodayDate(),
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                               fontWeight: FontWeight.normal,
+                              color: Colors.white,
                             ),
                           ),
                           const SizedBox(width: 8),
                           const Icon(
                             Icons.calendar_today,
                             size: 20,
+                            color: Colors.white,
                           ),
                         ],
                       ),
@@ -1108,17 +1129,34 @@ class MedicationListScreenState extends State<MedicationListScreen>
           if (_viewModel.showPersonTabs &&
               _tabController != null &&
               _viewModel.persons.length > 1)
-            TabBar(
-              controller: _tabController,
-              isScrollable: _viewModel.persons.length > 3,
-              tabs: _viewModel.persons.map((person) {
-                return Tab(
-                  text: person.name,
-                  icon: person.isDefault
-                      ? const Icon(Icons.person)
-                      : const Icon(Icons.person_outline),
-                );
-              }).toList(),
+            Container(
+              color: Theme.of(context).colorScheme.surface,
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: _viewModel.persons.length > 3,
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                indicatorWeight: AppTheme.tabIndicatorWeight,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle: const TextStyle(
+                  fontSize: AppTheme.tabFontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: AppTheme.tabFontSize,
+                  fontWeight: FontWeight.normal,
+                ),
+                dividerColor: Colors.transparent,
+                tabs: _viewModel.persons.map((person) {
+                  return Tab(
+                    text: person.name,
+                    icon: person.isDefault
+                        ? const Icon(Icons.person)
+                        : const Icon(Icons.person_outline),
+                  );
+                }).toList(),
+              ),
             ),
           // Contenido con navegación por días
           Expanded(

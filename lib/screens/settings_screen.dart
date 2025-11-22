@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:provider/provider.dart';
 import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/snackbar_service.dart';
+import '../services/notifications/notification_config.dart';
 import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
+import '../theme/theme_provider.dart';
 import 'settings/widgets/setting_option_card.dart';
 import 'settings/widgets/setting_switch_card.dart';
 import 'settings/widgets/info_card.dart';
@@ -254,6 +258,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  /// Show color palette selection dialog
+  void _showColorPaletteDialog() {
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final currentPalette = themeProvider.colorPalette;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Seleccionar paleta de colores'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: ColorPalette.values.map((palette) {
+            final isSelected = palette == currentPalette;
+            return RadioListTile<ColorPalette>(
+              title: Text(palette.displayName),
+              subtitle: Text(palette.description),
+              value: palette,
+              groupValue: currentPalette,
+              selected: isSelected,
+              onChanged: (ColorPalette? value) {
+                if (value != null) {
+                  themeProvider.setColorPalette(value);
+                  Navigator.pop(context);
+                }
+              },
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Open notification channel settings (Android only)
+  Future<void> _openNotificationSettings() async {
+    try {
+      await NotificationConfig.openNotificationChannelSettings();
+    } catch (e) {
+      if (!mounted) return;
+      SnackBarService.showError(
+        context,
+        'No se pudo abrir los ajustes de notificación: ${e.toString()}',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -287,6 +342,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
             enabled: true,
             onTap: _navigateToPersonsManagement,
           ),
+
+          const SizedBox(height: 16),
+
+          // Appearance Section
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Apariencia',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+
+          // Color Palette Card
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              return SettingOptionCard(
+                icon: Icons.palette,
+                iconColor: theme.colorScheme.primary,
+                title: 'Paleta de colores',
+                subtitle: themeProvider.colorPalette.displayName,
+                isLoading: false,
+                enabled: true,
+                onTap: _showColorPaletteDialog,
+              );
+            },
+          ),
+
+          // Notification Sound Card (Android only)
+          if (PlatformHelper.isAndroid)
+            SettingOptionCard(
+              icon: Icons.music_note,
+              iconColor: theme.colorScheme.secondary,
+              title: 'Tono de notificación',
+              subtitle: 'Configurar sonido, vibración y más',
+              isLoading: false,
+              enabled: true,
+              onTap: _openNotificationSettings,
+            ),
 
           const SizedBox(height: 16),
 

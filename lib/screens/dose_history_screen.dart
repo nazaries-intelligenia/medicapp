@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
 import '../models/dose_history_entry.dart';
 import '../models/medication.dart';
 import '../models/person.dart';
@@ -228,25 +229,45 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
         ],
         bottom: !_showPersonTabs || _tabController == null || _persons.length <= 1
             ? null
-            : TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                tabs: [
-                  Tab(text: 'Todos'), // "All" tab
-                  ..._persons.map((person) => Tab(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            if (person.isDefault)
-                              const Padding(
-                                padding: EdgeInsets.only(right: 4),
-                                child: Icon(Icons.person, size: 16),
-                              ),
-                            Text(person.name),
-                          ],
-                        ),
-                      )),
-                ],
+            : PreferredSize(
+                preferredSize: const Size.fromHeight(48),
+                child: Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: TabBar(
+                    controller: _tabController,
+                    isScrollable: true,
+                    labelColor: Theme.of(context).colorScheme.primary,
+                    unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+                    indicatorColor: Theme.of(context).colorScheme.primary,
+                    indicatorWeight: AppTheme.tabIndicatorWeight,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelStyle: const TextStyle(
+                      fontSize: AppTheme.tabFontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    unselectedLabelStyle: const TextStyle(
+                      fontSize: AppTheme.tabFontSize,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    dividerColor: Colors.transparent,
+                    tabs: [
+                      const Tab(text: 'Todos'), // "All" tab
+                      ..._persons.map((person) => Tab(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (person.isDefault)
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 4),
+                                    child: Icon(Icons.person, size: 16),
+                                  ),
+                                Text(person.name),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                ),
               ),
       ),
       body: _isLoading

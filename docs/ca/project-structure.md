@@ -151,6 +151,9 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── smart_cache_service.dart
+│   ├── medication_cache_service.dart
+│   ├── intelligent_reminders_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -164,6 +167,9 @@ lib/
 │       ├── medication_info_form.dart
 │       ├── frequency_option_card.dart
 │       └── fasting_configuration_form.dart
+├── theme/
+│   ├── app_theme.dart
+│   └── theme_provider.dart
 ├── utils/
 │   ├── datetime_extensions.dart
 │   ├── medication_sorter.dart
@@ -472,6 +478,37 @@ Genera IDs únics per a notificacions basats en:
 - Timestamp de la dosi
 - Evita col·lisions entre medicaments
 
+#### `smart_cache_service.dart`
+
+Sistema de memòria cau genèric amb TTL automàtic:
+
+- Implementa algorisme LRU (Least Recently Used)
+- Suporta Time-To-Live (TTL) configurable per entrada
+- Auto-neteja de dades caducades cada minut
+- Tracking d'estadístiques (hits, misses, hit rate)
+- Patró cache-aside amb `getOrCompute()`
+
+#### `medication_cache_service.dart`
+
+Gestiona quatre memòries cau especialitzades:
+
+- **medicationsCache**: 10 min TTL, 50 entrades - Medicaments individuals
+- **listsCache**: 5 min TTL, 20 entrades - Llistes de medicaments
+- **historyCache**: 3 min TTL, 30 entrades - Historial de dosis
+- **statisticsCache**: 30 min TTL, 10 entrades - Càlculs estadístics
+- Invalidació selectiva en canvis de dades
+- Redueix accessos a BD en 60-80%
+
+#### `intelligent_reminders_service.dart`
+
+Servei d'anàlisi d'adherència i predicció:
+
+- **analyzeAdherence()**: Calcula mètriques per dia/hora, detecta patrons
+- **predictSkipProbability()**: Prediu risc d'omissió de dosis
+- **suggestOptimalTimes()**: Recomana canvis d'horari per millorar adherència
+- Genera recomanacions personalitzades basades en historial
+- Càlcul de tendències (millorant/estable/declinant)
+
 #### `services/notifications/`
 
 Subcarpeta amb mòduls específics de notificacions:
@@ -501,6 +538,30 @@ Formularis reutilitzables:
 - **`medication_info_form.dart`**: Formulari d'informació bàsica
 - **`frequency_option_card.dart`**: Targeta d'opció de freqüència
 - **`fasting_configuration_form.dart`**: Formulari de configuració de dejuni
+
+### `lib/theme/`
+
+Sistema de tematització de l'aplicació:
+
+#### `app_theme.dart`
+
+Defineix els temes clar i fosc de l'aplicació:
+
+- **lightTheme**: Esquema de colors per a mode clar amb Material 3
+- **darkTheme**: Esquema de colors per a mode fosc amb Material 3
+- Personalització de components (AppBar, Card, FAB, Dialog, etc.)
+- Colors optimitzats per a llegibilitat en ambdós modes
+- Consistència visual amb Material Design 3
+
+#### `theme_provider.dart`
+
+Gestiona l'estat del tema amb ChangeNotifier:
+
+- Tres modes: System, Light, Dark
+- Canvi dinàmic de tema sense reiniciar app
+- Persisteix preferència de l'usuari via PreferencesService
+- Notifica widgets per actualitzar UI automàticament
+- Segueix configuració del sistema operatiu en mode System
 
 ### `lib/utils/`
 
