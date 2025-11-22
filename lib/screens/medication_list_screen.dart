@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
+import '../theme/app_theme.dart';
 import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
@@ -1134,16 +1135,16 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 controller: _tabController,
                 isScrollable: _viewModel.persons.length > 3,
                 labelColor: Theme.of(context).colorScheme.primary,
-                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
                 indicatorColor: Theme.of(context).colorScheme.primary,
-                indicatorWeight: 4.0,
+                indicatorWeight: AppTheme.tabIndicatorWeight,
                 indicatorSize: TabBarIndicatorSize.tab,
                 labelStyle: const TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTheme.tabFontSize,
                   fontWeight: FontWeight.bold,
                 ),
                 unselectedLabelStyle: const TextStyle(
-                  fontSize: 14,
+                  fontSize: AppTheme.tabFontSize,
                   fontWeight: FontWeight.normal,
                 ),
                 dividerColor: Colors.transparent,

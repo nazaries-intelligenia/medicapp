@@ -14,6 +14,11 @@ import 'package:flutter/material.dart';
 /// - Fondo Principal: #E8F5E9 - Casi blanco con tinte verde
 /// - Divisor/Borde: #A5D6A7 - Líneas sutiles para separaciones
 class AppTheme {
+  // Constantes para TabBar
+  static const double tabIndicatorWeight = 4.0;
+  static const double tabFontSize = 14.0;
+  static const double tabUnselectedOpacity = 0.5;
+  static const double iconUnselectedOpacity = 0.5;
   // Colores principales - Tema claro "Sea Green"
   static const Color primaryLight = Color(0xFF2E8B57);
   static const Color primaryVariantLight = Color(0xFF3CB371);
@@ -126,50 +131,6 @@ class AppTheme {
         unselectedItemColor: textSecondaryLight,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
-      ),
-
-      // Navigation Bar (Material 3)
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: surfaceLight,
-        indicatorColor: primaryLight,
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: Colors.white, size: 24);
-          }
-          return IconThemeData(color: textSecondaryLight, size: 24);
-        }),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: primaryLight,
-            );
-          }
-          return TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-            color: textSecondaryLight,
-          );
-        }),
-      ),
-
-      // Navigation Rail (Material 3)
-      navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: surfaceLight,
-        selectedIconTheme: const IconThemeData(color: Colors.white, size: 24),
-        unselectedIconTheme: IconThemeData(color: textSecondaryLight, size: 24),
-        selectedLabelTextStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: primaryLight,
-        ),
-        unselectedLabelTextStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-          color: textSecondaryLight,
-        ),
-        indicatorColor: primaryLight,
       ),
 
       // Text theme
@@ -391,50 +352,6 @@ class AppTheme {
         unselectedItemColor: textSecondaryDark,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
-      ),
-
-      // Navigation Bar (Material 3)
-      navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: surfaceDark,
-        indicatorColor: primaryDark,
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: Colors.white, size: 24);
-          }
-          return IconThemeData(color: textSecondaryDark, size: 24);
-        }),
-        labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: primaryDark,
-            );
-          }
-          return TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.normal,
-            color: textSecondaryDark,
-          );
-        }),
-      ),
-
-      // Navigation Rail (Material 3)
-      navigationRailTheme: NavigationRailThemeData(
-        backgroundColor: surfaceDark,
-        selectedIconTheme: const IconThemeData(color: Colors.white, size: 24),
-        unselectedIconTheme: IconThemeData(color: textSecondaryDark, size: 24),
-        selectedLabelTextStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: primaryDark,
-        ),
-        unselectedLabelTextStyle: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.normal,
-          color: textSecondaryDark,
-        ),
-        indicatorColor: primaryDark,
       ),
 
       // Text theme
