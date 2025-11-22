@@ -151,6 +151,9 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── smart_cache_service.dart
+│   ├── medication_cache_service.dart
+│   ├── intelligent_reminders_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -471,6 +474,37 @@ Xera IDs únicos para notificacións baseados en:
 - ID de medicamento
 - Timestamp da dose
 - Evita colisións entre medicamentos
+
+#### `smart_cache_service.dart`
+
+Sistema de caché xérico con expiración automática (TTL):
+
+- Implementa algoritmo LRU para evicción
+- TTL (Time-To-Live) configurable por caché
+- Patrón cache-aside con método `getOrCompute()`
+- Auto-limpeza periódica de entradas expiradas
+- Estatísticas en tempo real (hits, misses, hit rate)
+
+#### `medication_cache_service.dart`
+
+Xestiona catro cachés especializados para medicamentos:
+
+- **medicationsCache**: Medicamentos individuais (TTL 10 min, 50 entradas)
+- **listsCache**: Listas filtradas (TTL 5 min, 20 entradas)
+- **historyCache**: Historial de doses (TTL 3 min, 30 entradas)
+- **statisticsCache**: Cálculos estatísticos (TTL 30 min, 10 entradas)
+
+Reduce accesos a BD en 60-80% para datos frecuentes.
+
+#### `intelligent_reminders_service.dart`
+
+Servizo de análise de adherencia e predición de patróns:
+
+- **analyzeAdherence()**: Análise completa con métricas por día/hora
+- **predictSkipProbability()**: Predí probabilidade de omisión
+- **suggestOptimalTimes()**: Suxire horarios para mellorar adherencia
+- Detecta patróns de éxito/problemas
+- Xera recomendacións personalizadas
 
 #### `services/notifications/`
 

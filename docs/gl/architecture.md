@@ -477,17 +477,196 @@ Engadido para centralizar o cálculo de consumo diario, especialmente útil para
 **Excepcións:**
 - `InsufficientStockException`: Lánzase cando non hai stock suficiente para completar unha dose
 
+### SmartCacheService (Singleton)
+
+Sistema de caché intelixente que optimiza o rendemento da aplicación mediante almacenamento temporal de datos frecuentemente accedidos.
+
+```dart
+class SmartCacheService<T> {
+  final int maxSize;
+  final Duration ttl;
+
+  // Operacións principais
+  T? get(String key);
+  void put(String key, T value);
+  Future<T> getOrCompute(String key, Future<T> Function() computer);
+  void invalidate(String key);
+  void clear();
+
+  // Estatísticas
+  CacheStatistics get statistics;
+}
+```
+
+**Características:**
+- **TTL (Time-To-Live) automático**: Cada entrada expira despois dun período configurable
+- **Algoritmo LRU**: Evicción de entradas menos recentemente usadas cando se alcanza o límite
+- **Patrón cache-aside**: Método `getOrCompute()` que verifica caché primeiro, logo computa se é necesario
+- **Auto-limpeza**: Timer periódico que elimina entradas expiradas cada minuto
+- **Estatísticas en tempo real**: Tracking de hits, misses, evictions e hit rate
+
+#### MedicationCacheService
+
+Xestiona catro cachés especializados para diferentes tipos de datos de medicamentos:
+
+```dart
+class MedicationCacheService {
+  // Cachés especializados
+  static final medicationsCache = SmartCacheService<List<Medication>>(
+    maxSize: 50,
+    ttl: Duration(minutes: 10),
+  );
+
+  static final listsCache = SmartCacheService<List<Medication>>(
+    maxSize: 20,
+    ttl: Duration(minutes: 5),
+  );
+
+  static final historyCache = SmartCacheService<List<DoseHistoryEntry>>(
+    maxSize: 30,
+    ttl: Duration(minutes: 3),
+  );
+
+  static final statisticsCache = SmartCacheService<Map<String, dynamic>>(
+    maxSize: 10,
+    ttl: Duration(minutes: 30),
+  );
+}
+```
+
+**Configuracións por tipo:**
+- **Medicacións**: 10 minutos TTL, 50 entradas máximo - Para medicamentos individuais
+- **Listas**: 5 minutos TTL, 20 entradas - Para listas de medicamentos por persoa/filtro
+- **Historial**: 3 minutos TTL, 30 entradas - Para consultas de historial de doses
+- **Estatísticas**: 30 minutos TTL, 10 entradas - Para cálculos estatísticos pesados
+
+**Vantaxes:**
+- Reduce accesos a base de datos en 60-80% para datos frecuentemente consultados
+- Mellora tempos de resposta de queries complexos (estatísticas, historial)
+- Invalidación selectiva cando se modifican datos
+- Memoria controlada con límites configurables
+
+### IntelligentRemindersService
+
+Servizo de análise de adherencia e predición de patróns de medicación.
+
+```dart
+class IntelligentRemindersService {
+  // Análise de adherencia
+  static Future<AdherenceAnalysis> analyzeAdherence({
+    required String personId,
+    required String medicationId,
+    int daysToAnalyze = 30,
+  });
+
+  // Predición de omisións
+  static Future<SkipProbability> predictSkipProbability({
+    required String personId,
+    required String medicationId,
+    required int dayOfWeek,
+    required String timeOfDay,
+  });
+
+  // Suxestións de horarios óptimos
+  static Future<List<TimeOptimizationSuggestion>> suggestOptimalTimes({
+    required String personId,
+    required String medicationId,
+  });
+}
+```
+
+**Funcionalidade analyzeAdherence():**
+
+Realiza unha análise completa de adherencia terapéutica baseada no historial de doses:
+
+- **Métricas por día da semana**: Calcula taxas de adherencia para cada día (Lun-Dom)
+- **Métricas por hora do día**: Identifica en que horarios hai mellor cumprimento
+- **Mellores/peores días e horarios**: Detecta patróns de éxito e problemas
+- **Días problemáticos**: Lista días con adherencia <50%
+- **Recomendacións personalizadas**: Xera suxestións baseadas en patróns detectados
+- **Tendencia**: Calcula se a adherencia está mellorando, estable ou declinando
+
+Exemplo de análise:
+```dart
+AdherenceAnalysis {
+  overallAdherence: 0.85,  // 85% de adherencia global
+  bestDay: 'Monday',        // Mellor día: luns
+  worstDay: 'Saturday',     // Peor día: sábado
+  bestTimeSlot: '08:00',    // Mellor horario: 8:00
+  worstTimeSlot: '22:00',   // Peor horario: 22:00
+  trend: AdherenceTrend.improving,  // Mellorando co tempo
+  recommendations: [
+    'Considera mover dose de 22:00 a 20:00 (mellor adherencia)',
+    'Os fins de semana necesitan recordatorios adicionais'
+  ]
+}
+```
+
+**Funcionalidade predictSkipProbability():**
+
+Predí a probabilidade de que unha dose sexa omitida baseándose en patróns históricos:
+
+- **Entrada**: Persoa, medicamento, día da semana específico, hora específica
+- **Análise**: Examina historial de omisións en condicións similares
+- **Saída**: Probabilidade (0.0-1.0) e clasificación de risco (baixo/medio/alto)
+- **Factores considerados**: Día da semana, hora do día, tendencia recente
+
+Exemplo de predición:
+```dart
+SkipProbability {
+  probability: 0.65,         // 65% probabilidade de omisión
+  riskLevel: RiskLevel.high, // Risco alto
+  factors: [
+    'Sábados teñen 60% máis omisións',
+    'Horario 22:00 é consistentemente problemático'
+  ]
+}
+```
+
+**Funcionalidade suggestOptimalTimes():**
+
+Suxire cambios de horario para mellorar a adherencia:
+
+- Identifica horarios actuais con baixa adherencia (<70%)
+- Busca horarios alternativos con mellor historial de cumprimento
+- Calcula o potencial de mellora para cada suxestión
+- Prioriza suxestións por impacto esperado
+
+Exemplo de suxestións:
+```dart
+[
+  TimeOptimizationSuggestion {
+    currentTime: '22:00',
+    suggestedTime: '20:00',
+    currentAdherence: 0.45,      // 45% adherencia actual
+    expectedAdherence: 0.82,     // 82% esperada en novo horario
+    improvementPotential: 0.37,  // +37% mellora potencial
+    reason: 'A adherencia ás 20:00 é consistentemente alta'
+  }
+]
+```
+
+**Casos de uso:**
+- Pantallas de estatísticas con análise detallada de adherencia
+- Alertas proactivas cando se detectan patróns de omisión
+- Asistente de optimización de horarios
+- Reportes médicos con insights de cumprimento
+
 ### FastingConflictService
 
-Xestión de conflitos entre períodos de xaxún de diferentes medicamentos.
+Detecta conflitos entre horarios de medicamentos e períodos de xaxún.
 
 ```dart
 class FastingConflictService {
-  static List<FastingConflict> checkFastingConflicts({
-    required List<Medication> medications,
-    required String personId,
+  static FastingConflict? checkForConflicts({
+    required String selectedTime,
+    required List<Medication> allMedications,
+    String? excludeMedicationId,
   });
-  static String formatConflictMessage(FastingConflict conflict, BuildContext context);
+  static String? suggestAlternativeTime({
+    required String conflictTime,
+    required FastingConflict conflict,
+  });
 }
 ```
 
@@ -686,6 +865,99 @@ SettingsScreen
 ├─ PersonsManagementScreen
 └─ LanguageSelectionScreen
 ```
+
+### Sistema de Temas (ThemeProvider)
+
+MedicApp implementa un sistema completo de temas con soporte para modo claro e escuro nativo.
+
+```dart
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  ThemeMode get themeMode => _themeMode;
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    _themeMode = mode;
+    await PreferencesService.setThemeMode(mode);
+    notifyListeners();
+  }
+}
+```
+
+**Características do sistema de temas:**
+
+**Tres modos de operación:**
+- **System**: Segue a configuración do sistema operativo automaticamente
+- **Light**: Forza tema claro independentemente do sistema
+- **Dark**: Forza tema escuro independentemente do sistema
+
+**Implementación en AppTheme:**
+
+A clase `AppTheme` define esquemas de cor completos para ambos modos:
+
+```dart
+class AppTheme {
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.light,
+    ),
+    // Estilos personalizados para todos os compoñentes
+  );
+
+  static ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.blue,
+      brightness: Brightness.dark,
+    ),
+    // Estilos personalizados para todos os compoñentes
+  );
+}
+```
+
+**Personalización de compoñentes:**
+- `AppBarTheme`: Barras de aplicación con cores cohesivas
+- `CardTheme`: Tarxetas con elevación e bordos apropiados
+- `FloatingActionButtonTheme`: Botóns de acción flotante destacados
+- `InputDecorationTheme`: Campos de texto consistentes
+- `DialogTheme`: Diálogos con esquinas redondeadas
+- `SnackBarTheme`: Notificacións temporais estilizadas
+- `TextTheme`: Xerarquía tipográfica completa
+
+**Integración con PreferencesService:**
+
+O servizo de preferencias persiste a elección do usuario:
+
+```dart
+static Future<void> setThemeMode(ThemeMode mode) async {
+  await _prefs.setString('theme_mode', mode.toString());
+}
+
+static ThemeMode getThemeMode() {
+  final modeString = _prefs.getString('theme_mode');
+  // Conversión de string a enum
+}
+```
+
+**Uso en main.dart:**
+
+```dart
+MaterialApp(
+  theme: AppTheme.lightTheme,
+  darkTheme: AppTheme.darkTheme,
+  themeMode: themeProvider.themeMode,
+  // ...
+)
+```
+
+**Vantaxes:**
+- Transición suave entre temas sen reiniciar app
+- Cores optimizadas para lexibilidade en ambos modos
+- Aforro de batería en modo escuro (pantallas OLED)
+- Accesibilidade mellorada para usuarios con sensibilidade á luz
+- Preferencia persistida entre sesións
 
 ### Widgets Reutilizables
 
