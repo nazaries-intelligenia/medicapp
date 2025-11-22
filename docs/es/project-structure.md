@@ -16,6 +16,7 @@ lib/
 │   ├── medication.dart
 │   ├── person_medication.dart
 │   ├── dose_history_entry.dart
+│   ├── adherence_analysis.dart
 │   ├── medication_type.dart
 │   └── treatment_duration_type.dart
 ├── screens/
@@ -151,6 +152,11 @@ lib/
 │   ├── dose_history_service.dart
 │   ├── preferences_service.dart
 │   ├── notification_id_generator.dart
+│   ├── intelligent_reminders_service.dart
+│   ├── cache/
+│   │   ├── cache_entry.dart
+│   │   ├── smart_cache_service.dart
+│   │   └── medication_cache_service.dart
 │   └── notifications/
 │       ├── notification_config.dart
 │       ├── notification_cancellation_manager.dart
@@ -164,6 +170,9 @@ lib/
 │       ├── medication_info_form.dart
 │       ├── frequency_option_card.dart
 │       └── fasting_configuration_form.dart
+├── theme/
+│   ├── app_theme.dart
+│   └── theme_provider.dart
 ├── utils/
 │   ├── datetime_extensions.dart
 │   ├── medication_sorter.dart
@@ -321,6 +330,26 @@ Relaciona medicamentos con personas:
 - `isActive`: Si está activo para la persona
 - Usado para asignar medicamentos del botiquín a personas específicas
 
+#### `adherence_analysis.dart`
+
+Modelo para resultados de análisis de adherencia terapéutica:
+
+- `overallAdherence`: Tasa global de adherencia (0.0-1.0)
+- `adherenceByDayOfWeek`: Map con adherencia por día de la semana
+- `adherenceByTimeOfDay`: Map con adherencia por hora del día
+- `bestDay`: Día con mejor adherencia
+- `worstDay`: Día con peor adherencia
+- `bestTimeSlot`: Horario con mejor adherencia
+- `worstTimeSlot`: Horario con peor adherencia
+- `problematicDays`: Lista de días con adherencia <50%
+- `recommendations`: Lista de sugerencias personalizadas
+- `trend`: Tendencia de adherencia (improving/stable/declining)
+- `totalDosesAnalyzed`: Total de dosis analizadas
+- `dosesTaken`: Dosis tomadas
+- `dosesMissed`: Dosis omitidas
+
+Utilizado por `IntelligentRemindersService` para proporcionar insights detallados sobre patrones de medicación.
+
 #### `dose_history_entry.dart`
 
 Registro de una dosis tomada, omitida o pospuesta:
@@ -463,6 +492,42 @@ Gestiona preferencias de usuario con SharedPreferences:
 - Configuración de notificaciones
 - Preferencias de UI
 - Última fecha de uso
+- **Modo de tema**: Guarda y recupera ThemeMode (system/light/dark)
+
+Métodos relacionados con temas:
+- `setThemeMode(ThemeMode mode)`: Persiste elección de tema
+- `getThemeMode()`: Recupera tema guardado o retorna ThemeMode.system por defecto
+
+#### `intelligent_reminders_service.dart`
+
+Servicio de análisis de adherencia y predicción de patrones:
+
+**Funcionalidades principales:**
+
+1. **analyzeAdherence()**:
+   - Analiza historial de dosis por persona y medicamento
+   - Calcula métricas por día de la semana y hora del día
+   - Identifica mejores/peores días y horarios
+   - Genera recomendaciones personalizadas basadas en patrones
+   - Calcula tendencia de adherencia (mejorando/estable/declinando)
+
+2. **predictSkipProbability()**:
+   - Predice probabilidad de omitir dosis en día/hora específicos
+   - Clasifica riesgo como bajo (<30%), medio (30-60%), o alto (>60%)
+   - Identifica factores de riesgo basados en historial
+   - Útil para alertas proactivas
+
+3. **suggestOptimalTimes()**:
+   - Identifica horarios actuales con baja adherencia
+   - Sugiere horarios alternativos con mejor historial
+   - Calcula potencial de mejora para cada sugerencia
+   - Proporciona razones basadas en datos
+
+**Casos de uso:**
+- Pantallas de estadísticas con análisis detallado
+- Alertas proactivas para patrones problemáticos
+- Asistente de optimización de horarios
+- Reportes médicos con insights de cumplimiento
 
 #### `notification_id_generator.dart`
 
@@ -471,6 +536,46 @@ Genera IDs únicos para notificaciones basados en:
 - ID de medicamento
 - Timestamp de la dosis
 - Evita colisiones entre medicamentos
+
+#### `services/cache/`
+
+Subcarpeta con sistema de caché inteligente:
+
+**`cache_entry.dart`**
+
+Representa una entrada individual en el caché:
+
+- `value`: Dato almacenado (genérico tipo T)
+- `createdAt`: Timestamp de creación
+- `lastAccessedAt`: Timestamp del último acceso (para LRU)
+- `expiresAt`: Timestamp de expiración (basado en TTL)
+- `isExpired`: Getter que verifica si la entrada ha caducado
+
+**`smart_cache_service.dart`**
+
+Servicio de caché genérico con algoritmo LRU y TTL automático:
+
+- `maxSize`: Tamaño máximo de entradas en caché
+- `ttl`: Time-To-Live para cada entrada
+- Métodos principales:
+  - `get(key)`: Obtiene valor si existe y no ha expirado
+  - `put(key, value)`: Almacena valor con timestamp actual
+  - `getOrCompute(key, computer)`: Patrón cache-aside
+  - `invalidate(key)`: Elimina entrada específica
+  - `clear()`: Limpia todo el caché
+  - `statistics`: Getter con métricas (hits, misses, hit rate, evictions)
+- Auto-limpieza cada minuto para eliminar entradas expiradas
+- Algoritmo LRU evicta entradas menos usadas cuando se alcanza maxSize
+
+**`medication_cache_service.dart`**
+
+Gestiona cuatro cachés especializados para datos de medicamentos:
+
+- `medicationsCache`: 10min TTL, 50 entradas - Medicamentos individuales
+- `listsCache`: 5min TTL, 20 entradas - Listas de medicamentos
+- `historyCache`: 3min TTL, 30 entradas - Consultas de historial
+- `statisticsCache`: 30min TTL, 10 entradas - Cálculos estadísticos
+- Métodos de invalidación selectiva por medicationId o personId
 
 #### `services/notifications/`
 
@@ -539,6 +644,63 @@ Helpers específicos de plataforma:
 - Detectar Android/iOS
 - Abrir configuración del sistema
 - Solicitar permisos específicos de plataforma
+
+### `lib/theme/`
+
+Sistema de temas con soporte para modo claro y oscuro.
+
+#### `app_theme.dart`
+
+Define los temas visuales de la aplicación:
+
+**Temas completos:**
+- `lightTheme`: Tema claro con Material Design 3
+- `darkTheme`: Tema oscuro con Material Design 3
+
+**Esquemas de color:**
+- Colores primarios, secundarios y terciarios
+- Superficies y fondos apropiados
+- Contraste optimizado para accesibilidad
+
+**Componentes personalizados:**
+- `AppBarTheme`: Barras de aplicación cohesivas
+- `CardTheme`: Tarjetas con elevación y bordes
+- `FloatingActionButtonTheme`: Botones de acción destacados
+- `InputDecorationTheme`: Campos de texto consistentes
+- `DialogTheme`: Diálogos con esquinas redondeadas
+- `SnackBarTheme`: Notificaciones temporales estilizadas
+- `TextTheme`: Jerarquía tipográfica completa
+- `IconTheme`: Iconos con colores apropiados
+
+**Ventajas:**
+- Transición suave entre temas
+- Colores optimizados para legibilidad
+- Soporte Material Design 3 completo
+- Consistencia visual en toda la app
+
+#### `theme_provider.dart`
+
+Proveedor de estado para gestión de temas:
+
+```dart
+class ThemeProvider extends ChangeNotifier {
+  ThemeMode _themeMode;
+
+  Future<void> setThemeMode(ThemeMode mode);
+  ThemeMode get themeMode;
+}
+```
+
+**Responsabilidades:**
+- Mantener estado actual del tema (system/light/dark)
+- Notificar cambios a widgets suscritos
+- Persistir elección mediante PreferencesService
+- Cargar tema guardado al iniciar
+
+**Integración con app:**
+- Usado con ChangeNotifierProvider en main.dart
+- MaterialApp escucha cambios y actualiza UI automáticamente
+- Transiciones sin necesidad de reiniciar app
 
 ### `lib/l10n/`
 
