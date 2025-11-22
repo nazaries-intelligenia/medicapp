@@ -1127,20 +1127,27 @@ class MedicationListScreenState extends State<MedicationListScreen>
           if (_viewModel.showPersonTabs &&
               _tabController != null &&
               _viewModel.persons.length > 1)
-            TabBar(
-              controller: _tabController,
-              isScrollable: _viewModel.persons.length > 3,
-              labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-              indicatorColor: Theme.of(context).colorScheme.primary,
-              tabs: _viewModel.persons.map((person) {
-                return Tab(
-                  text: person.name,
-                  icon: person.isDefault
-                      ? const Icon(Icons.person)
-                      : const Icon(Icons.person_outline),
-                );
-              }).toList(),
+            Material(
+              color: Theme.of(context).colorScheme.surface,
+              elevation: 2,
+              child: TabBar(
+                controller: _tabController,
+                isScrollable: _viewModel.persons.length > 3,
+                labelColor: Theme.of(context).colorScheme.primary,
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                indicatorColor: Theme.of(context).colorScheme.primary,
+                indicatorWeight: 3.0,
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.transparent,
+                tabs: _viewModel.persons.map((person) {
+                  return Tab(
+                    text: person.name,
+                    icon: person.isDefault
+                        ? const Icon(Icons.person)
+                        : const Icon(Icons.person_outline),
+                  );
+                }).toList(),
+              ),
             ),
           // Contenido con navegación por días
           Expanded(
