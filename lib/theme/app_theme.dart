@@ -71,7 +71,7 @@ class AppTheme {
       ),
 
       // Cards
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardLight,
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -81,7 +81,7 @@ class AppTheme {
       ),
 
       // Floating Action Button
-      floatingActionButtonTheme: const FloatingActionButtonTheme(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: secondaryLight,
         foregroundColor: Colors.white,
         elevation: 4,
@@ -211,7 +211,7 @@ class AppTheme {
       ),
 
       // Dialog
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: surfaceLight,
         elevation: 8,
         shape: RoundedRectangleBorder(
@@ -292,7 +292,7 @@ class AppTheme {
       ),
 
       // Cards
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: cardDark,
         elevation: 2,
         shape: RoundedRectangleBorder(
@@ -302,7 +302,7 @@ class AppTheme {
       ),
 
       // Floating Action Button
-      floatingActionButtonTheme: const FloatingActionButtonTheme(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: secondaryDark,
         foregroundColor: Colors.black,
         elevation: 4,
@@ -432,7 +432,7 @@ class AppTheme {
       ),
 
       // Dialog
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: cardDark,
         elevation: 8,
         shape: RoundedRectangleBorder(
