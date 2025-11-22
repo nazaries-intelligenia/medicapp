@@ -1,34 +1,52 @@
 import 'package:flutter/material.dart';
 
 /// Definición centralizada de temas de la aplicación
+///
+/// Paleta de colores "Sea Green" para tema claro:
+/// - Primario (Marca): #2E8B57 - Verde "Sea Green" sólido
+/// - Primario Variante: #3CB371 - Un poco más claro (hover/pressed)
+/// - Acento/Interactivo: #00C853 - Verde vibrante para FAB y acciones
+/// - Secundario/Soporte: #81C784 - Verde suave para elementos secundarios
+/// - Éxito: #43A047 - Verde funcional para confirmaciones
+/// - Texto Oscuro: #0D2E1C - Verde bosque muy profundo
+/// - Texto Secundario: #577D6A - Subtítulos y texto de ayuda
+/// - Superficie (Tarjetas): #C8E6C9 - Fondo menta suave
+/// - Fondo Principal: #E8F5E9 - Casi blanco con tinte verde
+/// - Divisor/Borde: #A5D6A7 - Líneas sutiles para separaciones
 class AppTheme {
-  // Colores principales
-  static const Color primaryLight = Color(0xFF4A90E2);
+  // Colores principales - Tema claro "Sea Green"
+  static const Color primaryLight = Color(0xFF2E8B57);
+  static const Color primaryVariantLight = Color(0xFF3CB371);
+  static const Color accentLight = Color(0xFF00C853);
   static const Color primaryDark = Color(0xFF5BA3F5);
 
-  static const Color secondaryLight = Color(0xFF50C878);
+  static const Color secondaryLight = Color(0xFF81C784);
   static const Color secondaryDark = Color(0xFF66D98E);
 
   // Colores de fondo
-  static const Color backgroundLight = Color(0xFFF5F5F5);
+  static const Color backgroundLight = Color(0xFFE8F5E9);
   static const Color backgroundDark = Color(0xFF121212);
 
-  static const Color surfaceLight = Colors.white;
+  static const Color surfaceLight = Color(0xFFC8E6C9);
   static const Color surfaceDark = Color(0xFF1E1E1E);
 
   // Colores de tarjetas
-  static const Color cardLight = Colors.white;
+  static const Color cardLight = Color(0xFFC8E6C9);
   static const Color cardDark = Color(0xFF2C2C2C);
 
   // Colores de texto
-  static const Color textPrimaryLight = Color(0xFF212121);
+  static const Color textPrimaryLight = Color(0xFF0D2E1C);
   static const Color textPrimaryDark = Color(0xFFE0E0E0);
 
-  static const Color textSecondaryLight = Color(0xFF757575);
+  static const Color textSecondaryLight = Color(0xFF577D6A);
   static const Color textSecondaryDark = Color(0xFFB0B0B0);
 
-  // Colores de estado (comunes para ambos temas)
-  static const Color success = Color(0xFF4CAF50);
+  // Colores de divisores y bordes
+  static const Color dividerLight = Color(0xFFA5D6A7);
+  static const Color dividerDark = Color(0xFF424242);
+
+  // Colores de estado
+  static const Color success = Color(0xFF43A047);
   static const Color warning = Color(0xFFFF9800);
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
@@ -82,7 +100,7 @@ class AppTheme {
 
       // Floating Action Button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
-        backgroundColor: secondaryLight,
+        backgroundColor: accentLight,
         foregroundColor: Colors.white,
         elevation: 4,
       ),
@@ -231,7 +249,7 @@ class AppTheme {
 
       // Divider
       dividerTheme: const DividerThemeData(
-        color: Color(0xFFE0E0E0),
+        color: dividerLight,
         thickness: 1,
         space: 1,
       ),
@@ -452,7 +470,7 @@ class AppTheme {
 
       // Divider
       dividerTheme: const DividerThemeData(
-        color: Color(0xFF424242),
+        color: dividerDark,
         thickness: 1,
         space: 1,
       ),
