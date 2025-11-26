@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## "Kontraste Altua" Gaia
+
+Adineko pertsonentzat edo ikusmen arazoak dituztenentzat bereziki diseinatua. WCAG AAA betetzen du (7:1 edo gehiagoko kontraste-ratioa).
+
+### Gai Argi Kontraste Altua
+
+| Rola | Lagina | HEX Kodea | Erabilera |
+|-----|---------|------------|-----|
+| **Fondoa** | ⚪ | `#FFFFFF` | Zuri hutsa kontraste maximorako |
+| **Testu Nagusia** | ⚫ | `#000000` | Beltz hutsa irakurgarritasun maximorako |
+| **Bigarren Testua** | ⚫ | `#333333` | Gris oso iluna, oraindik kontraste onarekin |
+| **Nagusia** | 🔵 | `#0000CC` | Urdin ilun hutsa, kontraste maximoa zuriaren gainean |
+| **Azentu** | 🟠 | `#CC5500` | Laranja ilun bizia |
+| **Bigarrena** | 🟢 | `#006600` | Berde iluna |
+| **Errorea** | 🔴 | `#CC0000` | Gorri iluna |
+| **Zatitzaileak/Ertzak** | ⚫ | `#000000` | Beltzak eta lodiagoak (2px) |
+
+### Gai Ilun Kontraste Altua
+
+| Rola | Lagina | HEX Kodea | Erabilera |
+|-----|---------|------------|-----|
+| **Fondoa** | ⚫ | `#000000` | Beltz hutsa |
+| **Testu Nagusia** | ⚪ | `#FFFFFF` | Zuri hutsa |
+| **Bigarren Testua** | ⚪ | `#CCCCCC` | Gris oso argia |
+| **Nagusia** | 🟡 | `#FFFF00` | Hori distiratsua, kontraste maximoa beltzaren gainean |
+| **Azentu** | 🔵 | `#00FFFF` | Zian distiratsua |
+| **Bigarrena** | 🟢 | `#00FF00` | Lima berde distiratsua |
+| **Errorea** | 🔴 | `#FF6666` | Gorri argia |
+| **Zatitzaileak/Ertzak** | ⚪ | `#FFFFFF` | Zuriak eta lodiagoak (2px) |
+
+### Irisgarritasun Ezaugarriak
+
+- **Testu handiak**: Letra-tamaina handiagoak interfaze osoan
+- **Tipografia pisua handiagoa**: Bold/semibold erabilera irakurgarritasun hoberako
+- **Ertz lodiagoak**: 2px estandarraren ordez ikusgarritasun hoberako
+- **Ikono handiagoak**: 28px 24px-ren ordez
+- **Tarte handiagoa**: Padding handiagoa botoietan eta elementu interaktiboetan
+- **Lotura azpimarratuak**: TextButtons azpimarrarekin identifikazio hoberako
+
 ## Diseinua Printzipioa
 
-1. **Atzegarritasuna**: Testu/fondo bikote guztiak WCAG 2.1 mailan AA kontraste dute.
+1. **Atzegarritasuna**: Testu/fondo bikote guztiak WCAG 2.1 mailan AA kontraste dute (AAA Kontraste Alturako).
 2. **Koherentzia**: Kolore nagusiak aplikazio osoan koherentziaz erabiltzen dira.
-3. **Hierarkia Bisuala**: Berdeen tonu desberdinak informazioaren hierarki argia ezartzen du.
+3. **Hierarkia Bisuala**: Tonu desberdinak informazioaren hierarki argia ezartzen du.
 4. **Naturalitatea**: Berdeen paleta osasuna, ongizatea eta konfiantza transmititzen du, aplikazio medikoarentzat egokia.
+5. **Inklusibitatea**: Kontraste Altua paletak ikusmen arazoak dituzten pertsonei aplikazioa eroso erabiltzeko aukera ematen die.
 
 ## Erreferentzia
 

@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## Thème "Contraste Élevé"
+
+Conçu spécialement pour les personnes âgées ou ayant des problèmes de vision. Conforme à WCAG AAA (rapport de contraste 7:1 ou supérieur).
+
+### Thème Clair Contraste Élevé
+
+| Rôle | Échantillon | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Fond** | ⚪ | `#FFFFFF` | Blanc pur pour un contraste maximum |
+| **Texte Principal** | ⚫ | `#000000` | Noir pur pour une lisibilité maximale |
+| **Texte Secondaire** | ⚫ | `#333333` | Gris très foncé, toujours bon contraste |
+| **Principal** | 🔵 | `#0000CC` | Bleu foncé pur, contraste maximum sur blanc |
+| **Accent** | 🟠 | `#CC5500` | Orange foncé vibrant |
+| **Secondaire** | 🟢 | `#006600` | Vert foncé |
+| **Erreur** | 🔴 | `#CC0000` | Rouge foncé |
+| **Diviseurs/Bordures** | ⚫ | `#000000` | Noirs et plus épais (2px) |
+
+### Thème Sombre Contraste Élevé
+
+| Rôle | Échantillon | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Fond** | ⚫ | `#000000` | Noir pur |
+| **Texte Principal** | ⚪ | `#FFFFFF` | Blanc pur |
+| **Texte Secondaire** | ⚪ | `#CCCCCC` | Gris très clair |
+| **Principal** | 🟡 | `#FFFF00` | Jaune brillant, contraste maximum sur noir |
+| **Accent** | 🔵 | `#00FFFF` | Cyan brillant |
+| **Secondaire** | 🟢 | `#00FF00` | Vert citron brillant |
+| **Erreur** | 🔴 | `#FF6666` | Rouge clair |
+| **Diviseurs/Bordures** | ⚪ | `#FFFFFF` | Blancs et plus épais (2px) |
+
+### Caractéristiques d'Accessibilité
+
+- **Textes plus grands** : Tailles de police augmentées dans toute l'interface
+- **Poids typographique supérieur** : Utilisation de bold/semibold pour une meilleure lisibilité
+- **Bordures plus épaisses** : 2px au lieu du standard pour une meilleure visibilité
+- **Icônes plus grandes** : 28px au lieu de 24px
+- **Espacement supérieur** : Padding augmenté sur les boutons et éléments interactifs
+- **Liens soulignés** : TextButtons avec soulignement pour une meilleure identification
+
 ## Principes de Conception
 
-1. **Accessibilité** : Tous les paires texte/fond respectent la norme WCAG 2.1 niveau AA pour le contraste.
+1. **Accessibilité** : Tous les paires texte/fond respectent la norme WCAG 2.1 niveau AA pour le contraste (AAA pour Contraste Élevé).
 2. **Cohérence** : Les couleurs principales sont utilisées de manière cohérente dans toute l'application.
-3. **Hiérarchie Visuelle** : L'utilisation de différentes nuances de vert établit une hiérarchie claire de l'information.
+3. **Hiérarchie Visuelle** : L'utilisation de différentes nuances établit une hiérarchie claire de l'information.
 4. **Naturalité** : La palette verte transmet la santé, le bien-être et la confiance, appropriée pour une application médicale.
+5. **Inclusivité** : La palette Contraste Élevé permet aux personnes ayant des problèmes de vision d'utiliser l'application confortablement.
 
 ## Références
 

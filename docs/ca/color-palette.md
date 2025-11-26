@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## Tema "Alt Contrast"
+
+Dissenyat especialment per a persones grans o amb problemes de visió. Compleix amb WCAG AAA (ràtio de contrast 7:1 o superior).
+
+### Tema Clar Alt Contrast
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|------------|-----|
+| **Fons** | ⚪ | `#FFFFFF` | Blanc pur per a màxim contrast |
+| **Text Primari** | ⚫ | `#000000` | Negre pur per a màxima llegibilitat |
+| **Text Secundari** | ⚫ | `#333333` | Gris molt fosc, encara amb bon contrast |
+| **Primari** | 🔵 | `#0000CC` | Blau fosc pur, màxim contrast sobre blanc |
+| **Accent** | 🟠 | `#CC5500` | Taronja fosc vibrant |
+| **Secundari** | 🟢 | `#006600` | Verd fosc |
+| **Error** | 🔴 | `#CC0000` | Vermell fosc |
+| **Divisors/Voreres** | ⚫ | `#000000` | Negres i més gruixuts (2px) |
+
+### Tema Fosc Alt Contrast
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|------------|-----|
+| **Fons** | ⚫ | `#000000` | Negre pur |
+| **Text Primari** | ⚪ | `#FFFFFF` | Blanc pur |
+| **Text Secundari** | ⚪ | `#CCCCCC` | Gris molt clar |
+| **Primari** | 🟡 | `#FFFF00` | Groc brillant, màxim contrast sobre negre |
+| **Accent** | 🔵 | `#00FFFF` | Cian brillant |
+| **Secundari** | 🟢 | `#00FF00` | Verd llima brillant |
+| **Error** | 🔴 | `#FF6666` | Vermell clar |
+| **Divisors/Voreres** | ⚪ | `#FFFFFF` | Blancs i més gruixuts (2px) |
+
+### Característiques d'Accessibilitat
+
+- **Textos més grans**: Mides de font augmentades a tota la interfície
+- **Major pes tipogràfic**: Ús de bold/semibold per a millor llegibilitat
+- **Voreres més gruixudes**: 2px en lloc de l'estàndard per a millor visibilitat
+- **Icones més grans**: 28px en lloc de 24px
+- **Major espaiat**: Padding augmentat en botons i elements interactius
+- **Enllaços subratllats**: TextButtons amb subratllat per a millor identificació
+
 ## Principis de Disseny
 
-1. **Accessibilitat**: Tots els parells text/fons compleixen amb WCAG 2.1 nivell AA per al contrast.
+1. **Accessibilitat**: Tots els parells text/fons compleixen amb WCAG 2.1 nivell AA per al contrast (AAA per a Alt Contrast).
 2. **Consistència**: Els colors primaris s'utilitzen consistentment a tota l'aplicació.
-3. **Jerarquia Visual**: L'ús de diferents tons verds estableix una clara jerarquia d'informació.
+3. **Jerarquia Visual**: L'ús de diferents tons estableix una clara jerarquia d'informació.
 4. **Naturalitat**: La paleta verda transmet salut, benestar i confiança, apropiat per a una aplicació mèdica.
+5. **Inclusivitat**: La paleta Alt Contrast permet a persones amb problemes de visió utilitzar l'aplicació còmodament.
 
 ## Referències
 
