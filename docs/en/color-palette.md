@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## "High Contrast" Theme
+
+Specially designed for elderly people or those with vision problems. Complies with WCAG AAA (contrast ratio 7:1 or higher).
+
+### High Contrast Light Theme
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Background** | ⚪ | `#FFFFFF` | Pure white for maximum contrast |
+| **Primary Text** | ⚫ | `#000000` | Pure black for maximum readability |
+| **Secondary Text** | ⚫ | `#333333` | Very dark gray, still with good contrast |
+| **Primary** | 🔵 | `#0000CC` | Pure dark blue, maximum contrast on white |
+| **Accent** | 🟠 | `#CC5500` | Vibrant dark orange |
+| **Secondary** | 🟢 | `#006600` | Dark green |
+| **Error** | 🔴 | `#CC0000` | Dark red |
+| **Dividers/Borders** | ⚫ | `#000000` | Black and thicker (2px) |
+
+### High Contrast Dark Theme
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Background** | ⚫ | `#000000` | Pure black |
+| **Primary Text** | ⚪ | `#FFFFFF` | Pure white |
+| **Secondary Text** | ⚪ | `#CCCCCC` | Very light gray |
+| **Primary** | 🟡 | `#FFFF00` | Bright yellow, maximum contrast on black |
+| **Accent** | 🔵 | `#00FFFF` | Bright cyan |
+| **Secondary** | 🟢 | `#00FF00` | Bright lime green |
+| **Error** | 🔴 | `#FF6666` | Light red |
+| **Dividers/Borders** | ⚪ | `#FFFFFF` | White and thicker (2px) |
+
+### Accessibility Features
+
+- **Larger text**: Increased font sizes throughout the interface
+- **Heavier typography**: Use of bold/semibold for better readability
+- **Thicker borders**: 2px instead of standard for better visibility
+- **Larger icons**: 28px instead of 24px
+- **More spacing**: Increased padding on buttons and interactive elements
+- **Underlined links**: TextButtons with underline for better identification
+
 ## Design Principles
 
-1. **Accessibility**: All text/background pairs comply with WCAG 2.1 Level AA for contrast.
+1. **Accessibility**: All text/background pairs comply with WCAG 2.1 Level AA for contrast (AAA for High Contrast).
 2. **Consistency**: Primary colors are used consistently throughout the application.
-3. **Visual Hierarchy**: The use of different green tones establishes a clear hierarchy of information.
+3. **Visual Hierarchy**: The use of different tones establishes a clear hierarchy of information.
 4. **Naturalness**: The green palette conveys health, well-being, and trust, appropriate for a medical application.
+5. **Inclusivity**: The High Contrast palette allows people with vision problems to use the application comfortably.
 
 ## References
 

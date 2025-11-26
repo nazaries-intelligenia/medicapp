@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## Tema "Alto Contraste"
+
+Deseñado especialmente para persoas maiores ou con problemas de visión. Cumpre con WCAG AAA (ratio de contraste 7:1 ou superior).
+
+### Tema Claro Alto Contraste
+
+| Rol | Mostra | Código HEX | Uso |
+|-----|---------|------------|-----|
+| **Fondo** | ⚪ | `#FFFFFF` | Branco puro para máximo contraste |
+| **Texto Primario** | ⚫ | `#000000` | Negro puro para máxima lexibilidade |
+| **Texto Secundario** | ⚫ | `#333333` | Gris moi escuro, aínda con bo contraste |
+| **Primario** | 🔵 | `#0000CC` | Azul escuro puro, máximo contraste sobre branco |
+| **Acento** | 🟠 | `#CC5500` | Laranxa escuro vibrante |
+| **Secundario** | 🟢 | `#006600` | Verde escuro |
+| **Erro** | 🔴 | `#CC0000` | Vermello escuro |
+| **Divisores/Bordos** | ⚫ | `#000000` | Negros e máis grosos (2px) |
+
+### Tema Escuro Alto Contraste
+
+| Rol | Mostra | Código HEX | Uso |
+|-----|---------|------------|-----|
+| **Fondo** | ⚫ | `#000000` | Negro puro |
+| **Texto Primario** | ⚪ | `#FFFFFF` | Branco puro |
+| **Texto Secundario** | ⚪ | `#CCCCCC` | Gris moi claro |
+| **Primario** | 🟡 | `#FFFF00` | Amarelo brillante, máximo contraste sobre negro |
+| **Acento** | 🔵 | `#00FFFF` | Cian brillante |
+| **Secundario** | 🟢 | `#00FF00` | Verde lima brillante |
+| **Erro** | 🔴 | `#FF6666` | Vermello claro |
+| **Divisores/Bordos** | ⚪ | `#FFFFFF` | Brancos e máis grosos (2px) |
+
+### Características de Accesibilidade
+
+- **Textos máis grandes**: Tamaños de fonte aumentados en toda a interface
+- **Maior peso tipográfico**: Uso de bold/semibold para mellor lexibilidade
+- **Bordos máis grosos**: 2px en lugar do estándar para mellor visibilidade
+- **Iconas máis grandes**: 28px en lugar de 24px
+- **Maior espazado**: Padding aumentado en botóns e elementos interactivos
+- **Ligazóns subliñadas**: TextButtons con subliñado para mellor identificación
+
 ## Principios de Deseño
 
-1. **Accesibilidade**: Todos os pares texto/fondo cumpren con WCAG 2.1 nivel AA para contraste.
+1. **Accesibilidade**: Todos os pares texto/fondo cumpren con WCAG 2.1 nivel AA para contraste (AAA para Alto Contraste).
 2. **Consistencia**: Os cores primarios utilízanse consistentemente en toda a aplicación.
-3. **Xerarquía Visual**: O uso de diferentes tonos verdes establece unha clara xerarquía de información.
+3. **Xerarquía Visual**: O uso de diferentes tonos establece unha clara xerarquía de información.
 4. **Naturalidade**: A paleta verde transmite saúde, benestar e confianza, apropiado para unha aplicación médica.
+5. **Inclusividade**: A paleta Alto Contraste permite a persoas con problemas de visión usar a aplicación comodamente.
 
 ## Referencias
 

@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## Tema "Alto Contrasto"
+
+Progettato appositamente per persone anziane o con problemi di vista. Conforme a WCAG AAA (rapporto di contrasto 7:1 o superiore).
+
+### Tema Chiaro Alto Contrasto
+
+| Ruolo | Campione | Codice HEX | Uso |
+|-----|---------|------------|-----|
+| **Sfondo** | ⚪ | `#FFFFFF` | Bianco puro per massimo contrasto |
+| **Testo Primario** | ⚫ | `#000000` | Nero puro per massima leggibilità |
+| **Testo Secondario** | ⚫ | `#333333` | Grigio molto scuro, ancora buon contrasto |
+| **Primario** | 🔵 | `#0000CC` | Blu scuro puro, massimo contrasto su bianco |
+| **Accento** | 🟠 | `#CC5500` | Arancione scuro vibrante |
+| **Secondario** | 🟢 | `#006600` | Verde scuro |
+| **Errore** | 🔴 | `#CC0000` | Rosso scuro |
+| **Divisori/Bordi** | ⚫ | `#000000` | Neri e più spessi (2px) |
+
+### Tema Scuro Alto Contrasto
+
+| Ruolo | Campione | Codice HEX | Uso |
+|-----|---------|------------|-----|
+| **Sfondo** | ⚫ | `#000000` | Nero puro |
+| **Testo Primario** | ⚪ | `#FFFFFF` | Bianco puro |
+| **Testo Secondario** | ⚪ | `#CCCCCC` | Grigio molto chiaro |
+| **Primario** | 🟡 | `#FFFF00` | Giallo brillante, massimo contrasto su nero |
+| **Accento** | 🔵 | `#00FFFF` | Ciano brillante |
+| **Secondario** | 🟢 | `#00FF00` | Verde lime brillante |
+| **Errore** | 🔴 | `#FF6666` | Rosso chiaro |
+| **Divisori/Bordi** | ⚪ | `#FFFFFF` | Bianchi e più spessi (2px) |
+
+### Caratteristiche di Accessibilità
+
+- **Testi più grandi**: Dimensioni dei caratteri aumentate in tutta l'interfaccia
+- **Peso tipografico maggiore**: Uso di bold/semibold per migliore leggibilità
+- **Bordi più spessi**: 2px invece dello standard per migliore visibilità
+- **Icone più grandi**: 28px invece di 24px
+- **Maggiore spaziatura**: Padding aumentato su pulsanti ed elementi interattivi
+- **Link sottolineati**: TextButtons con sottolineatura per migliore identificazione
+
 ## Principi di Progettazione
 
-1. **Accessibilità**: Tutte le coppie testo/sfondo rispettano lo standard WCAG 2.1 livello AA per il contrasto.
+1. **Accessibilità**: Tutte le coppie testo/sfondo rispettano lo standard WCAG 2.1 livello AA per il contrasto (AAA per Alto Contrasto).
 2. **Coerenza**: I colori primari sono utilizzati coerentemente in tutta l'applicazione.
-3. **Gerarchia Visiva**: L'uso di diverse tonalità verdi stabilisce una chiara gerarchia delle informazioni.
+3. **Gerarchia Visiva**: L'uso di diverse tonalità stabilisce una chiara gerarchia delle informazioni.
 4. **Naturalità**: La tavolozza verde trasmette salute, benessere e fiducia, appropriata per un'applicazione medica.
+5. **Inclusività**: La tavolozza Alto Contrasto permette alle persone con problemi di vista di usare l'applicazione comodamente.
 
 ## Riferimenti
 

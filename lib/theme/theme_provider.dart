@@ -100,6 +100,8 @@ class ThemeProvider with ChangeNotifier {
         return ColorPalette.seaGreen;
       case 'material3':
         return ColorPalette.material3;
+      case 'highContrast':
+        return ColorPalette.highContrast;
       default:
         return ColorPalette.seaGreen;
     }
@@ -112,6 +114,8 @@ class ThemeProvider with ChangeNotifier {
         return 'seaGreen';
       case ColorPalette.material3:
         return 'material3';
+      case ColorPalette.highContrast:
+        return 'highContrast';
     }
   }
 }

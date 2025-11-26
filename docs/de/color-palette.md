@@ -110,12 +110,52 @@ static const Color error = Color(0xFFF44336);
 static const Color info = Color(0xFF2196F3);
 ```
 
+## "Hoher Kontrast" Thema
+
+Speziell für ältere Menschen oder Personen mit Sehproblemen entwickelt. Erfüllt WCAG AAA (Kontrastverhältnis 7:1 oder höher).
+
+### Helles Thema Hoher Kontrast
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-----|---------|------------|-----|
+| **Hintergrund** | ⚪ | `#FFFFFF` | Reines Weiß für maximalen Kontrast |
+| **Primärtext** | ⚫ | `#000000` | Reines Schwarz für maximale Lesbarkeit |
+| **Sekundärtext** | ⚫ | `#333333` | Sehr dunkles Grau, immer noch guter Kontrast |
+| **Primär** | 🔵 | `#0000CC` | Reines Dunkelblau, maximaler Kontrast auf Weiß |
+| **Akzent** | 🟠 | `#CC5500` | Lebhaftes Dunkelorange |
+| **Sekundär** | 🟢 | `#006600` | Dunkelgrün |
+| **Fehler** | 🔴 | `#CC0000` | Dunkelrot |
+| **Teiler/Rahmen** | ⚫ | `#000000` | Schwarz und dicker (2px) |
+
+### Dunkles Thema Hoher Kontrast
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-----|---------|------------|-----|
+| **Hintergrund** | ⚫ | `#000000` | Reines Schwarz |
+| **Primärtext** | ⚪ | `#FFFFFF` | Reines Weiß |
+| **Sekundärtext** | ⚪ | `#CCCCCC` | Sehr helles Grau |
+| **Primär** | 🟡 | `#FFFF00` | Helles Gelb, maximaler Kontrast auf Schwarz |
+| **Akzent** | 🔵 | `#00FFFF` | Helles Cyan |
+| **Sekundär** | 🟢 | `#00FF00` | Helles Limonengrün |
+| **Fehler** | 🔴 | `#FF6666` | Helles Rot |
+| **Teiler/Rahmen** | ⚪ | `#FFFFFF` | Weiß und dicker (2px) |
+
+### Barrierefreiheitsfunktionen
+
+- **Größerer Text**: Erhöhte Schriftgrößen in der gesamten Oberfläche
+- **Stärkere Typografie**: Verwendung von Bold/Semibold für bessere Lesbarkeit
+- **Dickere Rahmen**: 2px statt Standard für bessere Sichtbarkeit
+- **Größere Symbole**: 28px statt 24px
+- **Mehr Abstand**: Erhöhtes Padding bei Schaltflächen und interaktiven Elementen
+- **Unterstrichene Links**: TextButtons mit Unterstreichung für bessere Identifizierung
+
 ## Designprinzipien
 
-1. **Barrierefreiheit**: Alle Text-/Hintergrund-Paare erfüllen den WCAG 2.1 Level AA Kontrast.
+1. **Barrierefreiheit**: Alle Text-/Hintergrund-Paare erfüllen den WCAG 2.1 Level AA Kontrast (AAA für Hoher Kontrast).
 2. **Konsistenz**: Die Primärfarben werden in der gesamten Anwendung konsistent verwendet.
-3. **Visuelle Hierarchie**: Die Verwendung verschiedener Grüntöne etabliert eine klare Informationshierarchie.
+3. **Visuelle Hierarchie**: Die Verwendung verschiedener Töne etabliert eine klare Informationshierarchie.
 4. **Natürlichkeit**: Die grüne Palette vermittelt Gesundheit, Wohlbefinden und Vertrauen, passend für eine medizinische Anwendung.
+5. **Inklusivität**: Die Hoher Kontrast Palette ermöglicht Menschen mit Sehproblemen eine komfortable Nutzung der Anwendung.
 
 ## Referenzen
 
