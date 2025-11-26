@@ -32,7 +32,7 @@ class FilterDialog {
                   Text(l10n.doseHistoryMedicationLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<String?>(
-                    value: tempSelectedMedicationId,
+                    initialValue: tempSelectedMedicationId,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

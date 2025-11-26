@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../models/medication_type.dart';
@@ -407,9 +406,9 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
+                    color: Colors.orange.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -526,7 +525,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(
                         context,
-                      ).colorScheme.onPrimaryContainer.withOpacity(0.8),
+                      ).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                     ),
                   ),
               ],
@@ -546,7 +545,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
 
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                color: isDuplicated ? Colors.orange.withOpacity(0.1) : null,
+                color: isDuplicated ? Colors.orange.withValues(alpha: 0.1) : null,
                 child: Padding(
                   padding: const EdgeInsets.all(12),
                   child: Column(

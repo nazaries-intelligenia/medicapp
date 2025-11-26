@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../services/snackbar_service.dart';
@@ -23,8 +22,6 @@ class SpecificDatesSelectorScreen extends StatefulWidget {
 class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScreen> {
   late Set<String> _selectedDates; // Store as "yyyy-MM-dd" strings
   bool _localeInitialized = false;
-
-  DateFormat get _dateFormatter => DateFormat('d MMM yyyy', 'es_ES');
 
   @override
   void initState() {

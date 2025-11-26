@@ -33,7 +33,7 @@ class DoseHistoryCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
+                color: statusColor.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -87,10 +87,10 @@ class DoseHistoryCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: Colors.purple.withOpacity(0.15),
+                            color: Colors.purple.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: Colors.purple.withOpacity(0.3),
+                              color: Colors.purple.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -168,14 +168,14 @@ class DoseHistoryCard extends StatelessWidget {
                       Icon(
                         isTaken ? Icons.check_circle_outline : Icons.cancel_outlined,
                         size: 12,
-                        color: statusColor.withOpacity(0.7),
+                        color: statusColor.withValues(alpha: 0.7),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         l10n.doseRegisteredAt(entry.registeredTimeFormatted),
                         style: TextStyle(
                           fontSize: 11,
-                          color: statusColor.withOpacity(0.8),
+                          color: statusColor.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),

@@ -1135,7 +1135,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 controller: _tabController,
                 isScrollable: _viewModel.persons.length > 3,
                 labelColor: Theme.of(context).colorScheme.primary,
-                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: AppTheme.tabUnselectedOpacity),
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 indicatorWeight: AppTheme.tabIndicatorWeight,
                 indicatorSize: TabBarIndicatorSize.tab,
@@ -1294,10 +1294,10 @@ class _FastingCountdownPanel extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -1442,7 +1442,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                 ? null
                 : Border(
                     bottom: BorderSide(
-                      color: Theme.of(context).dividerColor.withOpacity(0.2),
+                      color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -1504,7 +1504,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -1524,7 +1524,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade700.withOpacity(0.1),
+                            color: Colors.green.shade700.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -1541,7 +1541,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

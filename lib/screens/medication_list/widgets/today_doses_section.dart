@@ -48,7 +48,6 @@ class TodayDosesSection extends StatelessWidget {
               final time = dose['time'] as String;
               final status = dose['status'] as String;
               final isTaken = status == 'taken';
-              final isSkipped = status == 'skipped';
               final isExtra = status == 'extra';
 
               // Determine which time to show
@@ -64,18 +63,18 @@ class TodayDosesSection extends StatelessWidget {
               Color textColor;
               IconData icon;
               if (isExtra) {
-                bgColor = Colors.purple.withOpacity(0.1);
-                borderColor = Colors.purple.withOpacity(0.3);
+                bgColor = Colors.purple.withValues(alpha: 0.1);
+                borderColor = Colors.purple.withValues(alpha: 0.3);
                 textColor = Colors.purple.shade700;
                 icon = Icons.star;
               } else if (isTaken) {
-                bgColor = Colors.green.withOpacity(0.1);
-                borderColor = Colors.green.withOpacity(0.3);
+                bgColor = Colors.green.withValues(alpha: 0.1);
+                borderColor = Colors.green.withValues(alpha: 0.3);
                 textColor = Colors.green.shade700;
                 icon = Icons.check_circle;
               } else {
-                bgColor = Colors.orange.withOpacity(0.1);
-                borderColor = Colors.orange.withOpacity(0.3);
+                bgColor = Colors.orange.withValues(alpha: 0.1);
+                borderColor = Colors.orange.withValues(alpha: 0.3);
                 textColor = Colors.orange.shade700;
                 icon = Icons.cancel;
               }

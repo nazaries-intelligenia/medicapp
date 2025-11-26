@@ -175,7 +175,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
               child: Text(
                 l10n.stepIndicator(4, 7),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -214,7 +214,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
                       Text(
                         l10n.medicationFrequencySubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 24),

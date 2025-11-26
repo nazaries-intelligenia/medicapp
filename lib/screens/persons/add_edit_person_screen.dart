@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../database/database_helper.dart';
 import '../../models/person.dart';
-import '../../l10n/app_localizations.dart';
 import '../../services/snackbar_service.dart';
 
 /// Screen for adding or editing a person
@@ -86,7 +85,6 @@ class _AddEditPersonScreenState extends State<AddEditPersonScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(

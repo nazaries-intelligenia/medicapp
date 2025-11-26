@@ -70,7 +70,7 @@ class MedicationInfoForm extends StatelessWidget {
           Text(
             l10n.medicationInfoSubtitle,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
           const SizedBox(height: 24),
@@ -246,7 +246,7 @@ class MedicationInfoForm extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? type.getColor(context).withOpacity(0.2)
+                          ? type.getColor(context).withValues(alpha: 0.2)
                           : Colors.transparent,
                       border: Border.all(
                         color: isSelected

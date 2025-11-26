@@ -32,7 +32,7 @@ class FrequencyOptionCard<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(
             color: isSelected ? color : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,
@@ -63,8 +63,8 @@ class FrequencyOptionCard<T> extends StatelessWidget {
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isSelected
-                              ? color.withOpacity(0.8)
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              ? color.withValues(alpha: 0.8)
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                   ),
                 ],

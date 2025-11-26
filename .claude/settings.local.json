@@ -1,30 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(timeout 120 flutter build:*)",
-      "Bash(git stash:*)",
-      "Bash(flutter doctor:*)",
-      "Bash(flutter build:*)",
-      "Bash(flutter analyze:*)",
-      "Bash(flutter pub get:*)",
-      "Bash(flutter test:*)",
-      "Bash(find:*)",
-      "Bash(/mnt/c/Users/RPO/flutter/bin/flutter test:*)",
-      "Bash(flutter clean:*)",
-      "Bash(tee:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(timeout 30 flutter test:*)",
-      "Bash(timeout 30 /mnt/c/Users/RPO/flutter/bin/flutter test:*)",
-      "Bash(timeout 120 flutter test:*)",
-      "Bash(cat:*)",
-      "Bash(pkill:*)",
-      "Bash(timeout 60 flutter test:*)",
-      "WebFetch(domain:blog.flutter.dev)",
-      "WebSearch",
-      "Bash(timeout 60 flutter analyze:*)",
-      "Bash(dart analyze:*)",
-      "Bash(wc:*)"
+      "Bash(powershell:*)",
+      "Bash(rg:*)",
+      "Bash(del replace_withopacity.ps1)"
     ],
     "deny": [],
     "ask": []

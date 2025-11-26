@@ -26,10 +26,10 @@ class DateListTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.deepPurple.withOpacity(0.1),
+          color: Colors.deepPurple.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: Colors.deepPurple.withOpacity(0.3),
+            color: Colors.deepPurple.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -38,7 +38,7 @@ class DateListTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.deepPurple.withOpacity(0.2),
+              color: Colors.deepPurple.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -57,7 +57,7 @@ class DateListTile extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple.withOpacity(0.7),
+                    color: Colors.deepPurple.withValues(alpha: 0.7),
                   ),
                 ),
               ],

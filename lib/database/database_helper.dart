@@ -1089,7 +1089,7 @@ class DatabaseHelper {
     required Medication scheduleData,
   }) async {
     final personMedication = PersonMedication(
-      id: Uuid().v4(), // Use UUID instead of timestamp to ensure uniqueness
+      id: const Uuid().v4(), // Use UUID instead of timestamp to ensure uniqueness
       personId: personId,
       medicationId: medicationId,
       assignedDate: DateTime.now().toIso8601String(),
@@ -1260,7 +1260,7 @@ class DatabaseHelper {
           await txn.insert(
             'person_medications',
             {
-              'id': DateTime.now().millisecondsSinceEpoch.toString() + '_${medication.id}',
+              'id': '${DateTime.now().millisecondsSinceEpoch}_${medication.id}',
               'personId': defaultPerson.id,
               'medicationId': medication.id,
               'assignedDate': DateTime.now().toIso8601String(),

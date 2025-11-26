@@ -53,7 +53,7 @@ class MedicationCard extends StatelessWidget {
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               leading: CircleAvatar(
-                backgroundColor: medication.type.getColor(context).withOpacity(0.2),
+                backgroundColor: medication.type.getColor(context).withValues(alpha: 0.2),
                 child: Icon(
                   medication.type.icon,
                   color: medication.type.getColor(context),
@@ -107,7 +107,7 @@ class MedicationCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: medication.progress,
                         minHeight: 6,
-                        backgroundColor: Colors.grey.withOpacity(0.2),
+                        backgroundColor: Colors.grey.withValues(alpha: 0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           medication.isFinished
                               ? Colors.grey
@@ -283,7 +283,7 @@ class MedicationCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: stockColor!.withOpacity(0.1),
+                          color: stockColor!.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -319,14 +319,12 @@ class _FastingCountdownWidget extends StatefulWidget {
 
 class _FastingCountdownWidgetState extends State<_FastingCountdownWidget> {
   late DateTime _fastingEndTime;
-  late String _fastingType;
   late bool _isActive;
 
   @override
   void initState() {
     super.initState();
     _fastingEndTime = widget.fastingPeriod['fastingEndTime'] as DateTime;
-    _fastingType = widget.fastingPeriod['fastingType'] as String;
     _isActive = widget.fastingPeriod['isActive'] as bool;
   }
 
@@ -353,8 +351,6 @@ class _FastingCountdownWidgetState extends State<_FastingCountdownWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return StreamBuilder(
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {

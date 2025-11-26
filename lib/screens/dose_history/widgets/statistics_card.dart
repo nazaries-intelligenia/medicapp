@@ -111,7 +111,7 @@ class _AdherenceBar extends StatelessWidget {
           child: LinearProgressIndicator(
             value: adherence / 100,
             minHeight: 8,
-            backgroundColor: Colors.grey.withOpacity(0.2),
+            backgroundColor: Colors.grey.withValues(alpha: 0.2),
             valueColor: AlwaysStoppedAnimation<Color>(
               _getAdherenceColor(),
             ),

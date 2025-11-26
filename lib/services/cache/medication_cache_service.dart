@@ -12,7 +12,7 @@ class MedicationCacheService {
   MedicationCacheService._();
 
   // Cachés separados para diferentes tipos de datos
-  final SmartCacheService<String, Medication> _medicationCache =
+  final SmartCacheService<String, Medication?> _medicationCache =
       SmartCacheService(
     defaultTTL: const Duration(minutes: 10),
     maxSize: 50,

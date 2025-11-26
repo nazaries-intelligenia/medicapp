@@ -4,7 +4,6 @@ import '../models/medication.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
 import '../database/database_helper.dart';
-import '../services/notification_service.dart';
 import 'medication_quantity/widgets/stock_input_card.dart';
 import 'medication_quantity/widgets/medication_summary_card.dart';
 import '../widgets/action_buttons.dart';
@@ -173,7 +172,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
               child: Text(
                 l10n.stepIndicator(currentStep, totalSteps),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),

@@ -152,7 +152,7 @@ class _MedicationPersonAssignmentScreenState
                           CircleAvatar(
                             backgroundColor: widget.medication.type
                                 .getColor(context)
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                             child: Icon(
                               widget.medication.type.icon,
                               color: widget.medication.type.getColor(context),

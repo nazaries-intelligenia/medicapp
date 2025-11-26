@@ -282,7 +282,7 @@ class _MedicationCardState extends State<MedicationCard> {
           onTap: _showMedicationModal,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           leading: CircleAvatar(
-            backgroundColor: widget.medication.type.getColor(context).withOpacity(0.2),
+            backgroundColor: widget.medication.type.getColor(context).withValues(alpha: 0.2),
             child: Icon(
               widget.medication.type.icon,
               color: widget.medication.type.getColor(context),
@@ -461,7 +461,7 @@ class _MedicationCardState extends State<MedicationCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: stockColor.withOpacity(0.1),
+                  color: stockColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: stockColor,

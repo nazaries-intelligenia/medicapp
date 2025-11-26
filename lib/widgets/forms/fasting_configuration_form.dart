@@ -60,7 +60,7 @@ class FastingConfigurationForm extends StatelessWidget {
           Text(
             l10n.fastingHelp,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
           const SizedBox(height: 24),
@@ -95,7 +95,7 @@ class FastingConfigurationForm extends StatelessWidget {
                     width: !requiresFasting ? 2 : 1,
                   ),
                   backgroundColor: !requiresFasting
-                      ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+                      ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
                       : null,
                 ),
               ),
@@ -118,7 +118,7 @@ class FastingConfigurationForm extends StatelessWidget {
                     width: requiresFasting ? 2 : 1,
                   ),
                   backgroundColor: requiresFasting
-                      ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+                      ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
                       : null,
                 ),
               ),
@@ -162,7 +162,7 @@ class FastingConfigurationForm extends StatelessWidget {
                     width: fastingType == 'before' ? 2 : 1,
                   ),
                   backgroundColor: fastingType == 'before'
-                      ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+                      ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
                       : null,
                 ),
               ),
@@ -185,7 +185,7 @@ class FastingConfigurationForm extends StatelessWidget {
                     width: fastingType == 'after' ? 2 : 1,
                   ),
                   backgroundColor: fastingType == 'after'
-                      ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3)
+                      ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
                       : null,
                 ),
               ),
@@ -299,7 +299,7 @@ class FastingConfigurationForm extends StatelessWidget {
                 ? l10n.fastingNotificationBeforeHelp
                 : l10n.fastingNotificationAfterHelp,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
           ),
           const SizedBox(height: 12),

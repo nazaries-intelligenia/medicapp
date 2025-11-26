@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../models/medication.dart';
 import '../models/person.dart'; // V19+: Import Person model
-import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
 import '../services/dose_action_service.dart';

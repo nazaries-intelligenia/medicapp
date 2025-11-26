@@ -27,7 +27,7 @@ class DaySelectionTile extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? Colors.teal.withOpacity(0.2)
+                ? Colors.teal.withValues(alpha: 0.2)
                 : Colors.transparent,
             border: Border.all(
               color: isSelected

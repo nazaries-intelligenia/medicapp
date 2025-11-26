@@ -34,7 +34,7 @@ class MedicationHeaderCard extends StatelessWidget {
     // Simple mode: minimal card for edit/view screens
     if (doseTime == null) {
       return Card(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -63,7 +63,7 @@ class MedicationHeaderCard extends StatelessWidget {
               Text(
                 medication.type.displayName,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
               ),
             ],
@@ -147,7 +147,7 @@ class MedicationHeaderCard extends StatelessWidget {
                       Text(
                         l10n.doseActionThisDoseQuantity,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),

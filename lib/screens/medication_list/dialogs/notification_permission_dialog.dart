@@ -45,8 +45,8 @@ class NotificationPermissionDialog {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.warning, color: Colors.orange),
-            SizedBox(width: 8),
+            const Icon(Icons.warning, color: Colors.orange),
+            const SizedBox(width: 8),
             Flexible(child: Text(l10n.permissionRequired)),
           ],
         ),
@@ -56,13 +56,13 @@ class NotificationPermissionDialog {
           children: [
             Text(
               l10n.notificationsWillNotWork,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.blue),
               ),

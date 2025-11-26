@@ -58,7 +58,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
             medicationType: widget.medicationType,
             durationType: _selectedDurationType,
             dosageIntervalHours: 0,
-            doseSchedule: {},
+            doseSchedule: const {},
             requiresFasting: false,
             notifyFasting: false,
           ),
@@ -129,7 +129,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
               child: Text(
                 l10n.stepIndicator(2, 7),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -168,7 +168,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
                       Text(
                         l10n.medicationDurationSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 24),

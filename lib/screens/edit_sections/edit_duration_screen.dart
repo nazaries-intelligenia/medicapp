@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../../database/database_helper.dart';
 import '../../services/notification_service.dart';
 import '../../services/snackbar_service.dart';
-import '../specific_dates_selector_screen.dart';
 import 'edit_duration/widgets/duration_type_info_card.dart';
 import 'edit_duration/widgets/treatment_dates_card.dart';
 import '../../widgets/action_buttons.dart';
@@ -39,7 +37,6 @@ class _EditDurationScreenState extends State<EditDurationScreen> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStartDate) async {
-    final l10n = AppLocalizations.of(context)!;
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: isStartDate
