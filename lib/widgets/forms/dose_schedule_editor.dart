@@ -309,7 +309,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
     return timeStrings.length != timeStrings.toSet().length;
   }
 
-  /// Returns the dose schedule as Map<String, double>
+  /// Returns the dose schedule as `Map<String, double>`
   /// Updates quantities from controllers before returning
   Map<String, double> getDoseSchedule() {
     // Update dose entry quantities from controllers

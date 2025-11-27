@@ -55,6 +55,7 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
 
     if (picked != null) {
       final dateString = picked.toDateString();
+      if (!mounted) return;
       if (_selectedDates.contains(dateString)) {
         SnackBarService.showWarning(context, l10n.specificDatesSelectorAlreadySelected);
       } else {

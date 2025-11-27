@@ -1158,9 +1158,7 @@ class MedicationListViewModel extends ChangeNotifier {
   /// Update an existing medication
   Future<void> updateMedication(Medication medication) async {
     Person? targetPerson = _selectedPerson;
-    if (targetPerson == null) {
-      targetPerson = await DatabaseHelper.instance.getDefaultPerson();
-    }
+    targetPerson ??= await DatabaseHelper.instance.getDefaultPerson();
 
     if (targetPerson != null) {
       await DatabaseHelper.instance.updateMedicationForPerson(

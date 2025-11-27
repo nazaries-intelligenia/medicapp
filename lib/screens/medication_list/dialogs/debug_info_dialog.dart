@@ -342,7 +342,7 @@ class DebugInfoDialog {
                                 const SizedBox(width: 8),
                                 Text(
                                   l10n.pastDueWarning,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,

@@ -334,6 +334,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
+    if (!mounted) return;
+
     final newMedication = await Navigator.push<Medication>(
       context,
       MaterialPageRoute(
@@ -342,6 +344,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         ),
       ),
     );
+
+    if (!mounted) return;
 
     if (newMedication != null) {
       await _viewModel.createMedication(newMedication, personId: selectedPersonId);
@@ -412,6 +416,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
             medication.id, _viewModel.selectedPerson!.id)
         : await DatabaseHelper.instance.getMedication(medication.id);
 
+    if (!mounted) return;
+
     if (freshMedication == null) {
       SnackBarService.showError(
         context,
@@ -432,6 +438,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         medicationName: freshMedication.name,
       );
 
+      if (!mounted) return;
+
       if (confirmExtra == true) {
         isExtraDose = true;
       } else {
@@ -444,6 +452,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         availableDoses: availableDoses,
         showExtraOption: true,
       );
+
+      if (!mounted) return;
 
       if (selectedDoseTime == DoseSelectionDialog.extraDoseOption) {
         isExtraDose = true;
@@ -459,6 +469,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
         final result = await _viewModel.registerExtraDose(
           medication: freshMedication,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         SnackBarService.showInfo(
           context,
@@ -474,6 +487,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
           medication: freshMedication,
           doseTime: selectedDoseTime,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         final confirmationMessage = parts[0] == 'allComplete'
             ? '${l10n.doseRegisteredAtTime(freshMedication.name, selectedDoseTime, parts[1])}\n${l10n.allDosesCompletedToday}'
@@ -486,6 +502,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         );
       }
     } on InsufficientStockException catch (e) {
+      if (!mounted) return;
+
       SnackBarService.showError(
         context,
         l10n.insufficientStockForThisDose(
@@ -516,12 +534,17 @@ class MedicationListScreenState extends State<MedicationListScreen>
       medication: medication,
     );
 
+    if (!mounted) return;
+
     if (doseQuantity != null && doseQuantity > 0) {
       try {
         final result = await _viewModel.registerManualDose(
           medication: medication,
           quantity: doseQuantity,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         final confirmationMessage = l10n.manualDoseRegistered(
           medication.name,
@@ -536,6 +559,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           duration: const Duration(seconds: 3),
         );
       } on InsufficientStockException catch (e) {
+        if (!mounted) return;
+
         SnackBarService.showError(
           context,
           l10n.insufficientStockForThisDose(
@@ -563,6 +588,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           currentExpirationDate: medication.expirationDate,
           isOptional: true,
         );
+
+        if (!mounted) return;
 
         // User cancelled the dialog
         if (expirationDate == null) {
@@ -603,14 +630,17 @@ class MedicationListScreenState extends State<MedicationListScreen>
       medication: medication,
     );
 
+    if (!mounted) return;
+
     if (refillAmount != null && refillAmount > 0) {
       final result = await _viewModel.refillMedication(
         medication: medication,
         amount: refillAmount,
       );
-      final parts = result.split('|');
 
       if (!mounted) return;
+
+      final parts = result.split('|');
 
       SnackBarService.showSuccess(
         context,
@@ -642,6 +672,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
       onDelete: () async {
         final l10n = AppLocalizations.of(context)!;
         await _viewModel.deleteMedication(medication);
+
+        if (!mounted) return;
+
         Navigator.pop(context);
         SnackBarService.showInfo(
           context,
@@ -888,6 +921,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         medicationId: medication.id,
       );
 
+      if (!mounted) return;
+
       // Find entry matching the dose time and person
       final selectedPerson = _viewModel.selectedPerson;
       if (selectedPerson == null) return;
@@ -899,6 +934,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
       }).firstOrNull;
 
       if (entry == null) {
+        if (!mounted) return;
+
         SnackBarService.showError(
           context,
           l10n.errorFindingDoseEntry,
@@ -917,6 +954,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           initialTime: initialTime,
           helpText: l10n.selectRegisteredTime,
         );
+
+        if (!mounted) return;
 
         if (picked == null) return; // User cancelled
 
@@ -947,6 +986,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
               ],
             ),
           );
+
+          if (!mounted) return;
 
           // Keep the selected time for next iteration
           initialTime = picked;
@@ -1016,6 +1057,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
+
+    if (!mounted) return;
 
     if (picked != null) {
       final now = DateTime.now();

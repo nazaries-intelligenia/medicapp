@@ -1,11 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/services/notification_id_generator.dart';
-import 'package:medicapp/database/database_helper.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
-import 'package:medicapp/models/person.dart';
 
 /// Tests for low stock notifications
 /// Feature: Alert users when medication stock is low or insufficient

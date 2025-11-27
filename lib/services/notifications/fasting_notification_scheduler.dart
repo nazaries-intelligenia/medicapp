@@ -333,7 +333,7 @@ class FastingNotificationScheduler {
       _activeOngoingNotifications.add(personId);
 
       // Android notification details with ongoing flag
-      final androidDetails = fln.AndroidNotificationDetails(
+      const androidDetails = fln.AndroidNotificationDetails(
         'fasting_ongoing',
         'Cuenta atrás de ayuno',
         channelDescription: 'Notificación fija que muestra el tiempo restante de ayuno',
@@ -348,7 +348,7 @@ class FastingNotificationScheduler {
         icon: '@mipmap/ic_launcher',
       );
 
-      final platformDetails = fln.NotificationDetails(
+      const platformDetails = fln.NotificationDetails(
         android: androidDetails,
       );
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/screens/edit_sections/edit_fasting_screen.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'helpers/test_helpers.dart';
 import 'helpers/medication_builder.dart';

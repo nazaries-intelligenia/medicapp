@@ -190,10 +190,10 @@ class MedicationOptionsSheet {
                       width: double.infinity,
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(l10n.btnCancel),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
+                        child: Text(l10n.btnCancel),
                       ),
                     ),
                   ],

@@ -3,13 +3,10 @@ import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
 import 'package:medicapp/models/person.dart';
-import 'package:medicapp/models/treatment_duration_type.dart';
 import 'package:medicapp/screens/medication_list/fasting_state_manager.dart';
-import 'package:medicapp/screens/medication_list/services/dose_calculation_service.dart';
 import 'package:uuid/uuid.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
-import 'helpers/person_test_helper.dart';
 
 /// Tests for multiple concurrent fasting periods prioritization (V19+)
 ///

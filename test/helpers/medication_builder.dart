@@ -216,8 +216,7 @@ class MedicationBuilder {
 
   /// Configura un medicamento con valores por defecto para tests comunes
   MedicationBuilder withDefaultTestConfig() {
-    return this
-        .withId('test-medication-${DateTime.now().millisecondsSinceEpoch}')
+    return withId('test-medication-${DateTime.now().millisecondsSinceEpoch}')
         .withStock(30.0);
   }
 

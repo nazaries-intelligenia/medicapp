@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/medication_update_service.dart';
 import 'package:medicapp/services/notification_service.dart';
@@ -50,7 +49,7 @@ void main() {
 
       await insertMedicationWithPerson(medication);
 
-      final updatedMed = await MedicationUpdateService.refillMedication(
+      await MedicationUpdateService.refillMedication(
         medication: medication,
         refillAmount: 20.0,
       );

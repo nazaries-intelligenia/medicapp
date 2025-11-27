@@ -33,6 +33,7 @@ class NotificationPermissionDialog {
 
     if (!canScheduleExact && hasMedications) {
       // Show warning dialog for exact alarms only
+      if (!context.mounted) return;
       await _showPermissionDialog(context);
     }
   }
@@ -71,17 +72,17 @@ class NotificationPermissionDialog {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.alarm, size: 20, color: Colors.blue),
-                      SizedBox(width: 8),
+                      const Icon(Icons.alarm, size: 20, color: Colors.blue),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           l10n.activateAlarmsPermission,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
                     l10n.alarmsPermissionDescription,
                     style: TextStyle(fontSize: 12, color: Colors.grey[700]),
@@ -104,8 +105,8 @@ class NotificationPermissionDialog {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.settings, size: 16),
-                SizedBox(width: 6),
+                const Icon(Icons.settings, size: 16),
+                const SizedBox(width: 6),
                 Text(l10n.openSettingsButton),
               ],
             ),

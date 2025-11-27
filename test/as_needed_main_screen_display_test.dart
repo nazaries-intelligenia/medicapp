@@ -51,15 +51,15 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a dose taken today
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_1',
         medicationId: medication.id,
         medicationName: medication.name,
         medicationType: medication.type,
         personId: 'test-person-id',
-        scheduledDateTime: now, // For as-needed, scheduled = registered
-        registeredDateTime: now,
+        scheduledDateTime: doseTime, // For as-needed, scheduled = registered
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -86,15 +86,15 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a SKIPPED dose (not taken)
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_2',
         medicationId: medication.id,
         medicationName: medication.name,
         medicationType: medication.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.skipped, // Skipped, not taken
         quantity: 0.0,
       );
@@ -153,8 +153,6 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(medication);
 
-      final now = DateTime.now();
-
       // Register first dose at 10:00
       final dose1 = DoseHistoryEntry(
         id: 'dose_4',
@@ -210,7 +208,7 @@ void main() {
       await DatabaseHelper.instance.insertMedication(med1);
       await DatabaseHelper.instance.insertMedication(med2);
 
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
 
       // Register dose for first medication
       final dose1 = DoseHistoryEntry(
@@ -219,8 +217,8 @@ void main() {
         medicationName: med1.name,
         medicationType: med1.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -233,8 +231,8 @@ void main() {
         medicationName: med2.name,
         medicationType: med2.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -263,7 +261,7 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a dose taken today
-      final now = DateTime.now();
+      final registeredTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_8',
         medicationId: medication.id,
@@ -271,7 +269,7 @@ void main() {
         medicationType: medication.type,
         personId: 'test-person-id',
         scheduledDateTime: todayAt(20, 0),
-        registeredDateTime: now,
+        registeredDateTime: registeredTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );

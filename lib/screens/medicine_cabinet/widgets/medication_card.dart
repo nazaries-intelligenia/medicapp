@@ -226,6 +226,8 @@ class _MedicationCardState extends State<MedicationCard> {
     // Load all medications to check for duplicates
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
+    if (!mounted) return;
+
     // Navigate to edit medication menu
     // Note: personId is null here - medicine cabinet should be refactored to be person-aware
     await Navigator.push(

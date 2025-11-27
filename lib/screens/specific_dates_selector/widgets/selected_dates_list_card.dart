@@ -48,7 +48,7 @@ class SelectedDatesListCard extends StatelessWidget {
                 date: date,
                 onRemove: () => onRemoveDate(dateString),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

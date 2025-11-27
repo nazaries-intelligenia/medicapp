@@ -1,17 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
-import 'package:medicapp/models/treatment_duration_type.dart';
 import 'package:medicapp/models/person.dart';
-import 'package:medicapp/models/dose_history_entry.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/screens/medication_list/medication_list_viewmodel.dart';
-import 'package:medicapp/screens/medication_list/services/dose_calculation_service.dart';
 import 'package:medicapp/utils/datetime_extensions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'helpers/test_helpers.dart';
 import 'helpers/database_test_helper.dart';
+import 'helpers/medication_builder.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -62,10 +60,10 @@ void main() {
     group('_getFreshMedication', () {
       test('returns medication when it exists', () async {
         // Arrange
-        final medication = createTestMedication(
-          name: 'Aspirin',
-          type: MedicationType.pill,
-        );
+        final medication = MedicationBuilder()
+            .withName('Aspirin')
+            .withType(MedicationType.pill)
+            .build();
         await DatabaseHelper.instance.insertMedication(medication);
         await DatabaseHelper.instance.assignMedicationToPerson(
           personId: testPerson.id,
@@ -112,7 +110,8 @@ void main() {
 
       test('returns default person ID when no person is selected', () async {
         // Arrange
-        final anotherPerson = await createTestPerson(
+        // Create another person to ensure default person is still selected
+        await createTestPerson(
           name: 'Another User',
           isDefault: false,
         );
@@ -138,12 +137,12 @@ void main() {
       viewModel = MedicationListViewModel();
       testPerson = await getDefaultPerson();
 
-      medication = createTestMedication(
-        name: 'Test Med',
-        type: MedicationType.pill,
-        doseSchedule: {'08:00': 1.0, '20:00': 1.0},
-        stockQuantity: 50.0,
-      );
+      medication = MedicationBuilder()
+          .withName('Test Med')
+          .withType(MedicationType.pill)
+          .withDoseSchedule({'08:00': 1.0, '20:00': 1.0})
+          .withStock(50.0)
+          .build();
 
       await DatabaseHelper.instance.insertMedication(medication);
       await DatabaseHelper.instance.assignMedicationToPerson(
@@ -182,12 +181,12 @@ void main() {
 
     test('registerDose throws InsufficientStockException when stock is low', () async {
       // Arrange - Create medication with insufficient stock
-      final lowStockMed = createTestMedication(
-        name: 'Low Stock Med',
-        type: MedicationType.pill,
-        doseSchedule: {'08:00': 5.0},
-        stockQuantity: 2.0, // Less than dose quantity
-      );
+      final lowStockMed = MedicationBuilder()
+          .withName('Low Stock Med')
+          .withType(MedicationType.pill)
+          .withDoseSchedule({'08:00': 5.0})
+          .withStock(2.0) // Less than dose quantity
+          .build();
 
       await DatabaseHelper.instance.insertMedication(lowStockMed);
       await DatabaseHelper.instance.assignMedicationToPerson(
@@ -250,12 +249,12 @@ void main() {
       viewModel = MedicationListViewModel();
       testPerson = await getDefaultPerson();
 
-      medication = createTestMedication(
-        name: 'Test Med',
-        type: MedicationType.pill,
-        doseSchedule: {'08:00': 2.0},
-        stockQuantity: 50.0,
-      );
+      medication = MedicationBuilder()
+          .withName('Test Med')
+          .withType(MedicationType.pill)
+          .withDoseSchedule({'08:00': 2.0})
+          .withStock(50.0)
+          .build();
 
       await DatabaseHelper.instance.insertMedication(medication);
       await DatabaseHelper.instance.assignMedicationToPerson(

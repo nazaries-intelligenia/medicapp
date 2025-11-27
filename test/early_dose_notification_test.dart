@@ -1,7 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/services/dose_action_service.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/person.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'helpers/medication_builder.dart';

@@ -122,7 +122,7 @@ class IntelligentRemindersService {
           doseTime: doseTime,
           dayOfWeek: dayOfWeek,
           skipProbability: 0.0,
-          riskFactors: ['Datos insuficientes'],
+          riskFactors: const ['Datos insuficientes'],
         );
       }
 

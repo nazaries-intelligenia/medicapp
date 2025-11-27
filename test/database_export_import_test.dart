@@ -1,7 +1,7 @@
+// ignore_for_file: depend_on_referenced_packages
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/person.dart';
 import 'package:path/path.dart';
@@ -65,12 +65,10 @@ void main() {
 
   group('Database Export', () {
     late Directory testDbDir;
-    late String testDbPath;
 
     setUp(() async {
       // Crear directorio temporal para base de datos de prueba
       testDbDir = await Directory.systemTemp.createTemp('medicapp_test_db_');
-      testDbPath = join(testDbDir.path, 'medications.db');
 
       // Desactivar modo en memoria
       DatabaseHelper.setInMemoryDatabase(false);
@@ -166,14 +164,12 @@ void main() {
 
   group('Database Import', () {
     late Directory testDbDir;
-    late String testDbPath;
     const testPersonId = 'test-person-export-import';
     Person? testPerson;
 
     setUp(() async {
       // Crear directorio temporal para base de datos de prueba
       testDbDir = await Directory.systemTemp.createTemp('medicapp_test_db_');
-      testDbPath = join(testDbDir.path, 'medications.db');
 
       // Desactivar modo en memoria
       DatabaseHelper.setInMemoryDatabase(false);

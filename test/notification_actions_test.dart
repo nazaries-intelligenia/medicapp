@@ -99,7 +99,7 @@ void main() {
           .build();
 
       await insertMedicationWithPerson(medication);
-      final personId = await getDefaultPersonId();
+      await getDefaultPersonId();
 
       // Act & Assert
       final initialMed = await getMedicationForDefaultPerson('med-2');
@@ -350,7 +350,7 @@ void main() {
           .build();
 
       await insertMedicationWithPerson(medication);
-      final personId = await getDefaultPersonId();
+      await getDefaultPersonId();
 
       // Act - Try to register again (should be idempotent or handle gracefully)
       final currentMed = await getMedicationForDefaultPerson('med-9');

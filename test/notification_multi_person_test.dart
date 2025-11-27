@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/models/person.dart';
 import 'helpers/medication_builder.dart';
 
 /// Tests for multi-person notification scheduling (V19+)

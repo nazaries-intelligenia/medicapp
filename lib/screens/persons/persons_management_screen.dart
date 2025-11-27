@@ -111,9 +111,11 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
 
     try {
       await DatabaseHelper.instance.deletePerson(person.id);
+      if (!mounted) return;
       SnackBarService.showSuccess(context, 'Persona eliminada correctamente');
       _loadPersons();
     } catch (e) {
+      if (!mounted) return;
       SnackBarService.showError(context, 'Error al eliminar persona: $e');
     }
   }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/services/fasting_conflict_service.dart';
 import 'helpers/medication_builder.dart';
 

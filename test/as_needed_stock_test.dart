@@ -12,7 +12,7 @@ void main() {
           .withId('test_1')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(SMALL_STOCK)
+          .withStock(smallStock)
           .build();
 
       expect(medication.isStockLow, isFalse);
@@ -23,8 +23,8 @@ void main() {
           .withId('test_2')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(SMALL_STOCK)
-          .withLastDailyConsumption(NO_STOCK)
+          .withStock(smallStock)
+          .withLastDailyConsumption(noStock)
           .build();
 
       expect(medication.isStockLow, isFalse);
@@ -40,7 +40,7 @@ void main() {
           .withId('test_3')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(SMALL_STOCK)
+          .withStock(smallStock)
           .withLastDailyConsumption(4.0)
           .build();
 
@@ -139,8 +139,8 @@ void main() {
           .withId('test_9')
           .withName('Ibuprofeno')
           .withAsNeeded()
-          .withStock(NO_STOCK)
-          .withLastDailyConsumption(DOUBLE_DOSE)
+          .withStock(noStock)
+          .withLastDailyConsumption(doubleDose)
           .build();
 
       // Stock is 0, so it's empty, not "low"

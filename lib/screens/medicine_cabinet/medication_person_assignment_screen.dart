@@ -246,7 +246,7 @@ class _MedicationPersonAssignmentScreenState
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
 
                   const SizedBox(height: 24),
 
@@ -282,7 +282,7 @@ class _MedicationPersonAssignmentScreenState
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
 
                   if (_allPersons.length == _assignedPersons.length)
                     Card(

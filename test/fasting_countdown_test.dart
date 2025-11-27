@@ -57,9 +57,6 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Simular que son las 09:30 (dentro del período de ayuno)
-        final now = DateTime(2025, 10, 30, 9, 30);
-
         // Nota: En un test real, necesitaríamos poder inyectar el tiempo actual
         // Por ahora, verificamos que el método funciona
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
@@ -183,10 +180,6 @@ void main() {
         await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
         // Ahora debería mostrar cuenta atrás
-        // Calculate expected remaining minutes based on actual dose time
-        final minutesSinceDose = now.difference(doseTime).inMinutes;
-        final expectedRemaining = 120 - minutesSinceDose; // 120 min fasting duration
-
         final resultAfter = await DoseCalculationService.getActiveFastingPeriod(medication);
 
         expect(resultAfter, isNotNull);

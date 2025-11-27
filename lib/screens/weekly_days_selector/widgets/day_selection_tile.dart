@@ -45,7 +45,7 @@ class DaySelectionTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.teal
-                      : Theme.of(context).colorScheme.surfaceVariant,
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   shape: BoxShape.circle,
                 ),
                 child: Center(

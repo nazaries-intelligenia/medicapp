@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medicapp/utils/datetime_extensions.dart';
 
 /// Tests para la funcionalidad de navegación por días en la UI
 /// Estos tests verifican la lógica de cálculo de fechas y offsets

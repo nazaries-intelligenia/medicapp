@@ -267,24 +267,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Seleccionar paleta de colores'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ColorPalette.values.map((palette) {
-            final isSelected = palette == currentPalette;
-            return RadioListTile<ColorPalette>(
-              title: Text(palette.displayName),
-              subtitle: Text(palette.description),
-              value: palette,
-              groupValue: currentPalette,
-              selected: isSelected,
-              onChanged: (ColorPalette? value) {
-                if (value != null) {
-                  themeProvider.setColorPalette(value);
-                  Navigator.pop(context);
-                }
-              },
-            );
-          }).toList(),
+        content: RadioGroup<ColorPalette>(
+          groupValue: currentPalette,
+          onChanged: (ColorPalette? value) {
+            if (value != null) {
+              themeProvider.setColorPalette(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ColorPalette.values.map((palette) {
+              final isSelected = palette == currentPalette;
+              return RadioListTile<ColorPalette>(
+                title: Text(palette.displayName),
+                subtitle: Text(palette.description),
+                value: palette,
+                selected: isSelected,
+              );
+            }).toList(),
+          ),
         ),
         actions: [
           TextButton(

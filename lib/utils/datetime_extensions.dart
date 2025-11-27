@@ -4,6 +4,6 @@ extension DateTimeExtensions on DateTime {
   }
 
   String toDateString() {
-    return '${year}-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
+    return '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
   }
 }
