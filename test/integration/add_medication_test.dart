@@ -43,28 +43,28 @@ void main() {
   testWidgets('Should add medication with default type and everyday duration', (WidgetTester tester) async {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
-    await addMedicationWithDuration(tester, 'Paracetamol');
+    await addMedicationWithDuration(tester, 'Acetaminophen');
 
     // Wait for the main screen to complete its async operations after Navigator.pop
     await waitForDatabase(tester);
 
-    expect(find.text('Paracetamol'), findsOneWidget);
+    expect(find.text('Acetaminophen'), findsOneWidget);
     expect(find.text(getL10n(tester).medicationTypePill), findsAtLeastNWidgets(1));
     expect(find.text(getL10n(tester).frequencyDailyTitle), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('Should add medication with "Hasta acabar medicación" duration', (WidgetTester tester) async {
+  testWidgets('Should add medication with "Until medication runs out" duration', (WidgetTester tester) async {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
     await addMedicationWithDuration(
       tester,
-      'Antibiótico',
+      'Antibiotic',
       durationType: getL10n(tester).durationUntilEmptyTitle,
     );
     await waitForDatabase(tester);
 
-    expect(find.text('Antibiótico'), findsOneWidget);
-    // The UI shows the short version "Hasta acabar", not the full title
+    expect(find.text('Antibiotic'), findsOneWidget);
+    // The UI shows the short version "Until finished", not the full title
     expect(find.text(getL10n(tester).editFrequencyUntilFinished), findsWidgets);
   });
 
@@ -74,11 +74,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add medication with Jarabe type
-    await addMedicationWithDuration(tester, 'Medicina X', type: getL10n(tester).medicationTypeSyrup);
+    await addMedicationWithDuration(tester, 'Medicine X', type: getL10n(tester).medicationTypeSyrup);
     await waitForDatabase(tester);
 
     // Verify medication was added with Jarabe type
-    expect(find.text('Medicina X'), findsOneWidget);
+    expect(find.text('Medicine X'), findsOneWidget);
     expect(find.text(getL10n(tester).medicationTypeSyrup), findsWidgets);
   });
 
@@ -88,7 +88,7 @@ void main() {
     await waitForDatabase(tester);
 
     // Add first medication
-    await addMedicationWithDuration(tester, 'Paracetamol');
+    await addMedicationWithDuration(tester, 'Acetaminophen');
     await waitForDatabase(tester);
 
     // Wait for all animations and overlays (like SnackBars) to complete
@@ -110,7 +110,7 @@ void main() {
 
     // Verify TextFormField exists before using .first
     expect(find.byType(TextFormField), findsWidgets, reason: 'Navigation to add screen may have failed');
-    await tester.enterText(find.byType(TextFormField).first, 'Paracetamol');
+    await tester.enterText(find.byType(TextFormField).first, 'Acetaminophen');
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
     await tester.pump();
@@ -129,7 +129,7 @@ void main() {
     await waitForDatabase(tester);
 
     // Add first medication
-    await addMedicationWithDuration(tester, 'Ibuprofeno');
+    await addMedicationWithDuration(tester, 'Ibuprofen');
     await waitForDatabase(tester);
 
     // Wait for all animations and overlays (like SnackBars) to complete
@@ -155,7 +155,7 @@ void main() {
 
     // Verify TextFormField exists before using .first
     expect(find.byType(TextFormField), findsWidgets, reason: 'Navigation to add screen may have failed');
-    await tester.enterText(find.byType(TextFormField).first, 'IBUPROFENO');
+    await tester.enterText(find.byType(TextFormField).first, 'IBUPROFEN');
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
     await tester.tap(find.text(getL10n(tester).btnContinue));
     await tester.pump();

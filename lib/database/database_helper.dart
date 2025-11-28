@@ -76,9 +76,9 @@ class DatabaseHelper {
     const integerNullableType = 'INTEGER';
     const realType = 'REAL NOT NULL DEFAULT 0';
 
-    // === NUEVA ARQUITECTURA (V19+) ===
-    // medications: Solo datos COMPARTIDOS entre personas (stock)
-    // person_medications: Pauta INDIVIDUAL de cada persona
+    // === NEW ARCHITECTURE (V19+) ===
+    // medications: Only SHARED data between persons (stock)
+    // person_medications: INDIVIDUAL schedule for each person
 
     await db.execute('''
       CREATE TABLE medications (

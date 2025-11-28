@@ -46,14 +46,14 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Omeprazol');
+    await addMedicationWithDuration(tester, 'Omeprazole');
     await waitForDatabase(tester);
 
     // Verify medication is in the list
-    expect(find.text('Omeprazol'), findsOneWidget);
+    expect(find.text('Omeprazole'), findsOneWidget);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Omeprazol'));
+    await tester.tap(find.text('Omeprazole'));
     await tester.pumpAndSettle();
 
     // Scroll to and tap the delete button
@@ -68,7 +68,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify medication is no longer in the list
-    expect(find.text('Omeprazol'), findsNothing);
+    expect(find.text('Omeprazole'), findsNothing);
 
     // Note: The deletion success SnackBar is shown in MedicineCabinetScreen
     // and disappears when we navigate back, so we can't verify it here

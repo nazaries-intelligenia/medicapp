@@ -25,11 +25,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Metformina');
+    await addMedicationWithDuration(tester, 'Metformin');
     await waitForDatabase(tester);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Metformina'));
+    await tester.tap(find.text('Metformin'));
     await tester.pumpAndSettle();
 
     // Verify edit button is shown
@@ -43,11 +43,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Atorvastatina');
+    await addMedicationWithDuration(tester, 'Atorvastatin');
     await waitForDatabase(tester);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Atorvastatina'));
+    await tester.tap(find.text('Atorvastatin'));
     await tester.pumpAndSettle();
 
     // Scroll to and tap edit button
@@ -67,7 +67,7 @@ void main() {
     expect(find.text(getL10n(tester).editMedicationMenuQuantity), findsWidgets);
 
     // Verify the medication name appears in the header
-    expect(find.text('Atorvastatina'), findsAtLeastNWidgets(1));
+    expect(find.text('Atorvastatin'), findsAtLeastNWidgets(1));
   });
 
   testWidgets('Should update medication name when changes are saved', (WidgetTester tester) async {
@@ -76,14 +76,14 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Simvastatina');
+    await addMedicationWithDuration(tester, 'Simvastatin');
     await waitForDatabase(tester);
 
     // Verify medication is in the list
-    expect(find.text('Simvastatina'), findsOneWidget);
+    expect(find.text('Simvastatin'), findsOneWidget);
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Simvastatina', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Simvastatin', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
@@ -144,7 +144,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify old name is gone and new name is in the list
-    expect(find.text('Simvastatina'), findsNothing);
+    expect(find.text('Simvastatin'), findsNothing);
     expect(find.text('Rosuvastatina'), findsOneWidget);
 
     // Wait for any background tasks (like notification rescheduling) to complete
@@ -160,16 +160,16 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with default type (Pastilla)
-    await addMedicationWithDuration(tester, 'Medicina');
+    await addMedicationWithDuration(tester, 'Medicine');
     await waitForDatabase(tester);
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Medicina', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Medicine', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
 
-    // Change type to Cápsula
+    // Change type to Capsule
     await scrollToWidget(tester, find.text(getL10n(tester).medicationTypeCapsule));
     await tester.tap(find.text(getL10n(tester).medicationTypeCapsule));
     await tester.pumpAndSettle();
@@ -224,7 +224,7 @@ void main() {
     // Final pump to ensure everything is settled
     await tester.pumpAndSettle();
 
-    // Verify type was updated - should now show Cápsula
+    // Verify type was updated - should now show Capsule
     expect(find.text(getL10n(tester).medicationTypeCapsule), findsWidgets);
 
     // Wait for any background tasks (like notification rescheduling) to complete
@@ -239,20 +239,20 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
-    // Add a medication with "Todos los días" frequency
-    await addMedicationWithDuration(tester, 'Vitaminas');
+    // Add a medication with "Every day" frequency
+    await addMedicationWithDuration(tester, 'Vitamins');
     await waitForDatabase(tester);
 
     // Verify initial frequency
     expect(find.text(getL10n(tester).frequencyDailyTitle), findsAtLeastNWidgets(1));
 
-    // Navigate to edit menu and select "Frecuencia"
-    await openEditMenuAndSelectSection(tester, 'Vitaminas', 'Frecuencia');
+    // Navigate to edit menu and select "Frequency"
+    await openEditMenuAndSelectSection(tester, 'Vitamins', getL10n(tester).editMedicationMenuFrequency);
 
     // Verify we're on the frequency edit screen
     expect(find.text(getL10n(tester).editFrequencyTitle), findsWidgets);
 
-    // Change frequency to "Hasta acabar medicación"
+    // Change frequency to "Until medication runs out"
     await scrollToWidget(tester, find.text(getL10n(tester).editFrequencyUntilFinished));
     await tester.tap(find.text(getL10n(tester).editFrequencyUntilFinished));
     await tester.pumpAndSettle();
@@ -305,7 +305,7 @@ void main() {
     // Final pump to ensure everything is settled
     await tester.pumpAndSettle();
 
-    // Verify frequency was updated (short version "Hasta acabar")
+    // Verify frequency was updated (short version "Until finished")
     expect(find.text(getL10n(tester).editFrequencyUntilFinished), findsWidgets);
 
     // Wait for any background tasks (like notification rescheduling) to complete
@@ -321,11 +321,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Levotiroxina');
+    await addMedicationWithDuration(tester, 'Levothyroxine');
     await waitForDatabase(tester);
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Levotiroxina', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Levothyroxine', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
@@ -349,7 +349,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify we're back on the main screen and original name is still in the list
-    expect(find.text('Levotiroxina'), findsOneWidget);
+    expect(find.text('Levothyroxine'), findsOneWidget);
     expect(find.text('Otro Medicamento'), findsNothing);
 
     // Verify edit menu is no longer visible
@@ -362,7 +362,7 @@ void main() {
     await waitForDatabase(tester);
 
     // Add two medications
-    await addMedicationWithDuration(tester, 'Amoxicilina');
+    await addMedicationWithDuration(tester, 'Amoxicillin');
     await waitForDatabase(tester);
     await tester.pumpAndSettle(); // Wait for any overlays to clear
     // Extra delay to ensure SnackBar is completely gone
@@ -371,18 +371,18 @@ void main() {
     });
     await tester.pump();
 
-    await addMedicationWithDuration(tester, 'Azitromicina');
+    await addMedicationWithDuration(tester, 'Azithromycin');
     await waitForDatabase(tester);
     await tester.pumpAndSettle(); // Wait for any overlays to clear
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Azitromicina', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Azithromycin', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
 
     // Try to change it to the name of the first medication
-    await tester.enterText(find.byType(TextFormField).first, 'Amoxicilina');
+    await tester.enterText(find.byType(TextFormField).first, 'Amoxicillin');
     await tester.pumpAndSettle();
 
     // Try to save
@@ -406,11 +406,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication
-    await addMedicationWithDuration(tester, 'Insulina');
+    await addMedicationWithDuration(tester, 'Insulin');
     await waitForDatabase(tester);
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Insulina', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Insulin', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
@@ -452,7 +452,7 @@ void main() {
       await tester.pump();
 
       // Check if the medication name is visible
-      if (find.text('Insulina').evaluate().isNotEmpty) {
+      if (find.text('Insulin').evaluate().isNotEmpty) {
         foundMedication = true;
         break;
       }
@@ -464,7 +464,7 @@ void main() {
     }
 
     // Verify the medication is still there with the same name
-    expect(find.text('Insulina'), findsOneWidget);
+    expect(find.text('Insulin'), findsOneWidget);
 
     // Wait for ViewModel async operations to complete before tearDown
     await tester.runAsync(() async {
@@ -484,8 +484,8 @@ void main() {
     await addMedicationWithDuration(tester, 'Enalapril');
     await waitForDatabase(tester);
 
-    // Navigate to edit menu and select "Información Básica"
-    await openEditMenuAndSelectSection(tester, 'Enalapril', 'Información Básica');
+    // Navigate to edit menu and select "Basic Information"
+    await openEditMenuAndSelectSection(tester, 'Enalapril', getL10n(tester).editMedicationMenuBasicInfo);
 
     // Verify we're on the basic info edit screen
     expect(find.text(getL10n(tester).editBasicInfoTitle), findsWidgets);
@@ -511,16 +511,16 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
-    // Add a medication with "Hasta acabar" frequency
+    // Add a medication with "Until finished" frequency
     await addMedicationWithDuration(
       tester,
-      'Probiótico',
+      'Probiotic',
       durationType: getL10n(tester).durationUntilEmptyTitle,
     );
     await waitForDatabase(tester);
 
     // Open edit menu
-    await tester.tap(find.text('Probiótico'));
+    await tester.tap(find.text('Probiotic'));
     await tester.pumpAndSettle();
     await scrollToWidget(tester, find.text(getL10n(tester).medicineCabinetEditMedication));
     await tester.tap(find.text(getL10n(tester).medicineCabinetEditMedication));

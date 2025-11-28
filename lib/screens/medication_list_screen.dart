@@ -54,7 +54,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
   final Set<String> _soundPlayedFastingPeriods = {};
 
   // Day navigation
-  static const int _centerPageIndex = 10000; // Centro para navegación "ilimitada"
+  static const int _centerPageIndex = 10000; // Center for "unlimited" navigation
   late final PageController _pageController;
   late DateTime _selectedDate;
 
@@ -1041,12 +1041,12 @@ class MedicationListScreenState extends State<MedicationListScreen>
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
 
-    // Si es hoy, mostrar "Hoy, día/mes/año"
+    // If it's today, show "Today, day/month/year"
     if (selectedDay == today) {
       return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
     }
 
-    // Para otros días, mostrar solo la fecha
+    // For other days, show only the date
     return '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
   }
 
@@ -1065,23 +1065,23 @@ class MedicationListScreenState extends State<MedicationListScreen>
       final today = DateTime(now.year, now.month, now.day);
       final pickedNormalized = DateTime(picked.year, picked.month, picked.day);
 
-      // Calcular offset desde hoy
+      // Calculate offset from today
       final dayOffset = pickedNormalized.difference(today).inDays;
       final targetPage = _centerPageIndex + dayOffset;
 
-      // Navegar a la página
+      // Navigate to the page
       await _pageController.animateToPage(
         targetPage,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
 
-      // Actualizar estado (onPageChanged se llamará automáticamente)
+      // Update state (onPageChanged will be called automatically)
     }
   }
 
   Future<void> _returnToToday() async {
-    // Navegar de vuelta al centro (hoy)
+    // Navigate back to the center (today)
     await _pageController.animateToPage(
       _centerPageIndex,
       duration: const Duration(milliseconds: 300),
@@ -1165,10 +1165,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
       ),
       body: Column(
         children: [
-          // Contador de ayuno (aparece encima de las pestañas)
+          // Fasting countdown (appears above the tabs)
           if (_viewModel.activeFastingPeriods.isNotEmpty)
             _buildAllFastingCountdowns(),
-          // Pestañas de usuarios
+          // User tabs
           if (_viewModel.showPersonTabs &&
               _tabController != null &&
               _viewModel.persons.length > 1)
@@ -1201,7 +1201,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 }).toList(),
               ),
             ),
-          // Contenido con navegación por días
+          // Content with day navigation
           Expanded(
             child: PageView.builder(
               controller: _pageController,

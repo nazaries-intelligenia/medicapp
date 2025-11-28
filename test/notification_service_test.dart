@@ -426,21 +426,21 @@ void main() {
       // Simulate updating notification multiple times (as would happen with timer)
       await service.showOngoingFastingNotification(
         personId: 'test-person-id',
-        medicationName: 'Paracetamol',
+        medicationName: 'Acetaminophen',
         timeRemaining: '2h',
         endTime: '16:00',
       );
 
       await service.showOngoingFastingNotification(
         personId: 'test-person-id',
-        medicationName: 'Paracetamol',
+        medicationName: 'Acetaminophen',
         timeRemaining: '1h 30m',
         endTime: '16:00',
       );
 
       await service.showOngoingFastingNotification(
         personId: 'test-person-id',
-        medicationName: 'Paracetamol',
+        medicationName: 'Acetaminophen',
         timeRemaining: '1h',
         endTime: '16:00',
       );
@@ -453,7 +453,7 @@ void main() {
       // Show notification for first medication
       await service.showOngoingFastingNotification(
         personId: 'test-person-id',
-        medicationName: 'Paracetamol',
+        medicationName: 'Acetaminophen',
         timeRemaining: '1h',
         endTime: '15:00',
       );
@@ -461,7 +461,7 @@ void main() {
       // Switch to more urgent medication
       await service.showOngoingFastingNotification(
         personId: 'test-person-id',
-        medicationName: 'Ibuprofeno',
+        medicationName: 'Ibuprofen',
         timeRemaining: '30 min',
         endTime: '14:30',
       );

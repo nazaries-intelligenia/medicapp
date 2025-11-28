@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 
-/// Widget reutilizable para el formulario de configuración de ayuno
-/// Usado tanto en creación como en edición de medicamentos
+/// Reusable widget for the fasting configuration form
+/// Used in both medication creation and editing
 class FastingConfigurationForm extends StatelessWidget {
   final bool requiresFasting;
   final String? fastingType;
@@ -35,7 +35,7 @@ class FastingConfigurationForm extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header con icono y descripción
+        // Header with icon and description
         if (showDescription) ...[
           Row(
             children: [
@@ -66,7 +66,7 @@ class FastingConfigurationForm extends StatelessWidget {
           const SizedBox(height: 24),
         ],
 
-        // Question: ¿Requiere ayuno?
+        // Question: Does it require fasting?
         Text(
           l10n.requiresFastingQuestion,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -132,7 +132,7 @@ class FastingConfigurationForm extends StatelessWidget {
           const Divider(),
           const SizedBox(height: 24),
 
-          // Question: ¿Cuándo es el ayuno?
+          // Question: When is the fasting?
           Text(
             l10n.fastingWhenQuestion,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -194,7 +194,7 @@ class FastingConfigurationForm extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Question: ¿Cuánto tiempo de ayuno?
+          // Question: How long is the fasting?
           Text(
             l10n.fastingDurationQuestion,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -286,7 +286,7 @@ class FastingConfigurationForm extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Question: ¿Deseas recibir notificaciones?
+          // Question: Do you want to receive notifications?
           Text(
             l10n.fastingNotificationsQuestion,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(

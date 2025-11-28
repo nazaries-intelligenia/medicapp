@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/date_symbol_data_local.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../services/snackbar_service.dart';
 import '../utils/datetime_extensions.dart';
@@ -21,22 +20,11 @@ class SpecificDatesSelectorScreen extends StatefulWidget {
 
 class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScreen> {
   late Set<String> _selectedDates; // Store as "yyyy-MM-dd" strings
-  bool _localeInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _selectedDates = widget.initialSelectedDates?.toSet() ?? {};
-    _initializeLocale();
-  }
-
-  Future<void> _initializeLocale() async {
-    if (!_localeInitialized) {
-      await initializeDateFormatting('es_ES', null);
-      setState(() {
-        _localeInitialized = true;
-      });
-    }
   }
 
   Future<void> _addDate() async {
@@ -91,20 +79,6 @@ class _SpecificDatesSelectorScreenState extends State<SpecificDatesSelectorScree
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Wait for locale initialization
-    if (!_localeInitialized) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.specificDatesSelectorTitle),
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        ),
-        body: const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
     final sortedDates = _selectedDates.toList()..sort();
 
     return Scaffold(

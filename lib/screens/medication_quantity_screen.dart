@@ -10,7 +10,7 @@ import '../widgets/action_buttons.dart';
 import '../utils/number_utils.dart';
 import 'medication_list/dialogs/expiration_date_dialog.dart';
 
-/// Pantalla 7: Cantidad de medicamentos (última pantalla del flujo)
+/// Screen 7: Medication quantity (last screen in the flow)
 class MedicationQuantityScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -189,7 +189,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Indicador de progreso
+                // Progress indicator
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
@@ -224,7 +224,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Card con información
+                // Information card
                 StockInputCard(
                   stockController: _stockController,
                   lowStockController: _lowStockThresholdController,
@@ -233,7 +233,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
 
                 const SizedBox(height: 16),
 
-                // Resumen del medicamento
+                // Medication summary
                 MedicationSummaryCard(
                   medicationName: widget.medicationName,
                   medicationType: widget.medicationType,

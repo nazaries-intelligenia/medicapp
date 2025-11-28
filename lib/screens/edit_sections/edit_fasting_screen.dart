@@ -7,7 +7,7 @@ import '../../services/notification_service.dart';
 import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar la configuración de ayuno
+/// Screen to edit fasting configuration
 class EditFastingScreen extends StatefulWidget {
   final Medication medication;
 

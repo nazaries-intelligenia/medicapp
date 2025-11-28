@@ -3,6 +3,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
 import '../../../services/snackbar_service.dart';
 import '../../../utils/datetime_extensions.dart';
+import '../../../utils/date_formatter.dart';
 
 class MedicationCard extends StatelessWidget {
   final Medication medication;
@@ -139,9 +140,9 @@ class MedicationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                   ],
                   // Show status description
-                  if (!medication.isSuspended && medication.statusDescription.isNotEmpty) ...[
+                  if (!medication.isSuspended && medication.hasStatusDescription) ...[
                     Text(
-                      medication.statusDescription,
+                      _getStatusDescription(l10n, medication),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: medication.isPending
                                 ? Colors.orange
@@ -154,7 +155,7 @@ class MedicationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                   ],
                   Text(
-                    medication.type.displayName,
+                    medication.type.getDisplayName(l10n),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: medication.type.getColor(context),
                         ),
@@ -302,6 +303,23 @@ class MedicationCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Get localized status description for medication
+  String _getStatusDescription(AppLocalizations l10n, Medication medication) {
+    if (medication.statusStartDate != null) {
+      final formattedDate = DateFormatter.formatDateMedium(medication.statusStartDate!);
+      return l10n.medicationStartsOn(formattedDate);
+    }
+    if (medication.statusEndDate != null) {
+      final formattedDate = DateFormatter.formatDateMedium(medication.statusEndDate!);
+      return l10n.medicationFinishedOn(formattedDate);
+    }
+    final progress = medication.statusDayProgress;
+    if (progress != null) {
+      return l10n.medicationDayOfTotal(progress.$1.toString(), progress.$2.toString());
+    }
+    return '';
   }
 }
 

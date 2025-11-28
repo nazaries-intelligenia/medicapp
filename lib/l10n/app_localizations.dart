@@ -332,6 +332,144 @@ abstract class AppLocalizations {
   /// **'Otro'**
   String get medicationTypeOther;
 
+  /// No description provided for @stockUnitPills.
+  ///
+  /// In es, this message translates to:
+  /// **'pastillas'**
+  String get stockUnitPills;
+
+  /// No description provided for @stockUnitCapsules.
+  ///
+  /// In es, this message translates to:
+  /// **'cápsulas'**
+  String get stockUnitCapsules;
+
+  /// No description provided for @stockUnitInjections.
+  ///
+  /// In es, this message translates to:
+  /// **'inyecciones'**
+  String get stockUnitInjections;
+
+  /// No description provided for @stockUnitMl.
+  ///
+  /// In es, this message translates to:
+  /// **'ml'**
+  String get stockUnitMl;
+
+  /// No description provided for @stockUnitOvules.
+  ///
+  /// In es, this message translates to:
+  /// **'óvulos'**
+  String get stockUnitOvules;
+
+  /// No description provided for @stockUnitSuppositories.
+  ///
+  /// In es, this message translates to:
+  /// **'supositorios'**
+  String get stockUnitSuppositories;
+
+  /// No description provided for @stockUnitInhalations.
+  ///
+  /// In es, this message translates to:
+  /// **'inhalaciones'**
+  String get stockUnitInhalations;
+
+  /// No description provided for @stockUnitSachets.
+  ///
+  /// In es, this message translates to:
+  /// **'sobres'**
+  String get stockUnitSachets;
+
+  /// No description provided for @stockUnitGrams.
+  ///
+  /// In es, this message translates to:
+  /// **'gramos'**
+  String get stockUnitGrams;
+
+  /// No description provided for @stockUnitBandages.
+  ///
+  /// In es, this message translates to:
+  /// **'vendas'**
+  String get stockUnitBandages;
+
+  /// No description provided for @stockUnitDrops.
+  ///
+  /// In es, this message translates to:
+  /// **'gotas'**
+  String get stockUnitDrops;
+
+  /// No description provided for @stockUnitUnits.
+  ///
+  /// In es, this message translates to:
+  /// **'unidades'**
+  String get stockUnitUnits;
+
+  /// No description provided for @stockUnitPill.
+  ///
+  /// In es, this message translates to:
+  /// **'pastilla'**
+  String get stockUnitPill;
+
+  /// No description provided for @stockUnitCapsule.
+  ///
+  /// In es, this message translates to:
+  /// **'cápsula'**
+  String get stockUnitCapsule;
+
+  /// No description provided for @stockUnitInjection.
+  ///
+  /// In es, this message translates to:
+  /// **'inyección'**
+  String get stockUnitInjection;
+
+  /// No description provided for @stockUnitOvule.
+  ///
+  /// In es, this message translates to:
+  /// **'óvulo'**
+  String get stockUnitOvule;
+
+  /// No description provided for @stockUnitSuppository.
+  ///
+  /// In es, this message translates to:
+  /// **'supositorio'**
+  String get stockUnitSuppository;
+
+  /// No description provided for @stockUnitInhalation.
+  ///
+  /// In es, this message translates to:
+  /// **'inhalación'**
+  String get stockUnitInhalation;
+
+  /// No description provided for @stockUnitSachet.
+  ///
+  /// In es, this message translates to:
+  /// **'sobre'**
+  String get stockUnitSachet;
+
+  /// No description provided for @stockUnitGram.
+  ///
+  /// In es, this message translates to:
+  /// **'gramo'**
+  String get stockUnitGram;
+
+  /// No description provided for @stockUnitBandage.
+  ///
+  /// In es, this message translates to:
+  /// **'venda'**
+  String get stockUnitBandage;
+
+  /// No description provided for @stockUnitDrop.
+  ///
+  /// In es, this message translates to:
+  /// **'gota'**
+  String get stockUnitDrop;
+
+  /// No description provided for @stockUnitUnit.
+  ///
+  /// In es, this message translates to:
+  /// **'unidad'**
+  String get stockUnitUnit;
+
   /// No description provided for @doseStatusTaken.
   ///
   /// In es, this message translates to:
@@ -2993,6 +3131,42 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Entendido'**
   String get settingsRestartDialogButton;
+
+  /// No description provided for @settingsLanguageTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Idioma'**
+  String get settingsLanguageTitle;
+
+  /// No description provided for @settingsLanguageSystem.
+  ///
+  /// In es, this message translates to:
+  /// **'Predeterminado del sistema'**
+  String get settingsLanguageSystem;
+
+  /// No description provided for @settingsColorPaletteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Paleta de colores'**
+  String get settingsColorPaletteTitle;
+
+  /// No description provided for @medicationStartsOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Empieza el {date}'**
+  String medicationStartsOn(Object date);
+
+  /// No description provided for @medicationFinishedOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizado el {date}'**
+  String medicationFinishedOn(Object date);
+
+  /// No description provided for @medicationDayOfTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Día {current} de {total}'**
+  String medicationDayOfTotal(Object current, Object total);
 
   /// No description provided for @notificationsWillNotWork.
   ///

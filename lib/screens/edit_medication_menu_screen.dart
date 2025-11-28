@@ -11,7 +11,7 @@ import 'edit_sections/edit_fasting_screen.dart';
 import '../widgets/medication_header_card.dart';
 import 'edit_medication_menu/widgets/edit_menu_option.dart';
 
-/// Pantalla de menú para editar diferentes aspectos de un medicamento
+/// Menu screen to edit different aspects of a medication
 class EditMedicationMenuScreen extends StatelessWidget {
   final Medication medication;
   final List<Medication> existingMedications;
@@ -38,7 +38,7 @@ class EditMedicationMenuScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Header con información del medicamento
+              // Header with medication information
               MedicationHeaderCard(medication: medication),
               const SizedBox(height: 24),
 
@@ -173,7 +173,7 @@ class EditMedicationMenuScreen extends StatelessWidget {
                 title: l10n.editMedicationMenuQuantity,
                 subtitle: l10n.editMedicationMenuQuantityDesc(
                   medication.stockQuantity.toString(),
-                  medication.type.stockUnit,
+                  medication.type.getStockUnit(l10n),
                 ),
                 color: Colors.teal,
                 onTap: () async {

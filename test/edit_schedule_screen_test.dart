@@ -5,6 +5,7 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'helpers/test_helpers.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/widget_test_helpers.dart' as widget_helpers;
 
 void main() {
   setupTestDatabase();
@@ -22,22 +23,25 @@ void main() {
     testWidgets('should render edit schedule screen', (WidgetTester tester) async {
       await pumpScreen(tester, EditScheduleScreen(medication: testMedication));
 
-      expect(find.text('Editar Horarios'), findsOneWidget);
-      expect(find.text('Guardar Cambios'), findsOneWidget);
-      expect(find.text('Cancelar'), findsOneWidget);
+      final l10n = widget_helpers.getL10n(tester);
+      expect(find.text(l10n.editScheduleTitle), findsOneWidget);
+      expect(find.text(l10n.editBasicInfoSaveChanges), findsOneWidget);
+      expect(find.text(l10n.btnCancel), findsOneWidget);
     });
 
     testWidgets('should display add dose button in app bar', (WidgetTester tester) async {
       await pumpScreen(tester, EditScheduleScreen(medication: testMedication));
 
+      final l10n = widget_helpers.getL10n(tester);
       expect(find.byIcon(Icons.add), findsOneWidget);
-      expect(find.byTooltip('Añadir toma'), findsOneWidget);
+      expect(find.byTooltip(l10n.editScheduleAddDose), findsOneWidget);
     });
 
     testWidgets('should display dose count in header', (WidgetTester tester) async {
       await pumpScreen(tester, EditScheduleScreen(medication: testMedication));
 
-      expect(find.text('Tomas al día: 2'), findsOneWidget);
+      final l10n = widget_helpers.getL10n(tester);
+      expect(find.text(l10n.editScheduleDosesPerDay(2)), findsOneWidget);
     });
 
     testWidgets('should display existing schedule times', (WidgetTester tester) async {
@@ -66,17 +70,18 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      final l10n = widget_helpers.getL10n(tester);
       // Initially one dose
-      expect(find.text('Toma 1'), findsOneWidget);
-      expect(find.text('Toma 2'), findsNothing);
+      expect(find.text(l10n.doseNumber(1)), findsOneWidget);
+      expect(find.text(l10n.doseNumber(2)), findsNothing);
 
       // Tap add button
       await tester.tap(find.byIcon(Icons.add));
       await tester.pumpAndSettle();
 
       // Should now have two doses
-      expect(find.text('Toma 1'), findsOneWidget);
-      expect(find.text('Toma 2'), findsOneWidget);
+      expect(find.text(l10n.doseNumber(1)), findsOneWidget);
+      expect(find.text(l10n.doseNumber(2)), findsOneWidget);
     });
   });
 
@@ -90,17 +95,18 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      final l10n = widget_helpers.getL10n(tester);
       // Find the quantity field and enter invalid quantity
       final quantityFields = find.byType(TextField);
       await tester.enterText(quantityFields.first, '0');
       await tester.pump();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pump();
 
       // Should show validation error
-      expect(find.text('Por favor, ingresa cantidades válidas (mayores a 0)'), findsOneWidget);
+      expect(find.text(l10n.editScheduleValidationQuantities), findsOneWidget);
     });
 
     testWidgets('should prevent entering negative quantities with input formatter', (WidgetTester tester) async {
@@ -134,17 +140,18 @@ void main() {
 
       await tester.pumpAndSettle();
 
+      final l10n = widget_helpers.getL10n(tester);
       // Clear quantity field
       final quantityFields = find.byType(TextField);
       await tester.enterText(quantityFields.first, '');
       await tester.pump();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pump();
 
       // Should show validation error
-      expect(find.text('Por favor, ingresa cantidades válidas (mayores a 0)'), findsOneWidget);
+      expect(find.text(l10n.editScheduleValidationQuantities), findsOneWidget);
     });
 
     testWidgets('should accept comma as decimal separator', (WidgetTester tester) async {
@@ -219,9 +226,14 @@ void main() {
           .withId('test-med-7')
           .build();
 
+      // Build widget first to get l10n
+      await pumpScreen(tester, EditScheduleScreen(medication: medication));
+      final l10n = widget_helpers.getL10n(tester);
+
+      // Now use the localized screen title
       await testCancelNavigation(
         tester,
-        screenTitle: 'Editar Horarios',
+        screenTitle: l10n.editScheduleTitle,
         screenBuilder: (context) => EditScheduleScreen(medication: medication),
       );
     });
@@ -263,7 +275,8 @@ void main() {
 
       await pumpScreen(tester, EditScheduleScreen(medication: medication));
 
-      expect(find.text('Tomas al día: 1'), findsOneWidget);
+      final l10n = widget_helpers.getL10n(tester);
+      expect(find.text(l10n.editScheduleDosesPerDay(1)), findsOneWidget);
       expect(find.text('08:00'), findsOneWidget);
     });
 
@@ -279,7 +292,8 @@ void main() {
 
       await pumpScreen(tester, EditScheduleScreen(medication: medication));
 
-      expect(find.text('Tomas al día: 4'), findsOneWidget);
+      final l10n = widget_helpers.getL10n(tester);
+      expect(find.text(l10n.editScheduleDosesPerDay(4)), findsOneWidget);
     });
 
     testWidgets('should handle medication with decimal quantities', (WidgetTester tester) async {

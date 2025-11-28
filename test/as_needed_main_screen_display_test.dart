@@ -25,7 +25,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_1')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -43,7 +43,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_2')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -78,7 +78,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_3')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -112,7 +112,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_4')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -146,7 +146,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_5')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -193,14 +193,14 @@ void main() {
       // Create two as-needed medications
       final med1 = MedicationBuilder()
           .withId('test_as_needed_6')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
 
       final med2 = MedicationBuilder()
           .withId('test_as_needed_7')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -251,7 +251,7 @@ void main() {
       // Create a programmed medication (not as-needed)
       final medication = MedicationBuilder()
           .withId('test_programmed_1')
-          .withName('Atorvastatina')
+          .withName('Atorvastatin')
           .withDurationType(TreatmentDurationType.everyday)
           .withDosageInterval(24)
           .withSingleDose('20:00', 1.0)

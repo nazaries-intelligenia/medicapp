@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-/// Paletas de colores disponibles en la aplicación
+/// Color palettes available in the application
 enum ColorPalette {
-  /// Paleta "Sea Green" - Verde natural con tonos bosque
+  /// "Sea Green" palette - Natural green with forest tones
   seaGreen,
 
-  /// Paleta Material 3 por defecto - Púrpura baseline de Material Design 3
+  /// Default Material 3 palette - Material Design 3 baseline purple
   material3,
 
-  /// Paleta "Alto Contraste" - Colores muy contrastados para personas con problemas de visión
+  /// "High Contrast" palette - Highly contrasted colors for people with vision problems
   highContrast,
 }
 
-/// Extensión para obtener nombres localizados de las paletas
+/// Extension to get localized names of the palettes
 extension ColorPaletteExtension on ColorPalette {
   String get displayName {
     switch (this) {
@@ -28,164 +28,164 @@ extension ColorPaletteExtension on ColorPalette {
   String get description {
     switch (this) {
       case ColorPalette.seaGreen:
-        return 'Tonos verdes naturales inspirados en el bosque';
+        return 'Natural green tones inspired by the forest';
       case ColorPalette.material3:
-        return 'Paleta púrpura por defecto de Material Design 3';
+        return 'Default purple palette from Material Design 3';
       case ColorPalette.highContrast:
-        return 'Colores muy contrastados para mejorar la legibilidad';
+        return 'Highly contrasted colors to improve readability';
     }
   }
 }
 
-/// Definición centralizada de temas de la aplicación
+/// Centralized definition of application themes
 ///
-/// Paleta de colores "Sea Green" para tema claro:
-/// - Primario (Marca): #2E8B57 - Verde "Sea Green" sólido
-/// - Primario Variante: #3CB371 - Un poco más claro (hover/pressed)
-/// - Acento/Interactivo: #00C853 - Verde vibrante para FAB y acciones
-/// - Secundario/Soporte: #81C784 - Verde suave para elementos secundarios
-/// - Éxito: #43A047 - Verde funcional para confirmaciones
-/// - Texto Oscuro: #0D2E1C - Verde bosque muy profundo
-/// - Texto Secundario: #577D6A - Subtítulos y texto de ayuda
-/// - Superficie (Tarjetas): #C8E6C9 - Fondo menta suave
-/// - Fondo Principal: #E8F5E9 - Casi blanco con tinte verde
-/// - Divisor/Borde: #A5D6A7 - Líneas sutiles para separaciones
+/// "Sea Green" color palette for light theme:
+/// - Primary (Brand): #2E8B57 - Solid "Sea Green"
+/// - Primary Variant: #3CB371 - Slightly lighter (hover/pressed)
+/// - Accent/Interactive: #00C853 - Vibrant green for FAB and actions
+/// - Secondary/Support: #81C784 - Soft green for secondary elements
+/// - Success: #43A047 - Functional green for confirmations
+/// - Dark Text: #0D2E1C - Very deep forest green
+/// - Secondary Text: #577D6A - Subtitles and help text
+/// - Surface (Cards): #C8E6C9 - Soft mint background
+/// - Main Background: #E8F5E9 - Almost white with green tint
+/// - Divider/Border: #A5D6A7 - Subtle lines for separations
 ///
-/// Paleta "Material 3" por defecto:
-/// - Basada en el color seed púrpura #6750A4 de Material Design 3
-/// - Genera automáticamente todos los tonos y variantes
-/// - Sigue las especificaciones oficiales de Material Design 3
+/// Default "Material 3" palette:
+/// - Based on Material Design 3 purple seed color #6750A4
+/// - Automatically generates all tones and variants
+/// - Follows official Material Design 3 specifications
 class AppTheme {
-  // Constantes para TabBar
+  // Constants for TabBar
   static const double tabIndicatorWeight = 4.0;
   static const double tabFontSize = 14.0;
   static const double tabUnselectedOpacity = 0.5;
   static const double iconUnselectedOpacity = 0.5;
-  // Colores principales - Tema claro "Sea Green"
+  // Main colors - "Sea Green" light theme
   static const Color primaryLight = Color(0xFF2E8B57);
   static const Color primaryVariantLight = Color(0xFF3CB371);
   static const Color accentLight = Color(0xFF00C853);
 
-  // Colores principales - Tema oscuro "Dark Forest"
+  // Main colors - "Dark Forest" dark theme
   static const Color primaryDark = Color(0xFFA5D6A7);
   static const Color accentDark = Color(0xFF4CAF50);
 
   static const Color secondaryLight = Color(0xFF81C784);
   static const Color secondaryDark = Color(0xFF819CA9);
 
-  // Colores de fondo
+  // Background colors
   static const Color backgroundLight = Color(0xFFE8F5E9);
   static const Color backgroundDark = Color(0xFF050A06);
 
   static const Color surfaceLight = Color(0xFFC8E6C9);
   static const Color surfaceDark = Color(0xFF0D1F14);
 
-  // Colores de tarjetas
+  // Card colors
   static const Color cardLight = Color(0xFFC8E6C9);
   static const Color cardDark = Color(0xFF142B1E);
 
-  // Colores de texto
+  // Text colors
   static const Color textPrimaryLight = Color(0xFF0D2E1C);
   static const Color textPrimaryDark = Color(0xFFE8F5E9);
 
   static const Color textSecondaryLight = Color(0xFF577D6A);
   static const Color textSecondaryDark = Color(0xFF819CA9);
 
-  // Iconos inactivos
+  // Inactive icons
   static const Color inactiveIconLight = Color(0xFF577D6A);
   static const Color inactiveIconDark = Color(0xFF455A64);
 
-  // Overlay y selección
+  // Overlay and selection
   static const Color overlayLight = Color(0xFFE8F5E9);
   static const Color overlayDark = Color(0xFF1E3B28);
 
-  // Resplandor/Glow
+  // Glow
   static const Color glowDark = Color(0xFF004D40);
 
-  // Colores de divisores y bordes
+  // Divider and border colors
   static const Color dividerLight = Color(0xFFA5D6A7);
   static const Color dividerDark = Color(0xFF455A64);
 
-  // Colores de estado
+  // Status colors
   static const Color success = Color(0xFF43A047);
   static const Color warning = Color(0xFFFF9800);
   static const Color error = Color(0xFFF44336);
   static const Color info = Color(0xFF2196F3);
 
-  // Color seed de Material 3 (púrpura baseline)
+  // Material 3 seed color (baseline purple)
   static const Color material3SeedColor = Color(0xFF6750A4);
 
   // ============================================================
-  // Colores Alto Contraste - Tema Claro
+  // High Contrast Colors - Light Theme
   // ============================================================
-  // Diseñado para máxima legibilidad con ratio de contraste WCAG AAA (7:1+)
+  // Designed for maximum readability with WCAG AAA contrast ratio (7:1+)
 
-  /// Primario: Azul oscuro puro - máximo contraste sobre blanco
+  /// Primary: Pure dark blue - maximum contrast on white
   static const Color highContrastPrimaryLight = Color(0xFF0000CC);
 
-  /// Primario variante: Azul más oscuro para estados hover/pressed
+  /// Primary variant: Darker blue for hover/pressed states
   static const Color highContrastPrimaryVariantLight = Color(0xFF000099);
 
-  /// Acento: Naranja oscuro vibrante - visible y distinguible
+  /// Accent: Vibrant dark orange - visible and distinguishable
   static const Color highContrastAccentLight = Color(0xFFCC5500);
 
-  /// Secundario: Verde oscuro para elementos secundarios
+  /// Secondary: Dark green for secondary elements
   static const Color highContrastSecondaryLight = Color(0xFF006600);
 
-  /// Fondo: Blanco puro
+  /// Background: Pure white
   static const Color highContrastBackgroundLight = Color(0xFFFFFFFF);
 
-  /// Superficie: Blanco puro para tarjetas
+  /// Surface: Pure white for cards
   static const Color highContrastSurfaceLight = Color(0xFFFFFFFF);
 
-  /// Tarjetas: Blanco con borde negro
+  /// Cards: White with black border
   static const Color highContrastCardLight = Color(0xFFFFFFFF);
 
-  /// Texto primario: Negro puro
+  /// Primary text: Pure black
   static const Color highContrastTextPrimaryLight = Color(0xFF000000);
 
-  /// Texto secundario: Gris muy oscuro (aún con buen contraste)
+  /// Secondary text: Very dark gray (still with good contrast)
   static const Color highContrastTextSecondaryLight = Color(0xFF333333);
 
-  /// Divisor: Negro para máxima visibilidad
+  /// Divider: Black for maximum visibility
   static const Color highContrastDividerLight = Color(0xFF000000);
 
   // ============================================================
-  // Colores Alto Contraste - Tema Oscuro
+  // High Contrast Colors - Dark Theme
   // ============================================================
-  // Diseñado para máxima legibilidad en fondo oscuro
+  // Designed for maximum readability on dark background
 
-  /// Primario: Amarillo brillante - máximo contraste sobre negro
+  /// Primary: Bright yellow - maximum contrast on black
   static const Color highContrastPrimaryDark = Color(0xFFFFFF00);
 
-  /// Primario variante: Amarillo dorado para estados
+  /// Primary variant: Golden yellow for states
   static const Color highContrastPrimaryVariantDark = Color(0xFFFFD700);
 
-  /// Acento: Cian brillante - muy visible en oscuro
+  /// Accent: Bright cyan - very visible on dark
   static const Color highContrastAccentDark = Color(0xFF00FFFF);
 
-  /// Secundario: Verde lima brillante
+  /// Secondary: Bright lime green
   static const Color highContrastSecondaryDark = Color(0xFF00FF00);
 
-  /// Fondo: Negro puro
+  /// Background: Pure black
   static const Color highContrastBackgroundDark = Color(0xFF000000);
 
-  /// Superficie: Negro puro
+  /// Surface: Pure black
   static const Color highContrastSurfaceDark = Color(0xFF000000);
 
-  /// Tarjetas: Negro con borde blanco
+  /// Cards: Black with white border
   static const Color highContrastCardDark = Color(0xFF000000);
 
-  /// Texto primario: Blanco puro
+  /// Primary text: Pure white
   static const Color highContrastTextPrimaryDark = Color(0xFFFFFFFF);
 
-  /// Texto secundario: Gris muy claro
+  /// Secondary text: Very light gray
   static const Color highContrastTextSecondaryDark = Color(0xFFCCCCCC);
 
-  /// Divisor: Blanco para máxima visibilidad
+  /// Divider: White for maximum visibility
   static const Color highContrastDividerDark = Color(0xFFFFFFFF);
 
-  /// Obtiene el tema claro según la paleta seleccionada
+  /// Gets the light theme according to the selected palette
   static ThemeData getLightTheme(ColorPalette palette) {
     switch (palette) {
       case ColorPalette.seaGreen:
@@ -197,7 +197,7 @@ class AppTheme {
     }
   }
 
-  /// Obtiene el tema oscuro según la paleta seleccionada
+  /// Gets the dark theme according to the selected palette
   static ThemeData getDarkTheme(ColorPalette palette) {
     switch (palette) {
       case ColorPalette.seaGreen:
@@ -209,17 +209,17 @@ class AppTheme {
     }
   }
 
-  // Tema claro por defecto (Sea Green)
+  // Default light theme (Sea Green)
   static ThemeData get lightTheme {
     return getLightTheme(ColorPalette.seaGreen);
   }
 
-  // Tema oscuro por defecto (Dark Forest)
+  // Default dark theme (Dark Forest)
   static ThemeData get darkTheme {
     return getDarkTheme(ColorPalette.seaGreen);
   }
 
-  /// Construye el tema claro con la paleta Material 3
+  /// Builds the light theme with the Material 3 palette
   static ThemeData _buildMaterial3LightTheme() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: material3SeedColor,
@@ -318,7 +318,7 @@ class AppTheme {
     );
   }
 
-  /// Construye el tema oscuro con la paleta Material 3
+  /// Builds the dark theme with the Material 3 palette
   static ThemeData _buildMaterial3DarkTheme() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: material3SeedColor,
@@ -417,7 +417,7 @@ class AppTheme {
     );
   }
 
-  /// Construye el tema claro con la paleta Sea Green
+  /// Builds the light theme with the Sea Green palette
   static ThemeData _buildSeaGreenLightTheme() {
     return ThemeData(
       useMaterial3: true,
@@ -638,7 +638,7 @@ class AppTheme {
     );
   }
 
-  /// Construye el tema oscuro con la paleta Sea Green (Dark Forest)
+  /// Builds the dark theme with the Sea Green palette (Dark Forest)
   static ThemeData _buildSeaGreenDarkTheme() {
     return ThemeData(
       useMaterial3: true,
@@ -859,20 +859,20 @@ class AppTheme {
     );
   }
 
-  /// Construye el tema claro de Alto Contraste
-  /// Diseñado para personas mayores con problemas de visión
-  /// Cumple con WCAG AAA (ratio de contraste 7:1 o superior)
+  /// Builds the High Contrast light theme
+  /// Designed for elderly people with vision problems
+  /// Meets WCAG AAA (contrast ratio 7:1 or higher)
   static ThemeData _buildHighContrastLightTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
 
-      // Color scheme - máximo contraste
+      // Color scheme - maximum contrast
       colorScheme: const ColorScheme.light(
         primary: highContrastPrimaryLight,
         secondary: highContrastSecondaryLight,
         surface: highContrastSurfaceLight,
-        error: Color(0xFFCC0000), // Rojo oscuro para mejor contraste
+        error: Color(0xFFCC0000), // Dark red for better contrast
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: highContrastTextPrimaryLight,
@@ -882,24 +882,24 @@ class AppTheme {
       // Scaffolds
       scaffoldBackgroundColor: highContrastBackgroundLight,
 
-      // AppBar - Alto contraste con fondo oscuro
+      // AppBar - High contrast with dark background
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF000000), // Negro para máximo contraste
+        backgroundColor: Color(0xFF000000), // Black for maximum contrast
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 22, // Ligeramente más grande
+          fontSize: 22, // Slightly larger
           fontWeight: FontWeight.bold,
         ),
         iconTheme: IconThemeData(
           color: Colors.white,
-          size: 28, // Iconos más grandes
+          size: 28, // Larger icons
         ),
       ),
 
-      // Cards - Con borde negro visible
+      // Cards - With visible black border
       cardTheme: CardThemeData(
         color: highContrastCardLight,
         elevation: 0,
@@ -907,7 +907,7 @@ class AppTheme {
           borderRadius: BorderRadius.circular(8),
           side: const BorderSide(
             color: highContrastDividerLight,
-            width: 2, // Borde más grueso
+            width: 2, // Thicker border
           ),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -937,7 +937,7 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
       ),
 
-      // Text theme - Tamaños más grandes y mayor peso
+      // Text theme - Larger sizes and greater weight
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontSize: 36,
@@ -986,7 +986,7 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration - Bordes más gruesos y visibles
+      // Input Decoration - Thicker and more visible borders
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: highContrastSurfaceLight,
@@ -1018,7 +1018,7 @@ class AppTheme {
         ),
       ),
 
-      // Elevated Button - Más grande y visible
+      // Elevated Button - Larger and more visible
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: highContrastPrimaryLight,
@@ -1043,12 +1043,12 @@ class AppTheme {
           textStyle: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            decoration: TextDecoration.underline, // Subrayado para mejor visibilidad
+            decoration: TextDecoration.underline, // Underlined for better visibility
           ),
         ),
       ),
 
-      // Outlined Button - Borde más grueso
+      // Outlined Button - Thicker border
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: highContrastPrimaryLight,
@@ -1064,7 +1064,7 @@ class AppTheme {
         ),
       ),
 
-      // Chip - Mayor contraste
+      // Chip - Greater contrast
       chipTheme: ChipThemeData(
         backgroundColor: highContrastSurfaceLight,
         deleteIconColor: highContrastTextPrimaryLight,
@@ -1080,7 +1080,7 @@ class AppTheme {
         ),
       ),
 
-      // Dialog - Con bordes visibles
+      // Dialog - With visible borders
       dialogTheme: DialogThemeData(
         backgroundColor: highContrastSurfaceLight,
         elevation: 8,
@@ -1104,14 +1104,14 @@ class AppTheme {
         ),
       ),
 
-      // Divider - Más grueso y visible
+      // Divider - Thicker and more visible
       dividerTheme: const DividerThemeData(
         color: highContrastDividerLight,
         thickness: 2,
         space: 2,
       ),
 
-      // Switch - Mayor tamaño visual
+      // Switch - Larger visual size
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -1128,13 +1128,13 @@ class AppTheme {
         trackOutlineColor: WidgetStateProperty.all(highContrastDividerLight),
       ),
 
-      // Icon theme - Iconos más grandes
+      // Icon theme - Larger icons
       iconTheme: const IconThemeData(
         color: highContrastTextPrimaryLight,
         size: 28,
       ),
 
-      // ListTile - Mayor espaciado
+      // ListTile - Greater spacing
       listTileTheme: const ListTileThemeData(
         contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         minVerticalPadding: 12,
@@ -1151,20 +1151,20 @@ class AppTheme {
     );
   }
 
-  /// Construye el tema oscuro de Alto Contraste
-  /// Diseñado para personas mayores con problemas de visión
-  /// Utiliza amarillo sobre negro para máximo contraste
+  /// Builds the High Contrast dark theme
+  /// Designed for elderly people with vision problems
+  /// Uses yellow on black for maximum contrast
   static ThemeData _buildHighContrastDarkTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
 
-      // Color scheme - máximo contraste en oscuro
+      // Color scheme - maximum contrast in dark
       colorScheme: const ColorScheme.dark(
         primary: highContrastPrimaryDark,
         secondary: highContrastSecondaryDark,
         surface: highContrastSurfaceDark,
-        error: Color(0xFFFF6666), // Rojo claro para modo oscuro
+        error: Color(0xFFFF6666), // Light red for dark mode
         onPrimary: Colors.black,
         onSecondary: Colors.black,
         onSurface: highContrastTextPrimaryDark,
@@ -1191,7 +1191,7 @@ class AppTheme {
         ),
       ),
 
-      // Cards - Con borde blanco visible
+      // Cards - With visible white border
       cardTheme: CardThemeData(
         color: highContrastCardDark,
         elevation: 0,
@@ -1229,7 +1229,7 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
       ),
 
-      // Text theme - Tamaños más grandes
+      // Text theme - Larger sizes
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontSize: 36,
@@ -1278,7 +1278,7 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration - Bordes blancos visibles
+      // Input Decoration - Visible white borders
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: highContrastCardDark,

@@ -9,7 +9,7 @@ import 'edit_duration/widgets/duration_type_info_card.dart';
 import 'edit_duration/widgets/treatment_dates_card.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar la duración del tratamiento
+/// Screen to edit treatment duration
 class EditDurationScreen extends StatefulWidget {
   final Medication medication;
 

@@ -59,7 +59,7 @@ class MedicationSummaryCard extends StatelessWidget {
             _SummaryRow(
               icon: medicationType.icon,
               label: l10n.summaryType,
-              value: medicationType.displayName,
+              value: medicationType.getDisplayName(l10n),
             ),
             if (doseSchedule.isNotEmpty) ...[
               _SummaryRow(

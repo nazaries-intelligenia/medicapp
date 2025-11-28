@@ -67,7 +67,7 @@ void main() {
     expect(find.byType(PopupMenuButton<String>), findsOneWidget);
 
     // Skip checking debug message as it's hardcoded and not localized
-    // expect(find.text('Menú de depuración activado'), findsOneWidget);
+    // expect(find.text('Debug menu activated'), findsOneWidget);
   });
 
   testWidgets('Debug menu should hide after tapping title 5 more times', (WidgetTester tester) async {
@@ -92,7 +92,7 @@ void main() {
     expect(find.byType(PopupMenuButton<String>), findsNothing);
 
     // Skip checking debug message as it's hardcoded and not localized
-    // expect(find.text('Menú de depuración desactivado'), findsOneWidget);
+    // expect(find.text('Debug menu deactivated'), findsOneWidget);
   });
 
   testWidgets('Debug menu should be accessible when visible', (WidgetTester tester) async {

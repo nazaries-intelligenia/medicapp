@@ -6,6 +6,7 @@ import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/snackbar_service.dart';
 import '../services/notifications/notification_config.dart';
+import '../services/locale_provider.dart';
 import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
@@ -311,6 +312,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  /// Show language selection dialog
+  void _showLanguageDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    final currentLocale = localeProvider.locale;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.settingsLanguageTitle),
+        content: SingleChildScrollView(
+          child: RadioGroup<String?>(
+            groupValue: currentLocale?.languageCode,
+            onChanged: (String? value) {
+              if (value == null) {
+                localeProvider.setLocale(null);
+              } else {
+                localeProvider.setLocale(Locale(value));
+              }
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // System default option
+                RadioListTile<String?>(
+                  title: Text(l10n.settingsLanguageSystem),
+                  value: null,
+                ),
+                const Divider(),
+                // Language options
+                ...LocaleProvider.supportedLanguages.entries.map((entry) {
+                  return RadioListTile<String?>(
+                    title: Text(entry.value),
+                    value: entry.key,
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.btnCancel),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -365,11 +417,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               return SettingOptionCard(
                 icon: Icons.palette,
                 iconColor: theme.colorScheme.primary,
-                title: 'Paleta de colores',
+                title: l10n.settingsColorPaletteTitle,
                 subtitle: themeProvider.colorPalette.displayName,
                 isLoading: false,
                 enabled: true,
                 onTap: _showColorPaletteDialog,
+              );
+            },
+          ),
+
+          // Language Card
+          Consumer<LocaleProvider>(
+            builder: (context, localeProvider, _) {
+              final currentLanguage = localeProvider.locale?.languageCode;
+              final languageName = currentLanguage != null
+                  ? LocaleProvider.supportedLanguages[currentLanguage] ?? currentLanguage
+                  : l10n.settingsLanguageSystem;
+              return SettingOptionCard(
+                icon: Icons.language,
+                iconColor: theme.colorScheme.secondary,
+                title: l10n.settingsLanguageTitle,
+                subtitle: languageName,
+                isLoading: false,
+                enabled: true,
+                onTap: _showLanguageDialog,
               );
             },
           ),

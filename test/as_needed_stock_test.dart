@@ -10,7 +10,7 @@ void main() {
     test('isStockLow should return false when lastDailyConsumption is null', () {
       final medication = MedicationBuilder()
           .withId('test_1')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(smallStock)
           .build();
@@ -21,7 +21,7 @@ void main() {
     test('isStockLow should return false when lastDailyConsumption is zero', () {
       final medication = MedicationBuilder()
           .withId('test_2')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(smallStock)
           .withLastDailyConsumption(noStock)
@@ -38,7 +38,7 @@ void main() {
       // Should be LOW since 2.5 < 3
       final medication = MedicationBuilder()
           .withId('test_3')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(smallStock)
           .withLastDailyConsumption(4.0)
@@ -55,7 +55,7 @@ void main() {
       // Should NOT be low since 6.67 >= 3
       final medication = MedicationBuilder()
           .withId('test_4')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .withLastDailyConsumption(3.0)
@@ -73,7 +73,7 @@ void main() {
       // Should NOT be low since 3.0 >= 3
       final medicationAtThreshold = MedicationBuilder()
           .withId('test_5')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(9.0)
           .withLastDailyConsumption(3.0)
@@ -89,7 +89,7 @@ void main() {
       // Should be LOW since 2.97 < 3
       final medicationBelowThreshold = MedicationBuilder()
           .withId('test_6')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(8.9)
           .withLastDailyConsumption(3.0)
@@ -106,7 +106,7 @@ void main() {
       // Should be LOW since 20 < 30
       final medication = MedicationBuilder()
           .withId('test_7')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(40.0)
           .withLowStockThreshold(30)
@@ -124,7 +124,7 @@ void main() {
       // Should NOT be low since 3.67 >= 3
       final medication = MedicationBuilder()
           .withId('test_8')
-          .withName('Jarabe')
+          .withName('Syrup')
           .withType(MedicationType.syrup)
           .withAsNeeded()
           .withStock(5.5)
@@ -137,7 +137,7 @@ void main() {
     test('isStockLow should return false when stock is zero (empty, not low)', () {
       final medication = MedicationBuilder()
           .withId('test_9')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(noStock)
           .withLastDailyConsumption(doubleDose)
@@ -157,7 +157,7 @@ void main() {
       // Should be LOW since 2.67 < 3
       final medication = MedicationBuilder()
           .withId('test_10')
-          .withName('Atorvastatina')
+          .withName('Atorvastatin')
           .withDosageInterval(8)
           .withDurationType(TreatmentDurationType.everyday)
           .withDoseSchedule({'08:00': 1.0, '16:00': 1.0, '00:00': 1.0})
@@ -172,7 +172,7 @@ void main() {
     test('should serialize and deserialize lastDailyConsumption', () {
       final medication = MedicationBuilder()
           .withId('test_11')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .withLastDailyConsumption(3.5)
@@ -187,7 +187,7 @@ void main() {
     test('should handle null lastDailyConsumption in serialization', () {
       final medication = MedicationBuilder()
           .withId('test_12')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -201,7 +201,7 @@ void main() {
     test('fromJson should handle missing lastDailyConsumption field (legacy data)', () {
       final json = {
         'id': 'test_13',
-        'name': 'Ibuprofeno',
+        'name': 'Ibuprofen',
         'type': 'pastilla',
         'dosageIntervalHours': 0,
         'durationType': 'asNeeded',
@@ -223,7 +223,7 @@ void main() {
     test('should handle as-needed medication with all fields', () {
       final medication = MedicationBuilder()
           .withId('test_14')
-          .withName('Ibuprofeno 400mg')
+          .withName('Ibuprofen 400mg')
           .withAsNeeded()
           .withStock(24.0)
           .withLowStockThreshold(5)
@@ -245,7 +245,7 @@ void main() {
       final medications = [
         MedicationBuilder()
             .withId('test_15_a')
-            .withName('Ibuprofeno')
+            .withName('Ibuprofen')
             .withType(MedicationType.pill)
             .withAsNeeded()
             .withStock(10.0)
@@ -253,7 +253,7 @@ void main() {
             .build(),
         MedicationBuilder()
             .withId('test_15_b')
-            .withName('Jarabe para la tos')
+            .withName('Cough Syrup')
             .withType(MedicationType.syrup)
             .withAsNeeded()
             .withStock(100.0)
@@ -261,7 +261,7 @@ void main() {
             .build(),
         MedicationBuilder()
             .withId('test_15_c')
-            .withName('Spray nasal')
+            .withName('Nasal Spray')
             .withType(MedicationType.spray)
             .withAsNeeded()
             .withStock(20.0)
@@ -270,7 +270,7 @@ void main() {
       ];
 
       expect(medications[0].isStockLow, isTrue);  // Pills
-      expect(medications[1].isStockLow, isFalse); // Jarabe
+      expect(medications[1].isStockLow, isFalse); // Syrup
       expect(medications[2].isStockLow, isTrue);  // Spray
     });
   });

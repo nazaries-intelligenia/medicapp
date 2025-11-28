@@ -31,6 +31,8 @@ class MedicationHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Simple mode: minimal card for edit/view screens
     if (doseTime == null) {
       return Card(
@@ -61,7 +63,7 @@ class MedicationHeaderCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                medication.type.displayName,
+                medication.type.getDisplayName(l10n),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
@@ -73,8 +75,6 @@ class MedicationHeaderCard extends StatelessWidget {
     }
 
     // Detailed mode: complete card for dose action screens
-    final l10n = AppLocalizations.of(context)!;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -100,7 +100,7 @@ class MedicationHeaderCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        medication.type.displayName,
+                        medication.type.getDisplayName(l10n),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: medication.type.getColor(context),
                         ),
@@ -153,7 +153,7 @@ class MedicationHeaderCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${medication.getDoseQuantity(doseTime!)} ${medication.type.stockUnitSingular}',
+                        '${medication.getDoseQuantity(doseTime!)} ${medication.type.getStockUnitSingular(l10n)}',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,

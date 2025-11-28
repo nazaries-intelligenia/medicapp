@@ -15,8 +15,8 @@ class DoseEntry {
   DoseEntry({this.time, this.quantity = 1.0});
 }
 
-/// Widget reutilizable para editar el horario y cantidades de las dosis
-/// Usado tanto en creación como en edición de medicamentos
+/// Reusable widget to edit the schedule and quantities of doses
+/// Used in both medication creation and editing
 class DoseScheduleEditor extends StatefulWidget {
   final int initialDoseCount;
   final Map<String, double>? initialSchedule;
@@ -498,6 +498,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         // Header with info
@@ -581,9 +582,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.doseNumber(doseNumber),
+                            l10n.doseNumber(doseNumber),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const Spacer(),
@@ -591,9 +590,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => _removeDose(index),
-                              tooltip: AppLocalizations.of(
-                                context,
-                              )!.removeDoseButton,
+                              tooltip: l10n.removeDoseButton,
                             ),
                           if (isDuplicated) ...[
                             const SizedBox(width: 8),
@@ -617,7 +614,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                         label: Text(
                           time != null
                               ? _formatTime(time)
-                              : AppLocalizations.of(context)!.selectTimeButton,
+                              : l10n.selectTimeButton,
                           style: TextStyle(
                             color: isDuplicated
                                 ? Colors.orange
@@ -648,7 +645,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                             child: Row(
                               children: [
                                 Text(
-                                  AppLocalizations.of(context)!.amountPerDose,
+                                  l10n.amountPerDose,
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -659,7 +656,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '(${widget.medicationType.stockUnitSingular})',
+                                  '(${widget.medicationType.getStockUnitSingular(l10n)})',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
@@ -674,9 +671,7 @@ class DoseScheduleEditorState extends State<DoseScheduleEditor> {
                           TextField(
                             controller: _quantityControllers[index],
                             decoration: InputDecoration(
-                              hintText: AppLocalizations.of(
-                                context,
-                              )!.amountHint,
+                              hintText: l10n.amountHint,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

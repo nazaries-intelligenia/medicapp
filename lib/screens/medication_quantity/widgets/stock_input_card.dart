@@ -70,7 +70,7 @@ class StockInputCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    '(${medicationType.stockUnit})',
+                    '(${medicationType.getStockUnit(l10n)})',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -86,7 +86,7 @@ class StockInputCard extends StatelessWidget {
               controller: stockController,
               decoration: InputDecoration(
                 hintText: l10n.availableQuantityHint,
-                helperText: l10n.availableQuantityHelp(medicationType.stockUnit),
+                helperText: l10n.availableQuantityHelp(medicationType.getStockUnit(l10n)),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

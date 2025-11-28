@@ -1,30 +1,30 @@
 import 'package:flutter/foundation.dart';
 
-/// Análisis de adherencia para una medicación
+/// Adherence analysis for a medication
 @immutable
 class AdherenceAnalysis {
   final String medicationId;
   final String medicationName;
 
-  // Métricas generales
+  // General metrics
   final int totalScheduledDoses;
   final int takenDoses;
   final int skippedDoses;
   final double adherenceRate;
 
-  // Análisis temporal
-  final Map<int, double> adherenceByDayOfWeek; // 1-7 (Lun-Dom)
+  // Temporal analysis
+  final Map<int, double> adherenceByDayOfWeek; // 1-7 (Mon-Sun)
   final Map<String, double> adherenceByTimeOfDay; // "08:00" -> 0.85
 
-  // Patrones identificados
-  final List<String> bestTimes; // Horarios con mejor adherencia
-  final List<String> worstTimes; // Horarios con peor adherencia
-  final List<int> problematicDays; // Días de la semana problemáticos
+  // Identified patterns
+  final List<String> bestTimes; // Times with better adherence
+  final List<String> worstTimes; // Times with worse adherence
+  final List<int> problematicDays; // Problematic days of the week
 
-  // Recomendaciones
+  // Recommendations
   final List<String> recommendations;
 
-  // Tendencia
+  // Trend
   final AdherenceTrend trend;
 
   const AdherenceAnalysis({
@@ -43,7 +43,7 @@ class AdherenceAnalysis {
     required this.trend,
   });
 
-  /// Clasifica la adherencia en categorías
+  /// Classifies adherence into categories
   AdherenceLevel get level {
     if (adherenceRate >= 0.90) return AdherenceLevel.excellent;
     if (adherenceRate >= 0.75) return AdherenceLevel.good;
@@ -51,14 +51,14 @@ class AdherenceAnalysis {
     return AdherenceLevel.poor;
   }
 
-  /// Verifica si la adherencia está mejorando
+  /// Checks if adherence is improving
   bool get isImproving => trend == AdherenceTrend.improving;
 
-  /// Verifica si requiere atención urgente
+  /// Checks if urgent attention is required
   bool get needsAttention => adherenceRate < 0.50;
 }
 
-/// Nivel de adherencia
+/// Adherence level
 enum AdherenceLevel {
   excellent, // >= 90%
   good,      // >= 75%
@@ -66,15 +66,15 @@ enum AdherenceLevel {
   poor,      // < 50%
 }
 
-/// Tendencia de adherencia
+/// Adherence trend
 enum AdherenceTrend {
-  improving,   // Mejorando con el tiempo
-  stable,      // Manteniendo el nivel
-  declining,   // Empeorando
-  insufficient, // No hay suficientes datos
+  improving,   // Improving over time
+  stable,      // Maintaining the level
+  declining,   // Getting worse
+  insufficient, // Not enough data
 }
 
-/// Sugerencia de horario óptimo
+/// Optimal time slot suggestion
 @immutable
 class TimeSlotSuggestion {
   final String currentTime;
@@ -90,7 +90,7 @@ class TimeSlotSuggestion {
   });
 }
 
-/// Predicción de omisión de dosis
+/// Dose skip prediction
 @immutable
 class SkipPrediction {
   final String medicationId;
@@ -107,7 +107,7 @@ class SkipPrediction {
     required this.riskFactors,
   });
 
-  /// Nivel de riesgo de omisión
+  /// Risk level of skipping
   RiskLevel get riskLevel {
     if (skipProbability >= 0.70) return RiskLevel.high;
     if (skipProbability >= 0.40) return RiskLevel.medium;
@@ -115,7 +115,7 @@ class SkipPrediction {
   }
 }
 
-/// Nivel de riesgo
+/// Risk level
 enum RiskLevel {
   low,
   medium,

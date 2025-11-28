@@ -186,7 +186,7 @@ void main() {
     test('should persist expiration date to database', () async {
       final medication = MedicationBuilder()
           .withId('med-exp-db-1')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withSingleDose('08:00', 1.0)
           .withStock(20.0)
           .withExpirationDate('06/2025')
@@ -208,7 +208,7 @@ void main() {
     test('should update expiration date in database', () async {
       final medication = MedicationBuilder()
           .withId('med-exp-db-2')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withSingleDose('12:00', 1.0)
           .withStock(15.0)
           .withExpirationDate('03/2025')
@@ -236,7 +236,7 @@ void main() {
     test('should handle null expiration date in database', () async {
       final medication = MedicationBuilder()
           .withId('med-exp-db-3')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withStock(30.0)
           .build(); // No expiration date
@@ -256,7 +256,7 @@ void main() {
     test('should handle empty expiration date string in database', () async {
       final medication = MedicationBuilder()
           .withId('med-exp-db-4')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withSingleDose('20:00', 1.0)
           .withStock(25.0)
           .withExpirationDate('')
@@ -279,7 +279,7 @@ void main() {
     test('should serialize expiration date to JSON', () {
       final medication = MedicationBuilder()
           .withId('med-exp-json-1')
-          .withName('Losartán')
+          .withName('Losartan')
           .withExpirationDate('12/2025')
           .build();
 
@@ -324,7 +324,7 @@ void main() {
     test('should preserve expiration date when not modified', () {
       final medication = MedicationBuilder()
           .withId('med-exp-copy-1')
-          .withName('Atorvastatina')
+          .withName('Atorvastatin')
           .withExpirationDate('05/2025')
           .withStock(20.0)
           .build();
@@ -338,7 +338,7 @@ void main() {
     test('should update expiration date when explicitly provided', () {
       final medication = MedicationBuilder()
           .withId('med-exp-copy-2')
-          .withName('Simvastatina')
+          .withName('Simvastatin')
           .withExpirationDate('03/2025')
           .build();
 

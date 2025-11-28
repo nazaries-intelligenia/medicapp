@@ -76,7 +76,7 @@ class MedicationStockCard extends StatelessWidget {
                             ),
                       ),
                       Text(
-                        medication.type.displayName,
+                        medication.type.getDisplayName(l10n),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: medication.type.getColor(context),
                             ),

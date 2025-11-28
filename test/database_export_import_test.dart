@@ -11,19 +11,19 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 
-/// Mock de PathProviderPlatform para tests
+/// Mock of PathProviderPlatform for tests
 class MockPathProviderPlatform extends Fake
     with MockPlatformInterfaceMixin
     implements PathProviderPlatform {
   @override
   Future<String?> getTemporaryPath() async {
-    // Usar directorio temporal del sistema
+    // Use system temporary directory
     return Directory.systemTemp.path;
   }
 
   @override
   Future<String?> getApplicationDocumentsPath() async {
-    // Crear un directorio temporal para documentos
+    // Create a temporary directory for documents
     final tempDir = Directory.systemTemp.createTempSync('medicapp_test_docs_');
     return tempDir.path;
   }
@@ -33,13 +33,13 @@ void main() {
   DatabaseTestHelper.setupAll();
 
   setUpAll(() {
-    // Configurar mock de path provider
+    // Configure path provider mock
     PathProviderPlatform.instance = MockPathProviderPlatform();
   });
 
   group('Database Export/Import - In-Memory Restrictions', () {
     setUp(() async {
-      // Usar base de datos en memoria para estos tests
+      // Use in-memory database for these tests
       DatabaseHelper.setInMemoryDatabase(true);
       await DatabaseHelper.resetDatabase();
     });
@@ -67,35 +67,35 @@ void main() {
     late Directory testDbDir;
 
     setUp(() async {
-      // Crear directorio temporal para base de datos de prueba
+      // Create temporary directory for test database
       testDbDir = await Directory.systemTemp.createTemp('medicapp_test_db_');
 
-      // Desactivar modo en memoria
+      // Disable in-memory mode
       DatabaseHelper.setInMemoryDatabase(false);
       await DatabaseHelper.resetDatabase();
 
-      // Limpiar todas las medicaciones antes de cada test
+      // Clean all medications before each test
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
 
-      // Configurar la ruta de la base de datos para tests
+      // Configure database path for tests
       databaseFactory = databaseFactoryFfi;
     });
 
     tearDown(() async {
-      // Limpiar datos antes de resetear
+      // Clean data before resetting
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
       await DatabaseHelper.resetDatabase();
 
-      // Limpiar directorio temporal
+      // Clean temporary directory
       if (await testDbDir.exists()) {
         await testDbDir.delete(recursive: true);
       }
     });
 
     test('should export database to a file', () async {
-      // Insertar algunos datos de prueba
+      // Insert some test data
       final medication = MedicationBuilder()
           .withId('export_test_1')
           .withName('Test Medicine')
@@ -106,32 +106,32 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(medication);
 
-      // Exportar la base de datos
+      // Export the database
       final exportPath = await DatabaseHelper.instance.exportDatabase();
 
-      // Verificar que el archivo fue creado
+      // Verify that the file was created
       final exportFile = File(exportPath);
       expect(await exportFile.exists(), isTrue);
       expect(await exportFile.length(), greaterThan(0));
 
-      // Limpiar archivo exportado
+      // Clean exported file
       if (await exportFile.exists()) {
         await exportFile.delete();
       }
     });
 
     test('should throw exception when database file does not exist', () async {
-      // Resetear la base de datos sin crear el archivo
+      // Reset the database without creating the file
       await DatabaseHelper.resetDatabase();
 
-      // Eliminar el archivo de base de datos si existe
+      // Delete the database file if it exists
       final dbPath = await DatabaseHelper.instance.getDatabasePath();
       final dbFile = File(dbPath);
       if (await dbFile.exists()) {
         await dbFile.delete();
       }
 
-      // Intentar exportar debería fallar
+      // Attempting to export should fail
       expect(
         () => DatabaseHelper.instance.exportDatabase(),
         throwsException,
@@ -139,7 +139,7 @@ void main() {
     });
 
     test('should create export file with timestamp in name', () async {
-      // Insertar datos de prueba
+      // Insert test data
       final medication = MedicationBuilder()
           .withId('export_test_2')
           .withName('Test Medicine 2')
@@ -147,14 +147,14 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(medication);
 
-      // Exportar
+      // Export
       final exportPath = await DatabaseHelper.instance.exportDatabase();
 
-      // Verificar que el nombre contiene el patrón esperado
+      // Verify that the name contains the expected pattern
       expect(exportPath, contains('medicapp_backup_'));
       expect(exportPath, endsWith('.db'));
 
-      // Limpiar
+      // Clean up
       final exportFile = File(exportPath);
       if (await exportFile.exists()) {
         await exportFile.delete();
@@ -168,18 +168,18 @@ void main() {
     Person? testPerson;
 
     setUp(() async {
-      // Crear directorio temporal para base de datos de prueba
+      // Create temporary directory for test database
       testDbDir = await Directory.systemTemp.createTemp('medicapp_test_db_');
 
-      // Desactivar modo en memoria
+      // Disable in-memory mode
       DatabaseHelper.setInMemoryDatabase(false);
       await DatabaseHelper.resetDatabase();
 
-      // Limpiar todas las medicaciones antes de cada test
+      // Clean all medications before each test
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
 
-      // Crear persona de prueba
+      // Create test person
       testPerson = Person(
         id: testPersonId,
         name: 'Test Person Export/Import',
@@ -191,24 +191,24 @@ void main() {
     });
 
     tearDown(() async {
-      // Limpiar persona de prueba
+      // Clean up persona de prueba
       if (testPerson != null) {
         await DatabaseHelper.instance.deletePerson(testPersonId);
       }
 
-      // Limpiar datos antes de resetear
+      // Clean data before resetting
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
       await DatabaseHelper.resetDatabase();
 
-      // Limpiar directorio temporal
+      // Clean temporary directory
       if (await testDbDir.exists()) {
         await testDbDir.delete(recursive: true);
       }
     });
 
     test('should import database and preserve all data', () async {
-      // Crear medicaciones de prueba
+      // Create test medications
       final med1 = MedicationBuilder()
           .withId('import_test_1')
           .withName('Medicine 1')
@@ -227,7 +227,7 @@ void main() {
           .withFasting(type: 'after', duration: 120)
           .build();
 
-      // Insertar medicaciones y asignarlas a persona (v19+)
+      // Insert medications and assign to person (v19+)
       await DatabaseHelper.instance.insertMedication(med1);
       await DatabaseHelper.instance.assignMedicationToPerson(
         personId: testPersonId,
@@ -242,29 +242,29 @@ void main() {
         scheduleData: med2,
       );
 
-      // Exportar base de datos
+      // Export database
       final exportPath = await DatabaseHelper.instance.exportDatabase();
 
-      // Limpiar base de datos actual
+      // Clean current database
       await DatabaseHelper.instance.deleteAllMedications();
       final medsBeforeImport = await DatabaseHelper.instance.getAllMedications();
       expect(medsBeforeImport.length, 0);
 
-      // Importar base de datos
+      // Import database
       await DatabaseHelper.instance.importDatabase(exportPath);
 
-      // Verificar que todos los datos fueron importados
+      // Verify that all data was imported
       final medsAfterImport = await DatabaseHelper.instance.getAllMedications();
       expect(medsAfterImport.length, 2);
 
-      // Verificar datos básicos (disponibles en medications table)
+      // Verify basic data (available in medications table)
       final imported1Basic = medsAfterImport.firstWhere((m) => m.id == 'import_test_1');
       expect(imported1Basic.name, 'Medicine 1');
       expect(imported1Basic.type, MedicationType.pill);
       expect(imported1Basic.stockQuantity, 30.0);
       expect(imported1Basic.lastRefillAmount, 50.0);
 
-      // Verificar datos de persona (incluyendo fasting fields)
+      // Verify person data (including fasting fields)
       final medsForPerson = await DatabaseHelper.instance.getMedicationsForPerson(testPersonId);
       expect(medsForPerson.length, 2);
 
@@ -276,7 +276,7 @@ void main() {
       expect(imported2.fastingType, 'after');
       expect(imported2.fastingDurationMinutes, 120);
 
-      // Limpiar archivo exportado
+      // Clean exported file
       final exportFile = File(exportPath);
       if (await exportFile.exists()) {
         await exportFile.delete();
@@ -291,7 +291,7 @@ void main() {
     });
 
     test('should create backup before importing', () async {
-      // Crear medicación inicial
+      // Create initial medication
       final originalMed = MedicationBuilder()
           .withId('backup_test_1')
           .withName('Original Medicine')
@@ -299,28 +299,28 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(originalMed);
 
-      // Crear base de datos para importar
+      // Create database to import
       final med2 = MedicationBuilder()
           .withId('backup_test_2')
           .withName('New Medicine')
           .build();
 
-      // Exportar (esto creará un archivo temporal)
+      // Export (this will create a temporary file)
       await DatabaseHelper.instance.insertMedication(med2);
       final exportPath = await DatabaseHelper.instance.exportDatabase();
 
-      // La importación debería crear un backup
+      // The import should create a backup
       await DatabaseHelper.instance.importDatabase(exportPath);
 
-      // Verificar que el backup fue creado
+      // Verify that the backup was created
       final dbPath = await DatabaseHelper.instance.getDatabasePath();
       final backupPath = '$dbPath.backup';
       final backupFile = File(backupPath);
 
-      // El backup debería existir
+      // The backup should exist
       expect(await backupFile.exists(), isTrue);
 
-      // Limpiar
+      // Clean up
       final exportFile = File(exportPath);
       if (await exportFile.exists()) {
         await exportFile.delete();
@@ -331,7 +331,7 @@ void main() {
     });
 
     test('should restore from backup if import fails', () async {
-      // Crear medicación inicial
+      // Create initial medication
       final originalMed = MedicationBuilder()
           .withId('restore_test_1')
           .withName('Original Medicine')
@@ -339,33 +339,33 @@ void main() {
 
       await DatabaseHelper.instance.insertMedication(originalMed);
 
-      // Crear archivo corrupto para importar
+      // Create corrupt file to import
       final corruptFile = File(join(testDbDir.path, 'corrupt.db'));
       await corruptFile.writeAsString('This is not a valid database file');
 
-      // Intentar importar debería fallar
+      // Attempting to import should fail
       try {
         await DatabaseHelper.instance.importDatabase(corruptFile.path);
         fail('Should have thrown an exception');
       } catch (e) {
-        // Esperamos que falle
+        // We expect it to fail
         expect(e, isException);
       }
 
-      // La base de datos original debería estar intacta
+      // The original database should be intact
       final meds = await DatabaseHelper.instance.getAllMedications();
       expect(meds.length, 1);
       expect(meds[0].id, 'restore_test_1');
       expect(meds[0].name, 'Original Medicine');
 
-      // Limpiar
+      // Clean up
       if (await corruptFile.exists()) {
         await corruptFile.delete();
       }
     });
 
     test('should replace current database with imported one', () async {
-      // Crear medicaciones originales
+      // Create original medications
       final originalMed1 = MedicationBuilder()
           .withId('replace_test_1')
           .withName('Original 1')
@@ -379,10 +379,10 @@ void main() {
       await DatabaseHelper.instance.insertMedication(originalMed1);
       await DatabaseHelper.instance.insertMedication(originalMed2);
 
-      // Exportar
+      // Export
       final exportPath = await DatabaseHelper.instance.exportDatabase();
 
-      // Cambiar base de datos actual
+      // Change current database
       await DatabaseHelper.instance.deleteAllMedications();
       final newMed = MedicationBuilder()
           .withId('replace_test_3')
@@ -390,22 +390,22 @@ void main() {
           .build();
       await DatabaseHelper.instance.insertMedication(newMed);
 
-      // Verificar estado antes de importar
+      // Verify state before importing
       final medsBeforeImport = await DatabaseHelper.instance.getAllMedications();
       expect(medsBeforeImport.length, 1);
       expect(medsBeforeImport[0].id, 'replace_test_3');
 
-      // Importar base de datos anterior
+      // Import previous database
       await DatabaseHelper.instance.importDatabase(exportPath);
 
-      // Verificar que la base de datos fue reemplazada
+      // Verify that the database was replaced
       final medsAfterImport = await DatabaseHelper.instance.getAllMedications();
       expect(medsAfterImport.length, 2);
       expect(medsAfterImport.any((m) => m.id == 'replace_test_1'), isTrue);
       expect(medsAfterImport.any((m) => m.id == 'replace_test_2'), isTrue);
       expect(medsAfterImport.any((m) => m.id == 'replace_test_3'), isFalse);
 
-      // Limpiar
+      // Clean up
       final exportFile = File(exportPath);
       if (await exportFile.exists()) {
         await exportFile.delete();
@@ -423,11 +423,11 @@ void main() {
       DatabaseHelper.setInMemoryDatabase(false);
       await DatabaseHelper.resetDatabase();
 
-      // Limpiar todas las medicaciones antes de cada test
+      // Clean all medications before each test
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
 
-      // Crear persona de prueba
+      // Create test person
       testPerson = Person(
         id: testPersonId,
         name: 'Test Person Integration',
@@ -439,12 +439,12 @@ void main() {
     });
 
     tearDown(() async {
-      // Limpiar persona de prueba
+      // Clean up persona de prueba
       if (testPerson != null) {
         await DatabaseHelper.instance.deletePerson(testPersonId);
       }
 
-      // Limpiar datos antes de resetear
+      // Clean data before resetting
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.deleteAllDoseHistory();
       await DatabaseHelper.resetDatabase();
@@ -454,7 +454,7 @@ void main() {
     });
 
     test('should handle multiple export/import cycles', () async {
-      // Ciclo 1: Crear y exportar
+      // Cycle 1: Create and export
       final med1 = MedicationBuilder()
           .withId('cycle_test_1')
           .withName('Cycle Medicine 1')
@@ -462,7 +462,7 @@ void main() {
       await DatabaseHelper.instance.insertMedication(med1);
       final export1 = await DatabaseHelper.instance.exportDatabase();
 
-      // Ciclo 2: Añadir más datos y exportar
+      // Cycle 2: Add more data and export
       final med2 = MedicationBuilder()
           .withId('cycle_test_2')
           .withName('Cycle Medicine 2')
@@ -470,18 +470,18 @@ void main() {
       await DatabaseHelper.instance.insertMedication(med2);
       final export2 = await DatabaseHelper.instance.exportDatabase();
 
-      // Importar primera exportación
+      // Import first export
       await DatabaseHelper.instance.importDatabase(export1);
       var meds = await DatabaseHelper.instance.getAllMedications();
       expect(meds.length, 1);
       expect(meds[0].id, 'cycle_test_1');
 
-      // Importar segunda exportación
+      // Import second export
       await DatabaseHelper.instance.importDatabase(export2);
       meds = await DatabaseHelper.instance.getAllMedications();
       expect(meds.length, 2);
 
-      // Limpiar
+      // Clean up
       await File(export1).delete();
       await File(export2).delete();
     });
@@ -505,12 +505,12 @@ void main() {
         scheduleData: complexMed,
       );
 
-      // Exportar e importar
+      // Export and import
       final exportPath = await DatabaseHelper.instance.exportDatabase();
       await DatabaseHelper.instance.deleteAllMedications();
       await DatabaseHelper.instance.importDatabase(exportPath);
 
-      // Verificar datos básicos (disponibles en medications table)
+      // Verify basic data (available in medications table)
       final imported = await DatabaseHelper.instance.getMedication('complex_test_1');
       expect(imported, isNotNull);
       expect(imported!.name, 'Complex Medicine');
@@ -519,7 +519,7 @@ void main() {
       expect(imported.lastRefillAmount, 75.25);
       expect(imported.lowStockThresholdDays, 7);
 
-      // Verificar datos de persona (incluyendo schedule y fasting fields)
+      // Verify person data (including schedule and fasting fields)
       final medsForPerson = await DatabaseHelper.instance.getMedicationsForPerson(testPersonId);
       expect(medsForPerson.length, 1);
       final importedWithSchedule = medsForPerson.first;
@@ -531,7 +531,7 @@ void main() {
       expect(importedWithSchedule.fastingType, 'before');
       expect(importedWithSchedule.fastingDurationMinutes, 30);
 
-      // Limpiar
+      // Clean up
       await File(exportPath).delete();
     });
   });

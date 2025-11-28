@@ -7,7 +7,7 @@ import '../widgets/forms/dose_schedule_editor.dart';
 import 'medication_fasting_screen.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 5: Horas de las dosis (establecer el horario de cada dosis)
+/// Screen 5: Dose times (set the schedule for each dose)
 class MedicationTimesScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -65,7 +65,7 @@ class _MedicationTimesScreenState extends State<MedicationTimesScreen> {
 
     final doseSchedule = editorState.getDoseSchedule();
 
-    // Continuar a la pantalla de ayuno
+    // Continue to the fasting screen
     Navigator.push(
       context,
       MaterialPageRoute(

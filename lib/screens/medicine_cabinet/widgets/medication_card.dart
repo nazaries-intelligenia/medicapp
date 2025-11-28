@@ -83,7 +83,7 @@ class _MedicationCardState extends State<MedicationCard> {
         l10n.medicineCabinetRefillSuccess(
           widget.medication.name,
           refillAmount.toString(),
-          widget.medication.type.stockUnit,
+          widget.medication.type.getStockUnit(l10n),
           updatedMedication.stockDisplayText,
         ),
       );
@@ -155,7 +155,7 @@ class _MedicationCardState extends State<MedicationCard> {
           l10n.medicineCabinetDoseRegistered(
             widget.medication.name,
             doseQuantity.toString(),
-            widget.medication.type.stockUnit,
+            widget.medication.type.getStockUnit(l10n),
             updatedMedication.stockDisplayText,
           ),
         );
@@ -405,7 +405,7 @@ class _MedicationCardState extends State<MedicationCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.medication.type.displayName,
+                widget.medication.type.getDisplayName(l10n),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: widget.medication.type.getColor(context),
                     ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/notification_service.dart';
+import '../services/localization_service.dart';
+import '../utils/date_formatter.dart';
 import 'medication_list_screen.dart';
 import 'medication_inventory_screen.dart';
 import 'dose_history_screen.dart';
@@ -46,6 +48,9 @@ class _MainScreenState extends State<MainScreen> {
 
     // Process any pending notifications after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Update LocalizationService and DateFormatter with the actual device locale
+      LocalizationService.instance.updateFromContext(context);
+      DateFormatter.setLocale(Localizations.localeOf(context));
       NotificationService.instance.processPendingNotification();
     });
   }

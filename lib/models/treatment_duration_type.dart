@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 enum TreatmentDurationType {
-  everyday('Todos los días'),
-  untilFinished('Hasta acabar la medicación'),
-  specificDates('Fechas específicas'),
-  weeklyPattern('Días de la semana'),
-  intervalDays('Cada N días'),
-  asNeeded('Según necesidad');
+  everyday('Every day'),
+  untilFinished('Until medication runs out'),
+  specificDates('Specific dates'),
+  weeklyPattern('Weekly pattern'),
+  intervalDays('Every N days'),
+  asNeeded('As needed');
 
   final String displayName;
 

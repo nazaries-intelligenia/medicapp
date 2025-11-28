@@ -33,7 +33,7 @@ void main() {
       // Arrange
       final medication = MedicationBuilder()
           .withId('med-1')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withSingleDose('08:00', 2.0)
           .withStock(20.0)
           .build();
@@ -61,7 +61,7 @@ void main() {
       final historyEntry = DoseHistoryEntry(
         id: 'test-history-${DateTime.now().millisecondsSinceEpoch}',
         medicationId: 'med-1',
-        medicationName: 'Paracetamol',
+        medicationName: 'Acetaminophen',
         medicationType: medication.type,
         personId: personId,
         scheduledDateTime: DateTime.now(),

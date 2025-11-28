@@ -11,7 +11,7 @@ void main() {
       // Expected period: 06:00 - 08:00
       final medication = MedicationBuilder()
           .withId('med1')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withFasting(type: 'before', duration: 120)
           .build();
@@ -21,7 +21,7 @@ void main() {
       expect(periods.length, 1);
       expect(periods[0].startTime, const TimeOfDay(hour: 6, minute: 0));
       expect(periods[0].endTime, const TimeOfDay(hour: 8, minute: 0));
-      expect(periods[0].medication.name, 'Omeprazol');
+      expect(periods[0].medication.name, 'Omeprazole');
     });
 
     test('should calculate "after" fasting periods correctly', () {
@@ -30,7 +30,7 @@ void main() {
       // Expected period: 14:00 - 17:00
       final medication = MedicationBuilder()
           .withId('med2')
-          .withName('Levotiroxina')
+          .withName('Levothyroxine')
           .withSingleDose('14:00', 1.0)
           .withFasting(type: 'after', duration: 180)
           .build();
@@ -140,7 +140,7 @@ void main() {
       // Medication with fasting 06:00 - 08:00
       final medication = MedicationBuilder()
           .withId('med1')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withFasting(type: 'before', duration: 120) // 2 hours
           .build();
@@ -152,7 +152,7 @@ void main() {
       );
 
       expect(conflict, isNotNull);
-      expect(conflict!.conflictingPeriod.medication.name, 'Omeprazol');
+      expect(conflict!.conflictingPeriod.medication.name, 'Omeprazole');
       expect(conflict.proposedTime, const TimeOfDay(hour: 7, minute: 0));
     });
 
@@ -160,7 +160,7 @@ void main() {
       // Medication with fasting 14:00 - 17:00
       final medication = MedicationBuilder()
           .withId('med2')
-          .withName('Levotiroxina')
+          .withName('Levothyroxine')
           .withSingleDose('14:00', 1.0)
           .withFasting(type: 'after', duration: 180) // 3 hours
           .build();
@@ -172,7 +172,7 @@ void main() {
       );
 
       expect(conflict, isNotNull);
-      expect(conflict!.conflictingPeriod.medication.name, 'Levotiroxina');
+      expect(conflict!.conflictingPeriod.medication.name, 'Levothyroxine');
     });
 
     test('should NOT detect conflict when time is outside fasting period', () {
@@ -249,7 +249,7 @@ void main() {
       // Medication 1: fasting 06:00 - 08:00
       final med1 = MedicationBuilder()
           .withId('med1')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withFasting(type: 'before', duration: 120)
           .build();
@@ -257,7 +257,7 @@ void main() {
       // Medication 2: fasting 14:00 - 17:00
       final med2 = MedicationBuilder()
           .withId('med2')
-          .withName('Levotiroxina')
+          .withName('Levothyroxine')
           .withSingleDose('14:00', 1.0)
           .withFasting(type: 'after', duration: 180)
           .build();
@@ -268,7 +268,7 @@ void main() {
         allMedications: [med1, med2],
       );
       expect(conflict1, isNotNull);
-      expect(conflict1!.conflictingPeriod.medication.name, 'Omeprazol');
+      expect(conflict1!.conflictingPeriod.medication.name, 'Omeprazole');
 
       // Check 15:00 - should conflict with med2
       final conflict2 = FastingConflictService.checkConflict(
@@ -276,7 +276,7 @@ void main() {
         allMedications: [med1, med2],
       );
       expect(conflict2, isNotNull);
-      expect(conflict2!.conflictingPeriod.medication.name, 'Levotiroxina');
+      expect(conflict2!.conflictingPeriod.medication.name, 'Levothyroxine');
 
       // Check 10:00 - should not conflict
       final conflict3 = FastingConflictService.checkConflict(
@@ -359,7 +359,7 @@ void main() {
       // Medication with fasting 08:00 - 10:00 (after)
       final medication = MedicationBuilder()
           .withId('med1')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withFasting(type: 'after', duration: 120)
           .build();

@@ -4,42 +4,42 @@ import 'package:medicapp/models/person.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:uuid/uuid.dart';
 
-/// Helper para configurar y limpiar la base de datos en tests.
+/// Helper to set up and clean up the database in tests.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// void main() {
 ///   DatabaseTestHelper.setupAll();
 ///   DatabaseTestHelper.setupEach();
 ///
-///   test('mi test', () async {
-///     // tu test aquí
+///   test('my test', () async {
+///     // your test here
 ///   });
 /// }
 /// ```
 class DatabaseTestHelper {
-  /// Configura la base de datos para todos los tests en un grupo.
-  /// Debe llamarse con setUpAll() una sola vez por archivo de test.
+  /// Configures the database for all tests in a group.
+  /// Should be called with setUpAll() once per test file.
   static void setupAll() {
     setUpAll(() {
-      // Inicializar FFI para sqflite
+      // Initialize FFI for sqflite
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
 
-      // Usar base de datos en memoria para tests
+      // Use in-memory database for tests
       DatabaseHelper.setInMemoryDatabase(true);
     });
   }
 
-  /// Limpia la base de datos después de cada test.
-  /// Debe llamarse con tearDown() en cada grupo de tests.
+  /// Cleans the database after each test.
+  /// Should be called with tearDown() in each test group.
   static void setupEach() {
     tearDown(() async {
       await cleanDatabase();
     });
   }
 
-  /// Limpia todos los datos de la base de datos.
+  /// Cleans all data from the database.
   static Future<void> cleanDatabase() async {
     // Delete all data in the correct order (respecting foreign keys)
     await DatabaseHelper.instance.deleteAllDoseHistory();
@@ -64,8 +64,8 @@ class DatabaseTestHelper {
     }
   }
 
-  /// Configura completamente la base de datos (setUpAll + tearDown).
-  /// Atazo para configurar todo con una sola llamada.
+  /// Fully configures the database (setUpAll + tearDown).
+  /// Shortcut to set up everything with a single call.
   static void setup() {
     setupAll();
     setupEach();

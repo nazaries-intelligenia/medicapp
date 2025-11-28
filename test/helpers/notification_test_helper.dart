@@ -3,12 +3,12 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'medication_builder.dart';
 
-/// Helper para probar la programación de notificaciones de ayuno dinámicas.
+/// Helper to test dynamic fasting notification scheduling.
 ///
-/// Este helper simplifica los tests repetitivos que crean medicamentos y
-/// programan notificaciones de ayuno dinámicas.
+/// This helper simplifies repetitive tests that create medications and
+/// schedule dynamic fasting notifications.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// await testNotificationScheduling(
 ///   medicationId: 'test_after_1',
@@ -47,12 +47,12 @@ Future<void> testNotificationScheduling({
   );
 }
 
-/// Helper para probar la programación automática de notificaciones "before".
+/// Helper to test automatic scheduling of "before" notifications.
 ///
-/// Este helper simplifica los tests que programan notificaciones automáticas
-/// para medicamentos con ayuno tipo "before".
+/// This helper simplifies tests that schedule automatic notifications
+/// for medications with "before" fasting type.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// await testBeforeNotificationScheduling(
 ///   medicationId: 'test_before_1',
@@ -91,12 +91,12 @@ Future<void> testBeforeNotificationScheduling({
   );
 }
 
-/// Helper para probar casos de borde de medicamentos sin ayuno válido.
+/// Helper to test edge cases of medications without valid fasting.
 ///
-/// Este helper simplifica los tests que verifican el comportamiento cuando
-/// el medicamento no tiene configuración de ayuno válida.
+/// This helper simplifies tests that verify behavior when
+/// the medication does not have a valid fasting configuration.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// await testInvalidFastingConfig(
 ///   medicationId: 'test_no_fasting',
@@ -152,12 +152,12 @@ Future<void> testInvalidFastingConfig({
   );
 }
 
-/// Helper para probar múltiples duraciones de ayuno.
+/// Helper to test multiple fasting durations.
 ///
-/// Este helper ejecuta tests con diferentes duraciones de ayuno para
-/// verificar que el servicio maneja correctamente todos los casos.
+/// This helper runs tests with different fasting durations to
+/// verify that the service correctly handles all cases.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// await testMultipleFastingDurations(
 ///   durations: [30, 60, 90, 120],
