@@ -480,6 +480,40 @@ await intent.launch();
 
 ---
 
+### device_info_plus ^11.1.0
+
+**Versió utilitzada:** `^11.1.0`
+
+**Propòsit:**
+Plugin per obtenir informació del dispositiu, incloent la versió del SDK d'Android, model del dispositiu, i altres detalls de la plataforma. A MedicApp s'utilitza per detectar la versió d'Android i habilitar/deshabilitar funcionalitats específiques segons la versió del sistema operatiu.
+
+**Ús a MedicApp:**
+
+```dart
+import 'package:device_info_plus/device_info_plus.dart';
+
+// Verificar si el dispositiu suporta configuració de canals de notificació
+static Future<bool> canOpenNotificationSettings() async {
+  if (!PlatformHelper.isAndroid) {
+    return false;
+  }
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+  // Android 8.0 (API 26) és el mínim per configurar canals de notificació
+  return androidInfo.version.sdkInt >= 26;
+}
+```
+
+**Casos d'ús:**
+
+1. **Detecció de versió d'Android:** Permet verificar si el dispositiu executa Android 8.0+ (API 26) per mostrar o ocultar l'opció de configuració de to de notificació, que només està disponible en versions que suporten canals de notificació.
+
+2. **Funcionalitats condicionals:** Habilita o deshabilita funcionalitats específiques de la UI basant-se en les capacitats del dispositiu.
+
+**Documentació oficial:** https://pub.dev/packages/device_info_plus
+
+---
+
 ## 4. Localització (i18n)
 
 ### flutter_localizations (SDK)
@@ -1682,6 +1716,7 @@ dependencies {
 | **timezone** | `^0.10.1` | Zones horàries | Notificacions |
 | **intl** | `^0.20.2` | Internacionalització | i18n |
 | **android_intent_plus** | `^6.0.0` | Intencions Android | Permisos |
+| **device_info_plus** | `^11.1.0` | Informació del dispositiu | Plataforma |
 | **shared_preferences** | `^2.2.2` | Preferències usuari | Persistència |
 | **file_picker** | `^8.0.0+1` | Selector d'arxius | Arxius |
 | **share_plus** | `^10.1.4` | Compartir arxius | Arxius |
@@ -1693,9 +1728,9 @@ dependencies {
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Eina (dev) |
 | **flutter_lints** | `^6.0.0` | Anàlisi estàtic | Eina (dev) |
 
-**Total dependències de producció:** 15
+**Total dependències de producció:** 16
 **Total dependències de desenvolupament:** 4
-**Total:** 19
+**Total:** 20
 
 ---
 

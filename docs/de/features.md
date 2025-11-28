@@ -248,6 +248,12 @@ const channels = [
 ];
 ```
 
+### Konfiguration des Benachrichtigungstons (Android 8.0+)
+
+Auf Geräten mit Android 8.0 (API 26) oder höher bietet MedicApp direkten Zugriff auf die Benachrichtigungston-Einstellungen über den Einstellungsbildschirm der App. Diese Funktion ermöglicht die Anpassung von Ton, Vibration und anderen Benachrichtigungsparametern über die Benachrichtigungskanäle des Systems.
+
+Die Option "Benachrichtigungston" erscheint nur im Einstellungsbildschirm, wenn das Gerät die Mindestanforderungen an die Betriebssystemversion erfüllt. Bei Versionen vor Android 8.0 wird diese Option automatisch ausgeblendet, da das System keine granulare Konfiguration von Benachrichtigungskanälen unterstützt.
+
 ---
 
 ## 10. Benachrichtigungen bei niedrigem Bestand

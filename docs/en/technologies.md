@@ -480,6 +480,40 @@ await intent.launch();
 
 ---
 
+### device_info_plus ^11.1.0
+
+**Version used:** `^11.1.0`
+
+**Purpose:**
+Plugin to obtain device information, including the Android SDK version, device model, and other platform details. In MedicApp it is used to detect the Android version and enable/disable specific functionalities based on the operating system version.
+
+**Usage in MedicApp:**
+
+```dart
+import 'package:device_info_plus/device_info_plus.dart';
+
+// Check if the device supports notification channel settings
+static Future<bool> canOpenNotificationSettings() async {
+  if (!PlatformHelper.isAndroid) {
+    return false;
+  }
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+  // Android 8.0 (API 26) is the minimum for notification channel settings
+  return androidInfo.version.sdkInt >= 26;
+}
+```
+
+**Use cases:**
+
+1. **Android version detection:** Allows verifying if the device runs Android 8.0+ (API 26) to show or hide the notification sound configuration option, which is only available on versions that support notification channels.
+
+2. **Conditional features:** Enables or disables specific UI features based on device capabilities.
+
+**Official documentation:** https://pub.dev/packages/device_info_plus
+
+---
+
 ## 4. Localization (i18n)
 
 ### flutter_localizations (SDK)
@@ -1682,6 +1716,7 @@ dependencies {
 | **timezone** | `^0.10.1` | Time zones | Notifications |
 | **intl** | `^0.20.2` | Internationalization | i18n |
 | **android_intent_plus** | `^6.0.0` | Android intents | Permissions |
+| **device_info_plus** | `^11.1.0` | Device information | Platform |
 | **shared_preferences** | `^2.2.2` | User preferences | Persistence |
 | **file_picker** | `^8.0.0+1` | File picker | Files |
 | **share_plus** | `^10.1.4` | Share files | Files |
@@ -1693,9 +1728,9 @@ dependencies {
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Tool (dev) |
 | **flutter_lints** | `^6.0.0` | Static analysis | Tool (dev) |
 
-**Total production dependencies:** 15
+**Total production dependencies:** 16
 **Total development dependencies:** 4
-**Total:** 19
+**Total:** 20
 
 ---
 

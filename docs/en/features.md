@@ -274,6 +274,12 @@ Additionally, fasting configuration allows deciding whether to want pre-fasting 
 
 MedicApp is optimized for Android 12 and higher versions, requiring and managing the necessary "Alarms and reminders" permissions for exact notifications. The application automatically detects if these permissions are not granted and guides the user to enable them from system settings, ensuring notifications arrive punctually at the scheduled time.
 
+### Notification Sound Configuration (Android 8.0+)
+
+On devices running Android 8.0 (API 26) or higher, MedicApp provides direct access to notification sound settings from the app's Settings screen. This feature allows customizing the sound, vibration, and other notification parameters using the system's notification channels.
+
+The "Notification Sound" option only appears in the Settings screen when the device meets the minimum operating system version requirements. On versions prior to Android 8.0, this option is automatically hidden since the system does not support granular notification channel configuration.
+
 ---
 
 ## 10. Low Stock Alerts

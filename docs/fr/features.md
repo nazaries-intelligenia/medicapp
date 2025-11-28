@@ -274,6 +274,12 @@ De plus, la configuration de jeûne permet de décider si l'on souhaite des noti
 
 MedicApp est optimisé pour Android 12 et versions supérieures, nécessitant et gérant les permissions "Alarmes et rappels" nécessaires pour des notifications exactes. L'application détecte automatiquement si ces permissions ne sont pas accordées et guide l'utilisateur pour les activer depuis la configuration du système, assurant que les notifications arrivent ponctuellement à l'heure programmée.
 
+### Configuration du Son de Notification (Android 8.0+)
+
+Sur les appareils fonctionnant sous Android 8.0 (API 26) ou supérieur, MedicApp offre un accès direct à la configuration du son de notification depuis les paramètres de l'application. Cette fonctionnalité permet de personnaliser le son, la vibration et d'autres paramètres de notification en utilisant les canaux de notification du système.
+
+L'option "Son de notification" n'apparaît dans l'écran Paramètres que lorsque l'appareil répond aux exigences minimales de version du système d'exploitation. Sur les versions antérieures à Android 8.0, cette option est automatiquement masquée car le système ne prend pas en charge la configuration granulaire des canaux de notification.
+
 ---
 
 ## 10. Alertes de Stock Faible

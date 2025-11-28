@@ -274,6 +274,12 @@ A més, la configuració de dejuni permet decidir si es volen notificacions d'in
 
 MedicApp està optimitzat per a Android 12 i versions superiors, requerint i gestionant els permisos de "Alarmes i recordatoris" necessaris per a notificacions exactes. L'aplicació detecta automàticament si aquests permisos no estan concedits i guia l'usuari per habilitar-los des de la configuració del sistema, assegurant que les notificacions arribin puntualment a l'hora programada.
 
+### Configuració del To de Notificació (Android 8.0+)
+
+En dispositius amb Android 8.0 (API 26) o superior, MedicApp ofereix accés directe a la configuració del to de notificació des dels ajustos de l'aplicació. Aquesta funcionalitat permet personalitzar el so, vibració i altres paràmetres de les notificacions utilitzant els canals de notificació del sistema.
+
+L'opció "To de notificació" només apareix a la pantalla d'Ajustos quan el dispositiu compleix els requisits mínims de versió del sistema operatiu. En versions anteriors a Android 8.0, aquesta opció s'oculta automàticament ja que el sistema no suporta la configuració granular de canals de notificació.
+
 ---
 
 ## 10. Alertes d'Estoc Baix
