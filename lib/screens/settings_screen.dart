@@ -32,11 +32,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _showFastingNotification = false;
   bool _showPersonTabs = true;
   int _personCount = 0;
+  bool _canOpenNotificationSettings = false;
 
   @override
   void initState() {
     super.initState();
     _loadPreferences();
+    _checkNotificationSettingsAvailability();
+  }
+
+  /// Check if notification settings can be opened on this device
+  Future<void> _checkNotificationSettingsAvailability() async {
+    final canOpen = await NotificationConfig.canOpenNotificationSettings();
+    if (mounted) {
+      setState(() {
+        _canOpenNotificationSettings = canOpen;
+      });
+    }
   }
 
   /// Load preferences from storage
@@ -299,19 +311,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  /// Open notification channel settings (Android only)
+  /// Open notification channel settings (Android 8.0+ only)
   Future<void> _openNotificationSettings() async {
     try {
-      final openedNotificationSettings = await NotificationConfig.openNotificationChannelSettings();
-      if (!mounted) return;
-
-      // If we could only open app settings (older Android), show a hint
-      if (!openedNotificationSettings) {
-        SnackBarService.showInfo(
-          context,
-          'Busca "Notificaciones" en los ajustes de la aplicación',
-        );
-      }
+      await NotificationConfig.openNotificationChannelSettings();
     } catch (e) {
       if (!mounted) return;
       SnackBarService.showError(
@@ -454,13 +457,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
-          // Notification Sound Card (Android only)
-          if (PlatformHelper.isAndroid)
+          // Notification Sound Card (Android 8.0+ only)
+          if (_canOpenNotificationSettings)
             SettingOptionCard(
               icon: Icons.music_note,
               iconColor: theme.colorScheme.secondary,
-              title: 'Tono de notificación',
-              subtitle: 'Configurar sonido, vibración y más',
+              title: l10n.settingsNotificationSoundTitle,
+              subtitle: l10n.settingsNotificationSoundSubtitle,
               isLoading: false,
               enabled: true,
               onTap: _openNotificationSettings,

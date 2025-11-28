@@ -1009,6 +1009,8 @@
   "settingsRestartDialogButton": "Entendido",
   "settingsLanguageTitle": "Idioma",
   "settingsLanguageSystem": "Predeterminado do sistema",
+  "settingsNotificationSoundTitle": "Ton de notificación",
+  "settingsNotificationSoundSubtitle": "Configurar son, vibración e máis",
   "settingsColorPaletteTitle": "Paleta de cores",
   "medicationStartsOn": "Comeza o {date}",
   "medicationFinishedOn": "Rematado o {date}",

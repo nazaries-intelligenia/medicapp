@@ -47,6 +47,47 @@ class NotificationConfig {
     );
   }
 
+  /// Checks if notification channel settings can be opened on this device
+  /// Returns true only if Android 8.0+ specific notification settings are available
+  static Future<bool> canOpenNotificationSettings() async {
+    if (!PlatformHelper.isAndroid) {
+      return false;
+    }
+
+    const packageName = 'com.medicapp.medicapp';
+
+    // Check if channel-specific settings can be opened (Android 8.0+)
+    try {
+      const channelIntent = AndroidIntent(
+        action: 'android.settings.CHANNEL_NOTIFICATION_SETTINGS',
+        arguments: <String, dynamic>{
+          'android.provider.extra.APP_PACKAGE': packageName,
+          'android.provider.extra.CHANNEL_ID': medicationChannelId,
+        },
+      );
+      final canResolve = await channelIntent.canResolveActivity();
+      if (canResolve == true) return true;
+    } catch (_) {
+      // Continue checking
+    }
+
+    // Check if app notification settings can be opened (Android 8.0+)
+    try {
+      const appNotifIntent = AndroidIntent(
+        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
+        arguments: <String, dynamic>{
+          'android.provider.extra.APP_PACKAGE': packageName,
+        },
+      );
+      final canResolve = await appNotifIntent.canResolveActivity();
+      if (canResolve == true) return true;
+    } catch (_) {
+      // Not available
+    }
+
+    return false;
+  }
+
   /// Opens the notification settings for the app on Android
   /// This allows users to customize sound, vibration, and other notification settings
   /// Works on Android 8.0+ (API 26+) for channel settings, fallback for older versions
@@ -58,41 +99,44 @@ class NotificationConfig {
 
     const packageName = 'com.medicapp.medicapp';
 
-    // Try notification-specific intents first (Android 8.0+)
-    final notificationIntents = [
-      // Approach 1: Channel-specific settings (Android 8.0+)
-      AndroidIntent(
+    // Try channel-specific settings first (Android 8.0+)
+    try {
+      const channelIntent = AndroidIntent(
         action: 'android.settings.CHANNEL_NOTIFICATION_SETTINGS',
         arguments: <String, dynamic>{
           'android.provider.extra.APP_PACKAGE': packageName,
           'android.provider.extra.CHANNEL_ID': medicationChannelId,
         },
-      ),
-      // Approach 2: App notification settings (Android 8.0+)
-      AndroidIntent(
+      );
+      final canResolve = await channelIntent.canResolveActivity();
+      if (canResolve == true) {
+        await channelIntent.launch();
+        return true;
+      }
+    } catch (_) {
+      // Try next approach
+    }
+
+    // Try app notification settings (Android 8.0+)
+    try {
+      const appNotifIntent = AndroidIntent(
         action: 'android.settings.APP_NOTIFICATION_SETTINGS',
         arguments: <String, dynamic>{
           'android.provider.extra.APP_PACKAGE': packageName,
         },
-      ),
-    ];
-
-    // Try notification-specific intents
-    for (final intent in notificationIntents) {
-      try {
-        final canResolve = await intent.canResolveActivity();
-        if (canResolve == true) {
-          await intent.launch();
-          return true; // Opened notification settings
-        }
-      } catch (_) {
-        continue;
+      );
+      final canResolve = await appNotifIntent.canResolveActivity();
+      if (canResolve == true) {
+        await appNotifIntent.launch();
+        return true;
       }
+    } catch (_) {
+      // Try next approach
     }
 
     // Fallback: General app settings (works on all Android versions)
     try {
-      final appSettingsIntent = AndroidIntent(
+      const appSettingsIntent = AndroidIntent(
         action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
         data: 'package:$packageName',
       );

@@ -1009,6 +1009,8 @@
   "settingsRestartDialogButton": "Ulertuta",
   "settingsLanguageTitle": "Hizkuntza",
   "settingsLanguageSystem": "Sistemaren lehenetsia",
+  "settingsNotificationSoundTitle": "Jakinarazpen-tonua",
+  "settingsNotificationSoundSubtitle": "Konfiguratu soinua, bibrazioa eta gehiago",
   "settingsColorPaletteTitle": "Kolore-paleta",
   "medicationStartsOn": "{date}(e)an hasten da",
   "medicationFinishedOn": "{date}(e)an amaitu da",

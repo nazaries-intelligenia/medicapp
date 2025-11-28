@@ -1009,6 +1009,8 @@
   "settingsRestartDialogButton": "Entès",
   "settingsLanguageTitle": "Idioma",
   "settingsLanguageSystem": "Predeterminat del sistema",
+  "settingsNotificationSoundTitle": "To de notificació",
+  "settingsNotificationSoundSubtitle": "Configura el so, la vibració i més",
   "settingsColorPaletteTitle": "Paleta de colors",
   "medicationStartsOn": "Comença el {date}",
   "medicationFinishedOn": "Finalitzat el {date}",

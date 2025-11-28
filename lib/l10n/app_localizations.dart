@@ -3144,6 +3144,18 @@ abstract class AppLocalizations {
   /// **'Predeterminado del sistema'**
   String get settingsLanguageSystem;
 
+  /// No description provided for @settingsNotificationSoundTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tono de notificación'**
+  String get settingsNotificationSoundTitle;
+
+  /// No description provided for @settingsNotificationSoundSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Configurar sonido, vibración y más'**
+  String get settingsNotificationSoundSubtitle;
+
   /// No description provided for @settingsColorPaletteTitle.
   ///
   /// In es, this message translates to:

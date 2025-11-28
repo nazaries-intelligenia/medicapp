@@ -1788,6 +1788,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get settingsLanguageSystem => 'Predefinito del sistema';
 
   @override
+  String get settingsNotificationSoundTitle => 'Suono di notifica';
+
+  @override
+  String get settingsNotificationSoundSubtitle =>
+      'Configura suono, vibrazione e altro';
+
+  @override
   String get settingsColorPaletteTitle => 'Tavolozza colori';
 
   @override

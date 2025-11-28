@@ -1784,6 +1784,13 @@ class AppLocalizationsEu extends AppLocalizations {
   String get settingsLanguageSystem => 'Sistemaren lehenetsia';
 
   @override
+  String get settingsNotificationSoundTitle => 'Jakinarazpen-tonua';
+
+  @override
+  String get settingsNotificationSoundSubtitle =>
+      'Konfiguratu soinua, bibrazioa eta gehiago';
+
+  @override
   String get settingsColorPaletteTitle => 'Kolore-paleta';
 
   @override

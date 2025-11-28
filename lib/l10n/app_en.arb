@@ -559,6 +559,8 @@
   "settingsRestartDialogButton": "OK",
   "settingsLanguageTitle": "Language",
   "settingsLanguageSystem": "System default",
+  "settingsNotificationSoundTitle": "Notification sound",
+  "settingsNotificationSoundSubtitle": "Configure sound, vibration and more",
   "settingsColorPaletteTitle": "Color palette",
 
   "@_MEDICATION_LIST_SCREEN": {},

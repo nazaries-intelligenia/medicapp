@@ -1026,6 +1026,8 @@
   "settingsRestartDialogButton": "Ho capito",
   "settingsLanguageTitle": "Lingua",
   "settingsLanguageSystem": "Predefinito del sistema",
+  "settingsNotificationSoundTitle": "Suono di notifica",
+  "settingsNotificationSoundSubtitle": "Configura suono, vibrazione e altro",
   "settingsColorPaletteTitle": "Tavolozza colori",
 
   "@_MEDICATION_LIST_SCREEN": {},
