@@ -50,55 +50,63 @@ class NotificationConfig {
   /// Opens the notification settings for the app on Android
   /// This allows users to customize sound, vibration, and other notification settings
   /// Works on Android 8.0+ (API 26+) for channel settings, fallback for older versions
-  static Future<void> openNotificationChannelSettings() async {
+  /// Returns true if notification-specific settings were opened, false if only app settings
+  static Future<bool> openNotificationChannelSettings() async {
     if (!PlatformHelper.isAndroid) {
-      return; // Only available on Android
+      return false; // Only available on Android
     }
 
     const packageName = 'com.medicapp.medicapp';
 
-    // Try opening notification channel settings (Android 8.0+)
-    // Using multiple approaches for better device compatibility
-    final approaches = [
+    // Try notification-specific intents first (Android 8.0+)
+    final notificationIntents = [
       // Approach 1: Channel-specific settings (Android 8.0+)
-      () => AndroidIntent(
+      AndroidIntent(
         action: 'android.settings.CHANNEL_NOTIFICATION_SETTINGS',
         arguments: <String, dynamic>{
           'android.provider.extra.APP_PACKAGE': packageName,
           'android.provider.extra.CHANNEL_ID': medicationChannelId,
         },
-      ).launch(),
-      // Approach 2: App notification settings with package argument
-      () => AndroidIntent(
+      ),
+      // Approach 2: App notification settings (Android 8.0+)
+      AndroidIntent(
         action: 'android.settings.APP_NOTIFICATION_SETTINGS',
         arguments: <String, dynamic>{
           'android.provider.extra.APP_PACKAGE': packageName,
         },
-      ).launch(),
-      // Approach 3: App notification settings with data URI
-      () => AndroidIntent(
-        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
-        data: 'package:$packageName',
-      ).launch(),
-      // Approach 4: General app settings (fallback)
-      () => AndroidIntent(
-        action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
-        data: 'package:$packageName',
-      ).launch(),
+      ),
     ];
 
-    for (final approach in approaches) {
+    // Try notification-specific intents
+    for (final intent in notificationIntents) {
       try {
-        await approach();
-        return; // Success, exit
+        final canResolve = await intent.canResolveActivity();
+        if (canResolve == true) {
+          await intent.launch();
+          return true; // Opened notification settings
+        }
       } catch (_) {
-        // Try next approach
         continue;
       }
     }
 
+    // Fallback: General app settings (works on all Android versions)
+    try {
+      final appSettingsIntent = AndroidIntent(
+        action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
+        data: 'package:$packageName',
+      );
+      final canResolve = await appSettingsIntent.canResolveActivity();
+      if (canResolve == true) {
+        await appSettingsIntent.launch();
+        return false; // Opened app settings, not notification-specific
+      }
+    } catch (_) {
+      // Ignore
+    }
+
     // If all approaches failed, throw an error
-    throw Exception('No se pudo abrir los ajustes de notificación');
+    throw Exception('No se pudo abrir los ajustes');
   }
 
   /// Get standard iOS/Darwin notification details for medication reminders

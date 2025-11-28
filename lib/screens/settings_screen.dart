@@ -302,12 +302,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
   /// Open notification channel settings (Android only)
   Future<void> _openNotificationSettings() async {
     try {
-      await NotificationConfig.openNotificationChannelSettings();
+      final openedNotificationSettings = await NotificationConfig.openNotificationChannelSettings();
+      if (!mounted) return;
+
+      // If we could only open app settings (older Android), show a hint
+      if (!openedNotificationSettings) {
+        SnackBarService.showInfo(
+          context,
+          'Busca "Notificaciones" en los ajustes de la aplicación',
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       SnackBarService.showError(
         context,
-        'No se pudo abrir los ajustes de notificación: ${e.toString()}',
+        'No se pudo abrir los ajustes: ${e.toString()}',
       );
     }
   }
