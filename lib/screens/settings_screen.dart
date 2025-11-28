@@ -338,10 +338,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: RadioGroup<String?>(
             groupValue: currentLocale?.languageCode,
             onChanged: (String? value) {
+              final deviceLocale = View.of(context).platformDispatcher.locale;
               if (value == null) {
-                localeProvider.setLocale(null);
+                localeProvider.setLocale(null, deviceLocale: deviceLocale);
               } else {
-                localeProvider.setLocale(Locale(value));
+                localeProvider.setLocale(Locale(value), deviceLocale: deviceLocale);
               }
               Navigator.pop(context);
             },
