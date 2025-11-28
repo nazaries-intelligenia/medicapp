@@ -25,7 +25,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_1')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -43,7 +43,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_2')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -51,15 +51,15 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a dose taken today
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_1',
         medicationId: medication.id,
         medicationName: medication.name,
         medicationType: medication.type,
         personId: 'test-person-id',
-        scheduledDateTime: now, // For as-needed, scheduled = registered
-        registeredDateTime: now,
+        scheduledDateTime: doseTime, // For as-needed, scheduled = registered
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -78,7 +78,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_3')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -86,15 +86,15 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a SKIPPED dose (not taken)
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_2',
         medicationId: medication.id,
         medicationName: medication.name,
         medicationType: medication.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.skipped, // Skipped, not taken
         quantity: 0.0,
       );
@@ -112,7 +112,7 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_4')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -146,14 +146,12 @@ void main() {
       // Create an as-needed medication
       final medication = MedicationBuilder()
           .withId('test_as_needed_5')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
 
       await DatabaseHelper.instance.insertMedication(medication);
-
-      final now = DateTime.now();
 
       // Register first dose at 10:00
       final dose1 = DoseHistoryEntry(
@@ -195,14 +193,14 @@ void main() {
       // Create two as-needed medications
       final med1 = MedicationBuilder()
           .withId('test_as_needed_6')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
 
       final med2 = MedicationBuilder()
           .withId('test_as_needed_7')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withAsNeeded()
           .withStock(20.0)
           .build();
@@ -210,7 +208,7 @@ void main() {
       await DatabaseHelper.instance.insertMedication(med1);
       await DatabaseHelper.instance.insertMedication(med2);
 
-      final now = DateTime.now();
+      final doseTime = DateTime.now();
 
       // Register dose for first medication
       final dose1 = DoseHistoryEntry(
@@ -219,8 +217,8 @@ void main() {
         medicationName: med1.name,
         medicationType: med1.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -233,8 +231,8 @@ void main() {
         medicationName: med2.name,
         medicationType: med2.type,
         personId: 'test-person-id',
-        scheduledDateTime: now,
-        registeredDateTime: now,
+        scheduledDateTime: doseTime,
+        registeredDateTime: doseTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );
@@ -253,7 +251,7 @@ void main() {
       // Create a programmed medication (not as-needed)
       final medication = MedicationBuilder()
           .withId('test_programmed_1')
-          .withName('Atorvastatina')
+          .withName('Atorvastatin')
           .withDurationType(TreatmentDurationType.everyday)
           .withDosageInterval(24)
           .withSingleDose('20:00', 1.0)
@@ -263,7 +261,7 @@ void main() {
       await DatabaseHelper.instance.insertMedication(medication);
 
       // Register a dose taken today
-      final now = DateTime.now();
+      final registeredTime = DateTime.now();
       final historyEntry = DoseHistoryEntry(
         id: 'dose_8',
         medicationId: medication.id,
@@ -271,7 +269,7 @@ void main() {
         medicationType: medication.type,
         personId: 'test-person-id',
         scheduledDateTime: todayAt(20, 0),
-        registeredDateTime: now,
+        registeredDateTime: registeredTime,
         status: DoseStatus.taken,
         quantity: 1.0,
       );

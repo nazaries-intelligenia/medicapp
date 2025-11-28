@@ -3,8 +3,8 @@ import 'package:medicapp/l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../models/medication_type.dart';
 
-/// Widget reutilizable para el formulario de información básica del medicamento
-/// Usado tanto en creación como en edición de medicamentos
+/// Reusable widget for the medication's basic information form
+/// Used in both medication creation and editing
 class MedicationInfoForm extends StatelessWidget {
   final TextEditingController nameController;
   final MedicationType selectedType;
@@ -70,13 +70,13 @@ class MedicationInfoForm extends StatelessWidget {
           Text(
             l10n.medicationInfoSubtitle,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
           ),
           const SizedBox(height: 24),
         ],
 
-        // Campo de nombre con autocompletado
+        // Name field with autocomplete
         if (!showDescription)
           Text(
             l10n.medicationNameLabel,
@@ -199,7 +199,7 @@ class MedicationInfoForm extends StatelessWidget {
                         title: Text(option),
                         subtitle: medication != null
                             ? Text(
-                                medication.type.displayName,
+                                medication.type.getDisplayName(l10n),
                                 style: Theme.of(context).textTheme.bodySmall,
                               )
                             : null,
@@ -216,7 +216,7 @@ class MedicationInfoForm extends StatelessWidget {
         ),
         SizedBox(height: showDescription ? 32 : 24),
 
-        // Selector de tipo
+        // Type selector
         Text(
           l10n.medicationTypeLabel,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -246,7 +246,7 @@ class MedicationInfoForm extends StatelessWidget {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? type.getColor(context).withOpacity(0.2)
+                          ? type.getColor(context).withValues(alpha: 0.2)
                           : Colors.transparent,
                       border: Border.all(
                         color: isSelected
@@ -268,7 +268,7 @@ class MedicationInfoForm extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          type.displayName,
+                          type.getDisplayName(l10n),
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 color: isSelected
                                     ? type.getColor(context)

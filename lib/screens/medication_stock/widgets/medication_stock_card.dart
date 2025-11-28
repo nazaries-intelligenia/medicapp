@@ -58,7 +58,7 @@ class MedicationStockCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: medication.type.getColor(context).withOpacity(0.2),
+                  backgroundColor: medication.type.getColor(context).withValues(alpha: 0.2),
                   child: Icon(
                     medication.type.icon,
                     color: medication.type.getColor(context),
@@ -76,7 +76,7 @@ class MedicationStockCard extends StatelessWidget {
                             ),
                       ),
                       Text(
-                        medication.type.displayName,
+                        medication.type.getDisplayName(l10n),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: medication.type.getColor(context),
                             ),
@@ -90,7 +90,7 @@ class MedicationStockCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: statusColor,

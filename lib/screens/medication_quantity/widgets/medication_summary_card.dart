@@ -28,7 +28,7 @@ class MedicationSummaryCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Card(
-      color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -59,7 +59,7 @@ class MedicationSummaryCard extends StatelessWidget {
             _SummaryRow(
               icon: medicationType.icon,
               label: l10n.summaryType,
-              value: medicationType.displayName,
+              value: medicationType.getDisplayName(l10n),
             ),
             if (doseSchedule.isNotEmpty) ...[
               _SummaryRow(
@@ -125,7 +125,7 @@ class _SummaryRow extends StatelessWidget {
           Icon(
             icon,
             size: 20,
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -135,7 +135,7 @@ class _SummaryRow extends StatelessWidget {
                 Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                 ),
                 const SizedBox(height: 2),

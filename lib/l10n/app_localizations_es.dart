@@ -120,6 +120,75 @@ class AppLocalizationsEs extends AppLocalizations {
   String get medicationTypeOther => 'Otro';
 
   @override
+  String get stockUnitPills => 'pastillas';
+
+  @override
+  String get stockUnitCapsules => 'cápsulas';
+
+  @override
+  String get stockUnitInjections => 'inyecciones';
+
+  @override
+  String get stockUnitMl => 'ml';
+
+  @override
+  String get stockUnitOvules => 'óvulos';
+
+  @override
+  String get stockUnitSuppositories => 'supositorios';
+
+  @override
+  String get stockUnitInhalations => 'inhalaciones';
+
+  @override
+  String get stockUnitSachets => 'sobres';
+
+  @override
+  String get stockUnitGrams => 'gramos';
+
+  @override
+  String get stockUnitBandages => 'vendas';
+
+  @override
+  String get stockUnitDrops => 'gotas';
+
+  @override
+  String get stockUnitUnits => 'unidades';
+
+  @override
+  String get stockUnitPill => 'pastilla';
+
+  @override
+  String get stockUnitCapsule => 'cápsula';
+
+  @override
+  String get stockUnitInjection => 'inyección';
+
+  @override
+  String get stockUnitOvule => 'óvulo';
+
+  @override
+  String get stockUnitSuppository => 'supositorio';
+
+  @override
+  String get stockUnitInhalation => 'inhalación';
+
+  @override
+  String get stockUnitSachet => 'sobre';
+
+  @override
+  String get stockUnitGram => 'gramo';
+
+  @override
+  String get stockUnitBandage => 'venda';
+
+  @override
+  String get stockUnitDrop => 'gota';
+
+  @override
+  String get stockUnitUnit => 'unidad';
+
+  @override
   String get doseStatusTaken => 'Tomada';
 
   @override
@@ -1707,6 +1776,30 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsRestartDialogButton => 'Entendido';
+
+  @override
+  String get settingsLanguageTitle => 'Idioma';
+
+  @override
+  String get settingsLanguageSystem => 'Predeterminado del sistema';
+
+  @override
+  String get settingsColorPaletteTitle => 'Paleta de colores';
+
+  @override
+  String medicationStartsOn(Object date) {
+    return 'Empieza el $date';
+  }
+
+  @override
+  String medicationFinishedOn(Object date) {
+    return 'Finalizado el $date';
+  }
+
+  @override
+  String medicationDayOfTotal(Object current, Object total) {
+    return 'Día $current de $total';
+  }
 
   @override
   String get notificationsWillNotWork =>

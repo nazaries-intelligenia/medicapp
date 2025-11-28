@@ -46,11 +46,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication first
-    await addMedicationWithDuration(tester, 'Aspirina');
+    await addMedicationWithDuration(tester, 'Aspirin');
     await waitForDatabase(tester);
 
     // Tap on the medication card
-    await tester.tap(find.text('Aspirina'));
+    await tester.tap(find.text('Aspirin'));
     await tester.pumpAndSettle();
 
     // Verify modal is shown
@@ -58,7 +58,7 @@ void main() {
     expect(find.text(getL10n(tester).medicineCabinetEditMedication), findsWidgets);
     expect(find.text(getL10n(tester).btnCancel), findsWidgets);
     // The medication name should appear twice: once in the list and once in the modal
-    expect(find.text('Aspirina'), findsNWidgets(2));
+    expect(find.text('Aspirin'), findsNWidgets(2));
   });
 
   testWidgets('Modal should display treatment duration', (WidgetTester tester) async {
@@ -66,19 +66,19 @@ void main() {
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
-    // Add a medication with "Hasta acabar" duration
+    // Add a medication with "Until finished" duration
     await addMedicationWithDuration(
       tester,
-      'Vitamina C',
+      'Vitamin C',
       durationType: getL10n(tester).durationUntilEmptyTitle,
     );
     await waitForDatabase(tester);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Vitamina C'));
+    await tester.tap(find.text('Vitamin C'));
     await tester.pumpAndSettle();
 
-    // Verify duration is displayed in modal (short version "Hasta acabar")
+    // Verify duration is displayed in modal (short version "Until finished")
     expect(find.text(getL10n(tester).editFrequencyUntilFinished), findsWidgets);
   });
 }

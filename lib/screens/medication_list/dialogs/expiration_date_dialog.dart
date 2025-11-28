@@ -88,9 +88,9 @@ class ExpirationDateDialog {
                       flex: 2,
                       child: TextFormField(
                         controller: yearController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'YYYY',
-                          border: const OutlineInputBorder(),
+                          border: OutlineInputBorder(),
                         ),
                         keyboardType: TextInputType.number,
                         inputFormatters: [

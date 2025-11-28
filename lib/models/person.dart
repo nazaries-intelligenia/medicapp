@@ -1,7 +1,7 @@
 class Person {
   final String id;
   final String name;
-  final bool isDefault; // Indica si es la persona por defecto (el usuario)
+  final bool isDefault; // Indicates if this is the default person (the user)
 
   Person({
     required this.id,

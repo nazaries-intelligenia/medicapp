@@ -65,7 +65,7 @@ void main() {
     await tester.pump();
 
     // Enter name (use .first to get the name field, not the frequency field)
-    await tester.enterText(find.byType(TextFormField).first, 'Ibuprofeno');
+    await tester.enterText(find.byType(TextFormField).first, 'Ibuprofen');
 
     // Scroll to and tap continue
     await scrollToWidget(tester, find.text(getL10n(tester).btnContinue));
@@ -155,7 +155,7 @@ void main() {
     await tester.pump();
 
     // Verify we're directly on the add medication screen (no modal when only 1 person exists)
-    // Navigation to other sections (Pastillero, Botiquín, Historial) is now via BottomNavigationBar
+    // Navigation to other sections (Pill Box, Medicine Cabinet, History) is now via BottomNavigationBar
     expect(find.text(getL10n(tester).addMedicationTitle), findsWidgets);
     expect(find.text(getL10n(tester).medicationInfoTitle), findsWidgets);
 

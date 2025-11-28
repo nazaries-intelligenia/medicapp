@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
-import '../../../database/database_helper.dart';
-import '../../../services/notification_service.dart';
 
 class MedicationOptionsSheet {
   static void show(
@@ -192,10 +190,10 @@ class MedicationOptionsSheet {
                       width: double.infinity,
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text(l10n.btnCancel),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 10),
                         ),
+                        child: Text(l10n.btnCancel),
                       ),
                     ),
                   ],

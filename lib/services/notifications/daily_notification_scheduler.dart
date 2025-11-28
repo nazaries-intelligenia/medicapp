@@ -72,11 +72,11 @@ class DailyNotificationScheduler {
 
           // Skip if the time has already passed
           if (scheduledDate.isBefore(now)) {
-            LoggerService.info('⏭️  Skipping past time: ${scheduledDate} (now: $now)');
+            LoggerService.info('⏭️  Skipping past time: $scheduledDate (now: $now)');
             continue;
           }
 
-          LoggerService.info('✅ Scheduling notification for: ${scheduledDate} (${doseTime})');
+          LoggerService.info('✅ Scheduling notification for: $scheduledDate ($doseTime)');
 
           // Generate unique ID for this specific date and dose (V19+: includes personId)
           final dateString = DateTime(targetDate.year, targetDate.month, targetDate.day).toDateString();

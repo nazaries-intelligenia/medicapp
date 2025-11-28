@@ -8,7 +8,7 @@ import '../../services/notification_service.dart';
 import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar información básica del medicamento (nombre y tipo)
+/// Screen to edit basic medication information (name and type)
 class EditBasicInfoScreen extends StatefulWidget {
   final Medication medication;
   final List<Medication> existingMedications;
@@ -80,7 +80,7 @@ class _EditBasicInfoScreenState extends State<EditBasicInfoScreen> {
 
       await DatabaseHelper.instance.updateMedication(updatedMedication);
 
-      // V19+: Reprogramar notificaciones para todas las personas asignadas si el nombre cambió
+      // V19+: Reschedule notifications for all assigned persons if the name changed
       if (widget.medication.name != updatedMedication.name) {
         final persons = await DatabaseHelper.instance.getPersonsForMedication(updatedMedication.id);
 

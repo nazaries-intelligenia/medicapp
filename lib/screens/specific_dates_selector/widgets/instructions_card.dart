@@ -38,7 +38,7 @@ class InstructionsCard extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: Text(l10n.specificDatesSelectorAddDate),
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.deepPurple.withOpacity(0.2),
+                backgroundColor: Colors.deepPurple.withValues(alpha: 0.2),
                 foregroundColor: Colors.deepPurple,
               ),
             ),

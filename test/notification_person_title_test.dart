@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/models/person.dart';
 import 'helpers/medication_builder.dart';
 
 /// Tests for conditional notification titles based on person
@@ -41,27 +40,27 @@ void main() {
     test('_buildNotificationTitle should show name for non-default user', () {
       // Simulate a non-default person
       const isDefault = false;
-      const personName = 'María';
+      const personName = 'Maria';
 
       // Build title for non-default user
       final title = service.buildNotificationTitle(personName, isDefault);
 
       // Should include person name
-      expect(title, equals('💊 María - Hora de tomar medicamento'));
-      expect(title, contains('María'));
+      expect(title, equals('💊 Maria - Hora de tomar medicamento'));
+      expect(title, contains('Maria'));
     });
 
     test('_buildNotificationTitle should show name for another non-default user', () {
       // Simulate another non-default person
       const isDefault = false;
-      const personName = 'Juan';
+      const personName = 'John';
 
       // Build title for non-default user
       final title = service.buildNotificationTitle(personName, isDefault);
 
       // Should include person name
-      expect(title, equals('💊 Juan - Hora de tomar medicamento'));
-      expect(title, contains('Juan'));
+      expect(title, equals('💊 John - Hora de tomar medicamento'));
+      expect(title, contains('John'));
     });
 
     test('_buildNotificationTitle should handle suffix for default user', () {
@@ -81,14 +80,14 @@ void main() {
     test('_buildNotificationTitle should handle suffix for non-default user', () {
       // Simulate a non-default person with suffix
       const isDefault = false;
-      const personName = 'María';
+      const personName = 'Maria';
 
       // Build title with suffix for non-default user
       final title = service.buildNotificationTitle(personName, isDefault, suffix: '(pospuesto)');
 
       // Should include person name and suffix
-      expect(title, equals('💊 María - Hora de tomar medicamento (pospuesto)'));
-      expect(title, contains('María'));
+      expect(title, equals('💊 Maria - Hora de tomar medicamento (pospuesto)'));
+      expect(title, contains('Maria'));
       expect(title, contains('(pospuesto)'));
     });
 
@@ -118,7 +117,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-title-med-1')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withSingleDose('08:00', 1.0)
           .withStock(30.0)
           .withStartDate(DateTime.now())
@@ -140,7 +139,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-postponed-1')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withSingleDose('14:00', 1.0)
           .withStock(20.0)
           .withStartDate(DateTime.now())

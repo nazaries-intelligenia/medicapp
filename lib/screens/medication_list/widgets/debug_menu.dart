@@ -42,8 +42,8 @@ class DebugMenu extends StatelessWidget {
           value: 'test',
           child: Row(
             children: [
-              Icon(Icons.notifications_active),
-              SizedBox(width: 8),
+              const Icon(Icons.notifications_active),
+              const SizedBox(width: 8),
               Text(l10n.testNotification),
             ],
           ),
@@ -52,8 +52,8 @@ class DebugMenu extends StatelessWidget {
           value: 'test_scheduled',
           child: Row(
             children: [
-              Icon(Icons.alarm_add),
-              SizedBox(width: 8),
+              const Icon(Icons.alarm_add),
+              const SizedBox(width: 8),
               Text(l10n.testScheduled1Min),
             ],
           ),
@@ -62,8 +62,8 @@ class DebugMenu extends StatelessWidget {
           value: 'reschedule',
           child: Row(
             children: [
-              Icon(Icons.refresh),
-              SizedBox(width: 8),
+              const Icon(Icons.refresh),
+              const SizedBox(width: 8),
               Text(l10n.rescheduleNotifications),
             ],
           ),
@@ -72,8 +72,8 @@ class DebugMenu extends StatelessWidget {
           value: 'debug',
           child: Row(
             children: [
-              Icon(Icons.info_outline),
-              SizedBox(width: 8),
+              const Icon(Icons.info_outline),
+              const SizedBox(width: 8),
               Text(l10n.notificationsInfo),
             ],
           ),
@@ -82,8 +82,8 @@ class DebugMenu extends StatelessWidget {
           value: 'open_alarms',
           child: Row(
             children: [
-              Icon(Icons.alarm),
-              SizedBox(width: 8),
+              const Icon(Icons.alarm),
+              const SizedBox(width: 8),
               Text(l10n.alarmsAndReminders),
             ],
           ),
@@ -94,8 +94,8 @@ class DebugMenu extends StatelessWidget {
             value: 'open_battery',
             child: Row(
               children: [
-                Icon(Icons.battery_full),
-                SizedBox(width: 8),
+                const Icon(Icons.battery_full),
+                const SizedBox(width: 8),
                 Text(l10n.batteryOptimizationMenu),
               ],
             ),

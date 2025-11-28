@@ -6,6 +6,8 @@ import 'package:medicapp/models/medication_type.dart';
 import 'helpers/test_helpers.dart';
 import 'helpers/medication_builder.dart';
 
+final l10n = getL10n();
+
 void main() {
   setupTestDatabase();
 
@@ -23,9 +25,9 @@ void main() {
     testWidgets('should render edit quantity screen', (WidgetTester tester) async {
       await pumpScreen(tester, EditQuantityScreen(medication: testMedication));
 
-      expect(find.text('Editar Cantidad'), findsOneWidget);
-      expect(find.text('Cantidad disponible'), findsOneWidget);
-      expect(find.text('Avisar cuando queden'), findsOneWidget);
+      expect(find.text(l10n.editQuantityTitle), findsOneWidget);
+      expect(find.text(l10n.editQuantityAvailableLabel), findsOneWidget);
+      expect(find.text(l10n.editQuantityThresholdLabel), findsOneWidget);
     });
 
     testWidgets('should initialize with current stock quantity', (WidgetTester tester) async {
@@ -53,11 +55,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pumpAndSettle();
 
       // Should show validation error
-      expect(find.text('Por favor, introduce la cantidad disponible'), findsOneWidget);
+      expect(find.text(l10n.editQuantityValidationRequired), findsOneWidget);
     });
 
     testWidgets('should prevent entering negative stock quantity with input formatter', (WidgetTester tester) async {
@@ -85,11 +87,11 @@ void main() {
       await tester.pump();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pump(); // Just trigger validation, don't wait for save
 
       // Should not show stock quantity validation error
-      expect(find.text('La cantidad debe ser mayor o igual a 0'), findsNothing);
+      expect(find.text(l10n.editQuantityValidationMin), findsNothing);
     });
 
     testWidgets('should accept comma as decimal separator in stock field', (WidgetTester tester) async {
@@ -133,11 +135,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pumpAndSettle();
 
       // Should show validation error
-      expect(find.text('Por favor, introduce los días de antelación'), findsOneWidget);
+      expect(find.text(l10n.editQuantityThresholdValidationRequired), findsOneWidget);
     });
 
     testWidgets('should show error for threshold less than 1 day', (WidgetTester tester) async {
@@ -149,11 +151,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pumpAndSettle();
 
       // Should show validation error
-      expect(find.text('Debe ser al menos 1 día'), findsOneWidget);
+      expect(find.text(l10n.editQuantityThresholdValidationMin), findsOneWidget);
     });
 
     testWidgets('should show error for threshold greater than 30 days', (WidgetTester tester) async {
@@ -165,11 +167,11 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pumpAndSettle();
 
       // Should show validation error
-      expect(find.text('No puede ser mayor a 30 días'), findsOneWidget);
+      expect(find.text(l10n.editQuantityThresholdValidationMax), findsOneWidget);
     });
 
     testWidgets('should accept valid threshold values (1-30)', (WidgetTester tester) async {
@@ -181,12 +183,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap save button - this will try to save but we just check no validation errors appear
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pump(); // Just one pump to trigger validation
 
       // Should not show validation errors for threshold
-      expect(find.text('Debe ser al menos 1 día'), findsNothing);
-      expect(find.text('No puede ser mayor a 30 días'), findsNothing);
+      expect(find.text(l10n.editQuantityThresholdValidationMin), findsNothing);
+      expect(find.text(l10n.editQuantityThresholdValidationMax), findsNothing);
     });
 
     testWidgets('should show cancel button', (WidgetTester tester) async {
@@ -198,7 +200,7 @@ void main() {
     testWidgets('should navigate back when cancel is pressed', (WidgetTester tester) async {
       await testCancelNavigation(
         tester,
-        screenTitle: 'Editar Cantidad',
+        screenTitle: l10n.editQuantityTitle,
         screenBuilder: (context) => EditQuantityScreen(medication: testMedication),
       );
     });
@@ -241,11 +243,11 @@ void main() {
       await tester.pump();
 
       // Tap save button
-      await tester.tap(find.text('Guardar Cambios'));
+      await tester.tap(find.text(l10n.editBasicInfoSaveChanges));
       await tester.pump(); // Just trigger validation, don't wait for save
 
       // Should not show validation error
-      expect(find.text('La cantidad debe ser mayor o igual a 0'), findsNothing);
+      expect(find.text(l10n.editQuantityValidationMin), findsNothing);
     });
 
     testWidgets('should prevent entering invalid characters with input formatter', (WidgetTester tester) async {

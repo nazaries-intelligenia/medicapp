@@ -15,6 +15,7 @@ void main() {
 
   // Setup database for all tests
   DatabaseTestHelper.setupAll();
+  DatabaseTestHelper.setupEach();
 
   setUp(() async {
     TestWidgetsFlutterBinding.ensureInitialized();

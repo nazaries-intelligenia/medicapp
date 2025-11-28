@@ -54,7 +54,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
   final Set<String> _soundPlayedFastingPeriods = {};
 
   // Day navigation
-  static const int _centerPageIndex = 10000; // Centro para navegación "ilimitada"
+  static const int _centerPageIndex = 10000; // Center for "unlimited" navigation
   late final PageController _pageController;
   late DateTime _selectedDate;
 
@@ -334,6 +334,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
 
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
+    if (!mounted) return;
+
     final newMedication = await Navigator.push<Medication>(
       context,
       MaterialPageRoute(
@@ -342,6 +344,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         ),
       ),
     );
+
+    if (!mounted) return;
 
     if (newMedication != null) {
       await _viewModel.createMedication(newMedication, personId: selectedPersonId);
@@ -412,6 +416,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
             medication.id, _viewModel.selectedPerson!.id)
         : await DatabaseHelper.instance.getMedication(medication.id);
 
+    if (!mounted) return;
+
     if (freshMedication == null) {
       SnackBarService.showError(
         context,
@@ -432,6 +438,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         medicationName: freshMedication.name,
       );
 
+      if (!mounted) return;
+
       if (confirmExtra == true) {
         isExtraDose = true;
       } else {
@@ -444,6 +452,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         availableDoses: availableDoses,
         showExtraOption: true,
       );
+
+      if (!mounted) return;
 
       if (selectedDoseTime == DoseSelectionDialog.extraDoseOption) {
         isExtraDose = true;
@@ -459,6 +469,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
         final result = await _viewModel.registerExtraDose(
           medication: freshMedication,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         SnackBarService.showInfo(
           context,
@@ -474,6 +487,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
           medication: freshMedication,
           doseTime: selectedDoseTime,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         final confirmationMessage = parts[0] == 'allComplete'
             ? '${l10n.doseRegisteredAtTime(freshMedication.name, selectedDoseTime, parts[1])}\n${l10n.allDosesCompletedToday}'
@@ -486,6 +502,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         );
       }
     } on InsufficientStockException catch (e) {
+      if (!mounted) return;
+
       SnackBarService.showError(
         context,
         l10n.insufficientStockForThisDose(
@@ -516,12 +534,17 @@ class MedicationListScreenState extends State<MedicationListScreen>
       medication: medication,
     );
 
+    if (!mounted) return;
+
     if (doseQuantity != null && doseQuantity > 0) {
       try {
         final result = await _viewModel.registerManualDose(
           medication: medication,
           quantity: doseQuantity,
         );
+
+        if (!mounted) return;
+
         final parts = result.split('|');
         final confirmationMessage = l10n.manualDoseRegistered(
           medication.name,
@@ -536,6 +559,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           duration: const Duration(seconds: 3),
         );
       } on InsufficientStockException catch (e) {
+        if (!mounted) return;
+
         SnackBarService.showError(
           context,
           l10n.insufficientStockForThisDose(
@@ -563,6 +588,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           currentExpirationDate: medication.expirationDate,
           isOptional: true,
         );
+
+        if (!mounted) return;
 
         // User cancelled the dialog
         if (expirationDate == null) {
@@ -603,14 +630,17 @@ class MedicationListScreenState extends State<MedicationListScreen>
       medication: medication,
     );
 
+    if (!mounted) return;
+
     if (refillAmount != null && refillAmount > 0) {
       final result = await _viewModel.refillMedication(
         medication: medication,
         amount: refillAmount,
       );
-      final parts = result.split('|');
 
       if (!mounted) return;
+
+      final parts = result.split('|');
 
       SnackBarService.showSuccess(
         context,
@@ -642,6 +672,9 @@ class MedicationListScreenState extends State<MedicationListScreen>
       onDelete: () async {
         final l10n = AppLocalizations.of(context)!;
         await _viewModel.deleteMedication(medication);
+
+        if (!mounted) return;
+
         Navigator.pop(context);
         SnackBarService.showInfo(
           context,
@@ -888,6 +921,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
         medicationId: medication.id,
       );
 
+      if (!mounted) return;
+
       // Find entry matching the dose time and person
       final selectedPerson = _viewModel.selectedPerson;
       if (selectedPerson == null) return;
@@ -899,6 +934,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
       }).firstOrNull;
 
       if (entry == null) {
+        if (!mounted) return;
+
         SnackBarService.showError(
           context,
           l10n.errorFindingDoseEntry,
@@ -917,6 +954,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
           initialTime: initialTime,
           helpText: l10n.selectRegisteredTime,
         );
+
+        if (!mounted) return;
 
         if (picked == null) return; // User cancelled
 
@@ -947,6 +986,8 @@ class MedicationListScreenState extends State<MedicationListScreen>
               ],
             ),
           );
+
+          if (!mounted) return;
 
           // Keep the selected time for next iteration
           initialTime = picked;
@@ -1000,12 +1041,12 @@ class MedicationListScreenState extends State<MedicationListScreen>
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
 
-    // Si es hoy, mostrar "Hoy, día/mes/año"
+    // If it's today, show "Today, day/month/year"
     if (selectedDay == today) {
       return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
     }
 
-    // Para otros días, mostrar solo la fecha
+    // For other days, show only the date
     return '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
   }
 
@@ -1017,28 +1058,30 @@ class MedicationListScreenState extends State<MedicationListScreen>
       lastDate: DateTime(2100),
     );
 
+    if (!mounted) return;
+
     if (picked != null) {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final pickedNormalized = DateTime(picked.year, picked.month, picked.day);
 
-      // Calcular offset desde hoy
+      // Calculate offset from today
       final dayOffset = pickedNormalized.difference(today).inDays;
       final targetPage = _centerPageIndex + dayOffset;
 
-      // Navegar a la página
+      // Navigate to the page
       await _pageController.animateToPage(
         targetPage,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
 
-      // Actualizar estado (onPageChanged se llamará automáticamente)
+      // Update state (onPageChanged will be called automatically)
     }
   }
 
   Future<void> _returnToToday() async {
-    // Navegar de vuelta al centro (hoy)
+    // Navigate back to the center (today)
     await _pageController.animateToPage(
       _centerPageIndex,
       duration: const Duration(milliseconds: 300),
@@ -1122,10 +1165,10 @@ class MedicationListScreenState extends State<MedicationListScreen>
       ),
       body: Column(
         children: [
-          // Contador de ayuno (aparece encima de las pestañas)
+          // Fasting countdown (appears above the tabs)
           if (_viewModel.activeFastingPeriods.isNotEmpty)
             _buildAllFastingCountdowns(),
-          // Pestañas de usuarios
+          // User tabs
           if (_viewModel.showPersonTabs &&
               _tabController != null &&
               _viewModel.persons.length > 1)
@@ -1135,7 +1178,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 controller: _tabController,
                 isScrollable: _viewModel.persons.length > 3,
                 labelColor: Theme.of(context).colorScheme.primary,
-                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+                unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: AppTheme.tabUnselectedOpacity),
                 indicatorColor: Theme.of(context).colorScheme.primary,
                 indicatorWeight: AppTheme.tabIndicatorWeight,
                 indicatorSize: TabBarIndicatorSize.tab,
@@ -1158,7 +1201,7 @@ class MedicationListScreenState extends State<MedicationListScreen>
                 }).toList(),
               ),
             ),
-          // Contenido con navegación por días
+          // Content with day navigation
           Expanded(
             child: PageView.builder(
               controller: _pageController,
@@ -1294,10 +1337,10 @@ class _FastingCountdownPanel extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.secondaryContainer.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Theme.of(context).colorScheme.secondary.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.3),
           width: 1,
         ),
       ),
@@ -1442,7 +1485,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                 ? null
                 : Border(
                     bottom: BorderSide(
-                      color: Theme.of(context).dividerColor.withOpacity(0.2),
+                      color: Theme.of(context).dividerColor.withValues(alpha: 0.2),
                       width: 1,
                     ),
                   ),
@@ -1504,7 +1547,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
+                            color: Colors.green.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -1524,7 +1567,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade700.withOpacity(0.1),
+                            color: Colors.green.shade700.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -1541,7 +1584,7 @@ class _FastingCountdownRowState extends State<_FastingCountdownRow> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

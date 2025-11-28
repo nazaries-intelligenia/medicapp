@@ -410,7 +410,7 @@ void main() {
           .build();
 
       await insertMedicationWithPerson(medication);
-      final personId = await getDefaultPersonId();
+      await getDefaultPersonId();
 
       // Act - Simulate multiple 10-minute postponements
       final originalTime = DateTime(

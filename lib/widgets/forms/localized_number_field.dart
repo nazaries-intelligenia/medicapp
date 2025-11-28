@@ -3,82 +3,82 @@ import 'package:flutter/services.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
 import '../../utils/number_utils.dart';
 
-/// Widget para entrada de números con soporte de localización de separadores decimales
+/// Widget for number input with localized decimal separator support
 ///
-/// Acepta tanto coma (,) como punto (.) como separadores decimales
-/// y formatea el valor según el locale del usuario.
+/// Accepts both comma (,) and period (.) as decimal separators
+/// and formats the value according to the user's locale.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// LocalizedNumberField(
 ///   controller: _controller,
-///   label: 'Cantidad',
+///   label: 'Amount',
 ///   allowDecimals: true,
 ///   minValue: 0,
-///   onChanged: (value) => print('Nuevo valor: $value'),
+///   onChanged: (value) => print('New value: $value'),
 /// )
 /// ```
 class LocalizedNumberField extends StatefulWidget {
-  /// Controller para el campo de texto
+  /// Controller for the text field
   final TextEditingController? controller;
 
-  /// Etiqueta del campo
+  /// Field label
   final String? label;
 
   /// Hint text (placeholder)
   final String? hint;
 
-  /// Texto de ayuda debajo del campo
+  /// Helper text below the field
   final String? helperText;
 
-  /// Validador personalizado
-  /// Recibe el valor parseado (double o null) y debe retornar un mensaje de error o null
+  /// Custom validator
+  /// Receives the parsed value (double or null) and should return an error message or null
   final String? Function(double?)? validator;
 
-  /// Callback cuando cambia el valor
-  /// Recibe el valor parseado (double o null)
+  /// Callback when value changes
+  /// Receives the parsed value (double or null)
   final void Function(double?)? onChanged;
 
-  /// Valor inicial
+  /// Initial value
   final double? initialValue;
 
-  /// Permitir decimales
+  /// Allow decimals
   final bool allowDecimals;
 
-  /// Número de dígitos decimales permitidos (null = sin límite)
+  /// Number of allowed decimal digits (null = no limit)
   final int? decimalDigits;
 
-  /// Permitir números negativos
+  /// Allow negative numbers
   final bool allowNegative;
 
-  /// Validación: valor mínimo permitido
+  /// Validation: minimum allowed value
   final double? minValue;
 
-  /// Validación: valor máximo permitido
+  /// Validation: maximum allowed value
   final double? maxValue;
 
-  /// Si es requerido
+  /// Whether it is required
   final bool required;
 
-  /// Decoración personalizada
+  /// Custom decoration
   final InputDecoration? decoration;
 
-  /// Estilo del texto
+  /// Text style
   final TextStyle? style;
 
   /// Auto focus
   final bool autofocus;
 
-  /// Habilitado
+  /// Enabled
   final bool enabled;
 
-  /// Número máximo de líneas
+  /// Maximum number of lines
   final int? maxLines;
 
-  /// Acción del teclado
+  /// Keyboard action
   final TextInputAction? textInputAction;
 
-  /// Callback al enviar
+  /// Callback on submit
   final void Function(String)? onFieldSubmitted;
 
   const LocalizedNumberField({
@@ -122,7 +122,7 @@ class _LocalizedNumberFieldState extends State<LocalizedNumberField> {
       _isInternalController = true;
       _controller = TextEditingController();
       if (widget.initialValue != null) {
-        // Formatear el valor inicial según el locale
+        // Format the initial value according to the locale
         _controller.text = _formatInitialValue(widget.initialValue!);
       }
     }
@@ -137,12 +137,12 @@ class _LocalizedNumberFieldState extends State<LocalizedNumberField> {
   }
 
   String _formatInitialValue(double value) {
-    // Si no permite decimales o es un entero, mostrar sin decimales
+    // If decimals are not allowed or it's an integer, display without decimals
     if (!widget.allowDecimals || value == value.toInt()) {
       return value.toInt().toString();
     }
 
-    // Formatear con locale
+    // Format with locale
     final locale = Localizations.localeOf(context).toString();
     return NumberUtils.formatSmart(value, locale, maxDecimals: widget.decimalDigits ?? 2);
   }
@@ -181,36 +181,36 @@ class _LocalizedNumberFieldState extends State<LocalizedNumberField> {
       textInputAction: widget.textInputAction,
       onFieldSubmitted: widget.onFieldSubmitted,
       validator: (value) {
-        // Validar campo requerido
+        // Validate required field
         if (widget.required && (value == null || value.trim().isEmpty)) {
           return l10n.validationRequired;
         }
 
-        // Si está vacío y no es requerido, es válido
+        // If empty and not required, it's valid
         if (value == null || value.trim().isEmpty) {
           return null;
         }
 
-        // Parsear el valor
+        // Parse the value
         final parsedValue = NumberUtils.parseLocalizedDouble(value);
 
-        // Validar que se pudo parsear
+        // Validate that it could be parsed
         if (parsedValue == null) {
           return l10n.validationInvalidNumber;
         }
 
-        // Validar rango mínimo
+        // Validate minimum range
         if (widget.minValue != null && parsedValue < widget.minValue!) {
           return l10n.validationMinValue(widget.minValue!);
         }
 
-        // Validar rango máximo
+        // Validate maximum range
         if (widget.maxValue != null && parsedValue > widget.maxValue!) {
-          // Necesitaríamos agregar esta string en l10n
-          return 'El valor debe ser menor o igual a ${widget.maxValue}';
+          // We would need to add this string in l10n
+          return 'The value must be less than or equal to ${widget.maxValue}';
         }
 
-        // Validador personalizado
+        // Custom validator
         if (widget.validator != null) {
           return widget.validator!(parsedValue);
         }
@@ -227,15 +227,15 @@ class _LocalizedNumberFieldState extends State<LocalizedNumberField> {
   }
 }
 
-/// Extension helper para obtener el valor numérico de un TextEditingController
+/// Extension helper to get the numeric value from a TextEditingController
 extension LocalizedNumberController on TextEditingController {
-  /// Obtiene el valor parseado como double o null si no es válido
+  /// Gets the parsed value as double or null if invalid
   double? get doubleValue => NumberUtils.parseLocalizedDouble(text);
 
-  /// Obtiene el valor parseado como int o null si no es válido
+  /// Gets the parsed value as int or null if invalid
   int? get intValue => doubleValue?.toInt();
 
-  /// Establece el valor formateado según el locale
+  /// Sets the value formatted according to the locale
   void setLocalizedValue(double value, String locale, {int? decimalDigits}) {
     text = NumberUtils.formatSmart(value, locale, maxDecimals: decimalDigits ?? 2);
   }

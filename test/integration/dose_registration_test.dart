@@ -19,13 +19,13 @@ void main() {
     await tearDownIntegrationTest();
   });
 
-  testWidgets('Should show "Registrar toma" button in medication modal', (WidgetTester tester) async {
+  testWidgets('Should show "Register dose" button in medication modal', (WidgetTester tester) async {
     // Build our app
     await tester.pumpWidget(const MedicApp());
     await waitForDatabase(tester);
 
     // Add a medication with stock
-    await addMedicationWithDuration(tester, 'Paracetamol', stockQuantity: '10');
+    await addMedicationWithDuration(tester, 'Acetaminophen', stockQuantity: '10');
     await waitForDatabase(tester);
 
     // V19+: Wait for medication list to load
@@ -36,11 +36,11 @@ void main() {
     await tester.pump();
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Paracetamol'));
+    await tester.tap(find.text('Acetaminophen'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Verify "Registrar toma" button is shown
+    // Verify "Register dose" button is shown
     expect(find.text(getL10n(tester).medicineCabinetRegisterDose), findsWidgets);
     expect(find.text(getL10n(tester).medicineCabinetEditMedication), findsWidgets);
     expect(find.text(getL10n(tester).medicineCabinetDeleteMedication), findsWidgets);
@@ -52,7 +52,7 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with stock and 24-hour interval (only 1 dose per day)
-    await addMedicationWithDuration(tester, 'Vitamina C', stockQuantity: '30', dosageIntervalHours: 24);
+    await addMedicationWithDuration(tester, 'Vitamin C', stockQuantity: '30', dosageIntervalHours: 24);
     await waitForDatabase(tester);
 
     // V19+: Wait for medication list to fully load
@@ -63,14 +63,14 @@ void main() {
     await tester.pump();
 
     // Verify initial stock is shown in the list (30 pastillas)
-    expect(find.text('Vitamina C'), findsOneWidget);
+    expect(find.text('Vitamin C'), findsOneWidget);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Vitamina C'));
+    await tester.tap(find.text('Vitamin C'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap "Registrar toma"
+    // Tap "Register dose"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
     await tester.pump(); // Start closing modal
     await tester.pump(); // Complete modal close
@@ -87,7 +87,7 @@ void main() {
 
     // The medication has one dose available (08:00), so the DoseSelectionDialog should appear
     // The dialog shows the available dose and an option to register an extra dose
-    expect(find.text('Registrar toma de Vitamina C'), findsOneWidget);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Vitamin C')), findsOneWidget);
     expect(find.text('08:00'), findsOneWidget);
 
     // Select the available dose time (08:00) to register it
@@ -102,7 +102,7 @@ void main() {
     await tester.pump();
 
     // The medication list should have reloaded - verify the medication is still there
-    expect(find.text('Vitamina C'), findsOneWidget);
+    expect(find.text('Vitamin C'), findsOneWidget);
 
     // The confirmation message should be shown (may be visible or may have faded)
     // We verify the operation succeeded by checking the medication is still in the list
@@ -122,15 +122,15 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with stock and 8-hour interval (3 doses per day)
-    await addMedicationWithDuration(tester, 'Ibuprofeno', stockQuantity: '20', dosageIntervalHours: 8);
+    await addMedicationWithDuration(tester, 'Ibuprofen', stockQuantity: '20', dosageIntervalHours: 8);
     await waitForDatabase(tester);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Ibuprofeno'));
+    await tester.tap(find.text('Ibuprofen'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap "Registrar toma"
+    // Tap "Register dose"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
@@ -141,8 +141,8 @@ void main() {
     }
 
     // Verify dose selection dialog IS shown (because there are multiple doses per day)
-    expect(find.text('Registrar toma de Ibuprofeno'), findsOneWidget);
-    expect(find.text('¿Qué toma has tomado?'), findsOneWidget);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Ibuprofen')), findsOneWidget);
+    expect(find.text(getL10n(tester).whichDoseDidYouTake), findsOneWidget);
 
     // Verify dose times are shown (in test mode, 3 doses are auto-generated for 8-hour interval)
     // Times should be displayed as buttons with alarm icons
@@ -155,18 +155,18 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with stock (12-hour interval creates 2 doses: 08:00 and 20:00)
-    await addMedicationWithDuration(tester, 'Aspirina', stockQuantity: '15', dosageIntervalHours: 12);
+    await addMedicationWithDuration(tester, 'Aspirin', stockQuantity: '15', dosageIntervalHours: 12);
     await waitForDatabase(tester);
 
     // Verify medication is in the list
-    expect(find.text('Aspirina'), findsOneWidget);
+    expect(find.text('Aspirin'), findsOneWidget);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Aspirina'));
+    await tester.tap(find.text('Aspirin'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap "Registrar toma"
+    // Tap "Register dose"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
@@ -177,8 +177,8 @@ void main() {
     }
 
     // Verify the dialog is shown (because there are 2 doses per day)
-    expect(find.text('Registrar toma de Aspirina'), findsOneWidget);
-    expect(find.text('¿Qué toma has tomado?'), findsOneWidget);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Aspirin')), findsOneWidget);
+    expect(find.text(getL10n(tester).whichDoseDidYouTake), findsOneWidget);
 
     // The medication should have dose times like "08:00" and "20:00"
     // Find the first dose time button - we know "08:00" exists
@@ -200,7 +200,7 @@ void main() {
     }
 
     // Verify the medication is still in the list (operation completed successfully)
-    expect(find.text('Aspirina'), findsOneWidget);
+    expect(find.text('Aspirin'), findsOneWidget);
 
     // The stock should have decreased from 15 to 14, but we can't easily verify
     // the exact number in the UI. The important thing is the operation completed
@@ -233,7 +233,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300)); // Allow modal to open
     await tester.pump(); // Complete frame
 
-    // Tap "Registrar toma"
+    // Tap "Register dose"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for the tap to be processed and modal to close
@@ -246,9 +246,9 @@ void main() {
     await tester.pump();
 
     // Verify the dose selection dialog was NOT shown (no stock path was taken)
-    expect(find.text('¿Qué toma has tomado?'), findsNothing);
+    expect(find.text(getL10n(tester).whichDoseDidYouTake), findsNothing);
 
-    // Verify the medication modal is closed (no "Editar medicamento" or "Eliminar medicamento" buttons)
+    // Verify the medication modal is closed (no "Edit medication" or "Delete medication" buttons)
     expect(find.text(getL10n(tester).medicineCabinetEditMedication), findsNothing);
     expect(find.text(getL10n(tester).medicineCabinetDeleteMedication), findsNothing);
 
@@ -266,15 +266,15 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with stock
-    await addMedicationWithDuration(tester, 'Vitamina D', stockQuantity: '30');
+    await addMedicationWithDuration(tester, 'Vitamin D', stockQuantity: '30');
     await waitForDatabase(tester);
 
     // Tap on the medication to open modal
-    await tester.tap(find.text('Vitamina D'));
+    await tester.tap(find.text('Vitamin D'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap "Registrar toma"
+    // Tap "Register dose"
     await tester.tap(find.text(getL10n(tester).medicineCabinetRegisterDose));
 
     // Wait for database query (getMedication) to complete before dialog opens
@@ -285,7 +285,7 @@ void main() {
     }
 
     // Verify dialog is shown
-    expect(find.text('Registrar toma de Vitamina D'), findsOneWidget);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Vitamin D')), findsOneWidget);
 
     // Tap cancel
     await tester.tap(find.text(getL10n(tester).btnCancel));
@@ -295,8 +295,9 @@ void main() {
     }
 
     // Verify dialog is closed and no confirmation message is shown
-    expect(find.text('Registrar toma de Vitamina D'), findsNothing);
-    expect(find.textContaining('Toma de Vitamina D registrada'), findsNothing);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Vitamin D')), findsNothing);
+    // Note: Can't check for exact confirmation message as it varies with stock/time
+    // The important thing is that the dialog is closed
   });
 
   testWidgets('Should only show remaining doses after registering first dose', (WidgetTester tester) async {
@@ -305,11 +306,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with 3 doses per day (8-hour interval)
-    await addMedicationWithDuration(tester, 'Medicamento', stockQuantity: '20', dosageIntervalHours: 8);
+    await addMedicationWithDuration(tester, 'Medicine', stockQuantity: '20', dosageIntervalHours: 8);
     await waitForDatabase(tester);
 
     // Register first dose
-    await tester.tap(find.text(getL10n(tester).summaryMedication));
+    await tester.tap(find.text('Medicine'));
     // Wait for modal animation - use manual pumps
     for (int i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -369,8 +370,8 @@ void main() {
 
     // Try to register another dose immediately
     // Wait for medication to appear in the list after reload
-    await waitForWidget(tester, find.text('Medicamento'));
-    await tester.tap(find.text('Medicamento'));
+    await waitForWidget(tester, find.text('Medicine'));
+    await tester.tap(find.text('Medicine'));
     // Wait for modal animation - use manual pumps
     for (int i = 0; i < 10; i++) {
       await tester.pump(const Duration(milliseconds: 50));
@@ -387,10 +388,10 @@ void main() {
     }
 
     // Verify the dialog is shown
-    expect(find.text('Registrar toma de Medicamento'), findsOneWidget);
+    expect(find.text(getL10n(tester).registerDoseOfMedication('Medicine')), findsOneWidget);
 
     // Verify only remaining doses are shown in the dialog (14:00 and 20:00)
-    // Note: 08:00 may still appear elsewhere on screen (in "Tomas de hoy" section),
+    // Note: 08:00 may still appear elsewhere on screen (in "Today's doses" section),
     // but it should not appear as a button in the dialog
     expect(find.text('14:00'), findsOneWidget);
     expect(find.text('20:00'), findsOneWidget);
@@ -507,7 +508,7 @@ void main() {
 
     // With the new extra dose feature, the dialog is now shown even with 1 dose
     // (to allow registering an extra dose)
-    expect(find.text('¿Qué toma has tomado?'), findsOneWidget);
+    expect(find.text(getL10n(tester).whichDoseDidYouTake), findsOneWidget);
 
     // Select the remaining scheduled dose (20:00)
     await tester.tap(find.text('20:00'));

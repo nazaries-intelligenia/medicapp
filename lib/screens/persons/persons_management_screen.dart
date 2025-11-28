@@ -111,9 +111,11 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
 
     try {
       await DatabaseHelper.instance.deletePerson(person.id);
+      if (!mounted) return;
       SnackBarService.showSuccess(context, 'Persona eliminada correctamente');
       _loadPersons();
     } catch (e) {
+      if (!mounted) return;
       SnackBarService.showError(context, 'Error al eliminar persona: $e');
     }
   }
@@ -136,20 +138,20 @@ class _PersonsManagementScreenState extends State<PersonsManagementScreen> {
                       Icon(
                         Icons.people_outline,
                         size: 64,
-                        color: theme.colorScheme.primary.withOpacity(0.5),
+                        color: theme.colorScheme.primary.withValues(alpha: 0.5),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'No hay personas registradas',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Añade una persona para empezar',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.4),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                         ),
                       ),
                     ],

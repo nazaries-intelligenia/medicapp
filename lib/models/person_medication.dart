@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'treatment_duration_type.dart';
 
-/// Modelo que representa la relación muchos-a-muchos entre personas y medicamentos.
+/// Model representing the many-to-many relationship between persons and medications.
 ///
-/// IMPORTANTE: Esta tabla ahora almacena la PAUTA INDIVIDUAL de cada persona para un medicamento.
-/// El medicamento base (nombre, tipo, stock) está en la tabla medications.
-/// Cada persona puede tener su propia pauta (horarios, duración, etc.) para el mismo medicamento.
+/// IMPORTANT: This table now stores the INDIVIDUAL REGIMEN of each person for a medication.
+/// The base medication (name, type, stock) is in the medications table.
+/// Each person can have their own regimen (schedules, duration, etc.) for the same medication.
 class PersonMedication {
   final String id;
   final String personId;
   final String medicationId;
   final String assignedDate;
 
-  // === PAUTA INDIVIDUAL (datos específicos de cada persona) ===
+  // === INDIVIDUAL REGIMEN (person-specific data) ===
   final TreatmentDurationType durationType;
   final int dosageIntervalHours;
   final Map<String, double> doseSchedule; // TimeString -> doseQuantity
@@ -56,7 +56,7 @@ class PersonMedication {
   /// Get dose times from the schedule
   List<String> get doseTimes => doseSchedule.keys.toList()..sort();
 
-  /// Convierte el objeto a un Map para guardar en la base de datos
+  /// Converts the object to a Map for database storage
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -82,7 +82,7 @@ class PersonMedication {
     };
   }
 
-  /// Crea un objeto PersonMedication desde un Map de la base de datos
+  /// Creates a PersonMedication object from a database Map
   factory PersonMedication.fromJson(Map<String, dynamic> json) {
     // Parse doseSchedule from JSON string
     final doseScheduleStr = json['doseSchedule'] as String? ?? '{}';
@@ -141,7 +141,7 @@ class PersonMedication {
     );
   }
 
-  /// Crea una copia del objeto con valores opcionales modificados
+  /// Creates a copy of the object with optionally modified values
   PersonMedication copyWith({
     String? id,
     String? personId,

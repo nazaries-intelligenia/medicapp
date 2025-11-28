@@ -3,14 +3,14 @@ import 'package:flutter/foundation.dart';
 import '../logger_service.dart';
 import 'cache_entry.dart';
 
-/// Servicio de caché inteligente con TTL, LRU y gestión automática de memoria
+/// Smart cache service with TTL, LRU and automatic memory management
 class SmartCacheService<K, V> {
   final Duration defaultTTL;
   final int maxSize;
   final Map<K, CacheEntry<V>> _cache = {};
   Timer? _cleanupTimer;
 
-  /// Estadísticas del caché
+  /// Cache statistics
   int _hits = 0;
   int _misses = 0;
   int _evictions = 0;
@@ -25,7 +25,7 @@ class SmartCacheService<K, V> {
     }
   }
 
-  /// Obtiene un valor del caché
+  /// Gets a value from the cache
   V? get(K key) {
     final entry = _cache[key];
 
@@ -48,9 +48,9 @@ class SmartCacheService<K, V> {
     return entry.data;
   }
 
-  /// Almacena un valor en el caché
+  /// Stores a value in the cache
   void put(K key, V value, {Duration? ttl}) {
-    // Si el caché está lleno, eliminar la entrada con menor prioridad (LRU)
+    // If the cache is full, remove the entry with the lowest priority (LRU)
     if (_cache.length >= maxSize) {
       _evictLeastRecentlyUsed();
     }
@@ -63,7 +63,7 @@ class SmartCacheService<K, V> {
     LoggerService.debug('Cached value for key: $key');
   }
 
-  /// Obtiene un valor o lo calcula si no existe (cache-aside pattern)
+  /// Gets a value or computes it if it doesn't exist (cache-aside pattern)
   Future<V> getOrCompute(
     K key,
     Future<V> Function() compute, {
@@ -79,13 +79,13 @@ class SmartCacheService<K, V> {
     return value;
   }
 
-  /// Invalida una entrada específica
+  /// Invalidates a specific entry
   void invalidate(K key) {
     _cache.remove(key);
     LoggerService.debug('Invalidated cache for key: $key');
   }
 
-  /// Invalida múltiples entradas que coincidan con un predicado
+  /// Invalidates multiple entries that match a predicate
   void invalidateWhere(bool Function(K key) predicate) {
     final keysToRemove = _cache.keys.where(predicate).toList();
     for (final key in keysToRemove) {
@@ -94,14 +94,14 @@ class SmartCacheService<K, V> {
     LoggerService.debug('Invalidated ${keysToRemove.length} cache entries');
   }
 
-  /// Limpia todo el caché
+  /// Clears all cache
   void clear() {
     final size = _cache.length;
     _cache.clear();
     LoggerService.info('Cache cleared: $size entries removed');
   }
 
-  /// Elimina entradas expiradas
+  /// Removes expired entries
   void cleanup() {
     final before = _cache.length;
     _cache.removeWhere((key, entry) => entry.isExpired);
@@ -112,7 +112,7 @@ class SmartCacheService<K, V> {
     }
   }
 
-  /// Elimina la entrada con menor prioridad (LRU)
+  /// Removes the entry with the lowest priority (LRU)
   void _evictLeastRecentlyUsed() {
     if (_cache.isEmpty) return;
 
@@ -134,20 +134,20 @@ class SmartCacheService<K, V> {
     }
   }
 
-  /// Inicia la limpieza automática periódica
+  /// Starts periodic automatic cleanup
   void _startAutoCleanup() {
     _cleanupTimer = Timer.periodic(const Duration(minutes: 1), (_) {
       cleanup();
     });
   }
 
-  /// Detiene la limpieza automática
+  /// Stops automatic cleanup
   void stopAutoCleanup() {
     _cleanupTimer?.cancel();
     _cleanupTimer = null;
   }
 
-  /// Obtiene estadísticas del caché
+  /// Gets cache statistics
   CacheStats get stats => CacheStats(
         size: _cache.length,
         maxSize: maxSize,
@@ -157,21 +157,21 @@ class SmartCacheService<K, V> {
         hitRate: _hits + _misses > 0 ? _hits / (_hits + _misses) : 0.0,
       );
 
-  /// Resetea las estadísticas
+  /// Resets the statistics
   void resetStats() {
     _hits = 0;
     _misses = 0;
     _evictions = 0;
   }
 
-  /// Libera recursos
+  /// Releases resources
   void dispose() {
     stopAutoCleanup();
     clear();
   }
 }
 
-/// Estadísticas del caché
+/// Cache statistics
 @immutable
 class CacheStats {
   final int size;

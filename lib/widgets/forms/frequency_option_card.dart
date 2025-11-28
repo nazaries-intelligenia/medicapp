@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Widget reutilizable para mostrar una opción de frecuencia como tarjeta seleccionable
-/// Usado en pantallas de creación y edición de frecuencia de medicamentos
+/// Reusable widget to display a frequency option as a selectable card
+/// Used in medication frequency creation and editing screens
 class FrequencyOptionCard<T> extends StatelessWidget {
   final T value;
   final T selectedValue;
@@ -32,7 +32,7 @@ class FrequencyOptionCard<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
           border: Border.all(
             color: isSelected ? color : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,
@@ -63,8 +63,8 @@ class FrequencyOptionCard<T> extends StatelessWidget {
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: isSelected
-                              ? color.withOpacity(0.8)
-                              : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              ? color.withValues(alpha: 0.8)
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
                   ),
                 ],

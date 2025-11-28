@@ -46,7 +46,7 @@ class DoseSelectionDialog {
                 const SizedBox(height: 8),
                 const Divider(),
                 const SizedBox(height: 8),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: FilledButton.tonalIcon(
                     onPressed: () => Navigator.pop(context, extraDoseOption),

@@ -1,4 +1,4 @@
-/// Representa una entrada en el caché con metadata de expiración
+/// Represents a cache entry with expiration metadata
 class CacheEntry<T> {
   final T data;
   final DateTime createdAt;
@@ -15,25 +15,25 @@ class CacheEntry<T> {
   })  : createdAt = createdAt ?? DateTime.now(),
         lastAccessedAt = lastAccessedAt ?? DateTime.now();
 
-  /// Verifica si la entrada ha expirado
+  /// Checks if the entry has expired
   bool get isExpired {
     final now = DateTime.now();
     return now.difference(createdAt) > ttl;
   }
 
-  /// Actualiza el timestamp de último acceso
+  /// Updates the last access timestamp
   void markAsAccessed() {
     lastAccessedAt = DateTime.now();
     accessCount++;
   }
 
-  /// Calcula la prioridad para el algoritmo LRU
-  /// Mayor prioridad = más probable que se mantenga en caché
+  /// Calculates the priority for the LRU algorithm
+  /// Higher priority = more likely to remain in cache
   double get priority {
     final timeSinceLastAccess = DateTime.now().difference(lastAccessedAt).inSeconds;
     final accessFrequency = accessCount.toDouble();
 
-    // Fórmula: más accesos recientes = mayor prioridad
+    // Formula: more recent accesses = higher priority
     return accessFrequency / (timeSinceLastAccess + 1);
   }
 }

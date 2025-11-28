@@ -195,8 +195,8 @@ class NotificationService {
       // Actions are configured in AndroidNotificationDetails (notification_config.dart)
       const medicationChannel = fln.AndroidNotificationChannel(
         'medication_reminders', // Must match the channel ID in NotificationConfig
-        'Recordatorios de Medicamentos',
-        description: 'Notificaciones para recordarte tomar tus medicamentos',
+        'Medication Reminders',
+        description: 'Notifications to remind you to take your medications',
         importance: fln.Importance.high,
         playSound: true,
         enableVibration: true,
@@ -205,9 +205,9 @@ class NotificationService {
       // Create fasting completion channel (no actions needed)
       const fastingChannel = fln.AndroidNotificationChannel(
         'fasting_completion',
-        'Alertas de fin de ayuno',
+        'Fasting End Alerts',
         description:
-            'Notificaciones importantes cuando termina el período de ayuno',
+            'Important notifications when the fasting period ends',
         importance: fln.Importance.max,
         playSound: true,
         enableVibration: true,

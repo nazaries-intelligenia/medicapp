@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import 'medication_type.dart';
 import 'treatment_duration_type.dart';
 import '../utils/datetime_extensions.dart';
 import '../services/logger_service.dart';
+import '../l10n/app_localizations.dart';
 
 class Medication {
   final String id;
@@ -226,20 +226,20 @@ class Medication {
   String get durationDisplayText {
     switch (durationType) {
       case TreatmentDurationType.everyday:
-        return 'Todos los días';
+        return 'Every day';
       case TreatmentDurationType.untilFinished:
-        return 'Hasta acabar';
+        return 'Until finished';
       case TreatmentDurationType.specificDates:
         final count = selectedDates?.length ?? 0;
-        return '$count fecha${count != 1 ? 's' : ''} específica${count != 1 ? 's' : ''}';
+        return '$count specific date${count != 1 ? 's' : ''}';
       case TreatmentDurationType.weeklyPattern:
         final count = weeklyDays?.length ?? 0;
-        return '$count día${count != 1 ? 's' : ''} por semana';
+        return '$count day${count != 1 ? 's' : ''} per week';
       case TreatmentDurationType.intervalDays:
         final interval = dayInterval ?? 2;
-        return 'Cada $interval días';
+        return 'Every $interval days';
       case TreatmentDurationType.asNeeded:
-        return 'Según necesidad';
+        return 'As needed';
     }
   }
 
@@ -277,7 +277,17 @@ class Medication {
     }
   }
 
-  /// Get the stock display text with proper units
+  /// Get the localized stock display text with proper units
+  /// This is the preferred method for displaying stock information to users
+  String getStockDisplayText(AppLocalizations l10n) {
+    final unit = stockQuantity == 1
+        ? type.getStockUnitSingular(l10n)
+        : type.getStockUnit(l10n);
+    return '${stockQuantity.toStringAsFixed(stockQuantity.truncateToDouble() == stockQuantity ? 0 : 1)} $unit';
+  }
+
+  /// Legacy: Get the stock display text with proper units (non-localized)
+  /// Use getStockDisplayText(l10n) instead for proper localization
   String get stockDisplayText {
     if (stockQuantity == 0) {
       return 'Sin stock';
@@ -436,20 +446,23 @@ class Medication {
     return false;
   }
 
-  /// Get status description for UI
-  String get statusDescription {
-    if (isPending) {
-      final formatter = DateFormat('d MMM yyyy', 'es_ES');
-      return 'Empieza el ${formatter.format(startDate!)}';
-    }
-    if (isFinished) {
-      final formatter = DateFormat('d MMM yyyy', 'es_ES');
-      return 'Finalizado el ${formatter.format(endDate!)}';
-    }
+  /// Check if medication has a status to display
+  bool get hasStatusDescription {
+    return isPending || isFinished || (isActive && currentDay != null && totalDays != null);
+  }
+
+  /// Get formatted start date for UI (use with l10n.medicationStartsOn)
+  DateTime? get statusStartDate => isPending ? startDate : null;
+
+  /// Get formatted end date for UI (use with l10n.medicationFinishedOn)
+  DateTime? get statusEndDate => isFinished ? endDate : null;
+
+  /// Get current day and total days for UI (use with l10n.medicationDayOfTotal)
+  (int current, int total)? get statusDayProgress {
     if (isActive && currentDay != null && totalDays != null) {
-      return 'Día $currentDay de $totalDays';
+      return (currentDay!, totalDays!);
     }
-    return ''; // No special status
+    return null;
   }
 
   /// Create a copy of this Medication with updated fields

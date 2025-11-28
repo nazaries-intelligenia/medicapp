@@ -3,6 +3,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
 import '../../../services/snackbar_service.dart';
 import '../../../utils/datetime_extensions.dart';
+import '../../../utils/date_formatter.dart';
 
 class MedicationCard extends StatelessWidget {
   final Medication medication;
@@ -53,7 +54,7 @@ class MedicationCard extends StatelessWidget {
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               leading: CircleAvatar(
-                backgroundColor: medication.type.getColor(context).withOpacity(0.2),
+                backgroundColor: medication.type.getColor(context).withValues(alpha: 0.2),
                 child: Icon(
                   medication.type.icon,
                   color: medication.type.getColor(context),
@@ -107,7 +108,7 @@ class MedicationCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: medication.progress,
                         minHeight: 6,
-                        backgroundColor: Colors.grey.withOpacity(0.2),
+                        backgroundColor: Colors.grey.withValues(alpha: 0.2),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           medication.isFinished
                               ? Colors.grey
@@ -139,9 +140,9 @@ class MedicationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                   ],
                   // Show status description
-                  if (!medication.isSuspended && medication.statusDescription.isNotEmpty) ...[
+                  if (!medication.isSuspended && medication.hasStatusDescription) ...[
                     Text(
-                      medication.statusDescription,
+                      _getStatusDescription(l10n, medication),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: medication.isPending
                                 ? Colors.orange
@@ -154,7 +155,7 @@ class MedicationCard extends StatelessWidget {
                     const SizedBox(height: 2),
                   ],
                   Text(
-                    medication.type.displayName,
+                    medication.type.getDisplayName(l10n),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: medication.type.getColor(context),
                         ),
@@ -283,7 +284,7 @@ class MedicationCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: stockColor!.withOpacity(0.1),
+                          color: stockColor!.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -303,6 +304,23 @@ class MedicationCard extends StatelessWidget {
       ),
     );
   }
+
+  /// Get localized status description for medication
+  String _getStatusDescription(AppLocalizations l10n, Medication medication) {
+    if (medication.statusStartDate != null) {
+      final formattedDate = DateFormatter.formatDateMedium(medication.statusStartDate!);
+      return l10n.medicationStartsOn(formattedDate);
+    }
+    if (medication.statusEndDate != null) {
+      final formattedDate = DateFormatter.formatDateMedium(medication.statusEndDate!);
+      return l10n.medicationFinishedOn(formattedDate);
+    }
+    final progress = medication.statusDayProgress;
+    if (progress != null) {
+      return l10n.medicationDayOfTotal(progress.$1.toString(), progress.$2.toString());
+    }
+    return '';
+  }
 }
 
 /// Widget with live countdown that updates every second
@@ -319,14 +337,12 @@ class _FastingCountdownWidget extends StatefulWidget {
 
 class _FastingCountdownWidgetState extends State<_FastingCountdownWidget> {
   late DateTime _fastingEndTime;
-  late String _fastingType;
   late bool _isActive;
 
   @override
   void initState() {
     super.initState();
     _fastingEndTime = widget.fastingPeriod['fastingEndTime'] as DateTime;
-    _fastingType = widget.fastingPeriod['fastingType'] as String;
     _isActive = widget.fastingPeriod['isActive'] as bool;
   }
 
@@ -353,8 +369,6 @@ class _FastingCountdownWidgetState extends State<_FastingCountdownWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return StreamBuilder(
       stream: Stream.periodic(const Duration(seconds: 1)),
       builder: (context, snapshot) {

@@ -45,7 +45,7 @@ class _MedicationInventoryScreenState extends State<MedicationInventoryScreen>
             child: TabBar(
               controller: _tabController,
               labelColor: Theme.of(context).colorScheme.primary,
-              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withOpacity(AppTheme.tabUnselectedOpacity),
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: AppTheme.tabUnselectedOpacity),
               indicatorColor: Theme.of(context).colorScheme.primary,
               indicatorWeight: AppTheme.tabIndicatorWeight,
               indicatorSize: TabBarIndicatorSize.tab,

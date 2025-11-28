@@ -9,8 +9,8 @@ import 'medication_dosage_screen.dart';
 import 'medication_frequency/widgets/weekly_days_selector_card.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 3: Frecuencia (cada cuántos días tomar el medicamento)
-/// Se salta si se seleccionaron fechas específicas
+/// Screen 3: Frequency (how many days to take the medication)
+/// Skipped if specific dates were selected
 class MedicationFrequencyScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -49,7 +49,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
   void initState() {
     super.initState();
 
-    // Si debemos saltar esta pantalla, ir directamente a la siguiente
+    // If we should skip this screen, go directly to the next one
     if (widget.skipFrequencyScreen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _navigateToNextScreen(
@@ -81,7 +81,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
   void _continueToNextStep() async {
     final l10n = AppLocalizations.of(context)!;
 
-    // Validar según el modo seleccionado
+    // Validate according to the selected mode
     if (_selectedMode == FrequencyMode.weeklyDays) {
       if (_weeklyDays == null || _weeklyDays!.isEmpty) {
         SnackBarService.showError(context, l10n.validationSelectWeekdays);
@@ -89,7 +89,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
       }
     }
 
-    // Determinar el tipo de duración basado en la frecuencia
+    // Determine duration type based on frequency
     TreatmentDurationType durationType;
     List<int>? weeklyDays;
     int? dayInterval;
@@ -101,7 +101,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
         dayInterval = null;
         break;
       case FrequencyMode.alternateDays:
-        // Días alternos: cada 2 días desde la fecha de inicio
+        // Alternate days: every 2 days from the start date
         durationType = TreatmentDurationType.intervalDays;
         weeklyDays = null;
         dayInterval = 2;
@@ -113,7 +113,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
         break;
     }
 
-    // Si originalmente era "hasta acabar", mantenerlo
+    // If it was originally "until finished", keep it
     if (widget.durationType == TreatmentDurationType.untilFinished) {
       durationType = TreatmentDurationType.untilFinished;
     }
@@ -130,7 +130,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
     required List<int>? weeklyDays,
     required int? dayInterval,
   }) async {
-    // Continuar a la pantalla de dosis
+    // Continue to the dosage screen
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -154,7 +154,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Si debemos saltar esta pantalla, mostrar un loading
+    // If we should skip this screen, show a loading indicator
     if (widget.skipFrequencyScreen) {
       return const Scaffold(
         body: Center(
@@ -175,7 +175,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
               child: Text(
                 l10n.stepIndicator(4, 7),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -188,7 +188,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Indicador de progreso
+              // Progress indicator
               LinearProgressIndicator(
                 value: 4 / 7,
                 backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -196,7 +196,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Card con información
+              // Information card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -214,12 +214,12 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
                       Text(
                         l10n.medicationFrequencySubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Opciones de frecuencia
+                      // Frequency options
                       FrequencyOptionCard<FrequencyMode>(
                         value: FrequencyMode.everyday,
                         selectedValue: _selectedMode,
@@ -254,7 +254,7 @@ class _MedicationFrequencyScreenState extends State<MedicationFrequencyScreen> {
                 ),
               ),
 
-              // Selector de días si se eligió "weeklyDays"
+              // Day selector if "weeklyDays" was chosen
               if (_selectedMode == FrequencyMode.weeklyDays) ...[
                 const SizedBox(height: 16),
                 WeeklyDaysSelectorCard(

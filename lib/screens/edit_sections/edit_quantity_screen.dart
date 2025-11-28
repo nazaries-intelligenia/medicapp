@@ -7,7 +7,7 @@ import 'edit_quantity/widgets/quantity_form_card.dart';
 import '../../widgets/action_buttons.dart';
 import '../../utils/number_utils.dart';
 
-/// Pantalla para editar la cantidad disponible y umbral de bajo stock
+/// Screen to edit available quantity and low stock threshold
 class EditQuantityScreen extends StatefulWidget {
   final Medication medication;
 

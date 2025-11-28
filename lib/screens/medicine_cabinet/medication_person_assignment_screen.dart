@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../models/person.dart';
 import '../../database/database_helper.dart';
 import '../../services/snackbar_service.dart';
 
-/// Pantalla para gestionar la asignación de personas a un medicamento.
-/// Permite ver qué personas están asignadas y agregar/remover asignaciones.
+/// Screen to manage the assignment of persons to a medication.
+/// Allows viewing which persons are assigned and adding/removing assignments.
 class MedicationPersonAssignmentScreen extends StatefulWidget {
   final Medication medication;
 
@@ -132,6 +133,8 @@ class _MedicationPersonAssignmentScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Asignar Personas'),
@@ -152,7 +155,7 @@ class _MedicationPersonAssignmentScreenState
                           CircleAvatar(
                             backgroundColor: widget.medication.type
                                 .getColor(context)
-                                .withOpacity(0.2),
+                                .withValues(alpha: 0.2),
                             child: Icon(
                               widget.medication.type.icon,
                               color: widget.medication.type.getColor(context),
@@ -174,7 +177,7 @@ class _MedicationPersonAssignmentScreenState
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  widget.medication.type.displayName,
+                                  widget.medication.type.getDisplayName(l10n),
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
@@ -246,7 +249,7 @@ class _MedicationPersonAssignmentScreenState
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
 
                   const SizedBox(height: 24),
 
@@ -282,7 +285,7 @@ class _MedicationPersonAssignmentScreenState
                         ),
                       ),
                     );
-                  }).toList(),
+                  }),
 
                   if (_allPersons.length == _assignedPersons.length)
                     Card(

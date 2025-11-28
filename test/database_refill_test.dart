@@ -1,8 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
-import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 

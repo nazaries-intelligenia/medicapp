@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/medication.dart';
 import '../../widgets/forms/fasting_configuration_form.dart';
@@ -8,7 +7,7 @@ import '../../services/notification_service.dart';
 import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar la configuración de ayuno
+/// Screen to edit fasting configuration
 class EditFastingScreen extends StatefulWidget {
   final Medication medication;
 

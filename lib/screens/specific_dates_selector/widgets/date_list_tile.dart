@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import 'package:medicapp/utils/date_formatter.dart';
 
 class DateListTile extends StatelessWidget {
   final DateTime date;
@@ -20,16 +20,15 @@ class DateListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final dateFormatter = DateFormat('d MMM yyyy', 'es_ES');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.deepPurple.withOpacity(0.1),
+          color: Colors.deepPurple.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: Colors.deepPurple.withOpacity(0.3),
+            color: Colors.deepPurple.withValues(alpha: 0.3),
             width: 1,
           ),
         ),
@@ -38,7 +37,7 @@ class DateListTile extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: Colors.deepPurple.withOpacity(0.2),
+              color: Colors.deepPurple.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -53,24 +52,24 @@ class DateListTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  DateFormat('MMM', 'es_ES').format(date).toUpperCase(),
+                  DateFormatter.formatMonthNameShort(date).toUpperCase(),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple.withOpacity(0.7),
+                    color: Colors.deepPurple.withValues(alpha: 0.7),
                   ),
                 ),
               ],
             ),
           ),
           title: Text(
-            dateFormatter.format(date),
+            DateFormatter.formatDateMedium(date),
             style: const TextStyle(
               fontWeight: FontWeight.w500,
             ),
           ),
           subtitle: Text(
-            DateFormat('EEEE', 'es_ES').format(date),
+            DateFormatter.formatDayName(date),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),

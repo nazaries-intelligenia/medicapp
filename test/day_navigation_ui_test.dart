@@ -1,32 +1,31 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medicapp/utils/datetime_extensions.dart';
 
-/// Tests para la funcionalidad de navegación por días en la UI
-/// Estos tests verifican la lógica de cálculo de fechas y offsets
+/// Tests for day navigation functionality in the UI
+/// These tests verify date and offset calculation logic
 void main() {
   group('Day Navigation - Date Formatting', () {
-    test('should format today with "Hoy" prefix', () {
+    test('should format today with "Today" prefix', () {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
 
-      // Para el día actual, debería usar el formato "Hoy, día/mes/año"
-      // Este test verifica la lógica que se implementa en _getTodayDate()
+      // For the current day, it should use the format "Today, day/month/year"
+      // This test verifies the logic implemented in _getTodayDate()
       expect(today.isToday(), isTrue);
     });
 
-    test('should format yesterday without "Hoy" prefix', () {
+    test('should format yesterday without "Today" prefix', () {
       final now = DateTime.now();
       final yesterday = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
 
-      // Para días que no son hoy, no debería ser "today"
+      // For days that are not today, it should not be "today"
       expect(yesterday.isToday(), isFalse);
     });
 
-    test('should format tomorrow without "Hoy" prefix', () {
+    test('should format tomorrow without "Today" prefix', () {
       final now = DateTime.now();
       final tomorrow = DateTime(now.year, now.month, now.day).add(const Duration(days: 1));
 
-      // Para días que no son hoy, no debería ser "today"
+      // For days that are not today, it should not be "today"
       expect(tomorrow.isToday(), isFalse);
     });
   });
@@ -38,7 +37,7 @@ void main() {
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
 
-      // Offset para hoy debería ser 0
+      // Offset for today should be 0
       final dayOffset = today.difference(today).inDays;
       final targetPage = centerPageIndex + dayOffset;
 
@@ -51,7 +50,7 @@ void main() {
       final today = DateTime(now.year, now.month, now.day);
       final yesterday = today.subtract(const Duration(days: 1));
 
-      // Offset para ayer debería ser -1
+      // Offset for yesterday should be -1
       final dayOffset = yesterday.difference(today).inDays;
       final targetPage = centerPageIndex + dayOffset;
 
@@ -64,7 +63,7 @@ void main() {
       final today = DateTime(now.year, now.month, now.day);
       final tomorrow = today.add(const Duration(days: 1));
 
-      // Offset para mañana debería ser 1
+      // Offset for tomorrow should be 1
       final dayOffset = tomorrow.difference(today).inDays;
       final targetPage = centerPageIndex + dayOffset;
 
@@ -77,7 +76,7 @@ void main() {
       final today = DateTime(now.year, now.month, now.day);
       final sevenDaysAgo = today.subtract(const Duration(days: 7));
 
-      // Offset para hace 7 días debería ser -7
+      // Offset for 7 days ago should be -7
       final dayOffset = sevenDaysAgo.difference(today).inDays;
       final targetPage = centerPageIndex + dayOffset;
 
@@ -90,7 +89,7 @@ void main() {
       final today = DateTime(now.year, now.month, now.day);
       final thirtyDaysLater = today.add(const Duration(days: 30));
 
-      // Offset para dentro de 30 días debería ser 30
+      // Offset for 30 days in the future should be 30
       final dayOffset = thirtyDaysLater.difference(today).inDays;
       final targetPage = centerPageIndex + dayOffset;
 
@@ -99,7 +98,7 @@ void main() {
     });
 
     test('should handle date normalization correctly', () {
-      // Verificar que las fechas se normalizan correctamente (hora = 00:00:00)
+      // Verify that dates are normalized correctly (time = 00:00:00)
       final dateWithTime = DateTime(2024, 11, 9, 15, 30, 45);
       final normalized = DateTime(dateWithTime.year, dateWithTime.month, dateWithTime.day);
 
@@ -116,35 +115,35 @@ void main() {
     const int centerPageIndex = 10000;
 
     test('should convert page index to date offset correctly', () {
-      // Página actual = centerPageIndex significa offset = 0 (hoy)
+      // Current page = centerPageIndex means offset = 0 (today)
       const pageOffset0 = centerPageIndex;
       expect(pageOffset0 - centerPageIndex, 0);
 
-      // Página centerPageIndex - 1 significa offset = -1 (ayer)
+      // Page centerPageIndex - 1 means offset = -1 (yesterday)
       const pageOffsetMinus1 = centerPageIndex - 1;
       expect(pageOffsetMinus1 - centerPageIndex, -1);
 
-      // Página centerPageIndex + 1 significa offset = 1 (mañana)
+      // Page centerPageIndex + 1 means offset = 1 (tomorrow)
       const pageOffsetPlus1 = centerPageIndex + 1;
       expect(pageOffsetPlus1 - centerPageIndex, 1);
     });
 
     test('should convert date offset to page index correctly', () {
-      // Offset 0 (hoy) debería dar página centerPageIndex
+      // Offset 0 (today) should give page centerPageIndex
       const pageForToday = centerPageIndex + 0;
       expect(pageForToday, centerPageIndex);
 
-      // Offset -5 (hace 5 días) debería dar página centerPageIndex - 5
+      // Offset -5 (5 days ago) should give page centerPageIndex - 5
       const pageForFiveDaysAgo = centerPageIndex + (-5);
       expect(pageForFiveDaysAgo, centerPageIndex - 5);
 
-      // Offset 10 (dentro de 10 días) debería dar página centerPageIndex + 10
+      // Offset 10 (10 days in the future) should give page centerPageIndex + 10
       const pageForTenDaysLater = centerPageIndex + 10;
       expect(pageForTenDaysLater, centerPageIndex + 10);
     });
 
     test('should handle large offsets correctly', () {
-      // Verificar que podemos manejar offsets grandes (ej: 1 año = 365 días)
+      // Verify that we can handle large offsets (e.g.: 1 year = 365 days)
       const oneYearOffset = 365;
       const pageForOneYearLater = centerPageIndex + oneYearOffset;
       expect(pageForOneYearLater, centerPageIndex + 365);
@@ -161,8 +160,8 @@ void main() {
       final today = DateTime(now.year, now.month, now.day);
       const centerPageIndex = 10000;
 
-      // Calcular fecha desde página
-      const page = centerPageIndex - 5; // 5 días atrás
+      // Calculate date from page
+      const page = centerPageIndex - 5; // 5 days ago
       const dayOffset = page - centerPageIndex;
       final calculatedDate = today.add(const Duration(days: dayOffset));
 
@@ -171,7 +170,7 @@ void main() {
     });
 
     test('should handle month boundaries correctly', () {
-      // Verificar que funciona correctamente al cruzar límites de mes
+      // Verify that it works correctly when crossing month boundaries
       final lastDayOfMonth = DateTime(2024, 1, 31);
       final nextDay = lastDayOfMonth.add(const Duration(days: 1));
 
@@ -181,7 +180,7 @@ void main() {
     });
 
     test('should handle year boundaries correctly', () {
-      // Verificar que funciona correctamente al cruzar límites de año
+      // Verify that it works correctly when crossing year boundaries
       final lastDayOfYear = DateTime(2024, 12, 31);
       final nextDay = lastDayOfYear.add(const Duration(days: 1));
 
@@ -191,7 +190,7 @@ void main() {
     });
 
     test('should handle leap year correctly', () {
-      // Verificar que funciona correctamente con años bisiestos
+      // Verify that it works correctly with leap years
       final feb28LeapYear = DateTime(2024, 2, 28);
       final nextDay = feb28LeapYear.add(const Duration(days: 1));
 
@@ -210,7 +209,7 @@ void main() {
 
   group('Day Navigation - Date Range Validation', () {
     test('should validate date picker range is within expected bounds', () {
-      // Verificar que el rango de fechas del picker (2000-2100) es válido
+      // Verify that the date picker range (2000-2100) is valid
       final firstDate = DateTime(2000);
       final lastDate = DateTime(2100);
       final today = DateTime.now();
@@ -250,7 +249,7 @@ void main() {
       final morning = DateTime(2024, 11, 9, 8, 0, 0);
       final evening = DateTime(2024, 11, 9, 20, 0, 0);
 
-      // Normalizar ambas fechas
+      // Normalize both dates
       final morningNorm = DateTime(morning.year, morning.month, morning.day);
       final eveningNorm = DateTime(evening.year, evening.month, evening.day);
 
@@ -262,7 +261,7 @@ void main() {
       final today = DateTime.now();
       final todayNorm = DateTime(today.year, today.month, today.day);
 
-      // Ir 5 días atrás y luego 5 días adelante debería volver a hoy
+      // Going 5 days back and then 5 days forward should return to today
       final fiveDaysAgo = todayNorm.subtract(const Duration(days: 5));
       final backToToday = fiveDaysAgo.add(const Duration(days: 5));
 
@@ -271,7 +270,7 @@ void main() {
   });
 }
 
-// Extension helper para verificar si una fecha es hoy
+// Extension helper to verify if a date is today
 extension DateTimeTestExtensions on DateTime {
   bool isToday() {
     final now = DateTime.now();

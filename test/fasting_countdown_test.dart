@@ -46,9 +46,9 @@ void main() {
 
   group('Fasting Countdown Display - DoseCalculationService.getActiveFastingPeriod', () {
 
-    group('Ayuno tipo "before" (antes de la toma)', () {
-      test('debe mostrar cuenta atrás cuando el ayuno está activo (ya comenzó)', () async {
-        // Medicamento con dosis a las 10:00, ayuno de 60 minutos antes
+    group('Fasting type "before" (before taking dose)', () {
+      test('should show countdown when fasting is active (already started)', () async {
+        // Medication with dose at 10:00, 60 minutes fasting before
         final medication = MedicationBuilder()
             .withId('test_before_active')
             .withSingleDose('10:00', 1.0)
@@ -57,21 +57,18 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Simular que son las 09:30 (dentro del período de ayuno)
-        final now = DateTime(2025, 10, 30, 9, 30);
-
-        // Nota: En un test real, necesitaríamos poder inyectar el tiempo actual
-        // Por ahora, verificamos que el método funciona
+        // Note: In a real test, we would need to be able to inject the current time
+        // For now, we verify that the method works
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // Si el test se ejecuta fuera del horario esperado, el resultado puede ser null
-        // o puede tener datos dependiendo de la hora real de ejecución
-        // Verificamos que el método no lanza excepciones
+        // If the test runs outside the expected time, the result may be null
+        // or may have data depending on the actual execution time
+        // We verify that the method does not throw exceptions
         expect(result, isA<Map<String, dynamic>?>());
       });
 
-      test('debe mostrar cuenta atrás cuando el ayuno es próximo (dentro de 24h)', () async {
-        // Medicamento con dosis a las 23:00, ayuno de 60 minutos antes
+      test('should show countdown when fasting is upcoming (within 24h)', () async {
+        // Medication with dose at 23:00, 60 minutes fasting before
         final medication = MedicationBuilder()
             .withId('test_before_upcoming')
             .withSingleDose('23:00', 1.0)
@@ -80,17 +77,17 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // El método debería devolver información si el ayuno comienza dentro de 24h
+        // The method should return information if fasting starts within 24h
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // Verificamos que el método funciona sin errores
+        // We verify that the method works without errors
         expect(result, isA<Map<String, dynamic>?>());
       });
 
-      test('no debe mostrar cuenta atrás si no hay dosis configuradas', () async {
+      test('should not show countdown if no doses are configured', () async {
         final medication = MedicationBuilder()
             .withId('test_before_no_doses')
-            .withNoDoses() // Explícitamente sin dosis
+            .withNoDoses() // Explicitly without doses
             .withFasting(type: 'before', duration: 60)
             .build();
 
@@ -101,18 +98,18 @@ void main() {
         expect(result, isNull);
       });
 
-      test('debe calcular correctamente el tiempo restante para ayuno "before"', () async {
+      test('should correctly calculate remaining time for "before" fasting', () async {
         final medication = MedicationBuilder()
             .withId('test_before_calculation')
             .withSingleDose('14:00', 1.0)
-            .withFasting(type: 'before', duration: 120) // 2 horas
+            .withFasting(type: 'before', duration: 120) // 2 hours
             .build();
 
         await DatabaseHelper.instance.insertMedication(medication);
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // Si hay resultado, verificar que tiene los campos esperados
+        // If there is a result, verify that it has the expected fields
         if (result != null) {
           expect(result.containsKey('fastingEndTime'), true);
           expect(result.containsKey('remainingMinutes'), true);
@@ -124,8 +121,8 @@ void main() {
         }
       });
 
-      test('debe diferenciar entre ayuno activo (isActive: true) y próximo (isActive: false)', () async {
-        // Este test verifica que el campo isActive se establece correctamente
+      test('should differentiate between active fasting (isActive: true) and upcoming (isActive: false)', () async {
+        // This test verifies that the isActive field is set correctly
         final medication = MedicationBuilder()
             .withId('test_before_active_flag')
             .withSingleDose('15:00', 1.0)
@@ -137,27 +134,27 @@ void main() {
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
         if (result != null) {
-          // isActive debe ser true si ya comenzó el ayuno, false si es próximo
+          // isActive should be true if fasting has already started, false if it's upcoming
           expect(result['isActive'], isA<bool>());
         }
       });
     });
 
-    group('Ayuno tipo "after" (después de la toma)', () {
-      test('debe mostrar cuenta atrás solo si hay una dosis tomada hoy', () async {
+    group('Fasting type "after" (after taking dose)', () {
+      test('should show countdown only if there is a dose taken today', () async {
         final medication = MedicationBuilder()
             .withId('test_after_active')
             .withSingleDose('08:00', 1.0)
-            .withFasting(type: 'after', duration: 120) // 2 horas
+            .withFasting(type: 'after', duration: 120) // 2 hours
             .build();
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Sin dosis registradas, no debería mostrar cuenta atrás
+        // Without recorded doses, it should not show countdown
         final resultBefore = await DoseCalculationService.getActiveFastingPeriod(medication);
         expect(resultBefore, isNull);
 
-        // Registrar una dosis tomada hace 1 hora, but ensure it's still today
+        // Register a dose taken 1 hour ago, but ensure it's still today
         final now = DateTime.now();
         var doseTime = now.subtract(const Duration(hours: 1));
         // If subtracting 1 hour crosses midnight, use a time early today that's in the past
@@ -182,11 +179,7 @@ void main() {
 
         await DatabaseHelper.instance.insertDoseHistory(historyEntry);
 
-        // Ahora debería mostrar cuenta atrás
-        // Calculate expected remaining minutes based on actual dose time
-        final minutesSinceDose = now.difference(doseTime).inMinutes;
-        final expectedRemaining = 120 - minutesSinceDose; // 120 min fasting duration
-
+        // Now it should show countdown
         final resultAfter = await DoseCalculationService.getActiveFastingPeriod(medication);
 
         expect(resultAfter, isNotNull);
@@ -197,7 +190,7 @@ void main() {
         expect(resultAfter['remainingMinutes'], lessThanOrEqualTo(120)); // Max is fasting duration
       });
 
-      test('no debe mostrar cuenta atrás si el ayuno "after" ya finalizó hace más de 2 horas', () async {
+      test('should not show countdown if "after" fasting ended more than 2 hours ago', () async {
         final now = DateTime.now();
 
         // Skip this test if running in the first 5 hours of the day
@@ -216,8 +209,8 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Registrar una dosis tomada hace 4 horas
-        // Con ayuno de 60 min, terminó hace 3 horas (fuera de ventana de 2h)
+        // Register a dose taken 4 hours ago
+        // With 60 min fasting, it ended 3 hours ago (outside 2h window)
         final doseTime = now.subtract(const Duration(hours: 4));
 
         final historyEntry = DoseHistoryEntry(
@@ -236,11 +229,11 @@ void main() {
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // El ayuno terminó hace 3 horas (más de 2h), no debería mostrar nada
+        // Fasting ended 3 hours ago (more than 2h), should not show anything
         expect(result, isNull);
       });
 
-      test('debe mostrar mensaje completado si ayuno terminó hace menos de 2 horas', () async {
+      test('should show completed message if fasting ended less than 2 hours ago', () async {
         final now = DateTime.now();
 
         // Skip this test if running in the first 3 hours of the day
@@ -257,8 +250,8 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Registrar una dosis tomada hace 2 horas
-        // Con ayuno de 60 min, terminó hace 1 hora (dentro de ventana de 2h)
+        // Register a dose taken 2 hours ago
+        // With 60 min fasting, it ended 1 hour ago (within 2h window)
         final doseTime = now.subtract(const Duration(hours: 2));
 
         final historyEntry = DoseHistoryEntry(
@@ -277,13 +270,13 @@ void main() {
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // El ayuno terminó hace 1 hora, debe mostrar mensaje completado
+        // Fasting ended 1 hour ago, should show completed message
         expect(result, isNotNull);
         expect(result!['isActive'], isFalse);
         expect(result['remainingMinutes'], lessThan(0));
       });
 
-      test('debe usar la dosis más reciente para calcular ayuno "after"', () async {
+      test('should use the most recent dose to calculate "after" fasting', () async {
         final now = DateTime.now();
 
         // Skip this test if running in the first 6 hours of the day
@@ -295,7 +288,7 @@ void main() {
         final medication = MedicationBuilder()
             .withId('test_after_most_recent')
             .withMultipleDoses(['08:00', '14:00', '20:00'], 1.0)
-            .withFasting(type: 'after', duration: 180) // 3 horas
+            .withFasting(type: 'after', duration: 180) // 3 hours
             .build();
 
         // V19+: Insert medication and associate with default person
@@ -304,13 +297,13 @@ void main() {
         // V19+: Get default person ID for dose history
         final personId = await getDefaultPersonId();
 
-        // Registrar múltiples dosis hoy - asegurar que están en el pasado
-        // y dentro del período de ayuno (3 horas)
+        // Register multiple doses today - ensure they are in the past
+        // and within the fasting period (3 hours)
 
-        // Dosis más antigua: hace 5 horas
+        // Oldest dose: 5 hours ago
         final dose1Taken = now.subtract(const Duration(hours: 5));
 
-        // Dosis más reciente: hace 2 horas (dentro del período de ayuno de 3h)
+        // Most recent dose: 2 hours ago (within 3h fasting period)
         final dose2Taken = now.subtract(const Duration(hours: 2));
 
         final dose1Scheduled = DateTime(now.year, now.month, now.day, 8, 0);
@@ -342,8 +335,8 @@ void main() {
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // Debería basarse en la dosis más reciente
-        // Como el ayuno es de 3h, debería haber tiempo restante
+        // Should be based on the most recent dose
+        // Since fasting is 3h, there should be remaining time
         expect(result, isNotNull);
         expect(result!['fastingType'], 'after');
         expect(result['isActive'], true);
@@ -352,7 +345,7 @@ void main() {
         expect(result['remainingMinutes'], lessThanOrEqualTo(180)); // Max 3 hours
       });
 
-      test('debe ignorar dosis saltadas al calcular ayuno "after"', () async {
+      test('should ignore skipped doses when calculating "after" fasting', () async {
         final medication = MedicationBuilder()
             .withId('test_after_ignore_skipped')
             .withSingleDose('08:00', 1.0)
@@ -363,7 +356,7 @@ void main() {
 
         final now = DateTime.now();
 
-        // Registrar una dosis saltada (no debería contar), ensure it's still today
+        // Register a skipped dose (should not count), ensure it's still today
         var skippedDose = now.subtract(const Duration(minutes: 30));
         // If subtracting 30 minutes crosses midnight, use a time early today instead
         if (skippedDose.day != now.day) {
@@ -383,13 +376,13 @@ void main() {
 
         final result = await DoseCalculationService.getActiveFastingPeriod(medication);
 
-        // No debería mostrar cuenta atrás porque la dosis fue saltada
+        // Should not show countdown because the dose was skipped
         expect(result, isNull);
       });
     });
 
-    group('Casos donde NO debe mostrar cuenta atrás', () {
-      test('no debe mostrar si requiresFasting es false', () async {
+    group('Cases where countdown should NOT be shown', () {
+      test('should not show if requiresFasting is false', () async {
         final medication = MedicationBuilder()
             .withId('test_no_fasting')
             .withSingleDose('08:00', 1.0)
@@ -403,8 +396,8 @@ void main() {
         expect(result, isNull);
       });
 
-      test('no debe mostrar si no hay dosis configuradas (medicamento sin ayuno)', () async {
-        // Test simplificado: medicamento sin ayuno configurado y sin dosis
+      test('should not show if no doses are configured (medication without fasting)', () async {
+        // Simplified test: medication without fasting configured and without doses
         final medication = MedicationBuilder()
             .withId('test_no_config')
             .withNoDoses()
@@ -418,14 +411,14 @@ void main() {
         expect(result, isNull);
       });
 
-      test('debe manejar correctamente medicamentos sin configuración de ayuno', () async {
-        // Medicamento normal sin ayuno, debería devolver null siempre
+      test('should correctly handle medications without fasting configuration', () async {
+        // Normal medication without fasting, should always return null
         final medication = MedicationBuilder()
             .withId('test_normal_med')
             .withSingleDose('12:00', 1.0)
             .build();
 
-        // Por defecto, los medicamentos no tienen ayuno configurado
+        // By default, medications do not have fasting configured
         expect(medication.requiresFasting, false);
 
         await DatabaseHelper.instance.insertMedication(medication);
@@ -436,8 +429,8 @@ void main() {
       });
     });
 
-    group('Estructura de datos retornados', () {
-      test('debe retornar todos los campos requeridos cuando hay ayuno activo', () async {
+    group('Returned data structure', () {
+      test('should return all required fields when there is active fasting', () async {
         final medication = MedicationBuilder()
             .withId('test_data_structure')
             .withSingleDose('08:00', 1.0)
@@ -446,7 +439,7 @@ void main() {
 
         await DatabaseHelper.instance.insertMedication(medication);
 
-        // Registrar una dosis reciente, ensure it's still today
+        // Register a recent dose, ensure it's still today
         final now = DateTime.now();
         var doseTime = now.subtract(const Duration(minutes: 30));
         // If subtracting 30 minutes crosses midnight, use a time early today instead

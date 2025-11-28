@@ -17,7 +17,7 @@ class EmptyHistoryView extends StatelessWidget {
           Icon(
             Icons.history,
             size: 64,
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
           ),
           const SizedBox(height: 16),
           Text(

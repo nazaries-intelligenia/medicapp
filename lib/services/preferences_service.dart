@@ -9,6 +9,7 @@ class PreferencesService {
   static const String _keyThemeMode = 'theme_mode';
   static const String _keyColorPalette = 'color_palette';
   static const String _keyNotificationSound = 'notification_sound';
+  static const String _keyLanguage = 'app_language';
 
   /// Get the preference for showing actual time for taken doses
   /// Returns true if the user wants to see the actual time when a dose was taken
@@ -110,6 +111,24 @@ class PreferencesService {
       await prefs.remove(_keyNotificationSound);
     } else {
       await prefs.setString(_keyNotificationSound, value);
+    }
+  }
+
+  /// Get the language preference
+  /// Returns null (default) to use system language, or the language code (e.g., 'en', 'es')
+  static Future<String?> getLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyLanguage);
+  }
+
+  /// Set the language preference
+  /// Pass null to use system language, or provide the language code
+  static Future<void> setLanguage(String? value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (value == null) {
+      await prefs.remove(_keyLanguage);
+    } else {
+      await prefs.setString(_keyLanguage, value);
     }
   }
 }

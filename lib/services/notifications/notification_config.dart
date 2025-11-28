@@ -59,7 +59,7 @@ class NotificationConfig {
       // Use AndroidIntent to open app notification settings
       // This opens the notification settings page where users can configure
       // sound, vibration, importance, etc. for all notification channels
-      final intent = AndroidIntent(
+      const intent = AndroidIntent(
         action: 'android.settings.APP_NOTIFICATION_SETTINGS',
         arguments: <String, dynamic>{
           'android.provider.extra.APP_PACKAGE': 'com.medicapp.medicapp',
@@ -69,7 +69,7 @@ class NotificationConfig {
     } catch (e) {
       // If that fails, try opening general app settings as fallback
       try {
-        final fallbackIntent = AndroidIntent(
+        const fallbackIntent = AndroidIntent(
           action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
           data: 'package:com.medicapp.medicapp',
         );

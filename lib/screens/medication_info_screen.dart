@@ -6,7 +6,7 @@ import '../widgets/forms/medication_info_form.dart';
 import 'medication_duration_screen.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 1: Información básica del medicamento (nombre y tipo)
+/// Screen 1: Basic medication information (name and type)
 class MedicationInfoScreen extends StatefulWidget {
   final List<Medication> existingMedications;
 
@@ -32,7 +32,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
 
   void _continueToNextStep() async {
     if (_formKey.currentState!.validate()) {
-      // Pasar datos a la siguiente pantalla
+      // Pass data to the next screen
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -43,7 +43,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
         ),
       );
 
-      // Si se completó el flujo, retornar el medicamento creado
+      // If the flow was completed, return the created medication
       if (result != null && mounted) {
         Navigator.pop(context, result);
       }
@@ -64,7 +64,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
               child: Text(
                 l10n.stepIndicator(1, 6),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -79,7 +79,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Indicador de progreso
+                // Progress indicator
                 LinearProgressIndicator(
                   value: 1 / 6,
                   backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -87,7 +87,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Card con formulario
+                // Card with form
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -111,7 +111,7 @@ class _MedicationInfoScreenState extends State<MedicationInfoScreen> {
                 ),
                 const SizedBox(height: 24),
 
-                // Botones de navegación
+                // Navigation buttons
                 ActionButtons(
                   primaryLabel: l10n.specificDatesSelectorContinue,
                   primaryIcon: Icons.arrow_forward,

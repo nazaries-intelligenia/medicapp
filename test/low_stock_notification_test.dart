@@ -1,11 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/services/notification_id_generator.dart';
-import 'package:medicapp/database/database_helper.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
-import 'package:medicapp/models/person.dart';
 
 /// Tests for low stock notifications
 /// Feature: Alert users when medication stock is low or insufficient
@@ -65,7 +63,7 @@ void main() {
       // Arrange
       final medication = MedicationBuilder()
           .withId('med-low-stock')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 2.0) // Requires 2 pills per dose
           .withStock(1.0) // Only 1 pill available - INSUFFICIENT
           .build();
@@ -88,7 +86,7 @@ void main() {
       // Arrange
       final medication = MedicationBuilder()
           .withId('med-warning-stock')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withSingleDose('14:00', 1.0)
           .withStock(2.0) // Low but not insufficient
           .build();
@@ -113,7 +111,7 @@ void main() {
       // Arrange
       final medication = MedicationBuilder()
           .withId('med-fractional')
-          .withName('Levotiroxina')
+          .withName('Levothyroxine')
           .withSingleDose('07:00', 0.5) // Requires 0.5 pills
           .withStock(0.3) // Only 0.3 pills - insufficient
           .build();
@@ -136,7 +134,7 @@ void main() {
       // Arrange
       final medication = MedicationBuilder()
           .withId('med-zero-stock')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withSingleDose('12:00', 1.0)
           .withStock(0.0) // No stock
           .build();

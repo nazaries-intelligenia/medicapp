@@ -6,6 +6,7 @@ import '../database/database_helper.dart';
 import '../services/preferences_service.dart';
 import '../services/snackbar_service.dart';
 import '../services/notifications/notification_config.dart';
+import '../services/locale_provider.dart';
 import '../utils/platform_helper.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
@@ -267,24 +268,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Seleccionar paleta de colores'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ColorPalette.values.map((palette) {
-            final isSelected = palette == currentPalette;
-            return RadioListTile<ColorPalette>(
-              title: Text(palette.displayName),
-              subtitle: Text(palette.description),
-              value: palette,
-              groupValue: currentPalette,
-              selected: isSelected,
-              onChanged: (ColorPalette? value) {
-                if (value != null) {
-                  themeProvider.setColorPalette(value);
-                  Navigator.pop(context);
-                }
-              },
-            );
-          }).toList(),
+        content: RadioGroup<ColorPalette>(
+          groupValue: currentPalette,
+          onChanged: (ColorPalette? value) {
+            if (value != null) {
+              themeProvider.setColorPalette(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ColorPalette.values.map((palette) {
+              final isSelected = palette == currentPalette;
+              return RadioListTile<ColorPalette>(
+                title: Text(palette.displayName),
+                subtitle: Text(palette.description),
+                value: palette,
+                selected: isSelected,
+              );
+            }).toList(),
+          ),
         ),
         actions: [
           TextButton(
@@ -307,6 +310,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'No se pudo abrir los ajustes de notificación: ${e.toString()}',
       );
     }
+  }
+
+  /// Show language selection dialog
+  void _showLanguageDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+    final currentLocale = localeProvider.locale;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.settingsLanguageTitle),
+        content: SingleChildScrollView(
+          child: RadioGroup<String?>(
+            groupValue: currentLocale?.languageCode,
+            onChanged: (String? value) {
+              if (value == null) {
+                localeProvider.setLocale(null);
+              } else {
+                localeProvider.setLocale(Locale(value));
+              }
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // System default option
+                RadioListTile<String?>(
+                  title: Text(l10n.settingsLanguageSystem),
+                  value: null,
+                ),
+                const Divider(),
+                // Language options
+                ...LocaleProvider.supportedLanguages.entries.map((entry) {
+                  return RadioListTile<String?>(
+                    title: Text(entry.value),
+                    value: entry.key,
+                  );
+                }),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.btnCancel),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -363,11 +417,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
               return SettingOptionCard(
                 icon: Icons.palette,
                 iconColor: theme.colorScheme.primary,
-                title: 'Paleta de colores',
+                title: l10n.settingsColorPaletteTitle,
                 subtitle: themeProvider.colorPalette.displayName,
                 isLoading: false,
                 enabled: true,
                 onTap: _showColorPaletteDialog,
+              );
+            },
+          ),
+
+          // Language Card
+          Consumer<LocaleProvider>(
+            builder: (context, localeProvider, _) {
+              final currentLanguage = localeProvider.locale?.languageCode;
+              final languageName = currentLanguage != null
+                  ? LocaleProvider.supportedLanguages[currentLanguage] ?? currentLanguage
+                  : l10n.settingsLanguageSystem;
+              return SettingOptionCard(
+                icon: Icons.language,
+                iconColor: theme.colorScheme.secondary,
+                title: l10n.settingsLanguageTitle,
+                subtitle: languageName,
+                isLoading: false,
+                enabled: true,
+                onTap: _showLanguageDialog,
               );
             },
           ),

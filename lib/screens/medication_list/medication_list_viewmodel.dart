@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import '../../models/medication.dart';
 import '../../models/treatment_duration_type.dart';
 import '../../models/dose_history_entry.dart';
@@ -27,7 +26,6 @@ import 'services/dose_calculation_service.dart';
 class MedicationListViewModel extends ChangeNotifier {
   // Test mode flag - prevents excessive notifyListeners calls during tests
   bool _isTestMode = false;
-  bool _notificationPending = false;
 
   // Data state
   final List<Medication> _medications = [];
@@ -548,6 +546,7 @@ class MedicationListViewModel extends ChangeNotifier {
   }
 
   /// Schedule notifications in background
+  // ignore: unused_element
   void _scheduleNotificationsInBackground(List<Medication> medications) {
     // Skip background scheduling in test mode to prevent pumpAndSettle timeouts
     if (_isTestMode) return;
@@ -1135,7 +1134,7 @@ class MedicationListViewModel extends ChangeNotifier {
 
     if (targetPerson != null) {
       final personIdForNotifications = targetPerson.id;
-      final medicationId = await DatabaseHelper.instance.createMedicationForPerson(
+      await DatabaseHelper.instance.createMedicationForPerson(
         medication: medication,
         personId: personIdForNotifications,
       );
@@ -1159,9 +1158,7 @@ class MedicationListViewModel extends ChangeNotifier {
   /// Update an existing medication
   Future<void> updateMedication(Medication medication) async {
     Person? targetPerson = _selectedPerson;
-    if (targetPerson == null) {
-      targetPerson = await DatabaseHelper.instance.getDefaultPerson();
-    }
+    targetPerson ??= await DatabaseHelper.instance.getDefaultPerson();
 
     if (targetPerson != null) {
       await DatabaseHelper.instance.updateMedicationForPerson(

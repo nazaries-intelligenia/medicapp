@@ -33,6 +33,7 @@ class NotificationPermissionDialog {
 
     if (!canScheduleExact && hasMedications) {
       // Show warning dialog for exact alarms only
+      if (!context.mounted) return;
       await _showPermissionDialog(context);
     }
   }
@@ -45,8 +46,8 @@ class NotificationPermissionDialog {
       builder: (context) => AlertDialog(
         title: Row(
           children: [
-            Icon(Icons.warning, color: Colors.orange),
-            SizedBox(width: 8),
+            const Icon(Icons.warning, color: Colors.orange),
+            const SizedBox(width: 8),
             Flexible(child: Text(l10n.permissionRequired)),
           ],
         ),
@@ -56,13 +57,13 @@ class NotificationPermissionDialog {
           children: [
             Text(
               l10n.notificationsWillNotWork,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.blue),
               ),
@@ -71,17 +72,17 @@ class NotificationPermissionDialog {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.alarm, size: 20, color: Colors.blue),
-                      SizedBox(width: 8),
+                      const Icon(Icons.alarm, size: 20, color: Colors.blue),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           l10n.activateAlarmsPermission,
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
                     l10n.alarmsPermissionDescription,
                     style: TextStyle(fontSize: 12, color: Colors.grey[700]),
@@ -104,8 +105,8 @@ class NotificationPermissionDialog {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.settings, size: 16),
-                SizedBox(width: 6),
+                const Icon(Icons.settings, size: 16),
+                const SizedBox(width: 6),
                 Text(l10n.openSettingsButton),
               ],
             ),

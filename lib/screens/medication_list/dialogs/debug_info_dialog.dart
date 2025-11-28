@@ -241,7 +241,7 @@ class DebugInfoDialog {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(l10n.notificationPermissions(notificationsEnabled ? l10n.yesText : l10n.noText),
-                style: TextStyle(fontSize: 13),
+                style: const TextStyle(fontSize: 13),
               ),
               const SizedBox(height: 8),
               Row(
@@ -263,7 +263,7 @@ class DebugInfoDialog {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.2),
+                    color: Colors.orange.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: Colors.orange),
                   ),
@@ -272,7 +272,7 @@ class DebugInfoDialog {
                     children: [
                       Text(
                         l10n.importantWarning,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.orange,
                           fontSize: 12,
@@ -281,12 +281,12 @@ class DebugInfoDialog {
                       const SizedBox(height: 3),
                       Text(
                         l10n.withoutPermissionNoNotifications,
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                       const SizedBox(height: 3),
                       Text(
                         l10n.alarmsSettings,
-                        style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic),
+                        style: const TextStyle(fontSize: 9, fontStyle: FontStyle.italic),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -299,10 +299,10 @@ class DebugInfoDialog {
               const SizedBox(height: 8),
               Text(l10n.medicationsWithSchedules(medications.where((m) => m.doseTimes.isNotEmpty).length, medications.length)),
               const SizedBox(height: 16),
-              Text(l10n.scheduledNotifications, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n.scheduledNotifications, style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               if (pendingNotifications.isEmpty)
-                Text(l10n.noScheduledNotifications, style: TextStyle(color: Colors.orange))
+                Text(l10n.noScheduledNotifications, style: const TextStyle(color: Colors.orange))
               else
                 ...notificationInfoList.map((info) {
                   final notification = info['notification'];
@@ -318,8 +318,8 @@ class DebugInfoDialog {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: isPastDue
-                            ? Colors.red.withOpacity(0.1)
-                            : Colors.grey.withOpacity(0.1),
+                            ? Colors.red.withValues(alpha: 0.1)
+                            : Colors.grey.withValues(alpha: 0.1),
                         border: isPastDue
                             ? Border.all(color: Colors.red, width: 1)
                             : null,
@@ -342,7 +342,7 @@ class DebugInfoDialog {
                                 const SizedBox(width: 8),
                                 Text(
                                   l10n.pastDueWarning,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,
@@ -364,8 +364,8 @@ class DebugInfoDialog {
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
                                 color: isPastDue
-                                    ? Colors.red.withOpacity(0.15)
-                                    : Colors.green.withOpacity(0.15),
+                                    ? Colors.red.withValues(alpha: 0.15)
+                                    : Colors.green.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -416,7 +416,7 @@ class DebugInfoDialog {
                   );
                 }),
               const SizedBox(height: 16),
-              Text(l10n.medicationsAndSchedules, style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(l10n.medicationsAndSchedules, style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               ...medications.map((medication) {
                 return Padding(
@@ -429,7 +429,7 @@ class DebugInfoDialog {
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       if (medication.doseTimes.isEmpty)
-                        Text(l10n.noSchedulesConfiguredWarning, style: TextStyle(fontSize: 14, color: Colors.orange))
+                        Text(l10n.noSchedulesConfiguredWarning, style: const TextStyle(fontSize: 14, color: Colors.orange))
                       else
                         ...medication.doseTimes.map((time) => Text('  • $time', style: const TextStyle(fontSize: 14))),
                     ],

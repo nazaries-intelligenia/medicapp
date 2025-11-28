@@ -1,5 +1,6 @@
 import '../models/medication_type.dart';
 import '../utils/datetime_extensions.dart';
+import '../utils/date_formatter.dart';
 
 /// Represents a single dose history entry
 class DoseHistoryEntry {
@@ -103,9 +104,9 @@ class DoseHistoryEntry {
     return scheduledDateTime.toTimeString();
   }
 
-  /// Format scheduled date as dd/MM/yyyy
+  /// Format scheduled date according to locale
   String get scheduledDateFormatted {
-    return '${scheduledDateTime.day.toString().padLeft(2, '0')}/${scheduledDateTime.month.toString().padLeft(2, '0')}/${scheduledDateTime.year}';
+    return DateFormatter.formatDate(scheduledDateTime);
   }
 
   /// Format registered time as HH:mm
@@ -133,9 +134,9 @@ enum DoseStatus {
   String get displayName {
     switch (this) {
       case DoseStatus.taken:
-        return 'Tomada';
+        return 'Taken';
       case DoseStatus.skipped:
-        return 'Omitida';
+        return 'Skipped';
     }
   }
 }

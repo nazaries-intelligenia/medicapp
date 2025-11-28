@@ -7,7 +7,7 @@ import '../../services/notification_service.dart';
 import '../../services/snackbar_service.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar horarios y cantidades de las tomas
+/// Screen to edit dose schedules and quantities
 class EditScheduleScreen extends StatefulWidget {
   final Medication medication;
   final List<Medication>? allMedications; // For fasting conflict validation

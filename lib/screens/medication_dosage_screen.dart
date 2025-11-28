@@ -10,7 +10,7 @@ import 'medication_dosage/widgets/custom_doses_input_card.dart';
 import 'medication_dosage/widgets/dose_summary_info.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 4: Dosis (todos los días igual o cada día diferente)
+/// Screen 4: Dosage (same every day or different each day)
 class MedicationDosageScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -76,7 +76,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
     int dosesPerDay;
 
     if (_selectedMode == DosageMode.sameEveryDay) {
-      // Validar que el intervalo divida 24 exactamente
+      // Validate that the interval divides 24 exactly
       final interval = int.tryParse(_intervalController.text);
 
       if (interval == null || interval <= 0) {
@@ -97,7 +97,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
       dosageIntervalHours = interval;
       dosesPerDay = 24 ~/ interval;
     } else {
-      // Modo personalizado
+      // Custom mode
       final doses = int.tryParse(_customDosesController.text);
 
       if (doses == null || doses <= 0) {
@@ -110,13 +110,13 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
         return;
       }
 
-      // Para modo personalizado, usamos un intervalo ficticio
-      // Esto es solo para compatibilidad con el modelo existente
+      // For custom mode, we use a fictitious interval
+      // This is only for compatibility with the existing model
       dosageIntervalHours = 24 ~/ doses;
       dosesPerDay = doses;
     }
 
-    // Continuar a la pantalla de horarios
+    // Continue to the schedules screen
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -159,7 +159,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
               child: Text(
                 l10n.stepIndicator(currentStep, totalSteps),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -172,7 +172,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Indicador de progreso
+              // Progress indicator
               LinearProgressIndicator(
                 value: progressValue,
                 backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -180,7 +180,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Card con información
+              // Card with information
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -198,12 +198,12 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
                       Text(
                         l10n.medicationDosageSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Opciones de modo
+                      // Mode options
                       DosageModeOptionCard(
                         mode: DosageMode.sameEveryDay,
                         selectedMode: _selectedMode,
@@ -228,7 +228,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
                 ),
               ),
 
-              // Controles según el modo seleccionado
+              // Controls according to the selected mode
               const SizedBox(height: 16),
               Card(
                 child: Padding(
@@ -248,7 +248,7 @@ class _MedicationDosageScreenState extends State<MedicationDosageScreen> {
                         ),
                       ],
 
-                      // Resumen de dosis
+                      // Dose summary
                       const SizedBox(height: 16),
                       DoseSummaryInfo(dosesPerDay: dosesPerDay),
                     ],

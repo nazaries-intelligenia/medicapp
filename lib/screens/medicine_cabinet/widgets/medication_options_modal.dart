@@ -98,7 +98,7 @@ class MedicationOptionsModal extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      medication.type.displayName,
+                      medication.type.getDisplayName(l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: medication.type.getColor(context),
                           ),

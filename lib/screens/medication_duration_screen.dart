@@ -9,7 +9,7 @@ import 'medication_quantity_screen.dart';
 import 'medication_duration/widgets/duration_option_card.dart';
 import 'medication_duration/widgets/specific_dates_selector_card.dart';
 
-/// Pantalla 2: Tipo de duración del tratamiento
+/// Screen 2: Treatment duration type
 class MedicationDurationScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -48,7 +48,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
   void _continueToNextStep() async {
     final l10n = AppLocalizations.of(context)!;
 
-    // Si es medicamento ocasional, ir directamente a la pantalla de cantidad
+    // If it's an as-needed medication, go directly to the quantity screen
     if (_selectedDurationType == TreatmentDurationType.asNeeded) {
       final result = await Navigator.push(
         context,
@@ -58,7 +58,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
             medicationType: widget.medicationType,
             durationType: _selectedDurationType,
             dosageIntervalHours: 0,
-            doseSchedule: {},
+            doseSchedule: const {},
             requiresFasting: false,
             notifyFasting: false,
           ),
@@ -71,7 +71,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
       return;
     }
 
-    // Si se seleccionaron fechas específicas, validar
+    // If specific dates were selected, validate
     if (_selectedDurationType == TreatmentDurationType.specificDates) {
       if (_specificDates == null || _specificDates!.isEmpty) {
         SnackBarService.showError(context, l10n.validationSelectDates);
@@ -79,7 +79,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
       }
     }
 
-    // Ir a la pantalla de fechas (inicio/fin) - solo si NO es fechas específicas
+    // Go to the dates screen (start/end) - only if NOT specific dates
     if (_selectedDurationType != TreatmentDurationType.specificDates) {
       final result = await Navigator.push(
         context,
@@ -96,7 +96,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
         Navigator.pop(context, result);
       }
     } else {
-      // Para fechas específicas, ir directamente a la siguiente pantalla con las fechas
+      // For specific dates, go directly to the next screen with the dates
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -129,7 +129,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
               child: Text(
                 l10n.stepIndicator(2, 7),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -142,7 +142,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Indicador de progreso
+              // Progress indicator
               LinearProgressIndicator(
                 value: 2 / 7,
                 backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -150,7 +150,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Card con información
+              // Information card
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -168,12 +168,12 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
                       Text(
                         l10n.medicationDurationSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 24),
 
-                      // Opciones de tipo de duración
+                      // Duration type options
                       DurationOptionCard(
                         type: TreatmentDurationType.everyday,
                         title: l10n.durationContinuousTitle,
@@ -226,7 +226,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
                 ),
               ),
 
-              // Selector de fechas específicas si está seleccionado
+              // Specific dates selector if selected
               if (_selectedDurationType == TreatmentDurationType.specificDates) ...[
                 const SizedBox(height: 16),
                 SpecificDatesSelectorCard(
@@ -237,7 +237,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
 
               const SizedBox(height: 24),
 
-              // Botón continuar
+              // Continue button
               FilledButton.icon(
                 onPressed: _continueToNextStep,
                 icon: const Icon(Icons.arrow_forward),
@@ -248,7 +248,7 @@ class _MedicationDurationScreenState extends State<MedicationDurationScreen> {
               ),
               const SizedBox(height: 8),
 
-              // Botón atrás
+              // Back button
               OutlinedButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),

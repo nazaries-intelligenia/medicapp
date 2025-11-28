@@ -91,7 +91,7 @@ Future<void> scrollToWidget(WidgetTester tester, Finder finder) async {
     } catch (e) {
       // If dragUntilVisible fails, try manual scroll
       await tester.drag(scrollView.first, const Offset(0, -300));
-      // Use manual pumps to avoid timeout with async BD operations
+      // Use manual pumps to avoid timeout with async DB operations
       for (int i = 0; i < 10; i++) {
         await tester.pump(const Duration(milliseconds: 50));
       }

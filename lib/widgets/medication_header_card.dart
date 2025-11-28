@@ -31,10 +31,12 @@ class MedicationHeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     // Simple mode: minimal card for edit/view screens
     if (doseTime == null) {
       return Card(
-        color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+        color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -61,9 +63,9 @@ class MedicationHeaderCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                medication.type.displayName,
+                medication.type.getDisplayName(l10n),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
               ),
             ],
@@ -73,8 +75,6 @@ class MedicationHeaderCard extends StatelessWidget {
     }
 
     // Detailed mode: complete card for dose action screens
-    final l10n = AppLocalizations.of(context)!;
-
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -100,7 +100,7 @@ class MedicationHeaderCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        medication.type.displayName,
+                        medication.type.getDisplayName(l10n),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: medication.type.getColor(context),
                         ),
@@ -147,13 +147,13 @@ class MedicationHeaderCard extends StatelessWidget {
                       Text(
                         l10n.doseActionThisDoseQuantity,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer.withOpacity(0.8),
+                          color: Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${medication.getDoseQuantity(doseTime!)} ${medication.type.stockUnitSingular}',
+                        '${medication.getDoseQuantity(doseTime!)} ${medication.type.getStockUnitSingular(l10n)}',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,

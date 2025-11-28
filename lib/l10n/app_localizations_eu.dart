@@ -120,6 +120,75 @@ class AppLocalizationsEu extends AppLocalizations {
   String get medicationTypeOther => 'Beste bat';
 
   @override
+  String get stockUnitPills => 'pilulak';
+
+  @override
+  String get stockUnitCapsules => 'kapsulak';
+
+  @override
+  String get stockUnitInjections => 'injekzioak';
+
+  @override
+  String get stockUnitMl => 'ml';
+
+  @override
+  String get stockUnitOvules => 'obuloak';
+
+  @override
+  String get stockUnitSuppositories => 'suposotorioak';
+
+  @override
+  String get stockUnitInhalations => 'inhalazio';
+
+  @override
+  String get stockUnitSachets => 'poltsak';
+
+  @override
+  String get stockUnitGrams => 'gramo';
+
+  @override
+  String get stockUnitBandages => 'bendak';
+
+  @override
+  String get stockUnitDrops => 'tantak';
+
+  @override
+  String get stockUnitUnits => 'unitateak';
+
+  @override
+  String get stockUnitPill => 'pilula';
+
+  @override
+  String get stockUnitCapsule => 'kapsula';
+
+  @override
+  String get stockUnitInjection => 'injekzio';
+
+  @override
+  String get stockUnitOvule => 'obuloa';
+
+  @override
+  String get stockUnitSuppository => 'suposotorio';
+
+  @override
+  String get stockUnitInhalation => 'inhalazio';
+
+  @override
+  String get stockUnitSachet => 'poltsa';
+
+  @override
+  String get stockUnitGram => 'gramo';
+
+  @override
+  String get stockUnitBandage => 'benda';
+
+  @override
+  String get stockUnitDrop => 'tanta';
+
+  @override
+  String get stockUnitUnit => 'unitate';
+
+  @override
   String get doseStatusTaken => 'Hartua';
 
   @override
@@ -1707,6 +1776,30 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String get settingsRestartDialogButton => 'Ulertuta';
+
+  @override
+  String get settingsLanguageTitle => 'Hizkuntza';
+
+  @override
+  String get settingsLanguageSystem => 'Sistemaren lehenetsia';
+
+  @override
+  String get settingsColorPaletteTitle => 'Kolore-paleta';
+
+  @override
+  String medicationStartsOn(Object date) {
+    return '$date(e)an hasten da';
+  }
+
+  @override
+  String medicationFinishedOn(Object date) {
+    return '$date(e)an amaitu da';
+  }
+
+  @override
+  String medicationDayOfTotal(Object current, Object total) {
+    return '$current. eguna $total(e)tik';
+  }
 
   @override
   String get notificationsWillNotWork =>

@@ -27,7 +27,7 @@ class DaySelectionTile extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isSelected
-                ? Colors.teal.withOpacity(0.2)
+                ? Colors.teal.withValues(alpha: 0.2)
                 : Colors.transparent,
             border: Border.all(
               color: isSelected
@@ -45,7 +45,7 @@ class DaySelectionTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.teal
-                      : Theme.of(context).colorScheme.surfaceVariant,
+                      : Theme.of(context).colorScheme.surfaceContainerHighest,
                   shape: BoxShape.circle,
                 ),
                 child: Center(

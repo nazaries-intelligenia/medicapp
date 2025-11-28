@@ -10,8 +10,8 @@ void main() {
     test('should serialize fasting configuration to JSON', () {
       final medication = MedicationBuilder()
           .withId('test_6')
-          .withMultipleDoses(['08:00', '16:00'], SINGLE_DOSE)
-          .withFasting(type: 'before', duration: MEDIUM_FASTING)
+          .withMultipleDoses(['08:00', '16:00'], singleDose)
+          .withFasting(type: 'before', duration: mediumFasting)
           .build();
 
       final json = medication.toJson();
@@ -25,7 +25,7 @@ void main() {
     test('should serialize fasting disabled to JSON', () {
       final medication = MedicationBuilder()
           .withId('test_7')
-          .withSingleDose('08:00', SINGLE_DOSE)
+          .withSingleDose('08:00', singleDose)
           .withFastingDisabled()
           .build();
 
@@ -45,13 +45,13 @@ void main() {
         'dosageIntervalHours': 8,
         'durationType': 'everyday',
         'doseTimes': '08:00,16:00',
-        'doseSchedule': '{"08:00": $SINGLE_DOSE, "16:00": $SINGLE_DOSE}',
-        'stockQuantity': SMALL_STOCK,
+        'doseSchedule': '{"08:00": $singleDose, "16:00": $singleDose}',
+        'stockQuantity': smallStock,
         'takenDosesToday': '',
         'skippedDosesToday': '',
         'requiresFasting': 1,
         'fastingType': 'before',
-        'fastingDurationMinutes': MEDIUM_FASTING,
+        'fastingDurationMinutes': mediumFasting,
         'notifyFasting': 1,
       };
 
@@ -153,7 +153,7 @@ void main() {
       final med15 = MedicationBuilder()
           .withId('test_13')
           .withName('Test Med 15min')
-          .withSingleDose('08:00', SINGLE_DOSE)
+          .withSingleDose('08:00', singleDose)
           .withFasting(type: 'before', duration: 15)
           .build();
       expect(med15.fastingDurationMinutes, 15);
@@ -162,7 +162,7 @@ void main() {
       final med4h = MedicationBuilder()
           .withId('test_14')
           .withName('Test Med 4h')
-          .withSingleDose('08:00', SINGLE_DOSE)
+          .withSingleDose('08:00', singleDose)
           .withFasting(type: 'after', duration: 240, notify: false)
           .build();
       expect(med4h.fastingDurationMinutes, 240);
@@ -172,7 +172,7 @@ void main() {
           .withId('test_15')
           .withName('Test Med 12h')
           .withDosageInterval(24)
-          .withSingleDose('08:00', SINGLE_DOSE)
+          .withSingleDose('08:00', singleDose)
           .withFasting(type: 'before', duration: 720)
           .build();
       expect(med12h.fastingDurationMinutes, 720);

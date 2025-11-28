@@ -4,14 +4,13 @@ import '../models/medication.dart';
 import '../models/medication_type.dart';
 import '../models/treatment_duration_type.dart';
 import '../database/database_helper.dart';
-import '../services/notification_service.dart';
 import 'medication_quantity/widgets/stock_input_card.dart';
 import 'medication_quantity/widgets/medication_summary_card.dart';
 import '../widgets/action_buttons.dart';
 import '../utils/number_utils.dart';
 import 'medication_list/dialogs/expiration_date_dialog.dart';
 
-/// Pantalla 7: Cantidad de medicamentos (última pantalla del flujo)
+/// Screen 7: Medication quantity (last screen in the flow)
 class MedicationQuantityScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -173,7 +172,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
               child: Text(
                 l10n.stepIndicator(currentStep, totalSteps),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -190,7 +189,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Indicador de progreso
+                // Progress indicator
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
@@ -225,7 +224,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                // Card con información
+                // Information card
                 StockInputCard(
                   stockController: _stockController,
                   lowStockController: _lowStockThresholdController,
@@ -234,7 +233,7 @@ class _MedicationQuantityScreenState extends State<MedicationQuantityScreen> {
 
                 const SizedBox(height: 16),
 
-                // Resumen del medicamento
+                // Medication summary
                 MedicationSummaryCard(
                   medicationName: widget.medicationName,
                   medicationType: widget.medicationType,

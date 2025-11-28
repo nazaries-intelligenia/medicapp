@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:medicapp/main.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/screens/medication_list/widgets/empty_medications_view.dart';
 import '../helpers/widget_test_helpers.dart';
 import '../helpers/database_test_helper.dart';
 

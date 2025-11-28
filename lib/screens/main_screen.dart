@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/notification_service.dart';
+import '../services/localization_service.dart';
+import '../utils/date_formatter.dart';
 import 'medication_list_screen.dart';
 import 'medication_inventory_screen.dart';
 import 'dose_history_screen.dart';
@@ -22,7 +24,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  int _previousIndex = 0;
   bool _settingsChanged = false; // Flag to track if we just left Settings
 
   // GlobalKeys to access screen states
@@ -47,6 +48,9 @@ class _MainScreenState extends State<MainScreen> {
 
     // Process any pending notifications after the first frame is rendered
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Update LocalizationService and DateFormatter with the actual device locale
+      LocalizationService.instance.updateFromContext(context);
+      DateFormatter.setLocale(Localizations.localeOf(context));
       NotificationService.instance.processPendingNotification();
     });
   }
@@ -76,7 +80,6 @@ class _MainScreenState extends State<MainScreen> {
     }
 
     setState(() {
-      _previousIndex = _selectedIndex;
       _selectedIndex = index;
     });
   }
@@ -104,7 +107,7 @@ class _MainScreenState extends State<MainScreen> {
                 NavigationRailDestination(
                   icon: Icon(
                     Icons.medical_services_outlined,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   selectedIcon: const Icon(
                     Icons.medical_services,
@@ -115,7 +118,7 @@ class _MainScreenState extends State<MainScreen> {
                 NavigationRailDestination(
                   icon: Icon(
                     Icons.inventory_2_outlined,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   selectedIcon: const Icon(
                     Icons.inventory_2,
@@ -126,7 +129,7 @@ class _MainScreenState extends State<MainScreen> {
                 NavigationRailDestination(
                   icon: Icon(
                     Icons.history_outlined,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   selectedIcon: const Icon(
                     Icons.history,
@@ -137,7 +140,7 @@ class _MainScreenState extends State<MainScreen> {
                 NavigationRailDestination(
                   icon: Icon(
                     Icons.settings_outlined,
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                   ),
                   selectedIcon: const Icon(
                     Icons.settings,
@@ -185,7 +188,7 @@ class _MainScreenState extends State<MainScreen> {
           NavigationDestination(
             icon: Icon(
               Icons.medical_services_outlined,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             selectedIcon: const Icon(
               Icons.medical_services,
@@ -196,7 +199,7 @@ class _MainScreenState extends State<MainScreen> {
           NavigationDestination(
             icon: Icon(
               Icons.inventory_2_outlined,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             selectedIcon: const Icon(
               Icons.inventory_2,
@@ -207,7 +210,7 @@ class _MainScreenState extends State<MainScreen> {
           NavigationDestination(
             icon: Icon(
               Icons.history_outlined,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             selectedIcon: const Icon(
               Icons.history,
@@ -218,7 +221,7 @@ class _MainScreenState extends State<MainScreen> {
           NavigationDestination(
             icon: Icon(
               Icons.settings_outlined,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
             ),
             selectedIcon: const Icon(
               Icons.settings,

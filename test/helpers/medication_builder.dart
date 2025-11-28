@@ -2,13 +2,13 @@ import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 
-/// Builder para crear medicamentos de prueba de forma simplificada y legible.
+/// Builder to create test medications in a simplified and readable way.
 ///
-/// Ejemplo de uso:
+/// Usage example:
 /// ```dart
 /// final medication = MedicationBuilder()
 ///   .withId('test_1')
-///   .withName('Aspirina')
+///   .withName('Aspirin')
 ///   .withFasting(type: 'after', duration: 120)
 ///   .build();
 /// ```
@@ -39,7 +39,7 @@ class MedicationBuilder {
   double? _lastDailyConsumption;
   String? _expirationDate;
 
-  /// Constructor por defecto
+  /// Default constructor
   MedicationBuilder();
 
   MedicationBuilder withId(String id) {
@@ -125,13 +125,13 @@ class MedicationBuilder {
     return this;
   }
 
-  /// Limpia el schedule de dosis (sin dosis configuradas)
+  /// Clears the dose schedule (no doses configured)
   MedicationBuilder withNoDoses() {
     _doseSchedule = {};
     return this;
   }
 
-  /// Configura el medicamento como "as needed" (a demanda)
+  /// Configures the medication as "as needed"
   MedicationBuilder withAsNeeded() {
     _durationType = TreatmentDurationType.asNeeded;
     _dosageIntervalHours = 0;
@@ -159,8 +159,8 @@ class MedicationBuilder {
     return this;
   }
 
-  /// Configura el medicamento con valores de ayuno inválidos para tests de edge cases.
-  /// Permite establecer duraciones nulas o cero para validar comportamiento de error.
+  /// Configures the medication with invalid fasting values for edge case tests.
+  /// Allows setting null or zero durations to validate error behavior.
   MedicationBuilder withFastingEdgeCase({
     required String type,
     required int? duration,
@@ -214,21 +214,20 @@ class MedicationBuilder {
 
   // ===== Factory Methods =====
 
-  /// Configura un medicamento con valores por defecto para tests comunes
+  /// Configures a medication with default values for common tests
   MedicationBuilder withDefaultTestConfig() {
-    return this
-        .withId('test-medication-${DateTime.now().millisecondsSinceEpoch}')
+    return withId('test-medication-${DateTime.now().millisecondsSinceEpoch}')
         .withStock(30.0);
   }
 
-  /// Configura múltiples dosis al día con horarios automáticos
-  /// Genera horarios comenzando a las 8:00 y espaciados cada 4 horas
+  /// Configures multiple doses per day with automatic schedules
+  /// Generates schedules starting at 8:00 and spaced every 4 hours
   MedicationBuilder withMultipleDosesPerDay(int count) {
     final times = List.generate(count, (i) => '${8 + i * 4}:00');
     return withMultipleDoses(times, 1.0);
   }
 
-  /// Configura ayuno con valores comunes para tests
+  /// Configures fasting with common values for tests
   MedicationBuilder withFastingEnabled({
     String type = 'before',
     int durationMinutes = 60,
@@ -236,17 +235,17 @@ class MedicationBuilder {
     return withFasting(type: type, duration: durationMinutes);
   }
 
-  /// Configura el medicamento con stock bajo (5 unidades)
+  /// Configures the medication with low stock (5 units)
   MedicationBuilder withLowStock() {
     return withStock(5.0);
   }
 
-  /// Configura el medicamento sin stock (0 unidades)
+  /// Configures the medication with no stock (0 units)
   MedicationBuilder withNoStock() {
     return withStock(0.0);
   }
 
-  /// Crea una copia del builder a partir de un medicamento existente
+  /// Creates a copy of the builder from an existing medication
   MedicationBuilder.from(Medication medication) {
     _id = medication.id;
     _name = medication.name;

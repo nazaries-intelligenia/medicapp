@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
-import 'package:medicapp/models/person.dart';
 import 'helpers/medication_builder.dart';
 
 /// Tests for multi-person notification scheduling (V19+)
@@ -19,7 +18,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-multi-med-1')
-          .withName('Vitamina C')
+          .withName('Vitamin C')
           .withSingleDose('09:00', 1.0)
           .withStock(60.0)
           .withStartDate(DateTime.now())
@@ -44,7 +43,7 @@ void main() {
       // Create a medication with multiple doses
       final medication = MedicationBuilder()
           .withId('test-multi-med-2')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withMultipleDoses(['08:00', '20:00'], 1.0)
           .withStock(100.0)
           .withStartDate(DateTime.now())
@@ -64,7 +63,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-reschedule-1')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withSingleDose('14:00', 1.0)
           .withStock(30.0)
           .withStartDate(DateTime.now())
@@ -87,7 +86,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-postpone-person-1')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withSingleDose('10:00', 1.0)
           .withStock(20.0)
           .withStartDate(DateTime.now())
@@ -109,7 +108,7 @@ void main() {
       // Create a medication with after-fasting requirement
       final medication = MedicationBuilder()
           .withId('test-fasting-person-1')
-          .withName('Medicamento con ayuno')
+          .withName('Medication with fasting')
           .withSingleDose('08:00', 1.0)
           .withStock(30.0)
           .withStartDate(DateTime.now())
@@ -135,7 +134,7 @@ void main() {
       // Create a medication
       final medication = MedicationBuilder()
           .withId('test-exclude-person-1')
-          .withName('Medicamento diario')
+          .withName('Daily Medication')
           .withSingleDose('16:00', 1.0)
           .withStock(50.0)
           .withStartDate(DateTime.now())
@@ -157,7 +156,7 @@ void main() {
       // Create a medication with weekly pattern
       final medication = MedicationBuilder()
           .withId('test-weekly-person-1')
-          .withName('Medicamento semanal')
+          .withName('Weekly Medication')
           .withSingleDose('09:00', 1.0)
           .withStock(30.0)
           .withStartDate(DateTime.now())
@@ -182,7 +181,7 @@ void main() {
 
       final medication = MedicationBuilder()
           .withId('test-dates-person-1')
-          .withName('Medicamento días específicos')
+          .withName('Medication with specific dates')
           .withSingleDose('10:00', 1.0)
           .withStock(10.0)
           .withStartDate(today)
@@ -309,7 +308,7 @@ void main() {
 
       final medication = MedicationBuilder()
           .withId('test-skip-cancel-1')
-          .withName('Medicamento compartido')
+          .withName('Shared Medication')
           .withMultipleDoses(['08:00', '20:00'], 1.0)
           .withStock(100.0)
           .withStartDate(DateTime.now())

@@ -11,7 +11,7 @@ import 'edit_frequency/widgets/weekly_pattern_config_card.dart';
 import 'edit_frequency/widgets/custom_interval_config_card.dart';
 import '../../widgets/action_buttons.dart';
 
-/// Pantalla para editar la frecuencia del medicamento
+/// Screen to edit medication frequency
 class EditFrequencyScreen extends StatefulWidget {
   final Medication medication;
 
@@ -259,7 +259,7 @@ class _EditFrequencyScreenState extends State<EditFrequencyScreen> {
                       Text(
                         l10n.editFrequencyQuestion,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 16),

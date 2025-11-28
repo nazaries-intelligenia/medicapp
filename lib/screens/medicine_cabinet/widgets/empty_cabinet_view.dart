@@ -24,7 +24,7 @@ class EmptyCabinetView extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -47,7 +47,7 @@ class EmptyCabinetView extends StatelessWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .onSurfaceVariant
-                              .withOpacity(0.6),
+                              .withValues(alpha: 0.6),
                         ),
                   ),
                 ],

@@ -98,11 +98,11 @@ void main() {
     await waitForDatabase(tester);
 
     // Add a medication with low stock
-    await addMedicationWithDuration(tester, 'Aspirina', stockQuantity: '5', dosageIntervalHours: 12);
+    await addMedicationWithDuration(tester, 'Aspirin', stockQuantity: '5', dosageIntervalHours: 12);
     await waitForDatabase(tester);
 
     // Verify the medication is displayed
-    expect(find.text('Aspirina'), findsOneWidget);
+    expect(find.text('Aspirin'), findsOneWidget);
 
     // Verify warning icon is shown (this confirms low stock detection works)
     expect(find.byIcon(Icons.warning), findsOneWidget);
@@ -121,6 +121,6 @@ void main() {
     expect(find.byIcon(Icons.warning), findsNWidgets(2));
 
     // Verify the medication is still displayed (operation didn't crash)
-    expect(find.text('Aspirina'), findsOneWidget);
+    expect(find.text('Aspirin'), findsOneWidget);
   });
 }

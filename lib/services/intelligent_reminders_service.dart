@@ -4,14 +4,14 @@ import 'package:medicapp/models/dose_history_entry.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/services/logger_service.dart';
 
-/// Servicio de análisis inteligente de adherencia a medicaciones
-/// Analiza patrones históricos y genera recomendaciones personalizadas
+/// Intelligent medication adherence analysis service
+/// Analyzes historical patterns and generates personalized recommendations
 class IntelligentRemindersService {
   static final IntelligentRemindersService instance = IntelligentRemindersService._();
 
   IntelligentRemindersService._();
 
-  /// Analiza la adherencia de una medicación durante un período
+  /// Analyzes medication adherence during a period
   Future<AdherenceAnalysis> analyzeAdherence({
     required String medicationId,
     required String medicationName,
@@ -20,7 +20,7 @@ class IntelligentRemindersService {
     int? daysPeriod,
   }) async {
     try {
-      // Determinar el período de análisis
+      // Determine the analysis period
       final end = endDate ?? DateTime.now();
       final start = startDate ??
           end.subtract(Duration(days: daysPeriod ?? 30));
@@ -29,35 +29,35 @@ class IntelligentRemindersService {
         'Analyzing adherence for $medicationName from $start to $end',
       );
 
-      // Obtener historial de dosis
+      // Get dose history
       final history = await DatabaseHelper.instance.getDoseHistoryForDateRange(
         startDate: start,
         endDate: end,
         medicationId: medicationId,
       );
 
-      // Obtener información de la medicación
+      // Get medication information
       final medication = await DatabaseHelper.instance.getMedication(medicationId);
       if (medication == null) {
         throw Exception('Medication not found: $medicationId');
       }
 
-      // Calcular métricas generales
+      // Calculate general metrics
       final totalScheduled = _calculateTotalScheduledDoses(medication, start, end);
       final takenDoses = history.where((e) => e.status == DoseStatus.taken).length;
       final skippedDoses = history.where((e) => e.status == DoseStatus.skipped).length;
       final adherenceRate = totalScheduled > 0 ? takenDoses / totalScheduled : 0.0;
 
-      // Análisis temporal
+      // Temporal analysis
       final adherenceByDayOfWeek = _calculateAdherenceByDayOfWeek(history, medication);
       final adherenceByTimeOfDay = _calculateAdherenceByTimeOfDay(history);
 
-      // Identificar patrones
+      // Identify patterns
       final bestTimes = _identifyBestTimes(adherenceByTimeOfDay, limit: 3);
       final worstTimes = _identifyWorstTimes(adherenceByTimeOfDay, limit: 3);
       final problematicDays = _identifyProblematicDays(adherenceByDayOfWeek);
 
-      // Generar recomendaciones
+      // Generate recommendations
       final recommendations = _generateRecommendations(
         adherenceRate: adherenceRate,
         bestTimes: bestTimes,
@@ -66,7 +66,7 @@ class IntelligentRemindersService {
         medication: medication,
       );
 
-      // Calcular tendencia
+      // Calculate trend
       final trend = _calculateTrend(history, totalScheduled);
 
       return AdherenceAnalysis(
@@ -90,7 +90,7 @@ class IntelligentRemindersService {
     }
   }
 
-  /// Predice la probabilidad de omitir una dosis específica
+  /// Predicts the probability of skipping a specific dose
   Future<SkipPrediction> predictSkipProbability({
     required String medicationId,
     required String doseTime,
@@ -102,14 +102,14 @@ class IntelligentRemindersService {
           DateTime.now().subtract(const Duration(days: 30));
       final end = DateTime.now();
 
-      // Obtener historial relevante
+      // Get relevant history
       final history = await DatabaseHelper.instance.getDoseHistoryForDateRange(
         startDate: start,
         endDate: end,
         medicationId: medicationId,
       );
 
-      // Filtrar por día de la semana y hora
+      // Filter by day of week and time
       final relevantHistory = history.where((entry) {
         final entryDayOfWeek = entry.scheduledDateTime.weekday;
         final entryTime = _formatTimeOfDay(entry.scheduledDateTime);
@@ -122,17 +122,17 @@ class IntelligentRemindersService {
           doseTime: doseTime,
           dayOfWeek: dayOfWeek,
           skipProbability: 0.0,
-          riskFactors: ['Datos insuficientes'],
+          riskFactors: const ['Insufficient data'],
         );
       }
 
-      // Calcular probabilidad de omisión
+      // Calculate skip probability
       final skipped = relevantHistory
           .where((e) => e.status == DoseStatus.skipped)
           .length;
       final skipProbability = skipped / relevantHistory.length;
 
-      // Identificar factores de riesgo
+      // Identify risk factors
       final riskFactors = _identifyRiskFactors(
         skipProbability: skipProbability,
         dayOfWeek: dayOfWeek,
@@ -157,7 +157,7 @@ class IntelligentRemindersService {
     }
   }
 
-  /// Sugiere horarios óptimos para mejorar adherencia
+  /// Suggests optimal times to improve adherence
   Future<List<TimeSlotSuggestion>> suggestOptimalTimes({
     required Medication medication,
     DateTime? analysisStartDate,
@@ -171,11 +171,11 @@ class IntelligentRemindersService {
 
       final suggestions = <TimeSlotSuggestion>[];
 
-      // Para cada horario problemático, sugerir alternativa
+      // For each problematic time, suggest alternative
       for (final worstTime in analysis.worstTimes) {
         final worstAdherence = analysis.adherenceByTimeOfDay[worstTime] ?? 0.0;
 
-        // Buscar el mejor horario alternativo
+        // Search for the best alternative time
         String? bestAlternative;
         double bestAdherence = 0.0;
 
@@ -212,10 +212,10 @@ class IntelligentRemindersService {
   }
 
   // ============================================================================
-  // HELPER METHODS - Cálculo de métricas
+  // HELPER METHODS - Metrics calculation
   // ============================================================================
 
-  /// Calcula el total de dosis programadas en un período
+  /// Calculates the total scheduled doses in a period
   int _calculateTotalScheduledDoses(
     Medication medication,
     DateTime start,
@@ -226,7 +226,7 @@ class IntelligentRemindersService {
     return days * dosesPerDay;
   }
 
-  /// Calcula adherencia por día de la semana (1=Lunes, 7=Domingo)
+  /// Calculates adherence by day of week (1=Monday, 7=Sunday)
   Map<int, double> _calculateAdherenceByDayOfWeek(
     List<DoseHistoryEntry> history,
     Medication medication,
@@ -250,20 +250,20 @@ class IntelligentRemindersService {
     return adherenceByDay;
   }
 
-  /// Calcula adherencia por hora del día
+  /// Calculates adherence by time of day
   Map<String, double> _calculateAdherenceByTimeOfDay(
     List<DoseHistoryEntry> history,
   ) {
     final adherenceByTime = <String, double>{};
     final groupedByTime = <String, List<DoseHistoryEntry>>{};
 
-    // Agrupar por hora
+    // Group by hour
     for (final entry in history) {
       final time = _formatTimeOfDay(entry.scheduledDateTime);
       groupedByTime.putIfAbsent(time, () => []).add(entry);
     }
 
-    // Calcular adherencia por grupo
+    // Calculate adherence by group
     for (final entry in groupedByTime.entries) {
       final taken = entry.value.where((e) => e.status == DoseStatus.taken).length;
       adherenceByTime[entry.key] = taken / entry.value.length;
@@ -272,7 +272,7 @@ class IntelligentRemindersService {
     return adherenceByTime;
   }
 
-  /// Identifica los mejores horarios (mayor adherencia)
+  /// Identifies the best times (highest adherence)
   List<String> _identifyBestTimes(
     Map<String, double> adherenceByTime,
     {int limit = 3}
@@ -282,12 +282,12 @@ class IntelligentRemindersService {
 
     return sorted
         .take(limit)
-        .where((e) => e.value >= 0.75) // Solo horarios con buena adherencia
+        .where((e) => e.value >= 0.75) // Only times with good adherence
         .map((e) => e.key)
         .toList();
   }
 
-  /// Identifica los peores horarios (menor adherencia)
+  /// Identifies the worst times (lowest adherence)
   List<String> _identifyWorstTimes(
     Map<String, double> adherenceByTime,
     {int limit = 3}
@@ -297,12 +297,12 @@ class IntelligentRemindersService {
 
     return sorted
         .take(limit)
-        .where((e) => e.value < 0.50) // Solo horarios problemáticos
+        .where((e) => e.value < 0.50) // Only problematic times
         .map((e) => e.key)
         .toList();
   }
 
-  /// Identifica días problemáticos (adherencia < 50%)
+  /// Identifies problematic days (adherence < 50%)
   List<int> _identifyProblematicDays(Map<int, double> adherenceByDay) {
     return adherenceByDay.entries
         .where((e) => e.value < 0.50)
@@ -310,7 +310,7 @@ class IntelligentRemindersService {
         .toList();
   }
 
-  /// Calcula la tendencia de adherencia
+  /// Calculates adherence trend
   AdherenceTrend _calculateTrend(
     List<DoseHistoryEntry> history,
     int totalScheduled,
@@ -319,7 +319,7 @@ class IntelligentRemindersService {
       return AdherenceTrend.insufficient;
     }
 
-    // Dividir historial en dos mitades
+    // Divide history into two halves
     final midpoint = history.length ~/ 2;
     final firstHalf = history.sublist(0, midpoint);
     final secondHalf = history.sublist(midpoint);
@@ -334,7 +334,7 @@ class IntelligentRemindersService {
     return AdherenceTrend.stable;
   }
 
-  /// Calcula tasa de adherencia de un subconjunto
+  /// Calculates adherence rate of a subset
   double _calculateAdherenceRate(List<DoseHistoryEntry> history) {
     if (history.isEmpty) return 0.0;
     final taken = history.where((e) => e.status == DoseStatus.taken).length;
@@ -342,10 +342,10 @@ class IntelligentRemindersService {
   }
 
   // ============================================================================
-  // HELPER METHODS - Generación de recomendaciones
+  // HELPER METHODS - Recommendations generation
   // ============================================================================
 
-  /// Genera recomendaciones personalizadas
+  /// Generates personalized recommendations
   List<String> _generateRecommendations({
     required double adherenceRate,
     required List<String> bestTimes,
@@ -355,53 +355,53 @@ class IntelligentRemindersService {
   }) {
     final recommendations = <String>[];
 
-    // Recomendación por nivel de adherencia
+    // Recommendation by adherence level
     if (adherenceRate < 0.50) {
       recommendations.add(
-        'Tu adherencia es baja (${(adherenceRate * 100).toStringAsFixed(0)}%). '
-        'Considera configurar recordatorios más frecuentes.',
+        'Your adherence is low (${(adherenceRate * 100).toStringAsFixed(0)}%). '
+        'Consider setting up more frequent reminders.',
       );
     } else if (adherenceRate < 0.75) {
       recommendations.add(
-        'Tu adherencia es moderada (${(adherenceRate * 100).toStringAsFixed(0)}%). '
-        'Pequeños ajustes pueden mejorarla significativamente.',
+        'Your adherence is moderate (${(adherenceRate * 100).toStringAsFixed(0)}%). '
+        'Small adjustments can significantly improve it.',
       );
     } else if (adherenceRate >= 0.90) {
       recommendations.add(
-        '¡Excelente adherencia! (${(adherenceRate * 100).toStringAsFixed(0)}%). '
-        'Mantén estos buenos hábitos.',
+        'Excellent adherence! (${(adherenceRate * 100).toStringAsFixed(0)}%). '
+        'Keep up these good habits.',
       );
     }
 
-    // Recomendaciones por horarios problemáticos
+    // Recommendations for problematic times
     if (worstTimes.isNotEmpty) {
       recommendations.add(
-        'Los horarios ${worstTimes.join(", ")} son difíciles para ti. '
-        'Considera ajustar estos horarios o usar alarmas adicionales.',
+        'The times ${worstTimes.join(", ")} are difficult for you. '
+        'Consider adjusting these times or using additional alarms.',
       );
     }
 
-    // Recomendaciones por días problemáticos
+    // Recommendations for problematic days
     if (problematicDays.isNotEmpty) {
       final dayNames = problematicDays.map(_getDayName).join(', ');
       recommendations.add(
-        'Los días $dayNames presentan más omisiones. '
-        'Presta especial atención estos días.',
+        '$dayNames present more skips. '
+        'Pay special attention on these days.',
       );
     }
 
-    // Recomendación por horarios exitosos
+    // Recommendation for successful times
     if (bestTimes.isNotEmpty && worstTimes.isNotEmpty) {
       recommendations.add(
-        'Tienes mejor adherencia en ${bestTimes.first}. '
-        'Podrías mover dosis de horarios difíciles a horas similares.',
+        'You have better adherence at ${bestTimes.first}. '
+        'You could move doses from difficult times to similar hours.',
       );
     }
 
     return recommendations;
   }
 
-  /// Identifica factores de riesgo para omisión
+  /// Identifies risk factors for skipping
   List<String> _identifyRiskFactors({
     required double skipProbability,
     required int dayOfWeek,
@@ -411,10 +411,10 @@ class IntelligentRemindersService {
     final riskFactors = <String>[];
 
     if (skipProbability > 0.50) {
-      riskFactors.add('Alta probabilidad histórica de omisión');
+      riskFactors.add('High historical probability of skipping');
     }
 
-    // Analizar si es fin de semana
+    // Analyze if it's weekend
     if (dayOfWeek == 6 || dayOfWeek == 7) {
       final weekendSkips = history.where((e) =>
         (e.scheduledDateTime.weekday == 6 ||
@@ -423,22 +423,22 @@ class IntelligentRemindersService {
       ).length;
 
       if (weekendSkips > 2) {
-        riskFactors.add('Patrón de omisiones en fines de semana');
+        riskFactors.add('Pattern of weekend skips');
       }
     }
 
-    // Analizar horario temprano/tardío
+    // Analyze early/late time
     final hour = int.parse(doseTime.split(':')[0]);
     if (hour < 7) {
-      riskFactors.add('Horario muy temprano en la mañana');
+      riskFactors.add('Very early morning time');
     } else if (hour >= 22) {
-      riskFactors.add('Horario muy tarde en la noche');
+      riskFactors.add('Very late night time');
     }
 
     return riskFactors;
   }
 
-  /// Genera razón para sugerencia de horario
+  /// Generates reason for time slot suggestion
   String _generateTimeSlotReason({
     required String currentTime,
     required double currentAdherence,
@@ -446,26 +446,26 @@ class IntelligentRemindersService {
     required double suggestedAdherence,
   }) {
     final improvement = (suggestedAdherence - currentAdherence) * 100;
-    return 'El horario $suggestedTime tiene ${improvement.toStringAsFixed(0)}% '
-        'más de adherencia histórica que $currentTime';
+    return 'The time $suggestedTime has ${improvement.toStringAsFixed(0)}% '
+        'more historical adherence than $currentTime';
   }
 
   // ============================================================================
-  // HELPER METHODS - Utilidades
+  // HELPER METHODS - Utilities
   // ============================================================================
 
-  /// Formatea hora del día como HH:mm
+  /// Formats time of day as HH:mm
   String _formatTimeOfDay(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
 
-  /// Obtiene el nombre del día de la semana
+  /// Gets the name of the day of the week
   String _getDayName(int dayOfWeek) {
     const dayNames = [
-      'Lunes', 'Martes', 'Miércoles', 'Jueves',
-      'Viernes', 'Sábado', 'Domingo'
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday',
+      'Friday', 'Saturday', 'Sunday'
     ];
     return dayNames[dayOfWeek - 1];
   }

@@ -4,15 +4,15 @@ import '../../database/database_helper.dart';
 import '../logger_service.dart';
 import 'smart_cache_service.dart';
 
-/// Servicio de caché específico para medicaciones
-/// Integra SmartCacheService con la lógica de negocio de medicaciones
+/// Medication-specific cache service
+/// Integrates SmartCacheService with medication business logic
 class MedicationCacheService {
   static final MedicationCacheService instance = MedicationCacheService._();
 
   MedicationCacheService._();
 
-  // Cachés separados para diferentes tipos de datos
-  final SmartCacheService<String, Medication> _medicationCache =
+  // Separate caches for different data types
+  final SmartCacheService<String, Medication?> _medicationCache =
       SmartCacheService(
     defaultTTL: const Duration(minutes: 10),
     maxSize: 50,
@@ -40,7 +40,7 @@ class MedicationCacheService {
   // MEDICATION CACHE
   // ============================================================================
 
-  /// Obtiene una medicación del caché o de la BD
+  /// Gets a medication from cache or from the DB
   Future<Medication?> getMedication(String medicationId) async {
     return await _medicationCache.getOrCompute(
       medicationId,
@@ -48,7 +48,7 @@ class MedicationCacheService {
     );
   }
 
-  /// Obtiene una medicación para una persona del caché o de la BD
+  /// Gets a medication for a person from cache or from the DB
   Future<Medication?> getMedicationForPerson(
     String medicationId,
     String personId,
@@ -63,7 +63,7 @@ class MedicationCacheService {
     );
   }
 
-  /// Obtiene todas las medicaciones de una persona
+  /// Gets all medications for a person
   Future<List<Medication>> getMedicationsForPerson(String personId) async {
     return await _medicationListCache.getOrCompute(
       'person_$personId',
@@ -71,20 +71,20 @@ class MedicationCacheService {
     );
   }
 
-  /// Invalida el caché de una medicación específica
+  /// Invalidates the cache for a specific medication
   void invalidateMedication(String medicationId) {
     _medicationCache.invalidateWhere((key) => key.startsWith(medicationId));
     LoggerService.debug('Invalidated medication cache: $medicationId');
   }
 
-  /// Invalida el caché de medicaciones de una persona
+  /// Invalidates the medications cache for a person
   void invalidatePersonMedications(String personId) {
     _medicationListCache.invalidate('person_$personId');
     _medicationCache.invalidateWhere((key) => key.endsWith('_$personId'));
     LoggerService.debug('Invalidated person medications cache: $personId');
   }
 
-  /// Invalida todo el caché de medicaciones cuando hay cambios importantes
+  /// Invalidates all medication caches when there are important changes
   void invalidateAllMedications() {
     _medicationCache.clear();
     _medicationListCache.clear();
@@ -95,7 +95,7 @@ class MedicationCacheService {
   // HISTORY CACHE
   // ============================================================================
 
-  /// Obtiene el historial de dosis de una medicación
+  /// Gets the dose history for a medication
   Future<List<DoseHistoryEntry>> getDoseHistoryForMedication(
     String medicationId,
   ) async {
@@ -105,7 +105,7 @@ class MedicationCacheService {
     );
   }
 
-  /// Obtiene el historial de dosis para un rango de fechas
+  /// Gets the dose history for a date range
   Future<List<DoseHistoryEntry>> getDoseHistoryForDateRange({
     required DateTime startDate,
     required DateTime endDate,
@@ -124,7 +124,7 @@ class MedicationCacheService {
     );
   }
 
-  /// Invalida el caché de historial cuando se registra/elimina una dosis
+  /// Invalidates the history cache when a dose is registered/deleted
   void invalidateDoseHistory({String? medicationId}) {
     if (medicationId != null) {
       _historyCache.invalidateWhere((key) => key.contains(medicationId));
@@ -138,7 +138,7 @@ class MedicationCacheService {
   // STATISTICS CACHE
   // ============================================================================
 
-  /// Obtiene estadísticas de dosis con caché
+  /// Gets dose statistics with caching
   Future<Map<String, dynamic>> getDoseStatistics({
     String? medicationId,
     DateTime? startDate,
@@ -162,7 +162,7 @@ class MedicationCacheService {
     );
   }
 
-  /// Invalida el caché de estadísticas
+  /// Invalidates the statistics cache
   void invalidateStatistics() {
     _statsCache.clear();
     LoggerService.debug('Invalidated statistics cache');
@@ -172,7 +172,7 @@ class MedicationCacheService {
   // CACHE MANAGEMENT
   // ============================================================================
 
-  /// Limpia todo el caché
+  /// Clears all caches
   void clearAll() {
     _medicationCache.clear();
     _medicationListCache.clear();
@@ -181,7 +181,7 @@ class MedicationCacheService {
     LoggerService.info('Cleared all caches');
   }
 
-  /// Obtiene estadísticas combinadas de todos los cachés
+  /// Gets combined statistics from all caches
   Map<String, CacheStats> getAllStats() {
     return {
       'medications': _medicationCache.stats,
@@ -191,7 +191,7 @@ class MedicationCacheService {
     };
   }
 
-  /// Libera recursos de todos los cachés
+  /// Releases resources from all caches
   void dispose() {
     _medicationCache.dispose();
     _medicationListCache.dispose();
@@ -199,7 +199,7 @@ class MedicationCacheService {
     _statsCache.dispose();
   }
 
-  /// Optimiza el caché eliminando entradas expiradas
+  /// Optimizes the cache by removing expired entries
   void optimize() {
     _medicationCache.cleanup();
     _medicationListCache.cleanup();

@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import 'package:medicapp/l10n/app_localizations_es.dart';
 import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
+import 'package:medicapp/services/localization_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-/// Setup común para inicializar SQLite en tests
+/// Common setup to initialize SQLite and LocalizationService in tests
 void setupTestDatabase() {
-  setUpAll(() {
+  setUpAll(() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+    // Initialize LocalizationService with Spanish for tests
+    await LocalizationService.instance.setLocale(const Locale('es'));
   });
 }
 
-/// Factory para crear medicaciones de test con valores por defecto
-/// @deprecated Usar MedicationBuilder en su lugar
+/// Factory to create test medications with default values
+/// @deprecated Use MedicationBuilder instead
 @Deprecated('Usar MedicationBuilder en su lugar')
 Medication createTestMedication({
   String? id,
@@ -58,85 +62,85 @@ Medication createTestMedication({
 }
 
 // ============================================================================
-// HELPERS DE FECHAS
+// DATE HELPERS
 // ============================================================================
 
-/// Obtiene la fecha de hoy en formato 'YYYY-MM-DD'.
+/// Gets today's date in 'YYYY-MM-DD' format.
 String getTodayString() {
   final now = DateTime.now();
   return formatDate(now);
 }
 
-/// Obtiene la fecha de ayer en formato 'YYYY-MM-DD'.
+/// Gets yesterday's date in 'YYYY-MM-DD' format.
 String getYesterdayString() {
   final yesterday = DateTime.now().subtract(const Duration(days: 1));
   return formatDate(yesterday);
 }
 
-/// Obtiene la fecha de mañana en formato 'YYYY-MM-DD'.
+/// Gets tomorrow's date in 'YYYY-MM-DD' format.
 String getTomorrowString() {
   final tomorrow = DateTime.now().add(const Duration(days: 1));
   return formatDate(tomorrow);
 }
 
-/// Formatea una fecha a string en formato 'YYYY-MM-DD'.
+/// Formats a date to string in 'YYYY-MM-DD' format.
 String formatDate(DateTime date) {
   return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
 }
 
-/// Crea una fecha para hoy a una hora específica.
+/// Creates a date for today at a specific time.
 DateTime todayAt(int hour, int minute) {
   final now = DateTime.now();
   return DateTime(now.year, now.month, now.day, hour, minute);
 }
 
-/// Verifica si dos fechas son del mismo día.
+/// Checks if two dates are the same day.
 bool isSameDay(DateTime date1, DateTime date2) {
   return date1.year == date2.year &&
       date1.month == date2.month &&
       date1.day == date2.day;
 }
 
-/// Verifica si una fecha es hoy.
+/// Checks if a date is today.
 bool isToday(DateTime date) {
   return isSameDay(date, DateTime.now());
 }
 
-/// Crea una fecha X días en el pasado.
+/// Creates a date X days in the past.
 DateTime daysAgo(int days) {
   return DateTime.now().subtract(Duration(days: days));
 }
 
-/// Crea una fecha X días en el futuro.
+/// Creates a date X days in the future.
 DateTime daysFromNow(int days) {
   return DateTime.now().add(Duration(days: days));
 }
 
 // ============================================================================
-// HELPERS DE NOTIFICACIONES
+// NOTIFICATION HELPERS
 // ============================================================================
 
-/// Genera un ID único para notificaciones (simula la lógica del servicio).
+/// Generates a unique ID for notifications (simulates service logic).
 int generateNotificationId(String medicationId, int doseIndex) {
   final medicationHash = medicationId.hashCode.abs();
   return (medicationHash % 1000000) * 100 + doseIndex;
 }
 
-/// Genera un ID de notificación para una fecha específica.
+/// Generates a notification ID for a specific date.
 int generateSpecificDateNotificationId(String medicationId, String dateString, int doseIndex) {
   final combinedString = '$medicationId-$dateString-$doseIndex';
   final hash = combinedString.hashCode.abs();
   return 3000000 + (hash % 1000000);
 }
 
-/// Genera un ID de notificación para patrón semanal.
+/// Generates a notification ID for weekly pattern.
 int generateWeeklyNotificationId(String medicationId, int weekday, int doseIndex) {
   final combinedString = '$medicationId-weekday$weekday-$doseIndex';
   final hash = combinedString.hashCode.abs();
   return 4000000 + (hash % 1000000);
 }
 
-/// Genera un ID de notificación pospuesta.
+/// Generates a postponed notification ID.
 int generatePostponedNotificationId(String medicationId, String doseTime) {
   final combinedString = '$medicationId-$doseTime';
   final hash = combinedString.hashCode.abs();
@@ -144,38 +148,38 @@ int generatePostponedNotificationId(String medicationId, String doseTime) {
 }
 
 // ============================================================================
-// HELPERS DE FORMATEO DE HORAS
+// TIME FORMATTING HELPERS
 // ============================================================================
 
-/// Formatea una hora en formato 'HH:MM'.
+/// Formats a time in 'HH:MM' format.
 String formatTime(int hour, [int minute = 0]) {
   return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 }
 
-/// Calcula una hora relativa (ej: 2 horas atrás, 3 horas adelante).
-/// Retorna el valor en formato 24 horas (0-23).
-/// Maneja correctamente valores negativos y cruces de medianoche.
+/// Calculates a relative hour (e.g. 2 hours ago, 3 hours ahead).
+/// Returns the value in 24-hour format (0-23).
+/// Correctly handles negative values and midnight crossings.
 int calculateRelativeHour(int currentHour, int delta) {
   int result = (currentHour + delta) % 24;
-  // En Dart, el módulo de números negativos devuelve valores negativos
-  // Ej: -1 % 24 = -1, no 23. Necesitamos corregir esto.
+  // In Dart, the modulo of negative numbers returns negative values
+  // E.g. -1 % 24 = -1, not 23. We need to correct this.
   if (result < 0) {
     result += 24;
   }
   return result;
 }
 
-/// Helper combinado: calcula hora relativa y la formatea.
+/// Combined helper: calculates relative hour and formats it.
 String formatRelativeTime(int currentHour, int hoursDelta, [int minute = 0]) {
   final hour = calculateRelativeHour(currentHour, hoursDelta);
   return formatTime(hour, minute);
 }
 
 // ============================================================================
-// HELPERS DE UI/WIDGETS
+// UI/WIDGET HELPERS
 // ============================================================================
 
-/// Helper para envolver un widget en MaterialApp y pumpearlo
+/// Helper to wrap a widget in MaterialApp and pump it
 Future<void> pumpScreen(
   WidgetTester tester,
   Widget screen, {
@@ -195,12 +199,12 @@ Future<void> pumpScreen(
   }
 }
 
-/// Helper para test de navegación con botón cancelar
+/// Helper to test navigation with cancel button
 ///
-/// Este helper verifica:
-/// 1. Que la pantalla se puede abrir desde un botón
-/// 2. Que el título de la pantalla es correcto
-/// 3. Que el botón cancelar navega de regreso
+/// This helper verifies:
+/// 1. That the screen can be opened from a button
+/// 2. That the screen title is correct
+/// 3. That the cancel button navigates back
 Future<void> testCancelNavigation(
   WidgetTester tester, {
   required String screenTitle,
@@ -239,11 +243,12 @@ Future<void> testCancelNavigation(
   expect(find.text(screenTitle), findsOneWidget);
 
   // Scroll to cancel button (may be off-screen)
-  await tester.ensureVisible(find.text('Cancelar'));
+  final l10n = getL10n();
+  await tester.ensureVisible(find.text(l10n.btnCancel));
   await tester.pumpAndSettle();
 
   // Tap cancel
-  await tester.tap(find.text('Cancelar'));
+  await tester.tap(find.text(l10n.btnCancel));
   await tester.pumpAndSettle();
 
   // Should be back to the original screen
@@ -251,17 +256,19 @@ Future<void> testCancelNavigation(
   expect(find.text('Open'), findsOneWidget);
 }
 
-/// Helper para verificar que el botón guardar existe
+/// Helper to verify that the save button exists
 void expectSaveButtonExists() {
-  expect(find.text('Guardar Cambios'), findsOneWidget);
+  final l10n = getL10n();
+  expect(find.text(l10n.editBasicInfoSaveChanges), findsOneWidget);
 }
 
-/// Helper para verificar que el botón cancelar existe
+/// Helper to verify that the cancel button exists
 void expectCancelButtonExists() {
-  expect(find.text('Cancelar'), findsOneWidget);
+  final l10n = getL10n();
+  expect(find.text(l10n.btnCancel), findsOneWidget);
 }
 
-/// Helper para hacer scroll a un elemento y hacer tap
+/// Helper to scroll to an element and tap it
 Future<void> scrollAndTap(
   WidgetTester tester,
   Finder finder, {
@@ -278,12 +285,18 @@ Future<void> scrollAndTap(
   }
 }
 
-/// Helper para verificar que se muestra un error de validación
+/// Helper to verify that a validation error is shown
 void expectValidationError(String errorMessage) {
   expect(find.text(errorMessage), findsOneWidget);
 }
 
-/// Helper para verificar que NO se muestra un error de validación
+/// Helper to verify that a validation error is NOT shown
 void expectNoValidationError(String errorMessage) {
   expect(find.text(errorMessage), findsNothing);
+}
+
+/// Helper to get localized strings for tests
+/// Returns Spanish localization (es_ES) used in tests
+AppLocalizations getL10n() {
+  return AppLocalizationsEs();
 }

@@ -6,8 +6,10 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:medicapp/screens/settings_screen.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/preferences_service.dart';
+import 'package:medicapp/services/locale_provider.dart';
 import 'package:medicapp/theme/theme_provider.dart';
 import 'package:medicapp/l10n/app_localizations.dart';
+import 'helpers/widget_test_helpers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +30,11 @@ void main() {
   });
 
   Widget createTestApp(Widget child) {
-    return ChangeNotifierProvider<ThemeProvider>(
-      create: (_) => ThemeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider<LocaleProvider>(create: (_) => LocaleProvider()),
+      ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -44,43 +49,45 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Check AppBar title
-      expect(find.text('Configuración'), findsOneWidget);
+      expect(find.text(l10n.settingsTitle), findsOneWidget);
 
       // Check Display section exists
-      expect(find.text('Visualización'), findsOneWidget);
+      expect(find.text(l10n.settingsDisplaySection), findsOneWidget);
 
       // Check Backup section exists (might need scrolling)
       await tester.dragUntilVisible(
-        find.text('Copia de Seguridad'),
+        find.text(l10n.settingsBackupSection),
         find.byType(ListView),
         const Offset(0, -100),
       );
-      expect(find.text('Copia de Seguridad'), findsOneWidget);
+      expect(find.text(l10n.settingsBackupSection), findsOneWidget);
 
       // Check preference switches exist (scroll back up if needed)
       await tester.dragUntilVisible(
-        find.text('Mostrar hora real de toma'),
+        find.text(l10n.settingsShowActualTimeTitle),
         find.byType(ListView),
         const Offset(0, 100),
       );
-      expect(find.text('Mostrar hora real de toma'), findsOneWidget);
-      expect(find.text('Mostrar cuenta atrás de ayuno'), findsOneWidget);
+      expect(find.text(l10n.settingsShowActualTimeTitle), findsOneWidget);
+      expect(find.text(l10n.settingsShowFastingCountdownTitle), findsOneWidget);
 
       // Check export/import options exist (scroll to bottom)
       await tester.dragUntilVisible(
-        find.text('Exportar Base de Datos'),
+        find.text(l10n.settingsExportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
-      expect(find.text('Exportar Base de Datos'), findsOneWidget);
+      expect(find.text(l10n.settingsExportTitle), findsOneWidget);
 
       await tester.dragUntilVisible(
-        find.text('Importar Base de Datos'),
+        find.text(l10n.settingsImportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
-      expect(find.text('Importar Base de Datos'), findsOneWidget);
+      expect(find.text(l10n.settingsImportTitle), findsOneWidget);
     });
 
     testWidgets('should load initial preference values', (WidgetTester tester) async {
@@ -91,6 +98,8 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Verify preferences were loaded correctly by checking stored values
       final actualTimeValue = await PreferencesService.getShowActualTimeForTakenDoses();
       final fastingCountdownValue = await PreferencesService.getShowFastingCountdown();
@@ -98,9 +107,21 @@ void main() {
       expect(actualTimeValue, true);
       expect(fastingCountdownValue, false);
 
-      // Also verify the UI shows the correct switches
-      expect(find.text('Mostrar hora real de toma'), findsOneWidget);
-      expect(find.text('Mostrar cuenta atrás de ayuno'), findsOneWidget);
+      // Also verify the UI shows the correct switches (scroll to display section)
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+      expect(find.text(l10n.settingsShowActualTimeTitle), findsOneWidget);
+
+      // Scroll to fasting countdown if needed
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowFastingCountdownTitle),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
+      expect(find.text(l10n.settingsShowFastingCountdownTitle), findsOneWidget);
     });
 
     testWidgets('should show fasting notification switch only on Android when countdown is enabled', (WidgetTester tester) async {
@@ -108,6 +129,15 @@ void main() {
 
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
+
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowFastingCountdownTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
 
       // Note: In test environment, Platform.isAndroid may not be true
       // This test validates the widget structure, actual platform check happens at runtime
@@ -123,8 +153,17 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Find and tap the ListTile containing the preference
-      await tester.tap(find.text('Mostrar hora real de toma'));
+      await tester.tap(find.text(l10n.settingsShowActualTimeTitle));
       await tester.pumpAndSettle();
 
       // Verify preference was saved
@@ -138,8 +177,17 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowFastingCountdownTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Find and tap the ListTile containing the preference
-      await tester.tap(find.text('Mostrar cuenta atrás de ayuno'));
+      await tester.tap(find.text(l10n.settingsShowFastingCountdownTitle));
       await tester.pumpAndSettle();
 
       // Verify preference was saved
@@ -173,8 +221,17 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Toggle actual time preference
-      await tester.tap(find.text('Mostrar hora real de toma'));
+      await tester.tap(find.text(l10n.settingsShowActualTimeTitle));
       await tester.pumpAndSettle();
 
       // Rebuild widget tree (simulating app restart)
@@ -192,20 +249,22 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to export option
       await tester.dragUntilVisible(
-        find.text('Exportar Base de Datos'),
+        find.text(l10n.settingsExportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
 
       // Verify export button is visible
-      expect(find.text('Exportar Base de Datos'), findsOneWidget);
-      expect(find.text('Guarda una copia de todos tus medicamentos e historial'), findsOneWidget);
+      expect(find.text(l10n.settingsExportTitle), findsOneWidget);
+      expect(find.text(l10n.settingsExportSubtitle), findsOneWidget);
 
       // Find export button card
       final exportCard = find.ancestor(
-        of: find.text('Exportar Base de Datos'),
+        of: find.text(l10n.settingsExportTitle),
         matching: find.byType(Card),
       );
 
@@ -219,16 +278,18 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to export option
       await tester.dragUntilVisible(
-        find.text('Exportar Base de Datos'),
+        find.text(l10n.settingsExportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
 
       // Get initial opacity (enabled state)
       final exportCard = find.ancestor(
-        of: find.text('Exportar Base de Datos'),
+        of: find.text(l10n.settingsExportTitle),
         matching: find.byType(Card),
       ).first;
 
@@ -244,43 +305,47 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to import option
       await tester.dragUntilVisible(
-        find.text('Importar Base de Datos'),
+        find.text(l10n.settingsImportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
       await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
-      await tester.tap(find.text('Importar Base de Datos'));
+      await tester.tap(find.text(l10n.settingsImportTitle));
       await tester.pumpAndSettle();
 
       // Should show confirmation dialog
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Importar Base de Datos'), findsWidgets); // Title appears twice
-      expect(find.text('Cancelar'), findsOneWidget);
-      expect(find.text('Continuar'), findsOneWidget);
+      expect(find.text(l10n.settingsImportTitle), findsWidgets); // Title appears twice
+      expect(find.text(l10n.btnCancel), findsOneWidget);
+      expect(find.text(l10n.btnContinue), findsOneWidget);
     });
 
     testWidgets('should cancel import when user selects cancel', (WidgetTester tester) async {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to import option
       await tester.dragUntilVisible(
-        find.text('Importar Base de Datos'),
+        find.text(l10n.settingsImportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
       await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
-      await tester.tap(find.text('Importar Base de Datos'));
+      await tester.tap(find.text(l10n.settingsImportTitle));
       await tester.pumpAndSettle();
 
       // Tap cancel
-      await tester.tap(find.text('Cancelar'));
+      await tester.tap(find.text(l10n.btnCancel));
       await tester.pumpAndSettle();
 
       // Dialog should be closed
@@ -293,20 +358,22 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to import option
       await tester.dragUntilVisible(
-        find.text('Importar Base de Datos'),
+        find.text(l10n.settingsImportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
       await tester.pumpAndSettle();
 
       // Tap on the text directly (Card has onTap)
-      await tester.tap(find.text('Importar Base de Datos'));
+      await tester.tap(find.text(l10n.settingsImportTitle));
       await tester.pumpAndSettle();
 
       // Tap continue
-      await tester.tap(find.text('Continuar'));
+      await tester.tap(find.text(l10n.btnContinue));
       await tester.pump(); // Don't settle, check intermediate state
 
       // Should show loading (briefly before file picker would open)
@@ -319,8 +386,17 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Toggle a preference
-      await tester.tap(find.text('Mostrar hora real de toma'));
+      await tester.tap(find.text(l10n.settingsShowActualTimeTitle));
 
       // Dispose the widget immediately
       await tester.pumpWidget(Container());
@@ -333,40 +409,56 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
-      // Check all preference titles
-      expect(find.text('Mostrar hora real de toma'), findsOneWidget);
-      expect(find.text('Mostrar cuenta atrás de ayuno'), findsOneWidget);
+      final l10n = getL10n(tester);
 
-      // Check subtitles
-      expect(find.text('Muestra la hora real en que se tomaron las dosis en lugar de la hora programada'), findsOneWidget);
-      expect(find.text('Muestra el tiempo restante de ayuno en la pantalla principal'), findsOneWidget);
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
+      // Check all preference titles
+      expect(find.text(l10n.settingsShowActualTimeTitle), findsOneWidget);
+      expect(find.text(l10n.settingsShowActualTimeSubtitle), findsOneWidget);
+
+      // Scroll to fasting countdown if needed
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowFastingCountdownTitle),
+        find.byType(ListView),
+        const Offset(0, -100),
+      );
+      expect(find.text(l10n.settingsShowFastingCountdownTitle), findsOneWidget);
+      expect(find.text(l10n.settingsShowFastingCountdownSubtitle), findsOneWidget);
     });
 
     testWidgets('should display export and import with correct subtitles', (WidgetTester tester) async {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // Scroll to export/import section
       await tester.dragUntilVisible(
-        find.text('Exportar Base de Datos'),
+        find.text(l10n.settingsExportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
 
       // Check export
-      expect(find.text('Exportar Base de Datos'), findsOneWidget);
-      expect(find.text('Guarda una copia de todos tus medicamentos e historial'), findsOneWidget);
+      expect(find.text(l10n.settingsExportTitle), findsOneWidget);
+      expect(find.text(l10n.settingsExportSubtitle), findsOneWidget);
 
       // Scroll to import
       await tester.dragUntilVisible(
-        find.text('Importar Base de Datos'),
+        find.text(l10n.settingsImportTitle),
         find.byType(ListView),
         const Offset(0, -200),
       );
 
       // Check import
-      expect(find.text('Importar Base de Datos'), findsOneWidget);
-      expect(find.text('Restaura una copia de seguridad previamente exportada'), findsOneWidget);
+      expect(find.text(l10n.settingsImportTitle), findsOneWidget);
+      expect(find.text(l10n.settingsImportSubtitle), findsOneWidget);
     });
   });
 
@@ -375,9 +467,11 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
       // AppBar should be present
       expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Configuración'), findsOneWidget);
+      expect(find.text(l10n.settingsTitle), findsOneWidget);
     });
 
     testWidgets('should show info card at bottom', (WidgetTester tester) async {
@@ -402,12 +496,21 @@ void main() {
       await tester.pumpWidget(createTestApp(const SettingsScreen()));
       await tester.pumpAndSettle();
 
+      final l10n = getL10n(tester);
+
+      // Scroll to display section first
+      await tester.dragUntilVisible(
+        find.text(l10n.settingsShowActualTimeTitle),
+        find.byType(ListView),
+        const Offset(0, -200),
+      );
+
       // Toggle actual time
-      await tester.tap(find.text('Mostrar hora real de toma'));
+      await tester.tap(find.text(l10n.settingsShowActualTimeTitle));
       await tester.pumpAndSettle();
 
       // Toggle fasting countdown
-      await tester.tap(find.text('Mostrar cuenta atrás de ayuno'));
+      await tester.tap(find.text(l10n.settingsShowFastingCountdownTitle));
       await tester.pumpAndSettle();
 
       // Verify both preferences are enabled

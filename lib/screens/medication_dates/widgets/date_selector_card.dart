@@ -54,21 +54,21 @@ class DateSelectorCard extends StatelessWidget {
                       Text(
                         label,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             ),
                       ),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.grey.withOpacity(0.2),
+                          color: Colors.grey.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           optionalLabel,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontSize: 10,
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
                         ),
                       ),

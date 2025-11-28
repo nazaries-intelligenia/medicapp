@@ -9,7 +9,7 @@ import 'medication_dates/widgets/duration_summary.dart';
 import 'medication_dates/widgets/dates_help_info.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 3: Fechas de inicio y fin del tratamiento (opcional)
+/// Screen 3: Treatment start and end dates (optional)
 class MedicationDatesScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -35,7 +35,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
   @override
   void initState() {
     super.initState();
-    // Por defecto, no establecemos fecha de inicio (empieza hoy)
+    // By default, we don't set a start date (starts today)
   }
 
   Future<void> _selectStartDate() async {
@@ -54,7 +54,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
     if (picked != null) {
       setState(() {
         _startDate = picked;
-        // Si la fecha de fin es anterior a la nueva fecha de inicio, ajustarla
+        // If the end date is before the new start date, adjust it
         if (_endDate != null && _endDate!.isBefore(picked)) {
           _endDate = null;
         }
@@ -83,7 +83,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
   }
 
   void _continueToNextStep() async {
-    // Para fechas específicas, ir directamente a dosis (saltando frecuencia)
+    // For specific dates, go directly to dosage (skipping frequency)
     if (widget.durationType == TreatmentDurationType.specificDates) {
       final result = await Navigator.push(
         context,
@@ -104,7 +104,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
         Navigator.pop(context, result);
       }
     } else {
-      // Para otros tipos, ir a la pantalla de frecuencia
+      // For other types, go to the frequency screen
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
@@ -141,7 +141,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
               child: Text(
                 l10n.stepIndicator(currentStep, totalSteps),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -154,7 +154,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Indicador de progreso
+              // Progress indicator
               LinearProgressIndicator(
                 value: progressValue,
                 backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -162,7 +162,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Card con información
+              // Card with information
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -180,14 +180,14 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
                       Text(
                         l10n.medicationDatesSubtitle,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                       ),
                       const SizedBox(height: 8),
                       DatesHelpInfo(message: l10n.medicationDatesHelp),
                       const SizedBox(height: 24),
 
-                      // Fecha de inicio
+                      // Start date
                       DateSelectorCard(
                         selectedDate: _startDate,
                         onTap: _selectStartDate,
@@ -198,7 +198,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
                         selectedColor: Colors.green,
                       ),
 
-                      // Botón para limpiar fecha de inicio
+                      // Button to clear start date
                       if (_startDate != null) ...[
                         const SizedBox(height: 8),
                         ClearDateButton(
@@ -214,7 +214,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Fecha de fin (opcional)
+                      // End date (optional)
                       DateSelectorCard(
                         selectedDate: _endDate,
                         onTap: _selectEndDate,
@@ -225,7 +225,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
                         selectedColor: Colors.deepOrange,
                       ),
 
-                      // Botón para limpiar fecha de fin
+                      // Button to clear end date
                       if (_endDate != null) ...[
                         const SizedBox(height: 8),
                         ClearDateButton(
@@ -234,7 +234,7 @@ class _MedicationDatesScreenState extends State<MedicationDatesScreen> {
                         ),
                       ],
 
-                      // Resumen de duración si ambas fechas están seleccionadas
+                      // Duration summary if both dates are selected
                       if (_startDate != null && _endDate != null) ...[
                         const SizedBox(height: 16),
                         DurationSummary(

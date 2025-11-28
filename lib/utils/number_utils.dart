@@ -1,52 +1,52 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-/// Utilidades para manejo de números con localización de separadores decimales
+/// Utilities for handling numbers with localized decimal separators
 class NumberUtils {
-  /// Parsea un string a double aceptando tanto coma como punto como separador decimal
+  /// Parses a string to double accepting both comma and period as decimal separator
   ///
-  /// Ejemplos:
+  /// Examples:
   /// - "2,5" -> 2.5
   /// - "2.5" -> 2.5
   /// - "1000,25" -> 1000.25
-  /// - "1.000,25" -> 1000.25 (formato europeo con separador de miles)
-  /// - "1,000.25" -> 1000.25 (formato americano con separador de miles)
+  /// - "1.000,25" -> 1000.25 (European format with thousands separator)
+  /// - "1,000.25" -> 1000.25 (American format with thousands separator)
   static double? parseLocalizedDouble(String value) {
     if (value.isEmpty) return null;
 
-    // Eliminar espacios en blanco
+    // Remove whitespace
     String normalized = value.trim();
 
-    // Detectar el formato basándose en el último separador
-    // Si hay coma después del último punto, es formato europeo (1.000,25)
-    // Si hay punto después de la última coma, es formato americano (1,000.25)
+    // Detect the format based on the last separator
+    // If there's a comma after the last period, it's European format (1.000,25)
+    // If there's a period after the last comma, it's American format (1,000.25)
     int lastComma = normalized.lastIndexOf(',');
     int lastDot = normalized.lastIndexOf('.');
 
     if (lastComma > lastDot) {
-      // Formato europeo: coma es decimal, punto es separador de miles
+      // European format: comma is decimal, period is thousands separator
       // 1.000,25 -> 1000.25
-      normalized = normalized.replaceAll('.', ''); // Eliminar separador de miles
-      normalized = normalized.replaceAll(',', '.'); // Reemplazar coma por punto
+      normalized = normalized.replaceAll('.', ''); // Remove thousands separator
+      normalized = normalized.replaceAll(',', '.'); // Replace comma with period
     } else if (lastDot > lastComma) {
-      // Formato americano: punto es decimal, coma es separador de miles
+      // American format: period is decimal, comma is thousands separator
       // 1,000.25 -> 1000.25
-      normalized = normalized.replaceAll(',', ''); // Eliminar separador de miles
-      // El punto ya es el separador decimal correcto
+      normalized = normalized.replaceAll(',', ''); // Remove thousands separator
+      // The period is already the correct decimal separator
     } else if (lastComma >= 0 && lastDot < 0) {
-      // Solo hay coma, asumimos que es decimal
+      // Only comma present, assume it's decimal
       // 2,5 -> 2.5
       normalized = normalized.replaceAll(',', '.');
     }
-    // Si solo hay punto, ya está en formato correcto
+    // If only period present, it's already in the correct format
 
     return double.tryParse(normalized);
   }
 
-  /// Formatea un double usando el locale actual
+  /// Formats a double using the current locale
   ///
-  /// Para español: 2.5 -> "2,5"
-  /// Para inglés: 2.5 -> "2.5"
+  /// For Spanish: 2.5 -> "2,5"
+  /// For English: 2.5 -> "2.5"
   static String formatLocalizedDouble(double value, String locale, {int? decimalDigits}) {
     final format = NumberFormat.decimalPatternDigits(
       locale: locale,
@@ -55,38 +55,38 @@ class NumberUtils {
     return format.format(value);
   }
 
-  /// Obtiene el separador decimal para el locale dado
+  /// Gets the decimal separator for the given locale
   ///
-  /// Español: ","
-  /// Inglés: "."
+  /// Spanish: ","
+  /// English: "."
   static String getDecimalSeparator(String locale) {
     final format = NumberFormat.decimalPattern(locale);
     final symbols = format.symbols;
     return symbols.DECIMAL_SEP;
   }
 
-  /// Obtiene el separador de miles para el locale dado
+  /// Gets the thousands separator for the given locale
   static String getGroupSeparator(String locale) {
     final format = NumberFormat.decimalPattern(locale);
     final symbols = format.symbols;
     return symbols.GROUP_SEP;
   }
 
-  /// Formatea un double de manera inteligente: muestra enteros sin decimales
-  /// y decimales con el mínimo de dígitos necesarios
+  /// Formats a double intelligently: displays integers without decimals
+  /// and decimals with the minimum necessary digits
   ///
-  /// Ejemplos en español:
+  /// Examples in Spanish:
   /// - 10.0 -> "10"
   /// - 2.5 -> "2,5"
   /// - 2.50 -> "2,5"
-  /// - 2.555 -> "2,56" (redondeado)
+  /// - 2.555 -> "2,56" (rounded)
   static String formatSmart(double value, String locale, {int maxDecimals = 2}) {
-    // Si es un número entero, mostrar sin decimales
+    // If it's an integer, display without decimals
     if (value == value.toInt()) {
       return value.toInt().toString();
     }
 
-    // Formatear con el locale apropiado
+    // Format with the appropriate locale
     final format = NumberFormat.decimalPatternDigits(
       locale: locale,
       decimalDigits: maxDecimals,
@@ -94,7 +94,7 @@ class NumberUtils {
 
     String formatted = format.format(value);
 
-    // Eliminar ceros finales innecesarios después del separador decimal
+    // Remove unnecessary trailing zeros after decimal separator
     final separator = getDecimalSeparator(locale);
     if (formatted.contains(separator)) {
       formatted = formatted.replaceAll(RegExp('0+\$'), '');
@@ -107,9 +107,9 @@ class NumberUtils {
   }
 }
 
-/// TextInputFormatter que permite entrada de números con separador decimal localizado
+/// TextInputFormatter that allows number input with localized decimal separator
 ///
-/// Acepta tanto punto como coma como separadores decimales para mayor flexibilidad
+/// Accepts both period and comma as decimal separators for greater flexibility
 class LocalizedDecimalInputFormatter extends TextInputFormatter {
   final int? decimalDigits;
   final bool allowNegative;
@@ -124,32 +124,32 @@ class LocalizedDecimalInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Permitir texto vacío
+    // Allow empty text
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
-    // Construir el patrón regex
+    // Build the regex pattern
     String pattern = r'^\d*[.,]?\d*$';
     if (allowNegative) {
       pattern = r'^-?\d*[.,]?\d*$';
     }
 
-    // Validar formato básico (dígitos, un separador decimal)
+    // Validate basic format (digits, one decimal separator)
     if (!RegExp(pattern).hasMatch(newValue.text)) {
       return oldValue;
     }
 
-    // Contar separadores decimales
+    // Count decimal separators
     int commaCount = ','.allMatches(newValue.text).length;
     int dotCount = '.'.allMatches(newValue.text).length;
 
-    // Solo permitir un separador decimal
+    // Only allow one decimal separator
     if (commaCount + dotCount > 1) {
       return oldValue;
     }
 
-    // Si hay límite de decimales, validarlo
+    // If there's a decimal limit, validate it
     if (decimalDigits != null) {
       int separatorIndex = newValue.text.lastIndexOf(RegExp('[.,]'));
       if (separatorIndex >= 0) {

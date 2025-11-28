@@ -6,6 +6,8 @@ import 'l10n/app_localizations.dart';
 import 'screens/main_screen.dart';
 import 'services/notification_service.dart';
 import 'services/logger_service.dart';
+import 'services/localization_service.dart';
+import 'services/locale_provider.dart';
 import 'database/database_helper.dart';
 import 'models/person.dart';
 import 'theme/app_theme.dart';
@@ -17,6 +19,9 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   // Ensure Flutter binding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize localization service with default locale
+  await LocalizationService.instance.setLocale(const Locale('en'));
 
   // Initialize notification service
   try {
@@ -68,7 +73,7 @@ Future<void> _initializeDefaultPerson() async {
   if (!hasDefaultPerson) {
     final defaultPerson = Person(
       id: const Uuid().v4(),
-      name: 'Yo',
+      name: 'Me',
       isDefault: true,
     );
 
@@ -88,30 +93,36 @@ class MedicApp extends StatefulWidget {
 
 class _MedicAppState extends State<MedicApp> {
   final ThemeProvider _themeProvider = ThemeProvider();
+  final LocaleProvider _localeProvider = LocaleProvider();
 
   @override
   void initState() {
     super.initState();
-    _initializeTheme();
+    _initializeProviders();
   }
 
-  Future<void> _initializeTheme() async {
+  Future<void> _initializeProviders() async {
     await _themeProvider.initialize();
-    // El Consumer se encargará automáticamente de los rebuilds
+    await _localeProvider.initialize();
+    // The Consumers will automatically handle rebuilds
   }
 
   @override
   void dispose() {
     _themeProvider.dispose();
+    _localeProvider.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<ThemeProvider>.value(
-      value: _themeProvider,
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, child) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ThemeProvider>.value(value: _themeProvider),
+        ChangeNotifierProvider<LocaleProvider>.value(value: _localeProvider),
+      ],
+      child: Consumer2<ThemeProvider, LocaleProvider>(
+        builder: (context, themeProvider, localeProvider, child) {
           return MaterialApp(
             title: 'MedicApp',
             navigatorKey: navigatorKey,
@@ -123,7 +134,10 @@ class _MedicAppState extends State<MedicApp> {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('es'),
+            locale: localeProvider.locale,
+            localeResolutionCallback: (deviceLocale, supportedLocales) {
+              return localeProvider.resolveLocale(deviceLocale);
+            },
             theme: AppTheme.getLightTheme(themeProvider.colorPalette),
             darkTheme: AppTheme.getDarkTheme(themeProvider.colorPalette),
             themeMode: themeProvider.themeMode,

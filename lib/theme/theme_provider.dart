@@ -3,7 +3,7 @@ import 'package:medicapp/services/preferences_service.dart';
 import 'package:medicapp/services/logger_service.dart';
 import 'package:medicapp/theme/app_theme.dart';
 
-/// Provider para gestionar el tema de la aplicación
+/// Provider to manage the application theme
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   ColorPalette _colorPalette = ColorPalette.seaGreen;
@@ -13,14 +13,14 @@ class ThemeProvider with ChangeNotifier {
 
   bool get isDarkMode {
     if (_themeMode == ThemeMode.system) {
-      // En modo sistema, detectamos el brillo del sistema
+      // In system mode, we detect the system brightness
       final brightness = WidgetsBinding.instance.platformDispatcher.platformBrightness;
       return brightness == Brightness.dark;
     }
     return _themeMode == ThemeMode.dark;
   }
 
-  /// Inicializa el tema desde las preferencias guardadas
+  /// Initializes the theme from saved preferences
   Future<void> initialize() async {
     try {
       final savedTheme = await PreferencesService.getThemeMode();
@@ -36,7 +36,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Cambia el modo del tema
+  /// Changes the theme mode
   Future<void> setThemeMode(ThemeMode mode) async {
     try {
       _themeMode = mode;
@@ -48,7 +48,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Alterna entre tema claro y oscuro (ignorando sistema)
+  /// Toggles between light and dark theme (ignoring system)
   Future<void> toggleTheme() async {
     final newMode = _themeMode == ThemeMode.dark
         ? ThemeMode.light
@@ -56,7 +56,7 @@ class ThemeProvider with ChangeNotifier {
     await setThemeMode(newMode);
   }
 
-  /// Cambia la paleta de colores
+  /// Changes the color palette
   Future<void> setColorPalette(ColorPalette palette) async {
     try {
       _colorPalette = palette;
@@ -68,7 +68,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte string a ThemeMode
+  /// Converts string to ThemeMode
   ThemeMode _themeModeFromString(String value) {
     switch (value) {
       case 'light':
@@ -81,7 +81,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte ThemeMode a string
+  /// Converts ThemeMode to string
   String _themeModeToString(ThemeMode mode) {
     switch (mode) {
       case ThemeMode.light:
@@ -93,7 +93,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte string a ColorPalette
+  /// Converts string to ColorPalette
   ColorPalette _colorPaletteFromString(String value) {
     switch (value) {
       case 'seaGreen':
@@ -107,7 +107,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte ColorPalette a string
+  /// Converts ColorPalette to string
   String _colorPaletteToString(ColorPalette palette) {
     switch (palette) {
       case ColorPalette.seaGreen:

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'package:medicapp/services/medication_update_service.dart';
 import 'package:medicapp/services/notification_service.dart';
@@ -24,7 +23,7 @@ void main() {
     test('should increase stock quantity by refill amount', () async {
       final medication = MedicationBuilder()
           .withId('med-refill-1')
-          .withName('Paracetamol')
+          .withName('Acetaminophen')
           .withSingleDose('08:00', 1.0)
           .withStock(5.0)
           .build();
@@ -43,14 +42,14 @@ void main() {
     test('should save lastRefillAmount for future reference', () async {
       final medication = MedicationBuilder()
           .withId('med-refill-2')
-          .withName('Ibuprofeno')
+          .withName('Ibuprofen')
           .withSingleDose('12:00', 2.0)
           .withStock(3.0)
           .build();
 
       await insertMedicationWithPerson(medication);
 
-      final updatedMed = await MedicationUpdateService.refillMedication(
+      await MedicationUpdateService.refillMedication(
         medication: medication,
         refillAmount: 20.0,
       );
@@ -99,7 +98,7 @@ void main() {
     test('should handle fractional refill amounts', () async {
       final medication = MedicationBuilder()
           .withId('med-refill-5')
-          .withName('Levotiroxina')
+          .withName('Levothyroxine')
           .withSingleDose('07:00', 0.5)
           .withStock(1.5)
           .build();
@@ -119,7 +118,7 @@ void main() {
     test('should set isSuspended to false', () async {
       final medication = MedicationBuilder()
           .withId('med-resume-1')
-          .withName('Omeprazol')
+          .withName('Omeprazole')
           .withSingleDose('08:00', 1.0)
           .withStock(10.0)
           .suspended(true)
@@ -137,7 +136,7 @@ void main() {
     test('should reschedule notifications for all assigned persons', () async {
       final medication = MedicationBuilder()
           .withId('med-resume-2')
-          .withName('Aspirina')
+          .withName('Aspirin')
           .withMultipleDoses(['08:00', '20:00'], 1.0)
           .withStock(20.0)
           .suspended(true)
@@ -157,7 +156,7 @@ void main() {
     test('should handle already active medication gracefully', () async {
       final medication = MedicationBuilder()
           .withId('med-resume-3')
-          .withName('Atorvastatina')
+          .withName('Atorvastatin')
           .withSingleDose('22:00', 1.0)
           .withStock(15.0)
           .suspended(false) // Already active
@@ -177,7 +176,7 @@ void main() {
     test('should persist resume status in database', () async {
       final medication = MedicationBuilder()
           .withId('med-resume-4')
-          .withName('Metformina')
+          .withName('Metformin')
           .withSingleDose('08:00', 1.0)
           .withStock(30.0)
           .suspended(true)
@@ -204,7 +203,7 @@ void main() {
     test('should set isSuspended to true', () async {
       final medication = MedicationBuilder()
           .withId('med-suspend-1')
-          .withName('Losartán')
+          .withName('Losartan')
           .withSingleDose('08:00', 1.0)
           .withStock(10.0)
           .suspended(false)
@@ -222,7 +221,7 @@ void main() {
     test('should cancel all scheduled notifications', () async {
       final medication = MedicationBuilder()
           .withId('med-suspend-2')
-          .withName('Amoxicilina')
+          .withName('Amoxicillin')
           .withMultipleDoses(['08:00', '14:00', '20:00'], 1.0)
           .withStock(21.0)
           .suspended(false)
@@ -241,7 +240,7 @@ void main() {
     test('should handle already suspended medication gracefully', () async {
       final medication = MedicationBuilder()
           .withId('med-suspend-3')
-          .withName('Simvastatina')
+          .withName('Simvastatin')
           .withSingleDose('22:00', 1.0)
           .withStock(15.0)
           .suspended(true) // Already suspended

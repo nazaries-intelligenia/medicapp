@@ -7,7 +7,7 @@ import '../widgets/forms/fasting_configuration_form.dart';
 import 'medication_quantity_screen.dart';
 import '../widgets/action_buttons.dart';
 
-/// Pantalla 6: Configuración de ayuno (opcional)
+/// Screen 6: Fasting configuration (optional)
 class MedicationFastingScreen extends StatefulWidget {
   final String medicationName;
   final MedicationType medicationType;
@@ -133,7 +133,7 @@ class _MedicationFastingScreenState extends State<MedicationFastingScreen> {
               child: Text(
                 l10n.stepIndicator(currentStep, totalSteps),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
               ),
             ),
@@ -156,7 +156,7 @@ class _MedicationFastingScreenState extends State<MedicationFastingScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Card con formulario
+              // Card with form
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),

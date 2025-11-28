@@ -83,7 +83,7 @@ class _MedicationCardState extends State<MedicationCard> {
         l10n.medicineCabinetRefillSuccess(
           widget.medication.name,
           refillAmount.toString(),
-          widget.medication.type.stockUnit,
+          widget.medication.type.getStockUnit(l10n),
           updatedMedication.stockDisplayText,
         ),
       );
@@ -155,7 +155,7 @@ class _MedicationCardState extends State<MedicationCard> {
           l10n.medicineCabinetDoseRegistered(
             widget.medication.name,
             doseQuantity.toString(),
-            widget.medication.type.stockUnit,
+            widget.medication.type.getStockUnit(l10n),
             updatedMedication.stockDisplayText,
           ),
         );
@@ -226,6 +226,8 @@ class _MedicationCardState extends State<MedicationCard> {
     // Load all medications to check for duplicates
     final allMedications = await DatabaseHelper.instance.getAllMedications();
 
+    if (!mounted) return;
+
     // Navigate to edit medication menu
     // Note: personId is null here - medicine cabinet should be refactored to be person-aware
     await Navigator.push(
@@ -282,7 +284,7 @@ class _MedicationCardState extends State<MedicationCard> {
           onTap: _showMedicationModal,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           leading: CircleAvatar(
-            backgroundColor: widget.medication.type.getColor(context).withOpacity(0.2),
+            backgroundColor: widget.medication.type.getColor(context).withValues(alpha: 0.2),
             child: Icon(
               widget.medication.type.icon,
               color: widget.medication.type.getColor(context),
@@ -403,7 +405,7 @@ class _MedicationCardState extends State<MedicationCard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.medication.type.displayName,
+                widget.medication.type.getDisplayName(l10n),
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: widget.medication.type.getColor(context),
                     ),
@@ -461,7 +463,7 @@ class _MedicationCardState extends State<MedicationCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: stockColor.withOpacity(0.1),
+                  color: stockColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: stockColor,
