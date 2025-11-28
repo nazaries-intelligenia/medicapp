@@ -2166,16 +2166,16 @@ class AppLocalizationsEu extends AppLocalizations {
   String get basedOnSchedule => 'Ordutegiaren arabera';
 
   @override
-  String today(int day, int month, int year) {
-    return 'Gaur $day/$month/$year';
+  String today(String date) {
+    return 'Gaur $date';
   }
 
   @override
   String get returnToToday => 'Itzuli gaurrera';
 
   @override
-  String tomorrow(int day, int month, int year) {
-    return 'Bihar $day/$month/$year';
+  String tomorrow(String date) {
+    return 'Bihar $date';
   }
 
   @override

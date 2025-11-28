@@ -1374,32 +1374,20 @@
   "afterTaking": "Nach der Einnahme",
   "basedOnActualDose": "Basierend auf tatsächlicher Einnahme",
   "basedOnSchedule": "Basierend auf Zeitplan",
-  "today": "Heute {day}/{month}/{year}",
+  "today": "Heute {date}",
   "@today": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },
   "returnToToday": "Zurück zu heute",
-  "tomorrow": "Morgen {day}/{month}/{year}",
+  "tomorrow": "Morgen {date}",
   "@tomorrow": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },

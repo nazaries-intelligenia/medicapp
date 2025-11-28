@@ -5,6 +5,7 @@ import '../models/person.dart';
 import '../services/notification_service.dart';
 import '../services/preferences_service.dart';
 import '../database/database_helper.dart';
+import '../utils/date_formatter.dart';
 
 class DebugNotificationsScreen extends StatefulWidget {
   final List<Medication> medications;
@@ -195,10 +196,10 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                 final scheduledMinutes = schedHour * 60 + schedMin;
 
                 if (scheduledMinutes > currentMinutes) {
-                  scheduledDate = '${l10n.basedOnSchedule} - ${l10n.today(now.day, now.month, now.year)}';
+                  scheduledDate = '${l10n.basedOnSchedule} - ${l10n.today(DateFormatter.formatDate(now))}';
                 } else {
                   final tomorrow = now.add(const Duration(days: 1));
-                  scheduledDate = '${l10n.basedOnSchedule} - ${l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year)}';
+                  scheduledDate = '${l10n.basedOnSchedule} - ${l10n.tomorrow(DateFormatter.formatDate(tomorrow))}';
                 }
               } else {
                 scheduledDate = l10n.basedOnSchedule;
@@ -227,11 +228,11 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                 final scheduledMinutes = schedHour * 60 + schedMin;
 
                 if (scheduledMinutes > currentMinutes) {
-                  scheduledDate = l10n.today(now.day, now.month, now.year);
+                  scheduledDate = l10n.today(DateFormatter.formatDate(now));
                   isPastDue = false;
                 } else {
                   final tomorrow = now.add(const Duration(days: 1));
-                  scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                  scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                   isPastDue = false;
                 }
               } else if (notificationType == l10n.notificationTypeSpecificDate || notificationType == l10n.notificationTypeWeeklyPattern) {
@@ -278,21 +279,21 @@ class _DebugNotificationsScreenState extends State<DebugNotificationsScreen> wit
                 final scheduledMinutes = schedHour * 60 + schedMin;
 
                 if (scheduledMinutes > currentMinutes) {
-                  scheduledDate = l10n.today(now.day, now.month, now.year);
+                  scheduledDate = l10n.today(DateFormatter.formatDate(now));
                 } else {
                   final tomorrow = now.add(const Duration(days: 1));
-                  scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                  scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                 }
               } else {
                 final currentMinutes = now.hour * 60 + now.minute;
                 final scheduledMinutes = schedHour * 60 + schedMin;
 
                 if (scheduledMinutes > currentMinutes) {
-                  scheduledDate = l10n.today(now.day, now.month, now.year);
+                  scheduledDate = l10n.today(DateFormatter.formatDate(now));
                   isPastDue = false;
                 } else {
                   final tomorrow = now.add(const Duration(days: 1));
-                  scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                  scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                   isPastDue = false;
                 }
               }

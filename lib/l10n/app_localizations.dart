@@ -3755,8 +3755,8 @@ abstract class AppLocalizations {
   /// No description provided for @today.
   ///
   /// In es, this message translates to:
-  /// **'Hoy {day}/{month}/{year}'**
-  String today(int day, int month, int year);
+  /// **'Hoy {date}'**
+  String today(String date);
 
   /// No description provided for @returnToToday.
   ///
@@ -3767,8 +3767,8 @@ abstract class AppLocalizations {
   /// No description provided for @tomorrow.
   ///
   /// In es, this message translates to:
-  /// **'Mañana {day}/{month}/{year}'**
-  String tomorrow(int day, int month, int year);
+  /// **'Mañana {date}'**
+  String tomorrow(String date);
 
   /// No description provided for @todayOrLater.
   ///

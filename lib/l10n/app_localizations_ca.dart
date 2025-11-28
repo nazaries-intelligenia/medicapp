@@ -2165,16 +2165,16 @@ class AppLocalizationsCa extends AppLocalizations {
   String get basedOnSchedule => 'Basat en horari';
 
   @override
-  String today(int day, int month, int year) {
-    return 'Avui $day/$month/$year';
+  String today(String date) {
+    return 'Avui $date';
   }
 
   @override
   String get returnToToday => 'Tornar a avui';
 
   @override
-  String tomorrow(int day, int month, int year) {
-    return 'Demà $day/$month/$year';
+  String tomorrow(String date) {
+    return 'Demà $date';
   }
 
   @override

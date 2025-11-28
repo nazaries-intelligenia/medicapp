@@ -3,6 +3,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/medication.dart';
 import '../../../services/notification_service.dart';
 import '../../../database/database_helper.dart';
+import '../../../utils/date_formatter.dart';
 
 class DebugInfoDialog {
   static Future<void> show({
@@ -92,10 +93,10 @@ class DebugInfoDialog {
                   final scheduledMinutes = schedHour * 60 + schedMin;
 
                   if (scheduledMinutes > currentMinutes) {
-                    scheduledDate = '${l10n.basedOnSchedule} - ${l10n.today(now.day, now.month, now.year)}';
+                    scheduledDate = '${l10n.basedOnSchedule} - ${l10n.today(DateFormatter.formatDate(now))}';
                   } else {
                     final tomorrow = now.add(const Duration(days: 1));
-                    scheduledDate = '${l10n.basedOnSchedule} - ${l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year)}';
+                    scheduledDate = '${l10n.basedOnSchedule} - ${l10n.tomorrow(DateFormatter.formatDate(tomorrow))}';
                   }
                 } else {
                   scheduledDate = l10n.basedOnSchedule;
@@ -128,11 +129,11 @@ class DebugInfoDialog {
                   final scheduledMinutes = schedHour * 60 + schedMin;
 
                   if (scheduledMinutes > currentMinutes) {
-                    scheduledDate = l10n.today(now.day, now.month, now.year);
+                    scheduledDate = l10n.today(DateFormatter.formatDate(now));
                     isPastDue = false;
                   } else {
                     final tomorrow = now.add(const Duration(days: 1));
-                    scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                    scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                     isPastDue = false; // Not past due if it's scheduled for tomorrow
                   }
                 } else if (notificationType == l10n.notificationTypeSpecificDate || notificationType == l10n.notificationTypeWeeklyPattern) {
@@ -185,10 +186,10 @@ class DebugInfoDialog {
                   final scheduledMinutes = schedHour * 60 + schedMin;
 
                   if (scheduledMinutes > currentMinutes) {
-                    scheduledDate = l10n.today(now.day, now.month, now.year);
+                    scheduledDate = l10n.today(DateFormatter.formatDate(now));
                   } else {
                     final tomorrow = now.add(const Duration(days: 1));
-                    scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                    scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                   }
                 } else {
                   // Default case: assume it's for today or tomorrow based on time
@@ -196,11 +197,11 @@ class DebugInfoDialog {
                   final scheduledMinutes = schedHour * 60 + schedMin;
 
                   if (scheduledMinutes > currentMinutes) {
-                    scheduledDate = l10n.today(now.day, now.month, now.year);
+                    scheduledDate = l10n.today(DateFormatter.formatDate(now));
                     isPastDue = false;
                   } else {
                     final tomorrow = now.add(const Duration(days: 1));
-                    scheduledDate = l10n.tomorrow(tomorrow.day, tomorrow.month, tomorrow.year);
+                    scheduledDate = l10n.tomorrow(DateFormatter.formatDate(tomorrow));
                     isPastDue = false;
                   }
                 }

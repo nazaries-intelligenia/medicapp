@@ -1389,32 +1389,20 @@
   "afterTaking": "Després de prendre",
   "basedOnActualDose": "Basat en presa real",
   "basedOnSchedule": "Basat en horari",
-  "today": "Avui {day}/{month}/{year}",
+  "today": "Avui {date}",
   "@today": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },
   "returnToToday": "Tornar a avui",
-  "tomorrow": "Demà {day}/{month}/{year}",
+  "tomorrow": "Demà {date}",
   "@tomorrow": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },

@@ -2140,16 +2140,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get basedOnSchedule => 'Based on schedule';
 
   @override
-  String today(int day, int month, int year) {
-    return 'Today $day/$month/$year';
+  String today(String date) {
+    return 'Today $date';
   }
 
   @override
   String get returnToToday => 'Return to today';
 
   @override
-  String tomorrow(int day, int month, int year) {
-    return 'Tomorrow $day/$month/$year';
+  String tomorrow(String date) {
+    return 'Tomorrow $date';
   }
 
   @override
