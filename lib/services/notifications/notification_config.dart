@@ -1,5 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart' as fln;
 import 'package:android_intent_plus/android_intent.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import '../../utils/platform_helper.dart';
 
 /// Shared configuration and factory methods for notification services
@@ -47,45 +48,24 @@ class NotificationConfig {
     );
   }
 
+  /// Minimum Android SDK version that supports notification channel settings
+  /// Android 8.0 (API 26) introduced notification channels
+  static const int _minSdkForNotificationSettings = 26;
+
   /// Checks if notification channel settings can be opened on this device
-  /// Returns true only if Android 8.0+ specific notification settings are available
+  /// Returns true only if Android 8.0+ (API 26+) where notification channels exist
   static Future<bool> canOpenNotificationSettings() async {
     if (!PlatformHelper.isAndroid) {
       return false;
     }
 
-    const packageName = 'com.medicapp.medicapp';
-
-    // Check if channel-specific settings can be opened (Android 8.0+)
     try {
-      const channelIntent = AndroidIntent(
-        action: 'android.settings.CHANNEL_NOTIFICATION_SETTINGS',
-        arguments: <String, dynamic>{
-          'android.provider.extra.APP_PACKAGE': packageName,
-          'android.provider.extra.CHANNEL_ID': medicationChannelId,
-        },
-      );
-      final canResolve = await channelIntent.canResolveActivity();
-      if (canResolve == true) return true;
+      final deviceInfo = DeviceInfoPlugin();
+      final androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.version.sdkInt >= _minSdkForNotificationSettings;
     } catch (_) {
-      // Continue checking
+      return false;
     }
-
-    // Check if app notification settings can be opened (Android 8.0+)
-    try {
-      const appNotifIntent = AndroidIntent(
-        action: 'android.settings.APP_NOTIFICATION_SETTINGS',
-        arguments: <String, dynamic>{
-          'android.provider.extra.APP_PACKAGE': packageName,
-        },
-      );
-      final canResolve = await appNotifIntent.canResolveActivity();
-      if (canResolve == true) return true;
-    } catch (_) {
-      // Not available
-    }
-
-    return false;
   }
 
   /// Opens the notification settings for the app on Android
