@@ -1,5 +1,65 @@
 # Paleta de Colors - MedicApp
 
+## Tema "Deep Emerald" (Per Defecte)
+
+MedicApp utilitza per defecte el tema "Deep Emerald", dissenyat especialment per a persones grans (Silver Surfers) amb màxima llegibilitat mantenint la identitat verda de la marca. Compleix amb els estàndards WCAG AAA (ratio de contrast 19:1).
+
+### Principis de Disseny
+
+1. **Enfosquiment del Primari**: Verd maragda profund (#1B5E20) per garantir que el text blanc sobre els botons sigui 100% llegible.
+2. **Fons i Superfície Nets**: Blancs i grisos molt clars sense matisos verds per evitar que els colors es "barregin".
+3. **Text quasi Negre**: Text principal (#051F12) enfosquit al màxim per al major ratio de contrast.
+4. **Vores Explícites**: Vores sòlides per delimitar zones tàctils, crucial per a persones amb pèrdua de percepció de profunditat.
+
+### Colors Principals (Marca i Acció)
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|----------|-----|
+| **Primari (Marca)** | 🟢 | `#1B5E20` | Verd maragda fosc. Garanteix contrast altíssim contra blanc. |
+| **Interactiu / Focus** | 🟢 | `#2E7D32` | Estats "pressed" o elements seleccionats. |
+| **Acció Vibrant (FAB)** | 🟢 | `#00701A` | Verd vibrant però sòlid (no neó). |
+| **Vores d'Elements** | 🟢 | `#1B5E20` | Vora de 2px per delimitar zones tàctils. |
+
+### Colors de Text (Llegibilitat Màxima)
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|----------|-----|
+| **Text Principal** | ⚫ | `#051F12` | Quasi negre amb toc verd imperceptible. Contrast 19:1. |
+| **Text Secundari** | 🔘 | `#37474F` | Gris blavós fosc, llegible per a ulls amb cataractes. |
+| **Text sobre Primari** | ⚪ | `#FFFFFF` | Blanc pur en negreta per a botons verds. |
+
+### Colors de Fons i Superfície
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|----------|-----|
+| **Fons Principal** | ⚪ | `#F5F5F5` | Gris molt clar neutre. Les targetes "floten" clarament. |
+| **Superfície (Targetes)** | ⚪ | `#FFFFFF` | Blanc pur, millor fons per a lectura. |
+| **Vora de Targetes** | 🔘 | `#E0E0E0` | Defineix clarament els límits de les targetes. |
+| **Divisor Fort** | 🔘 | `#BDBDBD` | Gris mitjà per a separacions clarament visibles. |
+
+### Colors d'Estat (Funcionals)
+
+| Estat | Codi HEX | Ús |
+|--------|----------|-----|
+| **Èxit** | `#1E7E34` | Verd fosc per a checks nítids |
+| **Advertència** | `#E65100` | Taronja cremat d'alta visibilitat |
+| **Error** | `#C62828` | Vermell profund i seriós |
+| **Informació** | `#0277BD` | Blau fort, evita el cian clar |
+
+### Tema Fosc Deep Emerald
+
+| Rol | Mostra | Codi HEX | Ús |
+|-----|---------|----------|-----|
+| **Fons** | ⚫ | `#121212` | Fosc profund però no negre pur |
+| **Superfície** | ⚫ | `#1E1E1E` | Lleugerament elevat |
+| **Targetes** | ⚫ | `#2C2C2C` | Gris fosc per a targetes |
+| **Primari** | 🟢 | `#A5D6A7` | Verd clar per a mode fosc |
+| **Accent** | 🟢 | `#66BB6A` | Verd mitjà visible |
+| **Text Principal** | ⚪ | `#FAFAFA` | Quasi blanc |
+| **Text Secundari** | 🔘 | `#B0BEC5` | Gris clar |
+
+---
+
 ## Tema Clar "Sea Green"
 
 MedicApp utilitza una paleta de colors inspirada en la natura amb tons verds que transmeten salut, benestar i confiança.

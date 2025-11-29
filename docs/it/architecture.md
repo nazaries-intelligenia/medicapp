@@ -887,6 +887,34 @@ SettingsScreen
 - Cambia a verde e suona al completamento
 - Pulsante di dismiss per nasconderlo
 
+### Pattern di Codice Riutilizzabili
+
+MedicApp implementa diversi pattern di codice riutilizzabili che migliorano la manutenibilità e riducono la duplicazione:
+
+**SelectableOptionCard<T>:**
+- Widget generico per schede di opzioni selezionabili con supporto di tipi
+- Posizione: `lib/widgets/forms/selectable_option_card.dart`
+- Scopo: Interfaccia coerente per la selezione di opzioni nei form
+
+**MedicationStatusBadge:**
+- Badge riutilizzabile per la visualizzazione dello stato dei farmaci
+- Scopo: Visualizzazione standardizzata degli stati (attivo, sospeso, esaurito)
+
+**MedicationActionHandler (Mixin):**
+- Mixin per la gestione coerente delle azioni sui farmaci
+- Scopo: Gestione degli errori centralizzata e logica delle azioni comune
+- Benefici: Riduce la duplicazione del codice nei componenti UI
+
+**NotificationServiceTestHelper:**
+- Helper di test per la configurazione e la pulizia del servizio di notifiche
+- Posizione: `test/helpers/notification_test_helper.dart`
+- Scopo: Semplifica la scrittura dei test delle notifiche
+
+**person_test_helper.dart:**
+- Posizione canonica consolidata per le utilità di test relative alle persone
+- Scopo: Punto unico per le funzioni helper dei test delle persone
+- Benefici: Evita la duplicazione del codice di test tra i file
+
 ### Navigazione
 
 MedicApp usa **Navigator 1.0** standard di Flutter:

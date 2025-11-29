@@ -6,6 +6,7 @@ import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for midnight edge cases in dose tracking and notifications
 /// Added in test coverage improvements for V19+
@@ -23,13 +24,12 @@ void main() {
   DatabaseTestHelper.setup();
 
   setUp(() async {
-    service = NotificationService.instance;
-    service.enableTestMode();
+    service = NotificationServiceTestHelper.setup();
     await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   tearDown(() {
-    service.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
   });
 
   group('Midnight Boundary: Dose Registration', () {

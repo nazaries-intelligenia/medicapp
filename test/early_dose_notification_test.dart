@@ -4,6 +4,7 @@ import 'package:medicapp/models/person.dart';
 import 'package:medicapp/database/database_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Test to verify that when a dose is taken early (before scheduled time),
 /// the next notification is NOT rescheduled for the same day
@@ -14,8 +15,7 @@ void main() {
   DatabaseTestHelper.setupAll();
 
   setUp(() async {
-    notificationService = NotificationService.instance;
-    notificationService.enableTestMode();
+    notificationService = NotificationServiceTestHelper.setup();
 
     // Create test person first (required for foreign key constraints)
     final testPerson = Person(
@@ -27,7 +27,7 @@ void main() {
   });
 
   tearDown(() async {
-    notificationService.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
     await DatabaseTestHelper.cleanDatabase();
   });
 

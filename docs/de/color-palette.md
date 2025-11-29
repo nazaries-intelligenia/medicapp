@@ -1,5 +1,65 @@
 # Farbpalette - MedicApp
 
+## "Deep Emerald" Theme (Standard)
+
+MedicApp verwendet standardmäßig das "Deep Emerald" Theme, das speziell für ältere Benutzer (Silver Surfers) mit maximaler Lesbarkeit entwickelt wurde und gleichzeitig die grüne Markenidentität beibehält. Erfüllt WCAG AAA Standards (19:1 Kontrastverhältnis).
+
+### Design-Prinzipien
+
+1. **Verdunkeltes Primär**: Tiefes Smaragdgrün (#1B5E20) garantiert, dass weißer Text auf Schaltflächen zu 100% lesbar ist.
+2. **Sauberer Hintergrund und Oberfläche**: Reine Weiße und sehr helle Grautöne ohne Grünstiche, um ein "Verschwimmen" der Farben zu verhindern.
+3. **Fast schwarzer Text**: Primärtext (#051F12) maximal verdunkelt für höchstes Kontrastverhältnis.
+4. **Explizite Rahmen**: Solide Rahmen zur Abgrenzung von Touch-Zonen, entscheidend für Menschen mit Tiefenwahrnehmungsverlust.
+
+### Primärfarben (Marke und Aktion)
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-------|--------|----------|-----------|
+| **Primär (Marke)** | 🟢 | `#1B5E20` | Dunkles Smaragdgrün. Garantiert sehr hohen Kontrast gegen Weiß. |
+| **Interaktiv / Fokus** | 🟢 | `#2E7D32` | "Pressed" Zustände oder ausgewählte Elemente. |
+| **Vibrierende Aktion (FAB)** | 🟢 | `#00701A` | Lebhaftes aber solides Grün (kein Neon). |
+| **Element-Rahmen** | 🟢 | `#1B5E20` | 2px Rahmen zur Abgrenzung von Touch-Zonen. |
+
+### Textfarben (Maximale Lesbarkeit)
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-------|--------|----------|-----------|
+| **Primärtext** | ⚫ | `#051F12` | Fast Schwarz mit unmerklichem Grünstich. 19:1 Kontrast. |
+| **Sekundärtext** | 🔘 | `#37474F` | Dunkles Blaugrau, lesbar für Augen mit grauem Star. |
+| **Text auf Primär** | ⚪ | `#FFFFFF` | Reines Weiß in Fettschrift für grüne Schaltflächen. |
+
+### Hintergrund- und Oberflächenfarben
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-------|--------|----------|-----------|
+| **Haupthintergrund** | ⚪ | `#F5F5F5` | Sehr helles neutrales Grau. Karten "schweben" deutlich. |
+| **Oberfläche (Karten)** | ⚪ | `#FFFFFF` | Reines Weiß, bester Hintergrund zum Lesen. |
+| **Kartenrahmen** | 🔘 | `#E0E0E0` | Definiert klar die Kartengrenzen. |
+| **Starker Trenner** | 🔘 | `#BDBDBD` | Mittelgrau für deutlich sichtbare Trennungen. |
+
+### Statusfarben (Funktional)
+
+| Status | HEX-Code | Verwendung |
+|--------|----------|-----------|
+| **Erfolg** | `#1E7E34` | Dunkles Grün für scharfe Häkchen |
+| **Warnung** | `#E65100` | Verbranntes Orange für hohe Sichtbarkeit |
+| **Fehler** | `#C62828` | Tiefes ernstes Rot |
+| **Information** | `#0277BD` | Kräftiges Blau, vermeidet helles Cyan |
+
+### Deep Emerald Dark Theme
+
+| Rolle | Muster | HEX-Code | Verwendung |
+|-------|--------|----------|-----------|
+| **Hintergrund** | ⚫ | `#121212` | Tiefes Dunkel aber nicht reines Schwarz |
+| **Oberfläche** | ⚫ | `#1E1E1E` | Leicht erhöht |
+| **Karten** | ⚫ | `#2C2C2C` | Dunkelgrau für Karten |
+| **Primär** | 🟢 | `#A5D6A7` | Hellgrün für Dunkelmodus |
+| **Akzent** | 🟢 | `#66BB6A` | Sichtbares mittleres Grün |
+| **Primärtext** | ⚪ | `#FAFAFA` | Fast Weiß |
+| **Sekundärtext** | 🔘 | `#B0BEC5` | Hellgrau |
+
+---
+
 ## Light-Theme "Sea Green"
 
 MedicApp nutzt eine Farbpalette, die von der Natur inspiriert ist und grüne Töne verwendet, die Gesundheit, Wohlbefinden und Vertrauen vermitteln.

@@ -980,6 +980,34 @@ MaterialApp(
 - Turns green and plays sound when completed
 - Dismiss button to hide it
 
+### Reusable Code Patterns
+
+MedicApp implements several reusable code patterns that improve maintainability and reduce duplication:
+
+**SelectableOptionCard<T>:**
+- Generic widget for selectable option cards with type support
+- Location: `lib/widgets/forms/selectable_option_card.dart`
+- Purpose: Consistent interface for option selection in forms
+
+**MedicationStatusBadge:**
+- Reusable badge widget for medication status display
+- Purpose: Standardized visualization of states (active, suspended, depleted)
+
+**MedicationActionHandler (Mixin):**
+- Mixin for consistent medication action handling
+- Purpose: Centralized error management and common action logic
+- Benefits: Reduces code duplication in UI components
+
+**NotificationServiceTestHelper:**
+- Test helper for notification service setup and teardown
+- Location: `test/helpers/notification_test_helper.dart`
+- Purpose: Simplifies writing notification tests
+
+**person_test_helper.dart:**
+- Consolidated canonical location for person-related test utilities
+- Purpose: Single point for person test helper functions
+- Benefits: Avoids test code duplication across files
+
 ### Navigation
 
 MedicApp uses **standard Navigator 1.0** from Flutter:

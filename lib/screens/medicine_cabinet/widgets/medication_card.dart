@@ -6,6 +6,8 @@ import '../../../database/database_helper.dart';
 import '../../../services/dose_action_service.dart';
 import '../../../services/medication_update_service.dart';
 import '../../../services/snackbar_service.dart';
+import '../../../utils/medication_action_handler.dart';
+import '../../../widgets/medication_status_badge.dart';
 import '../../edit_medication_menu_screen.dart';
 import 'medication_options_modal.dart';
 import '../../medication_list/dialogs/refill_input_dialog.dart';
@@ -27,7 +29,7 @@ class MedicationCard extends StatefulWidget {
   State<MedicationCard> createState() => _MedicationCardState();
 }
 
-class _MedicationCardState extends State<MedicationCard> {
+class _MedicationCardState extends State<MedicationCard> with MedicationActionHandler {
   void _showMedicationModal() {
     MedicationOptionsModal.show(
       context,
@@ -66,44 +68,51 @@ class _MedicationCardState extends State<MedicationCard> {
     );
 
     if (refillAmount != null && refillAmount > 0) {
-      // Use service to refill medication
-      final updatedMedication = await MedicationUpdateService.refillMedication(
-        medication: widget.medication,
-        refillAmount: refillAmount,
-      );
-
-      // Reload medications
-      widget.onMedicationUpdated();
-
-      if (!mounted) return;
-
-      // Show confirmation
-      SnackBarService.showSuccess(
-        context,
-        l10n.medicineCabinetRefillSuccess(
-          widget.medication.name,
-          refillAmount.toString(),
-          widget.medication.type.getStockUnit(l10n),
-          updatedMedication.stockDisplayText,
-        ),
-      );
-
-      // For as-needed medications, ask for expiration date after refill
-      if (widget.medication.allowsManualDoseRegistration && mounted) {
-        final expirationDate = await ExpirationDateDialog.show(
-          context,
-          currentExpirationDate: widget.medication.expirationDate,
-          isOptional: true,
+      try {
+        // Use service to refill medication
+        final updatedMedication = await MedicationUpdateService.refillMedication(
+          medication: widget.medication,
+          refillAmount: refillAmount,
         );
 
-        // If user provided or updated expiration date, update medication
-        if (expirationDate != null && expirationDate.isNotEmpty && expirationDate != widget.medication.expirationDate) {
-          final updatedMedicationWithExpiration = updatedMedication.copyWith(
-            expirationDate: expirationDate,
+        // Reload medications
+        widget.onMedicationUpdated();
+
+        if (!mounted) return;
+
+        // Show confirmation
+        SnackBarService.showSuccess(
+          context,
+          l10n.medicineCabinetRefillSuccess(
+            widget.medication.name,
+            refillAmount.toString(),
+            widget.medication.type.getStockUnit(l10n),
+            updatedMedication.stockDisplayText,
+          ),
+        );
+
+        // For as-needed medications, ask for expiration date after refill
+        if (widget.medication.allowsManualDoseRegistration && mounted) {
+          final expirationDate = await ExpirationDateDialog.show(
+            context,
+            currentExpirationDate: widget.medication.expirationDate,
+            isOptional: true,
           );
-          await DatabaseHelper.instance.updateMedication(updatedMedicationWithExpiration);
-          widget.onMedicationUpdated();
+
+          // If user provided or updated expiration date, update medication
+          if (expirationDate != null &&
+              expirationDate.isNotEmpty &&
+              expirationDate != widget.medication.expirationDate) {
+            final updatedMedicationWithExpiration = updatedMedication.copyWith(
+              expirationDate: expirationDate,
+            );
+            await DatabaseHelper.instance.updateMedication(updatedMedicationWithExpiration);
+            widget.onMedicationUpdated();
+          }
         }
+      } catch (e) {
+        if (!mounted) return;
+        SnackBarService.showError(context, e.toString());
       }
     }
   }
@@ -203,21 +212,13 @@ class _MedicationCardState extends State<MedicationCard> {
     );
 
     if (confirm == true) {
-      // Delete medication from database
-      await DatabaseHelper.instance.deleteMedication(widget.medication.id);
-
-      // Delete dose history for this medication
-      await DatabaseHelper.instance.deleteDoseHistoryForMedication(widget.medication.id);
-
-      // Reload medications
-      widget.onMedicationUpdated();
-
-      if (!mounted) return;
-
-      // Show confirmation
-      SnackBarService.showSuccess(
-        context,
-        l10n.medicineCabinetDeleteSuccess(widget.medication.name),
+      await executeMedicationAction(
+        action: () async {
+          await DatabaseHelper.instance.deleteMedication(widget.medication.id);
+          await DatabaseHelper.instance.deleteDoseHistoryForMedication(widget.medication.id);
+        },
+        successMessage: l10n.medicineCabinetDeleteSuccess(widget.medication.name),
+        onSuccess: widget.onMedicationUpdated,
       );
     }
   }
@@ -248,20 +249,14 @@ class _MedicationCardState extends State<MedicationCard> {
   void _resumeMedication() async {
     final l10n = AppLocalizations.of(context)!;
 
-    // Use service to resume medication
-    await MedicationUpdateService.resumeMedication(
-      medication: widget.medication,
-    );
-
-    // Reload medications
-    widget.onMedicationUpdated();
-
-    if (!mounted) return;
-
-    // Show confirmation
-    SnackBarService.showSuccess(
-      context,
-      l10n.medicineCabinetResumeSuccess(widget.medication.name),
+    await executeMedicationAction(
+      action: () async {
+        await MedicationUpdateService.resumeMedication(
+          medication: widget.medication,
+        );
+      },
+      successMessage: l10n.medicineCabinetResumeSuccess(widget.medication.name),
+      onSuccess: widget.onMedicationUpdated,
     );
   }
 
@@ -302,101 +297,20 @@ class _MedicationCardState extends State<MedicationCard> {
               ),
               if (widget.medication.isSuspended) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.shade600,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.pause_circle_outline,
-                        size: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.medicineCabinetSuspended,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
+                MedicationStatusBadge.suspended(
+                  label: l10n.medicineCabinetSuspended,
                 ),
               ],
               // Expiration badge
               if (widget.medication.isExpired) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.red.shade700,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.warning,
-                        size: 14,
-                        color: Colors.red.shade700,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.expirationDateExpired,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
+                MedicationStatusBadge.expired(
+                  label: l10n.expirationDateExpired,
                 ),
               ] else if (widget.medication.isNearExpiration) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.orange.shade700,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.schedule,
-                        size: 14,
-                        color: Colors.orange.shade700,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        l10n.expirationDateNearExpiration,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.orange.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
+                MedicationStatusBadge.nearExpiration(
+                  label: l10n.expirationDateNearExpiration,
                 ),
               ],
             ],

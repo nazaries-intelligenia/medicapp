@@ -1,5 +1,65 @@
 # Color Palette - MedicApp
 
+## "Deep Emerald" Theme (Default)
+
+MedicApp uses the "Deep Emerald" theme by default, specially designed for elderly users (Silver Surfers) with maximum legibility while maintaining the green brand identity. Complies with WCAG AAA standards (19:1 contrast ratio).
+
+### Design Principles
+
+1. **Darkened Primary**: Deep emerald green (#1B5E20) ensures white text on buttons is 100% readable.
+2. **Clean Background and Surface**: Pure whites and very light grays without green tints to prevent colors from "blending".
+3. **Near-Black Text**: Primary text (#051F12) darkened to maximum for highest contrast ratio.
+4. **Explicit Borders**: Solid borders to delimit touch zones, crucial for people with depth perception loss.
+
+### Primary Colors (Brand and Action)
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Primary (Brand)** | 🟢 | `#1B5E20` | Dark emerald green. Guarantees very high contrast against white. |
+| **Interactive / Focus** | 🟢 | `#2E7D32` | "Pressed" states or selected elements. |
+| **Vibrant Action (FAB)** | 🟢 | `#00701A` | Vibrant but solid green (not neon). |
+| **Element Borders** | 🟢 | `#1B5E20` | 2px border to delimit touch zones. |
+
+### Text Colors (Maximum Legibility)
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Primary Text** | ⚫ | `#051F12` | Near-black with imperceptible green touch. 19:1 contrast. |
+| **Secondary Text** | 🔘 | `#37474F` | Dark blue-gray, readable for eyes with cataracts. |
+| **Text on Primary** | ⚪ | `#FFFFFF` | Pure white in bold for green buttons. |
+
+### Background and Surface Colors
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Main Background** | ⚪ | `#F5F5F5` | Very light neutral gray. Cards clearly "float". |
+| **Surface (Cards)** | ⚪ | `#FFFFFF` | Pure white, best background for reading. |
+| **Card Border** | 🔘 | `#E0E0E0` | Clearly defines card boundaries. |
+| **Strong Divider** | 🔘 | `#BDBDBD` | Medium gray for clearly visible separations. |
+
+### State Colors (Functional)
+
+| State | HEX Code | Usage |
+|--------|------------|-----|
+| **Success** | `#1E7E34` | Dark green for crisp check icons |
+| **Warning** | `#E65100` | Burnt orange for high visibility |
+| **Error** | `#C62828` | Deep serious red |
+| **Information** | `#0277BD` | Strong blue, avoids light cyan |
+
+### Deep Emerald Dark Theme
+
+| Role | Sample | HEX Code | Usage |
+|-----|---------|------------|-----|
+| **Background** | ⚫ | `#121212` | Deep dark but not pure black |
+| **Surface** | ⚫ | `#1E1E1E` | Slightly elevated |
+| **Cards** | ⚫ | `#2C2C2C` | Dark gray for cards |
+| **Primary** | 🟢 | `#A5D6A7` | Light green for dark mode |
+| **Accent** | 🟢 | `#66BB6A` | Visible medium green |
+| **Primary Text** | ⚪ | `#FAFAFA` | Near white |
+| **Secondary Text** | 🔘 | `#B0BEC5` | Light gray |
+
+---
+
 ## Light Theme "Sea Green"
 
 MedicApp uses a color palette inspired by nature with green tones that convey health, well-being, and trust.

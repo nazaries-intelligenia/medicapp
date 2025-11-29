@@ -4,6 +4,7 @@ import 'package:medicapp/services/notification_id_generator.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for low stock notifications
 /// Feature: Alert users when medication stock is low or insufficient
@@ -18,13 +19,12 @@ void main() {
   DatabaseTestHelper.setup();
 
   setUp(() async {
-    service = NotificationService.instance;
-    service.enableTestMode();
+    service = NotificationServiceTestHelper.setup();
     await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   tearDown(() {
-    service.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
   });
 
   group('Low Stock Notification ID Generation', () {

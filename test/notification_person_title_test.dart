@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for conditional notification titles based on person
 /// V19+: Tests that default users don't see their name in notification titles,
@@ -11,8 +12,11 @@ void main() {
     late NotificationService service;
 
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
+    });
+
+    tearDown(() {
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('_buildNotificationTitle should hide name for default user', () {
@@ -109,8 +113,11 @@ void main() {
     late NotificationService service;
 
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
+    });
+
+    tearDown(() {
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('scheduleMedicationNotifications should use conditional title based on person', () async {

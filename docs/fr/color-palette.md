@@ -1,5 +1,65 @@
 # Palette de Couleurs - MedicApp
 
+## Thème "Deep Emerald" (Par Défaut)
+
+MedicApp utilise par défaut le thème "Deep Emerald", conçu spécialement pour les personnes âgées (Silver Surfers) avec une lisibilité maximale tout en maintenant l'identité verte de la marque. Conforme aux standards WCAG AAA (ratio de contraste 19:1).
+
+### Principes de Design
+
+1. **Assombrissement du Primaire** : Vert émeraude profond (#1B5E20) pour garantir que le texte blanc sur les boutons soit 100% lisible.
+2. **Fond et Surface Propres** : Blancs et gris très clairs sans teintes vertes pour éviter que les couleurs ne se "mélangent".
+3. **Texte Presque Noir** : Texte principal (#051F12) assombri au maximum pour le plus grand ratio de contraste.
+4. **Bordures Explicites** : Bordures solides pour délimiter les zones tactiles, crucial pour les personnes avec perte de perception de la profondeur.
+
+### Couleurs Principales (Marque et Action)
+
+| Rôle | Exemple | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Principal (Marque)** | 🟢 | `#1B5E20` | Vert émeraude foncé. Garantit un contraste très élevé contre le blanc. |
+| **Interactif / Focus** | 🟢 | `#2E7D32` | États "pressed" ou éléments sélectionnés. |
+| **Action Vibrante (FAB)** | 🟢 | `#00701A` | Vert vibrant mais solide (pas néon). |
+| **Bordures d'Éléments** | 🟢 | `#1B5E20` | Bordure de 2px pour délimiter les zones tactiles. |
+
+### Couleurs de Texte (Lisibilité Maximale)
+
+| Rôle | Exemple | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Texte Principal** | ⚫ | `#051F12` | Presque noir avec touche verte imperceptible. Contraste 19:1. |
+| **Texte Secondaire** | 🔘 | `#37474F` | Gris bleuté foncé, lisible pour les yeux avec cataractes. |
+| **Texte sur Primaire** | ⚪ | `#FFFFFF` | Blanc pur en gras pour boutons verts. |
+
+### Couleurs de Fond et Surface
+
+| Rôle | Exemple | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Fond Principal** | ⚪ | `#F5F5F5` | Gris très clair neutre. Les cartes "flottent" clairement. |
+| **Surface (Cartes)** | ⚪ | `#FFFFFF` | Blanc pur, meilleur fond pour la lecture. |
+| **Bordure de Cartes** | 🔘 | `#E0E0E0` | Définit clairement les limites des cartes. |
+| **Diviseur Fort** | 🔘 | `#BDBDBD` | Gris moyen pour des séparations clairement visibles. |
+
+### Couleurs d'État (Fonctionnelles)
+
+| État | Code HEX | Utilisation |
+|--------|------------|-----|
+| **Succès** | `#1E7E34` | Vert foncé pour des coches nettes |
+| **Avertissement** | `#E65100` | Orange brûlé haute visibilité |
+| **Erreur** | `#C62828` | Rouge profond et sérieux |
+| **Information** | `#0277BD` | Bleu fort, évite le cyan clair |
+
+### Thème Sombre Deep Emerald
+
+| Rôle | Exemple | Code HEX | Utilisation |
+|-----|---------|------------|-----|
+| **Fond** | ⚫ | `#121212` | Sombre profond mais pas noir pur |
+| **Surface** | ⚫ | `#1E1E1E` | Légèrement élevé |
+| **Cartes** | ⚫ | `#2C2C2C` | Gris foncé pour les cartes |
+| **Principal** | 🟢 | `#A5D6A7` | Vert clair pour mode sombre |
+| **Accent** | 🟢 | `#66BB6A` | Vert moyen visible |
+| **Texte Principal** | ⚪ | `#FAFAFA` | Presque blanc |
+| **Texte Secondaire** | 🔘 | `#B0BEC5` | Gris clair |
+
+---
+
 ## Thème Clair "Sea Green"
 
 MedicApp utilise une palette de couleurs inspirée par la nature avec des tons verts qui transmettent la santé, le bien-être et la confiance.

@@ -6,7 +6,7 @@ import 'package:medicapp/theme/app_theme.dart';
 /// Provider to manage the application theme
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
-  ColorPalette _colorPalette = ColorPalette.seaGreen;
+  ColorPalette _colorPalette = ColorPalette.deepEmerald;
 
   ThemeMode get themeMode => _themeMode;
   ColorPalette get colorPalette => _colorPalette;
@@ -96,6 +96,8 @@ class ThemeProvider with ChangeNotifier {
   /// Converts string to ColorPalette
   ColorPalette _colorPaletteFromString(String value) {
     switch (value) {
+      case 'deepEmerald':
+        return ColorPalette.deepEmerald;
       case 'seaGreen':
         return ColorPalette.seaGreen;
       case 'material3':
@@ -103,13 +105,15 @@ class ThemeProvider with ChangeNotifier {
       case 'highContrast':
         return ColorPalette.highContrast;
       default:
-        return ColorPalette.seaGreen;
+        return ColorPalette.deepEmerald;
     }
   }
 
   /// Converts ColorPalette to string
   String _colorPaletteToString(ColorPalette palette) {
     switch (palette) {
+      case ColorPalette.deepEmerald:
+        return 'deepEmerald';
       case ColorPalette.seaGreen:
         return 'seaGreen';
       case ColorPalette.material3:
