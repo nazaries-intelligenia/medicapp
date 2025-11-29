@@ -46,17 +46,61 @@ MedicApp utiliza por defecto el tema "Deep Emerald", diseñado especialmente par
 | **Error** | `#C62828` | Rojo profundo y serio |
 | **Información** | `#0277BD` | Azul fuerte, evita el cian claro |
 
-### Tema Oscuro Deep Emerald
+### Tema Oscuro "Night Forest" (Accesible)
+
+El tema oscuro de Deep Emerald se llama "Night Forest" y está diseñado específicamente para personas mayores. Evita el negro absoluto (#000000) para reducir la fatiga visual y utiliza bordes iluminados para definir espacios en lugar de sombras.
+
+#### Principios de Diseño Oscuro
+
+1. **Botones como Lámparas**: En modo oscuro, los botones tienen fondo claro y texto oscuro (inversión del tema claro) para que "brillen" sobre el fondo.
+2. **Bordes en lugar de Sombras**: Las sombras no funcionan bien en modo oscuro. Se usan bordes sutiles (#424242) para delimitar tarjetas y contenedores.
+3. **Sin Negro Puro**: El fondo es #121212 (gris muy oscuro) para evitar el "smearing" en pantallas OLED y reducir la fatiga visual.
+4. **Texto Gris Perla**: El texto principal es #E0E0E0 (90% blanco) para evitar el deslumbramiento del blanco puro.
+
+#### Colores Principales (Inversión Luminosa)
 
 | Rol | Muestra | Código HEX | Uso |
 |-----|---------|------------|-----|
-| **Fondo** | ⚫ | `#121212` | Oscuro profundo pero no negro puro |
-| **Superficie** | ⚫ | `#1E1E1E` | Ligeramente elevado |
-| **Tarjetas** | ⚫ | `#2C2C2C` | Gris oscuro para tarjetas |
-| **Primario** | 🟢 | `#A5D6A7` | Verde claro para modo oscuro |
-| **Acento** | 🟢 | `#66BB6A` | Verde medio visible |
-| **Texto Principal** | ⚪ | `#FAFAFA` | Casi blanco |
-| **Texto Secundario** | 🔘 | `#B0BEC5` | Gris claro |
+| **Primario (Marca)** | 🟢 | `#81C784` | Verde Hoja Claro. Botones principales y estados activos. Es luminoso y fácil de ver. |
+| **Texto sobre Primario** | ⚫ | `#003300` | **CRUCIAL**: El texto dentro del botón primario debe ser verde muy oscuro, NO blanco. |
+| **Primario Variante** | 🟢 | `#66BB6A` | Tono más saturado para estados de "foco" o selección. |
+| **Acento / Interactivo** | 🟢 | `#A5D6A7` | Para elementos flotantes (FAB) o interruptores activados. |
+| **Borde de Foco** | 🟢 | `#81C784` | Borde de 2px alrededor de inputs activos. |
+
+#### Colores de Fondo y Superficie
+
+| Rol | Muestra | Código HEX | Uso |
+|-----|---------|------------|-----|
+| **Fondo Principal** | ⚫ | `#121212` | Gris muy oscuro estándar (Material Design). Evita el "smearing" en OLED. |
+| **Superficie (Tarjetas)** | ⚫ | `#1E2623` | Gris verdoso oscuro. Ligeramente más claro con tinte verde. |
+| **Borde de Tarjeta** | 🔘 | `#424242` | **Esencial para mayores**: Borde gris sutil alrededor de las tarjetas. |
+| **Divisores** | 🔘 | `#555555` | Líneas de separación con mayor contraste. |
+
+#### Colores de Texto
+
+| Rol | Muestra | Código HEX | Uso |
+|-----|---------|------------|-----|
+| **Texto Principal** | ⚪ | `#E0E0E0` | Gris perla (90% blanco). Legible pero no "quema" la retina. |
+| **Texto Secundario** | 🔘 | `#B0BEC5` | Gris azulado claro. Se lee mucho mejor que el gris oscuro. |
+
+#### Colores de Estado (Versiones Pastel)
+
+Los colores de estado oscuros no se ven bien en modo oscuro. Se usan versiones "pastel" o desaturadas:
+
+| Estado | Código HEX | Uso |
+|--------|------------|-----|
+| **Éxito** | `#81C784` | Mismo verde claro del primario |
+| **Advertencia** | `#FFB74D` | Naranja pastel claro, muy visible |
+| **Error** | `#E57373` | Rojo suave/rosado. El rojo puro vibra demasiado sobre oscuro. |
+| **Información** | `#64B5F6` | Azul cielo claro |
+
+#### Comparativa Claro vs. Oscuro
+
+| Elemento | Tema Claro (Deep Emerald) | Tema Oscuro (Night Forest) | ¿Por qué? |
+|----------|---------------------------|----------------------------|-----------|
+| **Botón** | Fondo Oscuro (#1B5E20), Texto Blanco | Fondo Claro (#81C784), Texto Oscuro | En modo oscuro, un botón oscuro se perdería. El botón debe ser una "lámpara". |
+| **Tarjeta** | Fondo Blanco + Sombra | Fondo Gris Verdoso + Borde | Las sombras no funcionan en modo oscuro. El borde delimita la zona. |
+| **Texto** | Negro casi puro | Blanco al 87% (#E0E0E0) | Reduce el deslumbramiento en entornos con poca luz. |
 
 ---
 
@@ -120,54 +164,78 @@ El tema oscuro utiliza una paleta inspirada en un bosque nocturno con tonos verd
 Los colores están definidos en `lib/theme/app_theme.dart`:
 
 ```dart
-// Colores principales - Tema claro "Sea Green"
-static const Color primaryLight = Color(0xFF2E8B57);
-static const Color primaryVariantLight = Color(0xFF3CB371);
-static const Color accentLight = Color(0xFF00C853);
+// ============================================================
+// Deep Emerald Colors - Light Theme (Default for Silver Surfers)
+// ============================================================
 
-// Colores principales - Tema oscuro "Dark Forest"
-static const Color primaryDark = Color(0xFFA5D6A7);
-static const Color accentDark = Color(0xFF4CAF50);
+static const Color deepEmeraldPrimaryLight = Color(0xFF1B5E20);
+static const Color deepEmeraldPrimaryVariantLight = Color(0xFF2E7D32);
+static const Color deepEmeraldAccentLight = Color(0xFF00701A);
+static const Color deepEmeraldBackgroundLight = Color(0xFFF5F5F5);
+static const Color deepEmeraldSurfaceLight = Color(0xFFFFFFFF);
+static const Color deepEmeraldTextPrimaryLight = Color(0xFF051F12);
+static const Color deepEmeraldTextSecondaryLight = Color(0xFF37474F);
+static const Color deepEmeraldDividerLight = Color(0xFFBDBDBD);
+static const Color deepEmeraldCardBorderLight = Color(0xFFE0E0E0);
 
-static const Color secondaryLight = Color(0xFF81C784);
-static const Color secondaryDark = Color(0xFF819CA9);
+// Deep Emerald State Colors (Light)
+static const Color deepEmeraldSuccess = Color(0xFF1E7E34);
+static const Color deepEmeraldWarning = Color(0xFFE65100);
+static const Color deepEmeraldError = Color(0xFFC62828);
+static const Color deepEmeraldInfo = Color(0xFF0277BD);
 
-// Colores de fondo
-static const Color backgroundLight = Color(0xFFE8F5E9);
-static const Color backgroundDark = Color(0xFF050A06);
+// ============================================================
+// Deep Emerald Colors - Dark Theme "Night Forest" (Accessible)
+// ============================================================
 
-static const Color surfaceLight = Color(0xFFC8E6C9);
-static const Color surfaceDark = Color(0xFF0D1F14);
+// Colores principales (inversión luminosa)
+static const Color deepEmeraldPrimaryDark = Color(0xFF81C784);      // Verde hoja claro
+static const Color deepEmeraldPrimaryVariantDark = Color(0xFF66BB6A);
+static const Color deepEmeraldAccentDark = Color(0xFFA5D6A7);       // FABs y toggles
+static const Color deepEmeraldOnPrimaryDark = Color(0xFF003300);    // Texto OSCURO sobre botones
 
-// Colores de tarjetas
-static const Color cardLight = Color(0xFFC8E6C9);
-static const Color cardDark = Color(0xFF142B1E);
+// Fondos y superficies
+static const Color deepEmeraldBackgroundDark = Color(0xFF121212);   // Gris oscuro (no negro puro)
+static const Color deepEmeraldSurfaceDark = Color(0xFF1E2623);      // Gris verdoso oscuro
+static const Color deepEmeraldCardDark = Color(0xFF1E2623);
+static const Color deepEmeraldCardBorderDark = Color(0xFF424242);   // Borde visible para tarjetas
 
-// Colores de texto
-static const Color textPrimaryLight = Color(0xFF0D2E1C);
-static const Color textPrimaryDark = Color(0xFFE8F5E9);
+// Texto
+static const Color deepEmeraldTextPrimaryDark = Color(0xFFE0E0E0);  // Gris perla (90% blanco)
+static const Color deepEmeraldTextSecondaryDark = Color(0xFFB0BEC5);
+static const Color deepEmeraldDividerDark = Color(0xFF555555);
 
-static const Color textSecondaryLight = Color(0xFF577D6A);
-static const Color textSecondaryDark = Color(0xFF819CA9);
+// Estados (versiones pastel para modo oscuro)
+static const Color deepEmeraldSuccessDark = Color(0xFF81C784);
+static const Color deepEmeraldWarningDark = Color(0xFFFFB74D);
+static const Color deepEmeraldErrorDark = Color(0xFFE57373);
+static const Color deepEmeraldInfoDark = Color(0xFF64B5F6);
+```
 
-// Iconos inactivos
-static const Color inactiveIconDark = Color(0xFF455A64);
+### Implementación de Bordes de Contenedor
 
-// Overlay y selección
-static const Color overlayDark = Color(0xFF1E3B28);
+Para asegurar que las tarjetas no desaparezcan visualmente en modo oscuro:
 
-// Resplandor/Glow
-static const Color glowDark = Color(0xFF004D40);
+```dart
+// En el tema claro, el borde puede ser sutil o transparente
+cardTheme: CardThemeData(
+  color: deepEmeraldCardLight,
+  elevation: 1,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    side: const BorderSide(color: deepEmeraldCardBorderLight, width: 1),
+  ),
+),
 
-// Colores de divisores y bordes
-static const Color dividerLight = Color(0xFFA5D6A7);
-static const Color dividerDark = Color(0xFF455A64);
-
-// Colores de estado
-static const Color success = Color(0xFF43A047);
-static const Color warning = Color(0xFFFF9800);
-static const Color error = Color(0xFFF44336);
-static const Color info = Color(0xFF2196F3);
+// En el tema oscuro, el borde DEBE ser visible
+cardTheme: CardThemeData(
+  color: deepEmeraldCardDark,
+  elevation: 0, // Sin sombra, usar borde
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+    side: const BorderSide(color: deepEmeraldCardBorderDark, width: 1),
+  ),
+),
 ```
 
 ## Tema "Alto Contraste"

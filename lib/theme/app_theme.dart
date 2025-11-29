@@ -249,38 +249,66 @@ class AppTheme {
   static const Color deepEmeraldInfo = Color(0xFF0277BD);
 
   // ============================================================
-  // Deep Emerald Colors - Dark Theme
+  // Deep Emerald Colors - Dark Theme "Night Forest" (Accessible)
   // ============================================================
+  // Designed for elderly users (Silver Surfers) with maximum legibility
+  // Avoids pure black (#000000) to reduce eye strain
+  // Uses illuminated borders to define spaces instead of shadows
 
-  /// Primary: Light green for dark mode
-  static const Color deepEmeraldPrimaryDark = Color(0xFFA5D6A7);
+  /// Primary (Brand): Light leaf green - luminous and easy to see
+  /// Used for primary buttons and active states
+  static const Color deepEmeraldPrimaryDark = Color(0xFF81C784);
 
-  /// Primary variant: Lighter green for states
-  static const Color deepEmeraldPrimaryVariantDark = Color(0xFFC8E6C9);
+  /// Primary variant: Slightly more saturated for focus/selected states
+  static const Color deepEmeraldPrimaryVariantDark = Color(0xFF66BB6A);
 
-  /// Accent: Medium green visible on dark
-  static const Color deepEmeraldAccentDark = Color(0xFF66BB6A);
+  /// Accent/Interactive: For FABs and activated toggles
+  static const Color deepEmeraldAccentDark = Color(0xFFA5D6A7);
+
+  /// Text on Primary: CRUCIAL - Dark text on light buttons for legibility
+  static const Color deepEmeraldOnPrimaryDark = Color(0xFF003300);
 
   /// Secondary: Light teal green
   static const Color deepEmeraldSecondaryDark = Color(0xFF80CBC4);
 
-  /// Background: Deep dark (not pure black for comfort)
+  /// Background: Standard dark gray (Material Design) - avoids OLED smearing
   static const Color deepEmeraldBackgroundDark = Color(0xFF121212);
 
-  /// Surface: Slightly elevated dark
-  static const Color deepEmeraldSurfaceDark = Color(0xFF1E1E1E);
+  /// Surface (Cards): Dark greenish gray - slightly lighter with green tint
+  static const Color deepEmeraldSurfaceDark = Color(0xFF1E2623);
 
-  /// Cards: Dark gray for cards
-  static const Color deepEmeraldCardDark = Color(0xFF2C2C2C);
+  /// Cards: Same as surface for consistency
+  static const Color deepEmeraldCardDark = Color(0xFF1E2623);
 
-  /// Primary text: Almost white
-  static const Color deepEmeraldTextPrimaryDark = Color(0xFFFAFAFA);
+  /// Card Border: Essential for elderly - subtle gray border around cards
+  static const Color deepEmeraldCardBorderDark = Color(0xFF424242);
 
-  /// Secondary text: Light gray
+  /// Primary text: Pearl gray (90% white) - readable but doesn't burn eyes
+  static const Color deepEmeraldTextPrimaryDark = Color(0xFFE0E0E0);
+
+  /// Secondary text: Light bluish gray - reads much better than dark gray
   static const Color deepEmeraldTextSecondaryDark = Color(0xFFB0BEC5);
 
-  /// Divider: Medium gray
-  static const Color deepEmeraldDividerDark = Color(0xFF424242);
+  /// Divider: Higher contrast lines for separation
+  static const Color deepEmeraldDividerDark = Color(0xFF555555);
+
+  /// Focus border: Used as 1-2px stroke around active inputs
+  static const Color deepEmeraldFocusBorderDark = Color(0xFF81C784);
+
+  // Night Forest State Colors (Pastel versions for dark mode)
+  // Dark colors don't show well on dark backgrounds - use pastel/desaturated versions
+
+  /// Success: Same light green as primary
+  static const Color deepEmeraldSuccessDark = Color(0xFF81C784);
+
+  /// Warning: Light pastel orange - very visible
+  static const Color deepEmeraldWarningDark = Color(0xFFFFB74D);
+
+  /// Error: Soft pinkish red - pure red vibrates too much on dark and tires eyes
+  static const Color deepEmeraldErrorDark = Color(0xFFE57373);
+
+  /// Info: Light sky blue
+  static const Color deepEmeraldInfoDark = Color(0xFF64B5F6);
 
   /// Gets the light theme according to the selected palette
   static ThemeData getLightTheme(ColorPalette palette) {
@@ -1898,29 +1926,34 @@ class AppTheme {
     );
   }
 
-  /// Builds the Deep Emerald dark theme
-  /// Comfortable dark mode with green accents
+  /// Builds the Deep Emerald dark theme "Night Forest"
+  /// Designed for elderly users (Silver Surfers) with maximum legibility
+  /// Key differences from light theme:
+  /// - Buttons are "lamps" (light background, dark text) instead of dark
+  /// - Cards use borders instead of shadows (shadows don't work well in dark)
+  /// - Uses pastel state colors that are visible on dark backgrounds
+  /// - Avoids pure black to reduce eye strain on OLED screens
   static ThemeData _buildDeepEmeraldDarkTheme() {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
 
-      // Color scheme
+      // Color scheme - Night Forest accessible dark theme
       colorScheme: const ColorScheme.dark(
         primary: deepEmeraldPrimaryDark,
         secondary: deepEmeraldSecondaryDark,
         surface: deepEmeraldSurfaceDark,
-        error: Color(0xFFEF5350),
-        onPrimary: Colors.black,
-        onSecondary: Colors.black,
+        error: deepEmeraldErrorDark,
+        onPrimary: deepEmeraldOnPrimaryDark, // Dark text on light buttons
+        onSecondary: deepEmeraldOnPrimaryDark,
         onSurface: deepEmeraldTextPrimaryDark,
-        onError: Colors.white,
+        onError: Colors.black,
       ),
 
-      // Scaffolds
+      // Scaffolds - Standard dark gray, not pure black
       scaffoldBackgroundColor: deepEmeraldBackgroundDark,
 
-      // AppBar
+      // AppBar - Dark greenish surface
       appBarTheme: const AppBarTheme(
         backgroundColor: deepEmeraldSurfaceDark,
         foregroundColor: deepEmeraldTextPrimaryDark,
@@ -1933,23 +1966,29 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(
           color: deepEmeraldTextPrimaryDark,
+          size: 26,
         ),
       ),
 
-      // Cards
+      // Cards - With visible border (essential for elderly in dark mode)
+      // Shadows don't work well in dark mode, borders define the space
       cardTheme: CardThemeData(
         color: deepEmeraldCardDark,
-        elevation: 2,
+        elevation: 0, // No shadow, use border instead
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(
+            color: deepEmeraldCardBorderDark,
+            width: 1,
+          ),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
 
-      // Floating Action Button
+      // Floating Action Button - Light "lamp" button
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: deepEmeraldAccentDark,
-        foregroundColor: Colors.black,
+        foregroundColor: deepEmeraldOnPrimaryDark, // Dark text
         elevation: 4,
       ),
 
@@ -1958,11 +1997,18 @@ class AppTheme {
         backgroundColor: deepEmeraldSurfaceDark,
         selectedItemColor: deepEmeraldPrimaryDark,
         unselectedItemColor: deepEmeraldTextSecondaryDark,
-        elevation: 8,
+        selectedLabelStyle: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: TextStyle(
+          fontSize: 13,
+        ),
+        elevation: 0,
         type: BottomNavigationBarType.fixed,
       ),
 
-      // Text theme
+      // Text theme - Pearl gray text (not pure white)
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontSize: 34,
@@ -2009,34 +2055,47 @@ class AppTheme {
         ),
       ),
 
-      // Input Decoration
+      // Input Decoration - With visible borders for touch zones
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: deepEmeraldCardDark,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: deepEmeraldDividerDark),
+          borderSide: const BorderSide(color: deepEmeraldCardBorderDark, width: 1),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: deepEmeraldDividerDark),
+          borderSide: const BorderSide(color: deepEmeraldCardBorderDark, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: deepEmeraldPrimaryDark, width: 2),
+          borderSide: const BorderSide(color: deepEmeraldFocusBorderDark, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFEF5350)),
+          borderSide: const BorderSide(color: deepEmeraldErrorDark, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: deepEmeraldErrorDark, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        labelStyle: const TextStyle(
+          fontSize: 16,
+          color: deepEmeraldTextSecondaryDark,
+        ),
+        hintStyle: const TextStyle(
+          fontSize: 16,
+          color: deepEmeraldTextSecondaryDark,
+        ),
       ),
 
-      // Elevated Button
+      // Elevated Button - Light "lamp" button with dark text
+      // In dark mode, buttons need to be light to stand out
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: deepEmeraldPrimaryDark,
-          foregroundColor: Colors.black,
+          backgroundColor: deepEmeraldPrimaryDark, // Light green
+          foregroundColor: deepEmeraldOnPrimaryDark, // Dark text
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
@@ -2054,52 +2113,70 @@ class AppTheme {
         style: TextButton.styleFrom(
           foregroundColor: deepEmeraldPrimaryDark,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        ),
-      ),
-
-      // Outlined Button
-      outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: deepEmeraldPrimaryDark,
-          side: const BorderSide(color: deepEmeraldPrimaryDark),
-          padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
 
-      // Chip
-      chipTheme: ChipThemeData(
-        backgroundColor: deepEmeraldCardDark,
-        deleteIconColor: deepEmeraldTextSecondaryDark,
-        labelStyle: const TextStyle(color: deepEmeraldTextPrimaryDark),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+      // Outlined Button - With visible border
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: deepEmeraldPrimaryDark,
+          side: const BorderSide(color: deepEmeraldPrimaryDark, width: 2),
+          padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
 
-      // Dialog
-      dialogTheme: DialogThemeData(
+      // Chip - With border for definition
+      chipTheme: ChipThemeData(
         backgroundColor: deepEmeraldCardDark,
-        elevation: 8,
+        deleteIconColor: deepEmeraldTextSecondaryDark,
+        labelStyle: const TextStyle(
+          color: deepEmeraldTextPrimaryDark,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: deepEmeraldCardBorderDark),
+        ),
+      ),
+
+      // Dialog - With border
+      dialogTheme: DialogThemeData(
+        backgroundColor: deepEmeraldCardDark,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: deepEmeraldCardBorderDark),
         ),
       ),
 
       // Snackbar
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: deepEmeraldCardDark,
-        contentTextStyle: const TextStyle(color: deepEmeraldTextPrimaryDark),
+        backgroundColor: deepEmeraldSurfaceDark,
+        contentTextStyle: const TextStyle(
+          color: deepEmeraldTextPrimaryDark,
+          fontSize: 15,
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: deepEmeraldCardBorderDark),
         ),
       ),
 
-      // Divider
+      // Divider - Higher contrast
       dividerTheme: const DividerThemeData(
         color: deepEmeraldDividerDark,
         thickness: 1,
@@ -2120,6 +2197,71 @@ class AppTheme {
           }
           return const Color(0xFF424242);
         }),
+      ),
+
+      // Icon theme
+      iconTheme: const IconThemeData(
+        color: deepEmeraldTextPrimaryDark,
+        size: 24,
+      ),
+
+      // ListTile
+      listTileTheme: const ListTileThemeData(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        minVerticalPadding: 8,
+        titleTextStyle: TextStyle(
+          fontSize: 17,
+          fontWeight: FontWeight.w500,
+          color: deepEmeraldTextPrimaryDark,
+        ),
+        subtitleTextStyle: TextStyle(
+          fontSize: 15,
+          color: deepEmeraldTextSecondaryDark,
+        ),
+      ),
+
+      // DropdownMenu - With border
+      dropdownMenuTheme: DropdownMenuThemeData(
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: deepEmeraldCardDark,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: deepEmeraldCardBorderDark),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(color: deepEmeraldCardBorderDark),
+          ),
+        ),
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStateProperty.all(deepEmeraldCardDark),
+          surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+          side: WidgetStateProperty.all(
+            const BorderSide(color: deepEmeraldCardBorderDark),
+          ),
+        ),
+      ),
+
+      // PopupMenu - With border
+      popupMenuTheme: PopupMenuThemeData(
+        color: deepEmeraldCardDark,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: const BorderSide(color: deepEmeraldCardBorderDark),
+        ),
+      ),
+
+      // Menu - With border
+      menuTheme: const MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(deepEmeraldCardDark),
+          surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
+          side: WidgetStatePropertyAll(
+            BorderSide(color: deepEmeraldCardBorderDark),
+          ),
+        ),
       ),
     );
   }
