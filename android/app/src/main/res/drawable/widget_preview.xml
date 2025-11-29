@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget preview using DeepEmerald dark theme colors -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background: DeepEmerald surface dark with opacity -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E61E2623" />
+            <corners android:radius="16dp" />
+            <size
+                android:width="146dp"
+                android:height="146dp" />
+        </shape>
+    </item>
+    <!-- Title area simulation with DeepEmerald primary dark -->
+    <item
+        android:top="12dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#4081C784" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="122dp"
+                android:height="20dp" />
+        </shape>
+    </item>
+    <!-- List item 1 simulation -->
+    <item
+        android:top="40dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#3081C784" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="122dp"
+                android:height="16dp" />
+        </shape>
+    </item>
+    <!-- List item 2 simulation -->
+    <item
+        android:top="62dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#3081C784" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="122dp"
+                android:height="16dp" />
+        </shape>
+    </item>
+    <!-- List item 3 simulation -->
+    <item
+        android:top="84dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#3081C784" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="122dp"
+                android:height="16dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dose taken icon using DeepEmerald colors -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <!-- DeepEmerald success dark color -->
+            <solid android:color="#81C784" />
+            <size
+                android:width="16dp"
+                android:height="16dp" />
+        </shape>
+    </item>
+    <item
+        android:width="10dp"
+        android:height="10dp"
+        android:gravity="center">
+        <vector
+            android:width="10dp"
+            android:height="10dp"
+            android:viewportWidth="24"
+            android:viewportHeight="24">
+            <path
+                android:fillColor="#1E2623"
+                android:pathData="M9,16.17L4.83,12l-1.42,1.41L9,19 21,7l-1.41,-1.41z" />
+        </vector>
+    </item>
+</layer-list>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pill icon using DeepEmerald primary dark color -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#81C784"
+        android:pathData="M19.5,6.5L17.5,4.5C16.5,3.5 15,3.5 14,4.5L4.5,14C3.5,15 3.5,16.5 4.5,17.5L6.5,19.5C7.5,20.5 9,20.5 10,19.5L19.5,10C20.5,9 20.5,7.5 19.5,6.5zM9.3,18.8L5.2,14.7L9.4,10.5L13.5,14.6L9.3,18.8z" />
+</vector>
