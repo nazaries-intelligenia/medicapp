@@ -887,6 +887,34 @@ SettingsScreen
 - Berdez aldatzen da eta soinua egiten du osatzean
 - Dismiss botoia ezkutatzeko
 
+### Kode Eredu Berrerabilgarriak
+
+MedicApp-ek hainbat kode eredu berrerabilgarri inplementatzen ditu mantengarritasuna hobetzen eta bikoizketa murrizten dutenak:
+
+**SelectableOptionCard<T>:**
+- Widget generikoa hautagai txartelak aukeratzeko mota-euskarriarekin
+- Kokapena: `lib/widgets/forms/selectable_option_card.dart`
+- Helburua: Interfaze koherentea formularioetako aukeren hautaketarako
+
+**MedicationStatusBadge:**
+- Badge berrerabilgarria sendagaien egoera erakusteko
+- Helburua: Egoeren bisualizazio estandarizatua (aktiboa, etenda, agortuta)
+
+**MedicationActionHandler (Mixin):**
+- Mixin sendagaien ekintzen kudeaketa koherenterako
+- Helburua: Errore kudeaketa zentratua eta ekintzen logika arrunta
+- Onurak: UI osagaietan kode bikoizketa murrizten du
+
+**NotificationServiceTestHelper:**
+- Proba laguntza jakinarazpen zerbitzuaren konfiguraziorako eta garbiketa
+- Kokapena: `test/helpers/notification_test_helper.dart`
+- Helburua: Jakinarazpen probak idaztea sinplifikatu
+
+**person_test_helper.dart:**
+- Pertsonekin lotutako proba utilitateen kokapen kanonikoa eta bateratua
+- Helburua: Puntu bakarra pertsonen proba laguntza funtzioentzat
+- Onurak: Fitxategien arteko proba kodearen bikoizketa saihesten du
+
 ### Nabigazioa
 
 MedicApp Flutter-en **Navigator 1.0** estandarra erabiltzen du:

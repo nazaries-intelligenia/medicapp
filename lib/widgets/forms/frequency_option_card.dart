@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'selectable_option_card.dart';
 
 /// Reusable widget to display a frequency option as a selectable card
 /// Used in medication frequency creation and editing screens
+///
+/// This is a thin wrapper around [SelectableOptionCard] that maintains
+/// backward compatibility with existing code.
 class FrequencyOptionCard<T> extends StatelessWidget {
   final T value;
   final T selectedValue;
@@ -24,61 +28,16 @@ class FrequencyOptionCard<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = selectedValue == value;
-
-    return InkWell(
-      onTap: () => onTap(value),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
-          border: Border.all(
-            color: isSelected ? color : Theme.of(context).dividerColor,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-              size: 28,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected
-                              ? color.withValues(alpha: 0.8)
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: color,
-                size: 28,
-              ),
-          ],
-        ),
-      ),
+    return SelectableOptionCard<T>(
+      value: value,
+      selectedValue: selectedValue,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      color: color,
+      onTap: (T? val) {
+        if (val != null) onTap(val);
+      },
     );
   }
 }

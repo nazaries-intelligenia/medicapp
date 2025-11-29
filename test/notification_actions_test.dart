@@ -5,6 +5,7 @@ import 'package:medicapp/models/dose_history_entry.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for notification quick actions (register, skip, snooze)
 /// Added in feature: Quick actions on medication notifications
@@ -19,13 +20,12 @@ void main() {
   DatabaseTestHelper.setup();
 
   setUp(() async {
-    service = NotificationService.instance;
-    service.enableTestMode();
+    service = NotificationServiceTestHelper.setup();
     await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   tearDown(() {
-    service.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
   });
 
   group('Notification Action: register_dose', () {

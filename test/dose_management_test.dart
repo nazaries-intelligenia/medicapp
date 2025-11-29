@@ -1,43 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/database/database_helper.dart';
-import 'package:medicapp/models/medication.dart';
 import 'package:medicapp/models/dose_history_entry.dart';
 import 'package:medicapp/models/person.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/test_helpers.dart';
-
-/// Helper to insert medication and assign to default person (V19+ requirement)
-Future<void> insertMedicationWithPerson(Medication medication) async {
-  await DatabaseHelper.instance.insertMedication(medication);
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson != null) {
-    await DatabaseHelper.instance.assignMedicationToPerson(
-      personId: defaultPerson.id,
-      medicationId: medication.id,
-      scheduleData: medication,
-    );
-  }
-}
-
-/// Helper to get medication for default person (V19+ requirement)
-Future<Medication?> getMedicationForDefaultPerson(String medicationId) async {
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson == null) return null;
-  final medications = await DatabaseHelper.instance.getMedicationsForPerson(defaultPerson.id);
-  return medications.where((m) => m.id == medicationId).firstOrNull;
-}
-
-/// Helper to update medication for default person (V19+ requirement)
-Future<void> updateMedicationForDefaultPerson(Medication medication) async {
-  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
-  if (defaultPerson != null) {
-    await DatabaseHelper.instance.updateMedicationForPerson(
-      medication: medication,
-      personId: defaultPerson.id,
-    );
-  }
-}
+import 'helpers/person_test_helper.dart';
 
 void main() {
   // Setup database simplificado con helper

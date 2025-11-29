@@ -68,3 +68,25 @@ Future<String> getDefaultPersonId() async {
   if (defaultPerson == null) throw Exception('No default person found');
   return defaultPerson.id;
 }
+
+/// Updates a medication for the default person.
+///
+/// This is a convenience wrapper around DatabaseHelper.updateMedicationForPerson
+/// that automatically uses the default person's ID.
+///
+/// Example:
+/// ```dart
+/// final updatedMedication = MedicationBuilder.from(medication)
+///     .withStock(newStock)
+///     .build();
+/// await updateMedicationForDefaultPerson(updatedMedication);
+/// ```
+Future<void> updateMedicationForDefaultPerson(Medication medication) async {
+  final defaultPerson = await DatabaseHelper.instance.getDefaultPerson();
+  if (defaultPerson != null) {
+    await DatabaseHelper.instance.updateMedicationForPerson(
+      medication: medication,
+      personId: defaultPerson.id,
+    );
+  }
+}

@@ -4,16 +4,16 @@ import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'package:medicapp/models/treatment_duration_type.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 void main() {
   group('Notification Cancellation on Manual Registration', () {
     setUp(() {
-      // Enable test mode to prevent actual notifications
-      NotificationService.instance.enableTestMode();
+      NotificationServiceTestHelper.setup();
     });
 
     tearDown(() {
-      NotificationService.instance.disableTestMode();
+      NotificationServiceTestHelper.tearDown();
     });
 
     test("should cancel today's dose notification when dose is registered", () async {

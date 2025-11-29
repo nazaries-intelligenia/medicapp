@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../models/treatment_duration_type.dart';
+import '../../../widgets/forms/selectable_option_card.dart';
 
+/// Widget to display a treatment duration type option as a selectable card
+///
+/// This is a thin wrapper around [SelectableOptionCard] specialized for
+/// [TreatmentDurationType]. It automatically retrieves the icon and color
+/// from the duration type.
 class DurationOptionCard extends StatelessWidget {
   final TreatmentDurationType type;
   final String title;
@@ -21,59 +27,13 @@ class DurationOptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = type.getColor(context);
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
-          border: Border.all(
-            color: isSelected ? color : Theme.of(context).dividerColor,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              type.icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-              size: 28,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected
-                              ? color.withValues(alpha: 0.8)
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: color,
-                size: 28,
-              ),
-          ],
-        ),
-      ),
+    return SelectableOptionCard<void>(
+      isSelected: isSelected,
+      icon: type.icon,
+      title: title,
+      subtitle: subtitle,
+      color: color,
+      onTap: (_) => onTap(),
     );
   }
 }

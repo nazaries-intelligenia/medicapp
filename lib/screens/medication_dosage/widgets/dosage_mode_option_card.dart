@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../medication_dosage_screen.dart';
+import '../../../widgets/forms/selectable_option_card.dart';
 
+/// Widget to display a dosage mode option as a selectable card
+///
+/// This is a thin wrapper around [SelectableOptionCard] specialized for
+/// [DosageMode] types.
 class DosageModeOptionCard extends StatelessWidget {
   final DosageMode mode;
   final DosageMode selectedMode;
@@ -23,61 +28,16 @@ class DosageModeOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isSelected = selectedMode == mode;
-
-    return InkWell(
-      onTap: () => onTap(mode),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
-          border: Border.all(
-            color: isSelected ? color : Theme.of(context).dividerColor,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-              size: 28,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: isSelected ? color : Theme.of(context).colorScheme.onSurface,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected
-                              ? color.withValues(alpha: 0.8)
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: color,
-                size: 28,
-              ),
-          ],
-        ),
-      ),
+    return SelectableOptionCard<DosageMode>(
+      value: mode,
+      selectedValue: selectedMode,
+      icon: icon,
+      title: title,
+      subtitle: subtitle,
+      color: color,
+      onTap: (DosageMode? val) {
+        if (val != null) onTap(val);
+      },
     );
   }
 }

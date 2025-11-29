@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for multi-person notification scheduling (V19+)
 /// Tests that each person gets their own notifications with unique IDs
@@ -10,8 +11,11 @@ void main() {
     late NotificationService service;
 
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
+    });
+
+    tearDown(() {
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('should schedule notifications for multiple persons without errors', () async {
@@ -207,8 +211,11 @@ void main() {
     late NotificationService service;
 
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
+    });
+
+    tearDown(() {
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('notification IDs should be unique per person', () async {
@@ -260,8 +267,11 @@ void main() {
     late NotificationService service;
 
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
+    });
+
+    tearDown(() {
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('should require personId parameter', () async {

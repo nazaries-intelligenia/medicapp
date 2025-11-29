@@ -983,6 +983,34 @@ MaterialApp(
 - Change en vert et joue un son à la fin
 - Bouton dismiss pour le masquer
 
+### Patterns de Code Réutilisables
+
+MedicApp implémente plusieurs patterns de code réutilisables qui améliorent la maintenabilité et réduisent la duplication :
+
+**SelectableOptionCard<T> :**
+- Widget générique pour les cartes d'options sélectionnables avec support de types
+- Emplacement : `lib/widgets/forms/selectable_option_card.dart`
+- Objectif : Interface cohérente pour la sélection d'options dans les formulaires
+
+**MedicationStatusBadge :**
+- Badge réutilisable pour l'affichage du statut des médicaments
+- Objectif : Visualisation standardisée des états (actif, suspendu, épuisé)
+
+**MedicationActionHandler (Mixin) :**
+- Mixin pour une gestion cohérente des actions de médicaments
+- Objectif : Gestion d'erreurs centralisée et logique d'actions commune
+- Avantages : Réduit la duplication de code dans les composants UI
+
+**NotificationServiceTestHelper :**
+- Helper de test pour la configuration et le nettoyage du service de notifications
+- Emplacement : `test/helpers/notification_test_helper.dart`
+- Objectif : Simplifie l'écriture des tests de notifications
+
+**person_test_helper.dart :**
+- Emplacement canonique consolidé pour les utilitaires de test liés aux personnes
+- Objectif : Point unique pour les fonctions helper de tests de personnes
+- Avantages : Évite la duplication de code de test entre fichiers
+
 ### Navigation
 
 MedicApp utilise **Navigator 1.0** standard de Flutter :

@@ -6,6 +6,7 @@ import 'package:medicapp/models/person.dart';
 import 'helpers/database_test_helper.dart';
 import 'helpers/medication_builder.dart';
 import 'helpers/person_test_helper.dart';
+import 'helpers/notification_test_helper.dart';
 
 /// Tests for notification platform limits handling
 /// Added in test coverage improvements for V19+
@@ -22,13 +23,12 @@ void main() {
   DatabaseTestHelper.setup();
 
   setUp(() async {
-    service = NotificationService.instance;
-    service.enableTestMode();
+    service = NotificationServiceTestHelper.setup();
     await DatabaseTestHelper.ensureDefaultPerson();
   });
 
   tearDown(() {
-    service.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
   });
 
   group('Notification Limit Handling', () {

@@ -3,17 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/services/notification_id_generator.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 void main() {
   late NotificationService service;
 
   setUp(() {
-    service = NotificationService.instance;
-    service.enableTestMode();
+    service = NotificationServiceTestHelper.setup();
   });
 
   tearDown(() {
-    service.disableTestMode();
+    NotificationServiceTestHelper.tearDown();
   });
 
   group('Test Mode Management', () {

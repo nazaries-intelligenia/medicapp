@@ -982,6 +982,34 @@ MaterialApp(
 - Canvia a verd i toca so en completar-se
 - Botó de dismiss per ocultar-lo
 
+### Patrons de Codi Reutilitzables
+
+MedicApp implementa diversos patrons de codi reutilitzables que milloren la mantenibilitat i redueixen la duplicació:
+
+**SelectableOptionCard<T>:**
+- Widget genèric per a targetes d'opcions seleccionables amb suport de tipus
+- Ubicació: `lib/widgets/forms/selectable_option_card.dart`
+- Propòsit: Interfície consistent per a selecció d'opcions en formularis
+
+**MedicationStatusBadge:**
+- Badge reutilitzable per mostrar estats de medicaments
+- Propòsit: Visualització estandarditzada d'estats (actiu, suspès, esgotat)
+
+**MedicationActionHandler (Mixin):**
+- Mixin per a gestió consistent d'accions de medicaments
+- Propòsit: Gestió d'errors centralitzada i lògica d'accions comú
+- Beneficis: Redueix duplicació de codi en components UI
+
+**NotificationServiceTestHelper:**
+- Helper de proves per a configuració i neteja del servei de notificacions
+- Ubicació: `test/helpers/notification_test_helper.dart`
+- Propòsit: Simplifica l'escriptura de proves de notificacions
+
+**person_test_helper.dart:**
+- Ubicació canònica consolidada per a utilitats de prova relacionades amb persones
+- Propòsit: Punt únic per a funcions helper de proves de persones
+- Beneficis: Evita duplicació de codi de proves entre fitxers
+
 ### Navegació
 
 MedicApp usa **Navigator 1.0** estàndard de Flutter:

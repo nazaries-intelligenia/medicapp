@@ -2,18 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'package:medicapp/models/medication_type.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 void main() {
   late NotificationService service;
 
   group('Fasting Notification Tests', () {
     setUp(() {
-      service = NotificationService.instance;
-      service.enableTestMode();
+      service = NotificationServiceTestHelper.setup();
     });
 
     tearDown(() {
-      service.disableTestMode();
+      NotificationServiceTestHelper.tearDown();
     });
 
     group('Automatic "before" fasting scheduling', () {

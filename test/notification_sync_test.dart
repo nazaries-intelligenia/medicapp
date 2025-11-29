@@ -1,16 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:medicapp/services/notification_service.dart';
 import 'helpers/medication_builder.dart';
+import 'helpers/notification_test_helper.dart';
 
 void main() {
   group('Notification Synchronization', () {
     setUp(() {
-      // Enable test mode to prevent actual notifications
-      NotificationService.instance.enableTestMode();
+      NotificationServiceTestHelper.setup();
     });
 
     tearDown(() {
-      NotificationService.instance.disableTestMode();
+      NotificationServiceTestHelper.tearDown();
     });
 
     test('should handle multiple medications', () async {
