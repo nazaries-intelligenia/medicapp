@@ -31,7 +31,7 @@ class DosageModeOptionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : Colors.transparent,
+          color: isSelected ? color.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surface,
           border: Border.all(
             color: isSelected ? color : Theme.of(context).dividerColor,
             width: isSelected ? 2 : 1,

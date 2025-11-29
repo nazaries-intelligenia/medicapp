@@ -72,6 +72,9 @@ dependencies:
   # State management
   provider: ^6.1.2
 
+  # Device info for checking Android SDK version
+  device_info_plus: ^11.1.0
+
   # Ringtone manager for notification sound selection (Android)
   flutter_ringtone_manager: ^1.1.1
 

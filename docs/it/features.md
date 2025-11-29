@@ -274,6 +274,12 @@ Inoltre, la configurazione del digiuno permette di decidere se si desiderano not
 
 MedicApp è ottimizzata per Android 12 e versioni superiori, richiedendo e gestendo i permessi di "Allarmi e promemoria" necessari per notifiche esatte. L'applicazione rileva automaticamente se questi permessi non sono concessi e guida l'utente per abilitarli dalle impostazioni del sistema, assicurando che le notifiche arrivino puntualmente all'ora programmata.
 
+### Configurazione del Suono di Notifica (Android 8.0+)
+
+Sui dispositivi con Android 8.0 (API 26) o superiore, MedicApp offre accesso diretto alla configurazione del suono di notifica dalle impostazioni dell'applicazione. Questa funzionalità permette di personalizzare il suono, la vibrazione e altri parametri delle notifiche utilizzando i canali di notifica del sistema.
+
+L'opzione "Suono di notifica" appare nella schermata Impostazioni solo quando il dispositivo soddisfa i requisiti minimi della versione del sistema operativo. Nelle versioni precedenti ad Android 8.0, questa opzione viene nascosta automaticamente poiché il sistema non supporta la configurazione granulare dei canali di notifica.
+
 ---
 
 ## 10. Avvisi di Scorte Basse

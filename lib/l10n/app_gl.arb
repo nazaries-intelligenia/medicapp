@@ -1009,6 +1009,8 @@
   "settingsRestartDialogButton": "Entendido",
   "settingsLanguageTitle": "Idioma",
   "settingsLanguageSystem": "Predeterminado do sistema",
+  "settingsNotificationSoundTitle": "Ton de notificación",
+  "settingsNotificationSoundSubtitle": "Configurar son, vibración e máis",
   "settingsColorPaletteTitle": "Paleta de cores",
   "medicationStartsOn": "Comeza o {date}",
   "medicationFinishedOn": "Rematado o {date}",
@@ -1387,32 +1389,20 @@
   "afterTaking": "Despois de tomar",
   "basedOnActualDose": "Baseado en toma real",
   "basedOnSchedule": "Baseado en horario",
-  "today": "Hoxe {day}/{month}/{year}",
+  "today": "Hoxe {date}",
   "@today": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },
   "returnToToday": "Volver a hoxe",
-  "tomorrow": "Mañá {day}/{month}/{year}",
+  "tomorrow": "Mañá {date}",
   "@tomorrow": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },

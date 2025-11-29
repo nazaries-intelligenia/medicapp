@@ -1792,6 +1792,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsLanguageSystem => 'Systemstandard';
 
   @override
+  String get settingsNotificationSoundTitle => 'Benachrichtigungston';
+
+  @override
+  String get settingsNotificationSoundSubtitle =>
+      'Ton, Vibration und mehr konfigurieren';
+
+  @override
   String get settingsColorPaletteTitle => 'Farbpalette';
 
   @override
@@ -2170,16 +2177,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get basedOnSchedule => 'Basierend auf Zeitplan';
 
   @override
-  String today(int day, int month, int year) {
-    return 'Heute $day/$month/$year';
+  String today(String date) {
+    return 'Heute $date';
   }
 
   @override
   String get returnToToday => 'Zurück zu heute';
 
   @override
-  String tomorrow(int day, int month, int year) {
-    return 'Morgen $day/$month/$year';
+  String tomorrow(String date) {
+    return 'Morgen $date';
   }
 
   @override

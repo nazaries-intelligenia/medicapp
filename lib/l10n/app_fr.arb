@@ -1026,6 +1026,8 @@
   "settingsRestartDialogButton": "Compris",
   "settingsLanguageTitle": "Langue",
   "settingsLanguageSystem": "Par défaut du système",
+  "settingsNotificationSoundTitle": "Son de notification",
+  "settingsNotificationSoundSubtitle": "Configurer le son, la vibration et plus",
   "settingsColorPaletteTitle": "Palette de couleurs",
 
   "@_MEDICATION_LIST_SCREEN": {},
@@ -1372,32 +1374,20 @@
   "afterTaking": "Après avoir pris",
   "basedOnActualDose": "Basé sur la prise réelle",
   "basedOnSchedule": "Basé sur l'horaire",
-  "today": "Aujourd'hui {day}/{month}/{year}",
+  "today": "Aujourd'hui {date}",
   "@today": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },
   "returnToToday": "Retour à aujourd'hui",
-  "tomorrow": "Demain {day}/{month}/{year}",
+  "tomorrow": "Demain {date}",
   "@tomorrow": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },

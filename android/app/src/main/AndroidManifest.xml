@@ -50,6 +50,11 @@
         <!-- Receiver for handling scheduled notifications -->
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
+
+        <!-- Receiver for handling notification action buttons -->
+        <!-- Required for Register, Skip, and Snooze quick actions to work -->
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
@@ -60,6 +65,17 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Required for opening notification settings -->
+        <intent>
+            <action android:name="android.settings.APP_NOTIFICATION_SETTINGS"/>
+        </intent>
+        <intent>
+            <action android:name="android.settings.CHANNEL_NOTIFICATION_SETTINGS"/>
+        </intent>
+        <intent>
+            <action android:name="android.settings.APPLICATION_DETAILS_SETTINGS"/>
+            <data android:scheme="package"/>
         </intent>
     </queries>
 </manifest>

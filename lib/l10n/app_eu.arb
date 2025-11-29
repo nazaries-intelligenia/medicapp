@@ -1009,6 +1009,8 @@
   "settingsRestartDialogButton": "Ulertuta",
   "settingsLanguageTitle": "Hizkuntza",
   "settingsLanguageSystem": "Sistemaren lehenetsia",
+  "settingsNotificationSoundTitle": "Jakinarazpen-tonua",
+  "settingsNotificationSoundSubtitle": "Konfiguratu soinua, bibrazioa eta gehiago",
   "settingsColorPaletteTitle": "Kolore-paleta",
   "medicationStartsOn": "{date}(e)an hasten da",
   "medicationFinishedOn": "{date}(e)an amaitu da",
@@ -1387,32 +1389,20 @@
   "afterTaking": "Hartu ondoren",
   "basedOnActualDose": "Benetako dosiaren arabera",
   "basedOnSchedule": "Ordutegiaren arabera",
-  "today": "Gaur {day}/{month}/{year}",
+  "today": "Gaur {date}",
   "@today": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },
   "returnToToday": "Itzuli gaurrera",
-  "tomorrow": "Bihar {day}/{month}/{year}",
+  "tomorrow": "Bihar {date}",
   "@tomorrow": {
     "placeholders": {
-      "day": {
-        "type": "int"
-      },
-      "month": {
-        "type": "int"
-      },
-      "year": {
-        "type": "int"
+      "date": {
+        "type": "String"
       }
     }
   },

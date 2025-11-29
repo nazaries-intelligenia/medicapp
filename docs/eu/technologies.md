@@ -482,6 +482,40 @@ await intent.launch();
 
 ---
 
+### device_info_plus ^11.1.0
+
+**Erabilitako bertsioa:** `^11.1.0`
+
+**Helburua:**
+Plugin-a gailuaren informazioa lortzeko, Android SDK bertsioa, gailu modeloa eta plataformaren beste xehetasun batzuk barne. MedicApp-en Android bertsioa detektatzeko eta funtzionalitate espezifikoak gaitu/desgaitzeko erabiltzen da sistema eragilearen bertsioaren arabera.
+
+**MedicApp-en erabilera:**
+
+```dart
+import 'package:device_info_plus/device_info_plus.dart';
+
+// Gailuak jakinarazpen-kanalaren ezarpenak onartzen dituen egiaztatu
+static Future<bool> canOpenNotificationSettings() async {
+  if (!PlatformHelper.isAndroid) {
+    return false;
+  }
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+  // Android 8.0 (API 26) gutxienekoa da jakinarazpen-kanal ezarpenetarako
+  return androidInfo.version.sdkInt >= 26;
+}
+```
+
+**Erabilera kasuak:**
+
+1. **Android bertsioaren detekzioa:** Gailuak Android 8.0+ (API 26) exekutatzen duen egiaztatzea ahalbidetzen du jakinarazpen soinuaren konfigurazio aukera erakutsi edo ezkutatzeko, jakinarazpen kanalak onartzen dituzten bertsioetan soilik eskuragarri dagoena.
+
+2. **Baldintza funtzionalak:** Gailuaren gaitasunetan oinarritutako UI funtzionalitate espezifikoak gaitzen edo desgaitzen ditu.
+
+**Dokumentazio ofiziala:** https://pub.dev/packages/device_info_plus
+
+---
+
 ## 4. Lokalizazioa (i18n)
 
 ### flutter_localizations (SDK)
@@ -1684,6 +1718,7 @@ dependencies {
 | **timezone** | `^0.10.1` | Ordu-zonak | Jakinarazpenak |
 | **intl** | `^0.20.2` | Nazioartekotzea | i18n |
 | **android_intent_plus** | `^6.0.0` | Android Intent-ak | Baimenak |
+| **device_info_plus** | `^11.1.0` | Gailu informazioa | Plataforma |
 | **shared_preferences** | `^2.2.2` | Erabiltzailearen hobespenak | Iraunkortasuna |
 | **file_picker** | `^8.0.0+1` | Fitxategi hautatzailea | Fitxategiak |
 | **share_plus** | `^10.1.4` | Fitxategiak partekatu | Fitxategiak |
@@ -1695,9 +1730,9 @@ dependencies {
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Tresna (dev) |
 | **flutter_lints** | `^6.0.0` | Analisi estatikoa | Tresna (dev) |
 
-**Produkzioko mendekotasun osoa:** 15
+**Produkzioko mendekotasun osoa:** 16
 **Garapeneko mendekotasun osoa:** 4
-**Guztira:** 19
+**Guztira:** 20
 
 ---
 

@@ -480,6 +480,40 @@ await intent.launch();
 
 ---
 
+### device_info_plus ^11.1.0
+
+**Versión utilizada:** `^11.1.0`
+
+**Propósito:**
+Plugin para obtener información del dispositivo, incluyendo la versión del SDK de Android, modelo de dispositivo, y otros detalles de la plataforma. En MedicApp se utiliza para detectar la versión de Android y habilitar/deshabilitar funcionalidades específicas según la versión del sistema operativo.
+
+**Uso en MedicApp:**
+
+```dart
+import 'package:device_info_plus/device_info_plus.dart';
+
+// Verificar si el dispositivo soporta configuración de canales de notificación
+static Future<bool> canOpenNotificationSettings() async {
+  if (!PlatformHelper.isAndroid) {
+    return false;
+  }
+  final deviceInfo = DeviceInfoPlugin();
+  final androidInfo = await deviceInfo.androidInfo;
+  // Android 8.0 (API 26) es el mínimo para configurar canales de notificación
+  return androidInfo.version.sdkInt >= 26;
+}
+```
+
+**Casos de uso:**
+
+1. **Detección de versión de Android:** Permite verificar si el dispositivo ejecuta Android 8.0+ (API 26) para mostrar u ocultar la opción de configuración de tono de notificación, que solo está disponible en versiones que soportan canales de notificación.
+
+2. **Funcionalidades condicionales:** Habilita o deshabilita funcionalidades específicas de la UI basándose en las capacidades del dispositivo.
+
+**Documentación oficial:** https://pub.dev/packages/device_info_plus
+
+---
+
 ## 4. Localización (i18n)
 
 ### flutter_localizations (SDK)
@@ -1682,6 +1716,7 @@ dependencies {
 | **timezone** | `^0.10.1` | Zonas horarias | Notificaciones |
 | **intl** | `^0.20.2` | Internacionalización | i18n |
 | **android_intent_plus** | `^6.0.0` | Intenciones Android | Permisos |
+| **device_info_plus** | `^11.1.0` | Información del dispositivo | Plataforma |
 | **shared_preferences** | `^2.2.2` | Preferencias usuario | Persistencia |
 | **file_picker** | `^8.0.0+1` | Selector de archivos | Archivos |
 | **share_plus** | `^10.1.4` | Compartir archivos | Archivos |
@@ -1693,9 +1728,9 @@ dependencies {
 | **flutter_native_splash** | `^2.4.7` | Splash screen | Herramienta (dev) |
 | **flutter_lints** | `^6.0.0` | Análisis estático | Herramienta (dev) |
 
-**Total dependencias de producción:** 14
+**Total dependencias de producción:** 16
 **Total dependencias de desarrollo:** 4
-**Total:** 18
+**Total:** 20
 
 ---
 

@@ -274,6 +274,12 @@ Además, la configuración de ayuno permite decidir si se desean notificaciones 
 
 MedicApp está optimizado para Android 12 y versiones superiores, requiriendo y gestionando los permisos de "Alarmas y recordatorios" necesarios para notificaciones exactas. La aplicación detecta automáticamente si estos permisos no están concedidos y guía al usuario para habilitarlos desde la configuración del sistema, asegurando que las notificaciones lleguen puntualmente a la hora programada.
 
+### Configuración de Tono de Notificación (Android 8.0+)
+
+En dispositivos con Android 8.0 (API 26) o superior, MedicApp ofrece acceso directo a la configuración del tono de notificación desde los ajustes de la aplicación. Esta funcionalidad permite personalizar el sonido, vibración y otros parámetros de las notificaciones utilizando los canales de notificación del sistema.
+
+La opción "Tono de notificación" solo aparece en la pantalla de Ajustes cuando el dispositivo cumple los requisitos mínimos de versión del sistema operativo. En versiones anteriores a Android 8.0, esta opción se oculta automáticamente ya que el sistema no soporta la configuración granular de canales de notificación.
+
 ---
 
 ## 10. Alertas de Stock Bajo

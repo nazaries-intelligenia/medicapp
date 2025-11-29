@@ -274,6 +274,12 @@ Gainera, barazkaldiaren konfigurak hasiera baraualdi jakinarazpenak nahi diren a
 
 MedicApp Android 12 eta bertsio berriagorako optimizatua dago, jakinarazpen zehatzendako beharrezkoak diren "Alarmak eta oroigarriak" baimenak eskatuz eta kudeatuz. Aplikazioak automatikoki detektatzen du baimen hauek emanda ez badaude eta erabiltzailea gidatzen du sistemaoko ezarpenetatik gaitzeko, jakinarazpenak puntualki programatutako orduan iritsiko direla ziurtatuz.
 
+### Jakinarazpen Soinuaren Konfigurazioa (Android 8.0+)
+
+Android 8.0 (API 26) edo bertsio berriagoak dituzten gailuetan, MedicApp-ek jakinarazpen soinuaren konfiguraziora sarbide zuzena eskaintzen du aplikazioaren Ezarpenetatik. Funtzionalitate honek soinua, dardara eta jakinarazpenen beste parametro batzuk pertsonalizatzea ahalbidetzen du sistemaren jakinarazpen kanalak erabiliz.
+
+"Jakinarazpen soinua" aukera Ezarpenen pantailan soilik agertzen da gailuak sistema eragilearen gutxieneko bertsio baldintzak betetzen dituenean. Android 8.0 aurreko bertsioetan, aukera hau automatikoki ezkutatzen da sistemak jakinarazpen kanalen konfigurazio granularra onartzen ez duelako.
+
 ---
 
 ## 10. Stock Baxuko Alertak

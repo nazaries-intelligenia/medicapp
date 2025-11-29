@@ -11,6 +11,7 @@ import '../services/dose_history_service.dart';
 import '../services/snackbar_service.dart';
 import '../services/logger_service.dart';
 import '../utils/platform_helper.dart';
+import '../utils/date_formatter.dart';
 import 'medication_info_screen.dart';
 import 'edit_medication_menu_screen.dart';
 import 'medication_list/widgets/medication_card.dart';
@@ -193,7 +194,11 @@ class MedicationListScreenState extends State<MedicationListScreen>
       // This ensures notifications for today + tomorrow are always up to date
       NotificationService.instance.rescheduleAllMedicationNotifications();
 
-      // Reload data after settings change
+      // Always reload medications when returning from background
+      // This ensures UI reflects changes made from notification actions
+      _viewModel.loadMedications();
+
+      // Reload preferences (may trigger additional UI updates)
       reloadAfterSettingsChange();
     }
   }
@@ -1040,14 +1045,15 @@ class MedicationListScreenState extends State<MedicationListScreen>
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final selectedDay = DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day);
+    final formattedDate = DateFormatter.formatDate(_selectedDate);
 
-    // If it's today, show "Today, day/month/year"
+    // If it's today, show "Today, date"
     if (selectedDay == today) {
-      return l10n.today(_selectedDate.day, _selectedDate.month, _selectedDate.year);
+      return l10n.today(formattedDate);
     }
 
     // For other days, show only the date
-    return '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}';
+    return formattedDate;
   }
 
   Future<void> _showDatePickerDialog() async {

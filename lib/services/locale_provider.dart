@@ -53,18 +53,32 @@ class LocaleProvider extends ChangeNotifier {
   }
 
   /// Set the locale and persist the preference
-  Future<void> setLocale(Locale? locale) async {
+  Future<void> setLocale(Locale? locale, {Locale? deviceLocale}) async {
     _locale = locale;
     await PreferencesService.setLanguage(locale?.languageCode);
 
+    // Resolve the actual locale to use (handles null = system locale)
+    final resolvedLocale = locale ?? _resolveSystemLocale(deviceLocale);
+
     // Update LocalizationService for background services
-    if (locale != null) {
-      await LocalizationService.instance.setLocale(locale);
-      // Update DateFormatter with the locale
-      DateFormatter.setLocale(locale);
-    }
+    await LocalizationService.instance.setLocale(resolvedLocale);
+    // Update DateFormatter with the locale
+    DateFormatter.setLocale(resolvedLocale);
 
     notifyListeners();
+  }
+
+  /// Resolve system locale to a supported locale
+  Locale _resolveSystemLocale(Locale? deviceLocale) {
+    if (deviceLocale != null) {
+      for (final supportedLocale in AppLocalizations.supportedLocales) {
+        if (supportedLocale.languageCode == deviceLocale.languageCode) {
+          return supportedLocale;
+        }
+      }
+    }
+    // Fallback to English
+    return const Locale('en');
   }
 
   /// Resolve the locale to use based on preference and system locale
