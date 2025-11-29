@@ -247,7 +247,7 @@ class MedicationInfoForm extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: isSelected
                           ? type.getColor(context).withValues(alpha: 0.2)
-                          : Colors.transparent,
+                          : Theme.of(context).colorScheme.surface,
                       border: Border.all(
                         color: isSelected
                             ? type.getColor(context)

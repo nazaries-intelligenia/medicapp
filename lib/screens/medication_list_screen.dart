@@ -194,7 +194,11 @@ class MedicationListScreenState extends State<MedicationListScreen>
       // This ensures notifications for today + tomorrow are always up to date
       NotificationService.instance.rescheduleAllMedicationNotifications();
 
-      // Reload data after settings change
+      // Always reload medications when returning from background
+      // This ensures UI reflects changes made from notification actions
+      _viewModel.loadMedications();
+
+      // Reload preferences (may trigger additional UI updates)
       reloadAfterSettingsChange();
     }
   }

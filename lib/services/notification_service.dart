@@ -90,10 +90,22 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
           return;
         }
 
-        // Update stock
-        final newStock = medication.stockQuantity - doseQuantity;
-        final updatedMedication = medication.copyWith(stockQuantity: newStock);
-        await DatabaseHelper.instance.updateMedication(updatedMedication);
+        // Update medication with stock AND takenDosesToday
+        final updatedTakenDoses = List<String>.from(medication.takenDosesToday)
+          ..add(doseTime);
+        final updatedSkippedDoses = List<String>.from(medication.skippedDosesToday)
+          ..remove(doseTime);
+
+        final updatedMedication = medication.copyWith(
+          stockQuantity: medication.stockQuantity - doseQuantity,
+          takenDosesToday: updatedTakenDoses,
+          skippedDosesToday: updatedSkippedDoses,
+          takenDosesDate: now.toDateString(),
+        );
+        await DatabaseHelper.instance.updateMedicationForPerson(
+          medication: updatedMedication,
+          personId: personId,
+        );
 
         // Create history entry
         final historyEntry = DoseHistoryEntry(
@@ -115,6 +127,22 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
       case 'skip_dose':
         LoggerService.info('⏭️ Background: Skipping dose for ${medication.name}');
 
+        // Update medication with skippedDosesToday
+        final skipUpdatedSkipped = List<String>.from(medication.skippedDosesToday)
+          ..add(doseTime);
+        final skipUpdatedTaken = List<String>.from(medication.takenDosesToday)
+          ..remove(doseTime);
+
+        final skipUpdatedMedication = medication.copyWith(
+          skippedDosesToday: skipUpdatedSkipped,
+          takenDosesToday: skipUpdatedTaken,
+          takenDosesDate: now.toDateString(),
+        );
+        await DatabaseHelper.instance.updateMedicationForPerson(
+          medication: skipUpdatedMedication,
+          personId: personId,
+        );
+
         // Create skipped history entry
         final skippedEntry = DoseHistoryEntry(
           id: '${medication.id}_${now.millisecondsSinceEpoch}',
@@ -126,7 +154,7 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
               int.parse(doseTime.split(':')[0]), int.parse(doseTime.split(':')[1])),
           registeredDateTime: now,
           status: DoseStatus.skipped,
-          quantity: doseQuantity,
+          quantity: 0.0,
         );
         await DatabaseHelper.instance.insertDoseHistory(skippedEntry);
         LoggerService.info('✅ Background: Dose skipped successfully');

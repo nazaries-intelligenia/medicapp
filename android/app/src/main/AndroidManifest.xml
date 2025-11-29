@@ -50,6 +50,11 @@
         <!-- Receiver for handling scheduled notifications -->
         <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
             android:exported="false" />
+
+        <!-- Receiver for handling notification action buttons -->
+        <!-- Required for Register, Skip, and Snooze quick actions to work -->
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
