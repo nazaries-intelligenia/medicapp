@@ -55,6 +55,26 @@
         <!-- Required for Register, Skip, and Snooze quick actions to work -->
         <receiver android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
             android:exported="false" />
+
+        <!-- Home Screen Widget -->
+        <receiver
+            android:name=".MedicationWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.medicapp.medicapp.UPDATE_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/medication_widget_info" />
+        </receiver>
+
+        <!-- Widget ListView Service -->
+        <service
+            android:name=".MedicationWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

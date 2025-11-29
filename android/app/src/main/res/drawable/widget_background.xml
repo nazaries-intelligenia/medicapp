@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Widget background using DeepEmerald dark theme colors -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- DeepEmerald surface dark (#1E2623) with 90% opacity -->
+    <solid android:color="#E61E2623" />
+    <corners android:radius="16dp" />
+</shape>

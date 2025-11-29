@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MedicApp</string>
+    <string name="widget_name">Dosis del día</string>
+    <string name="widget_description">Muestra las dosis de medicamentos pendientes para hoy</string>
+    <string name="widget_empty">Sin dosis pendientes</string>
+    <string name="widget_today">Hoy</string>
+</resources>

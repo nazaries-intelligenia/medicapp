@@ -3,6 +3,7 @@ import '../models/medication.dart';
 import '../models/dose_history_entry.dart';
 import '../database/database_helper.dart';
 import '../services/notification_service.dart';
+import '../services/widget_service.dart';
 import '../utils/datetime_extensions.dart';
 
 /// Service for handling dose registration actions (taken, skipped, manual)
@@ -79,6 +80,9 @@ class DoseActionService {
     // Handle notifications (V19+: pass personId)
     await _handleTakenDoseNotifications(updatedMedication, doseTime, DateTime.now(), personId);
 
+    // Update home screen widget
+    await WidgetService.instance.updateWidget();
+
     return updatedMedication;
   }
 
@@ -141,6 +145,9 @@ class DoseActionService {
 
     // Handle notifications (V19+: pass personId)
     await _handleSkippedDoseNotifications(updatedMedication, doseTime, personId);
+
+    // Update home screen widget
+    await WidgetService.instance.updateWidget();
 
     return updatedMedication;
   }
@@ -236,6 +243,9 @@ class DoseActionService {
       );
     }
 
+    // Update home screen widget
+    await WidgetService.instance.updateWidget();
+
     return updatedMedication;
   }
 
@@ -319,6 +329,9 @@ class DoseActionService {
         personId: personId, // V19+: Pass personId
       );
     }
+
+    // Update home screen widget
+    await WidgetService.instance.updateWidget();
 
     return updatedMedication;
   }
