@@ -830,6 +830,65 @@ Cette considération ergonomique réduit la fatigue physique et rend l'applicati
 
 ---
 
+## 18. Widget d'Écran d'Accueil (Android)
+
+### Vue Rapide des Doses Quotidiennes
+
+MedicApp inclut un widget natif Android pour l'écran d'accueil qui permet de visualiser les doses programmées du jour actuel sans ouvrir l'application. Ce widget fournit des informations essentielles d'un coup d'œil, idéal pour les utilisateurs qui ont besoin d'un rappel visuel constant de leur médication.
+
+### Caractéristiques du Widget
+
+**Taille 2x2** : Le widget occupe un espace de 2x2 cellules sur l'écran d'accueil (environ 146x146dp), assez compact pour ne pas prendre trop de place mais avec des informations clairement lisibles.
+
+**Liste des Doses du Jour** : Affiche toutes les doses programmées pour le jour actuel, incluant :
+- Nom du médicament
+- Heure programmée de chaque dose
+- État visuel (en attente, prise ou sautée)
+
+**Indicateurs d'État** :
+- **Cercle vert rempli avec coche** : Dose déjà prise
+- **Cercle avec bordure verte** : Dose en attente
+- **Texte atténué** : Dose sautée ou déjà complétée
+
+**Compteur de Progression** : L'en-tête du widget affiche un compteur "X/Y" indiquant combien de doses ont été prises sur le total programmé pour la journée.
+
+### Intégration avec l'Application
+
+**Mise à Jour Automatique** : Le widget se met à jour automatiquement chaque fois que :
+- Une dose est enregistrée (prise, sautée ou extra)
+- Un médicament est ajouté ou modifié
+- Le jour change (à minuit)
+
+**Communication Flutter-Android** : L'intégration utilise un MethodChannel (`com.medicapp.medicapp/widget`) qui permet à l'application Flutter de notifier le widget natif lorsque les données changent.
+
+**Lecture Directe de Base de Données** : Le widget accède directement à la base de données SQLite de l'application pour obtenir les données de médicaments, assurant des informations actualisées même lorsque l'app n'est pas en cours d'exécution.
+
+### Thème Visuel DeepEmerald
+
+Le widget utilise la palette de couleurs DeepEmerald, le thème par défaut de MedicApp :
+
+- **Fond** : Vert foncé profond (#1E2623) avec 90% d'opacité
+- **Icônes et accents** : Vert clair (#81C784)
+- **Texte** : Blanc avec différents niveaux d'opacité selon l'état
+- **Diviseurs** : Vert clair avec transparence
+
+### Limitations Techniques
+
+**Android uniquement** : Le widget est une fonctionnalité native Android et n'est pas disponible sur iOS, web ou autres plateformes.
+
+**Personne par défaut** : Le widget affiche les doses de la personne configurée comme par défaut dans l'application.
+
+**Pas d'actions directes** : Pour l'instant, toucher le widget ouvre l'application principale. Les doses ne peuvent pas être enregistrées directement depuis le widget.
+
+### Fichiers Associés
+
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Fournisseur principal du widget
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Service pour la ListView du widget
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
+- `lib/services/widget_service.dart` - Service Flutter pour communication avec le widget
+
+---
+
 ## Intégration des Fonctionnalités
 
 Toutes ces caractéristiques ne fonctionnent pas de manière isolée, mais sont profondément intégrées pour créer une expérience cohésive. Par exemple :

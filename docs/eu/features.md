@@ -698,6 +698,62 @@ Sistema honek ziurtatzen du MedicApp erabiltzaile guztientzat erabilgarria dela,
 
 ---
 
+## 18. Hasiera-Pantailako Widget-a (Android)
+
+### Deskribapena
+Android-en hasiera-pantailarako widget natiboa, eguneko dosien ikuspegi azkarra eskaintzen duena.
+
+### Ezaugarri Nagusiak
+
+#### 18.1. Eguneko Dosien Ikuspegi Azkarra
+**2x2 Tamaina**: Widget-ak 2x2 gelaxkako lekua hartzen du hasiera-pantailan (gutxi gorabehera 146x146dp).
+
+**Eguneko Dosien Zerrenda**: Eguneko programatutako dosi guztiak erakusten ditu:
+- Sendagaiaren izena
+- Dosi bakoitzaren programatutako ordua
+- Egoera bisuala (zain, hartua edo omititua)
+
+**Egoera Adierazleak**:
+- **Berdez betetako zirkulua egiaztapen-marka batekin**: Jada hartutako dosia
+- **Ertz berdea duen zirkulua**: Zain dagoen dosia
+- **Testu ahuldua**: Omititutako edo jada amaitutako dosia
+
+**Progresio Kontagailua**: Widget-aren goiburuan "X/Y" kontagailua erakusten da, egunerako programatutako guztietatik zenbat dosi hartu diren adieraziz.
+
+#### 18.2. Aplikazioarekin Integrazioa
+**Eguneratze Automatikoa**: Widget-a automatikoki eguneratzen da:
+- Dosia erregistratzen denean (hartua, omititua edo gehigarria)
+- Sendagaia gehitu edo aldatzen denean
+- Eguna aldatzen denean (gauerdian)
+
+**Flutter-Android Komunikazioa**: Integrazioak MethodChannel (`com.medicapp.medicapp/widget`) erabiltzen du Flutter aplikazioak widget natiboari datu-aldaketez jakinarazteko.
+
+**Datu-Baseari Zuzeneko Sarbidea**: Widget-ak zuzenean atzitzen du aplikazioaren SQLite datu-basea sendagaien datuak lortzeko, informazio eguneratua ziurtatuz aplikazioa martxan ez dagoenean ere.
+
+#### 18.3. DeepEmerald Gai Bisuala
+Widget-ak DeepEmerald kolore-paleta erabiltzen du, MedicApp-en gai lehenetsia:
+
+- **Hondoa**: Berde ilun sakona (#1E2623) %90eko opakutasunarekin
+- **Ikonoak eta azentuak**: Berde argia (#81C784)
+- **Testua**: Zuria opakutasun-maila ezberdinekin egoeraren arabera
+- **Bereizleak**: Berde argia gardentasunarekin
+
+#### 18.4. Muga Teknikoak
+**Android bakarrik**: Widget-a Android funtzionalitate natiboa da eta ez dago iOS, web edo beste plataformetan eskuragarri.
+
+**Pertsona lehenetsia**: Widget-ak aplikazioan lehenetsi gisa konfiguratutako pertsonaren dosiak erakusten ditu. Ezin da pertsona desberdinak zuzenean widget-etik hautatu.
+
+**Zuzeneko ekintzarik gabe**: Gaur egun, widget-a ukitzeak aplikazio nagusia irekitzen du. Ezin dira dosiak zuzenean widget-etik erregistratu (etorkizuneko bertsioetan gehitu daiteke).
+
+#### 18.5. Lotutako Fitxategiak
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Widget-aren hornitzaile nagusia
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Widget-aren ListView-rako zerbitzua
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Diseinu nagusia
+- `android/app/src/main/res/xml/medication_widget_info.xml` - Widget-aren konfigurazioa
+- `lib/services/widget_service.dart` - Flutter zerbitzua widget-arekin komunikatzeko
+
+---
+
 ## Funtzionalitaten Integrazioa
 
 Ezaugarri hauek guztiak ez dira isolatuki funtzionatzen, esperientzia koherentea sortzeko sakonki integratuak daude baizik. Adibidez:
