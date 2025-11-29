@@ -22,6 +22,138 @@ import 'notifications/fasting_notification_scheduler.dart';
 import 'notifications/notification_cancellation_manager.dart';
 import 'logger_service.dart';
 
+/// Top-level function to handle notification actions in background
+/// This MUST be a top-level function (not a class method) for background execution
+@pragma('vm:entry-point')
+void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
+  LoggerService.info('🔔 Background notification action: ${response.actionId}');
+  LoggerService.info('   Payload: ${response.payload}');
+
+  if (response.payload == null || response.payload!.isEmpty) {
+    LoggerService.info('No payload in background notification');
+    return;
+  }
+
+  // Only process if there's an action (not just a tap)
+  if (response.actionId == null || response.actionId!.isEmpty) {
+    LoggerService.info('No action ID, ignoring background response');
+    return;
+  }
+
+  // Parse payload: "medicationId|doseIndexOrTime|personId"
+  final parts = response.payload!.split('|');
+  if (parts.length != 3) {
+    LoggerService.warning('Invalid payload format: ${response.payload}');
+    return;
+  }
+
+  final medicationId = parts[0];
+  final doseIndexStr = parts[1];
+  final personId = parts[2];
+
+  try {
+    // Initialize database if needed (background isolate may not have it)
+    await DatabaseHelper.instance.database;
+
+    // Get medication
+    final medications = await DatabaseHelper.instance.getMedicationsForPerson(personId);
+    final medication = medications.where((m) => m.id == medicationId).firstOrNull;
+
+    if (medication == null) {
+      LoggerService.warning('❌ Background: Medication not found');
+      return;
+    }
+
+    // Parse dose time
+    String doseTime;
+    if (doseIndexStr.contains(':')) {
+      doseTime = doseIndexStr;
+    } else {
+      final doseIndex = int.tryParse(doseIndexStr);
+      if (doseIndex == null || doseIndex >= medication.doseTimes.length) {
+        LoggerService.warning('❌ Background: Invalid dose index');
+        return;
+      }
+      doseTime = medication.doseTimes[doseIndex];
+    }
+
+    final doseQuantity = medication.getDoseQuantity(doseTime);
+    final now = DateTime.now();
+
+    switch (response.actionId) {
+      case 'register_dose':
+        LoggerService.info('✅ Background: Registering dose for ${medication.name}');
+
+        // Check stock
+        if (medication.stockQuantity < doseQuantity) {
+          LoggerService.warning('❌ Background: Insufficient stock');
+          return;
+        }
+
+        // Update stock
+        final newStock = medication.stockQuantity - doseQuantity;
+        final updatedMedication = medication.copyWith(stockQuantity: newStock);
+        await DatabaseHelper.instance.updateMedication(updatedMedication);
+
+        // Create history entry
+        final historyEntry = DoseHistoryEntry(
+          id: '${medication.id}_${now.millisecondsSinceEpoch}',
+          medicationId: medication.id,
+          medicationName: medication.name,
+          medicationType: medication.type,
+          personId: personId,
+          scheduledDateTime: DateTime(now.year, now.month, now.day,
+              int.parse(doseTime.split(':')[0]), int.parse(doseTime.split(':')[1])),
+          registeredDateTime: now,
+          status: DoseStatus.taken,
+          quantity: doseQuantity,
+        );
+        await DatabaseHelper.instance.insertDoseHistory(historyEntry);
+        LoggerService.info('✅ Background: Dose registered successfully');
+        break;
+
+      case 'skip_dose':
+        LoggerService.info('⏭️ Background: Skipping dose for ${medication.name}');
+
+        // Create skipped history entry
+        final skippedEntry = DoseHistoryEntry(
+          id: '${medication.id}_${now.millisecondsSinceEpoch}',
+          medicationId: medication.id,
+          medicationName: medication.name,
+          medicationType: medication.type,
+          personId: personId,
+          scheduledDateTime: DateTime(now.year, now.month, now.day,
+              int.parse(doseTime.split(':')[0]), int.parse(doseTime.split(':')[1])),
+          registeredDateTime: now,
+          status: DoseStatus.skipped,
+          quantity: doseQuantity,
+        );
+        await DatabaseHelper.instance.insertDoseHistory(skippedEntry);
+        LoggerService.info('✅ Background: Dose skipped successfully');
+        break;
+
+      case 'snooze_dose':
+        LoggerService.info('⏰ Background: Snoozing dose for ${medication.name}');
+        // Snooze needs to reschedule - this is handled by the foreground service
+        // Store the snooze request for when the app opens
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('pending_snooze', '${medication.id}|$doseTime|$personId|${response.id}');
+        LoggerService.info('✅ Background: Snooze request stored');
+        break;
+
+      default:
+        LoggerService.warning('⚠️ Background: Unknown action ${response.actionId}');
+    }
+
+    // Cancel the notification after action
+    final notificationsPlugin = fln.FlutterLocalNotificationsPlugin();
+    await notificationsPlugin.cancel(response.id ?? 0);
+
+  } catch (e) {
+    LoggerService.error('❌ Background action error: $e', e);
+  }
+}
+
 class NotificationService {
   // Singleton pattern
   static final NotificationService instance = NotificationService._init();
@@ -175,6 +307,7 @@ class NotificationService {
     await _notificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
+      onDidReceiveBackgroundNotificationResponse: onBackgroundNotificationResponse,
     );
 
     // Create notification channels explicitly (Android 8.0+)
@@ -218,6 +351,37 @@ class NotificationService {
       await androidPlugin.createNotificationChannel(fastingChannel);
 
       LoggerService.info('✅ Notification channels created successfully');
+    }
+  }
+
+  /// Process any pending snooze requests from background actions
+  Future<void> processPendingSnooze() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final pendingSnooze = prefs.getString('pending_snooze');
+
+      if (pendingSnooze != null && pendingSnooze.isNotEmpty) {
+        LoggerService.info('⏰ Processing pending snooze: $pendingSnooze');
+
+        final parts = pendingSnooze.split('|');
+        if (parts.length == 4) {
+          final medicationId = parts[0];
+          final doseTime = parts[1];
+          final personId = parts[2];
+          final notificationId = int.tryParse(parts[3]) ?? 0;
+
+          final medication = await _getMedicationForPerson(medicationId, personId);
+          if (medication != null) {
+            await _snoozeDoseNotification(medication, doseTime, personId, notificationId);
+            LoggerService.info('✅ Pending snooze processed successfully');
+          }
+        }
+
+        // Clear the pending snooze
+        await prefs.remove('pending_snooze');
+      }
+    } catch (e) {
+      LoggerService.error('❌ Error processing pending snooze: $e', e);
     }
   }
 
@@ -841,6 +1005,9 @@ class NotificationService {
   /// Should be called after the app is fully initialized
   /// V19+: Now includes personId handling
   Future<void> processPendingNotification() async {
+    // First, process any pending snooze from background actions
+    await processPendingSnooze();
+
     if (_pendingMedicationId != null &&
         _pendingDoseTime != null &&
         _pendingPersonId != null) {
