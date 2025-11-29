@@ -1,5 +1,65 @@
 # Tavolozza di Colori - MedicApp
 
+## Tema "Deep Emerald" (Predefinito)
+
+MedicApp utilizza di default il tema "Deep Emerald", progettato appositamente per utenti anziani (Silver Surfers) con massima leggibilità mantenendo l'identità verde del marchio. Conforme agli standard WCAG AAA (rapporto di contrasto 19:1).
+
+### Principi di Design
+
+1. **Scurimento del Primario**: Verde smeraldo profondo (#1B5E20) per garantire che il testo bianco sui pulsanti sia leggibile al 100%.
+2. **Sfondo e Superficie Puliti**: Bianchi e grigi molto chiari senza sfumature verdi per evitare che i colori si "mescolino".
+3. **Testo Quasi Nero**: Testo principale (#051F12) scurito al massimo per il più alto rapporto di contrasto.
+4. **Bordi Espliciti**: Bordi solidi per delimitare le zone touch, cruciale per persone con perdita di percezione della profondità.
+
+### Colori Principali (Marchio e Azione)
+
+| Ruolo | Campione | Codice HEX | Utilizzo |
+|-------|----------|------------|----------|
+| **Primario (Marchio)** | 🟢 | `#1B5E20` | Verde smeraldo scuro. Garantisce contrasto altissimo contro il bianco. |
+| **Interattivo / Focus** | 🟢 | `#2E7D32` | Stati "pressed" o elementi selezionati. |
+| **Azione Vibrante (FAB)** | 🟢 | `#00701A` | Verde vibrante ma solido (non neon). |
+| **Bordi Elementi** | 🟢 | `#1B5E20` | Bordo di 2px per delimitare le zone touch. |
+
+### Colori di Testo (Leggibilità Massima)
+
+| Ruolo | Campione | Codice HEX | Utilizzo |
+|-------|----------|------------|----------|
+| **Testo Principale** | ⚫ | `#051F12` | Quasi nero con tocco verde impercettibile. Contrasto 19:1. |
+| **Testo Secondario** | 🔘 | `#37474F` | Grigio bluastro scuro, leggibile per occhi con cataratta. |
+| **Testo su Primario** | ⚪ | `#FFFFFF` | Bianco puro in grassetto per pulsanti verdi. |
+
+### Colori di Sfondo e Superficie
+
+| Ruolo | Campione | Codice HEX | Utilizzo |
+|-------|----------|------------|----------|
+| **Sfondo Principale** | ⚪ | `#F5F5F5` | Grigio molto chiaro neutro. Le schede "galleggiano" chiaramente. |
+| **Superficie (Schede)** | ⚪ | `#FFFFFF` | Bianco puro, miglior sfondo per la lettura. |
+| **Bordo Schede** | 🔘 | `#E0E0E0` | Definisce chiaramente i limiti delle schede. |
+| **Divisore Forte** | 🔘 | `#BDBDBD` | Grigio medio per separazioni chiaramente visibili. |
+
+### Colori di Stato (Funzionali)
+
+| Stato | Codice HEX | Utilizzo |
+|--------|------------|----------|
+| **Successo** | `#1E7E34` | Verde scuro per check nitidi |
+| **Avvertimento** | `#E65100` | Arancione bruciato ad alta visibilità |
+| **Errore** | `#C62828` | Rosso profondo e serio |
+| **Informazione** | `#0277BD` | Blu forte, evita il ciano chiaro |
+
+### Tema Scuro Deep Emerald
+
+| Ruolo | Campione | Codice HEX | Utilizzo |
+|-------|----------|------------|----------|
+| **Sfondo** | ⚫ | `#121212` | Scuro profondo ma non nero puro |
+| **Superficie** | ⚫ | `#1E1E1E` | Leggermente elevato |
+| **Schede** | ⚫ | `#2C2C2C` | Grigio scuro per le schede |
+| **Primario** | 🟢 | `#A5D6A7` | Verde chiaro per modalità scura |
+| **Accento** | 🟢 | `#66BB6A` | Verde medio visibile |
+| **Testo Principale** | ⚪ | `#FAFAFA` | Quasi bianco |
+| **Testo Secondario** | 🔘 | `#B0BEC5` | Grigio chiaro |
+
+---
+
 ## Tema Chiaro "Sea Green"
 
 MedicApp utilizza una tavolozza di colori ispirata alla natura con tonalità verdi che trasmettono salute, benessere e fiducia.

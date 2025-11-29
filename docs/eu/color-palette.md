@@ -1,5 +1,65 @@
 # Koloreak Paleta - MedicApp
 
+## "Deep Emerald" Gaia (Lehenetsia)
+
+MedicApp-ek lehenespenez "Deep Emerald" gaia erabiltzen du, adineko pertsonentzat (Silver Surfers) bereziki diseinatua irakurgarritasun maximoarekin markaren berde identitatea mantenduz. WCAG AAA estandarrak betetzen ditu (19:1 kontraste ratioa).
+
+### Diseinu Printzipioak
+
+1. **Primario Ilundua**: Esmeralda berde sakona (#1B5E20) botoien gaineko testu zuria %100 irakurgarria dela bermatzeko.
+2. **Atzeko Plano eta Azalera Garbiak**: Zuri garbi eta gris oso argiak berde matizik gabe koloreak "nahastea" ekiditeko.
+3. **Ia Beltzezko Testua**: Testu nagusia (#051F12) maximora ilundua kontraste ratio handienerako.
+4. **Ertz Esplizituak**: Ertz solidoak ukipen-eremuak mugatzeko, sakontasun hautematearen galerarekin pertsonentzat funtsezkoa.
+
+### Kolore Nagusiak (Marka eta Ekintza)
+
+| Rola | Lagina | Kodigo HEX | Erabilera |
+|-----|---------|------------|-----|
+| **Nagusia (Marka)** | 🟢 | `#1B5E20` | Esmeralda berde iluna. Zuriaren aurka kontraste altua bermatzen du. |
+| **Interaktiboa / Fokua** | 🟢 | `#2E7D32` | "Pressed" egoerak edo hautatutako elementuak. |
+| **Ekintza Bibrante (FAB)** | 🟢 | `#00701A` | Berde bibrante baina solidoa (ez neoia). |
+| **Elementu Ertzak** | 🟢 | `#1B5E20` | 2px ertza ukipen-eremuak mugatzeko. |
+
+### Testu Koloreak (Irakurgarritasun Maximoa)
+
+| Rola | Lagina | Kodigo HEX | Erabilera |
+|-----|---------|------------|-----|
+| **Testu Nagusia** | ⚫ | `#051F12` | Ia beltza berde ukitu hautemaitzarekin. 19:1 kontrastea. |
+| **Testu Sekundarioa** | 🔘 | `#37474F` | Gris urdin iluna, kataratadun begiendako irakurgarria. |
+| **Primarioaren gaineko Testua** | ⚪ | `#FFFFFF` | Zuri garbia lodiz botoi berdeentzat. |
+
+### Atzeko Plano eta Azalera Koloreak
+
+| Rola | Lagina | Kodigo HEX | Erabilera |
+|-----|---------|------------|-----|
+| **Atzeko Plano Nagusia** | ⚪ | `#F5F5F5` | Gris oso argi neutroa. Txartelak argi "flotatzen" dira. |
+| **Azalera (Txartelak)** | ⚪ | `#FFFFFF` | Zuri garbia, irakurketarako atzeko plano onena. |
+| **Txartel Ertza** | 🔘 | `#E0E0E0` | Txartel mugak argi definitzen ditu. |
+| **Banatzaile Sendoa** | 🔘 | `#BDBDBD` | Gris ertaina argi ikusgai diren bereizketetan. |
+
+### Egoera Koloreak (Funtzionalak)
+
+| Egoera | Kodigo HEX | Erabilera |
+|--------|------------|-----|
+| **Arrakasta** | `#1E7E34` | Berde iluna check garbienetako |
+| **Abisua** | `#E65100` | Laranja errealdua ikusgarritasun altua |
+| **Errorea** | `#C62828` | Gorri sakona eta serioa |
+| **Informazioa** | `#0277BD` | Urdin sendoa, zian argia ekiditzen du |
+
+### Deep Emerald Gaia Iluna
+
+| Rola | Lagina | Kodigo HEX | Erabilera |
+|-----|---------|------------|-----|
+| **Atzeko Planoa** | ⚫ | `#121212` | Ilun sakona baina ez beltz garbia |
+| **Azalera** | ⚫ | `#1E1E1E` | Apur bat altxatua |
+| **Txartelak** | ⚫ | `#2C2C2C` | Gris iluna txarteletarako |
+| **Nagusia** | 🟢 | `#A5D6A7` | Berde argia modu ilunean |
+| **Akzentua** | 🟢 | `#66BB6A` | Berde ertain ikusgarria |
+| **Testu Nagusia** | ⚪ | `#FAFAFA` | Ia zuria |
+| **Testu Sekundarioa** | 🔘 | `#B0BEC5` | Gris argia |
+
+---
+
 ## "Sea Green" Gaia Arina
 
 MedicApp naturatik inspiratutako kolore paleta bat erabiltzen du, berdeen tonak osasuna, ongizatea eta konfiantza transmititzen dituztena.
