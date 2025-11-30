@@ -506,6 +506,36 @@ abstract class AppLocalizations {
   /// **'Según necesidad'**
   String get durationAsNeeded;
 
+  /// No description provided for @durationEveryDay.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los días'**
+  String get durationEveryDay;
+
+  /// No description provided for @durationUntilFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Hasta terminar'**
+  String get durationUntilFinished;
+
+  /// No description provided for @durationSpecificDatesCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} {count, plural, =1{fecha específica} other{fechas específicas}}'**
+  String durationSpecificDatesCount(int count);
+
+  /// No description provided for @durationWeeklyDaysCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} {count, plural, =1{día} other{días}} por semana'**
+  String durationWeeklyDaysCount(int count);
+
+  /// No description provided for @durationEveryNDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada {days} días'**
+  String durationEveryNDays(int days);
+
   /// No description provided for @mainScreenTitle.
   ///
   /// In es, this message translates to:
@@ -3207,7 +3237,7 @@ abstract class AppLocalizations {
   /// No description provided for @pendingDose.
   ///
   /// In es, this message translates to:
-  /// **'⚠️ Dosis pendiente: {time}'**
+  /// **'Dosis pendiente: {time}'**
   String pendingDose(String time);
 
   /// No description provided for @nextDoseTomorrow.

@@ -80,6 +80,26 @@
   "durationContinuous": "Continuous",
   "durationSpecificDates": "Specific Dates",
   "durationAsNeeded": "As Needed",
+  "durationEveryDay": "Every day",
+  "durationUntilFinished": "Until finished",
+  "durationSpecificDatesCount": "{count} specific {count, plural, =1{date} other{dates}}",
+  "@durationSpecificDatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationWeeklyDaysCount": "{count} {count, plural, =1{day} other{days}} per week",
+  "@durationWeeklyDaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationEveryNDays": "Every {days} days",
+  "@durationEveryNDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
 
   "@_MAIN_SCREEN": {},
   "mainScreenTitle": "My Medications",
@@ -571,7 +591,7 @@
   "debugMenuActivated": "Debug menu activated",
   "debugMenuDeactivated": "Debug menu deactivated",
   "nextDoseAt": "Next dose: {time}",
-  "pendingDose": "⚠️ Pending dose: {time}",
+  "pendingDose": "Pending dose: {time}",
   "nextDoseTomorrow": "Next dose: tomorrow at {time}",
   "nextDoseOnDay": "Next dose: {dayName} {day}/{month} at {time}",
   "dayNameMon": "Mon",

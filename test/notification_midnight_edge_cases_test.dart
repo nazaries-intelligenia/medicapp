@@ -260,8 +260,8 @@ void main() {
       expect(resultMed?.fastingType, 'after');
       expect(resultMed?.fastingDurationMinutes, 120);
 
-      // Verify fasting end time would be after midnight
-      expect(fastingEndTime.day, greaterThan(doseTime.day),
+      // Verify fasting end time would be after midnight (use isAfter for month boundary safety)
+      expect(fastingEndTime.isAfter(doseTime), isTrue,
           reason: 'Fasting period should cross into next day');
       expect(fastingEndTime.hour, 1,
           reason: 'Fasting should end at 01:00 next day');
@@ -388,8 +388,8 @@ void main() {
       // Act - Schedule notification (in test mode, simulated)
       await service.scheduleMedicationNotifications(medication, personId: personId);
 
-      // Assert - Verify times cross midnight
-      expect(postponedTime.day, greaterThan(originalTime.day),
+      // Assert - Verify times cross midnight (use isAfter for month boundary safety)
+      expect(postponedTime.isAfter(originalTime), isTrue,
           reason: 'Postponed time should be next day');
       expect(postponedTime.hour, 0, reason: 'Should be 00:00');
       expect(postponedTime.minute, 0, reason: 'Should be 00:00');
@@ -429,7 +429,8 @@ void main() {
 
       // Second postpone: 23:55 + 10min = 00:05 (next day)
       final secondPostpone = firstPostpone.add(const Duration(minutes: 10));
-      expect(secondPostpone.day, greaterThan(originalTime.day));
+      expect(secondPostpone.isAfter(originalTime), isTrue,
+          reason: 'Second postpone should be after original time (next day)');
       expect(secondPostpone.hour, 0);
       expect(secondPostpone.minute, 5);
 

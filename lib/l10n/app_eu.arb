@@ -78,8 +78,28 @@
 
   "@_TREATMENT_DURATION": {},
   "durationContinuous": "Etengabea",
-  "durationSpecificDates": "Fechas zehatzak",
-  "durationAsNeeded": "Según beharren arabera",
+  "durationSpecificDates": "Data zehatzak",
+  "durationAsNeeded": "Beharren arabera",
+  "durationEveryDay": "Egunero",
+  "durationUntilFinished": "Amaitu arte",
+  "durationSpecificDatesCount": "{count} data {count, plural, =1{zehatza} other{zehatz}}",
+  "@durationSpecificDatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationWeeklyDaysCount": "{count} {count, plural, =1{egun} other{egun}} astean",
+  "@durationWeeklyDaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationEveryNDays": "{days} egunero",
+  "@durationEveryNDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
 
   "@_MAIN_SCREEN": {},
   "mainScreenTitle": "Nire medikamentuak",
@@ -1060,7 +1080,7 @@
       }
     }
   },
-  "pendingDose": "⚠️ Dosi zain: {time}",
+  "pendingDose": "Dosi zain: {time}",
   "@pendingDose": {
     "placeholders": {
       "time": {

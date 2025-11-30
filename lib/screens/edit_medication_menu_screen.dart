@@ -85,7 +85,7 @@ class EditMedicationMenuScreen extends StatelessWidget {
               EditMenuOption(
                 icon: Icons.calendar_today,
                 title: l10n.editMedicationMenuDuration,
-                subtitle: medication.durationDisplayText,
+                subtitle: medication.getDurationDisplayText(l10n),
                 color: Colors.green,
                 onTap: () async {
                   final result = await Navigator.push(

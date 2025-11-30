@@ -80,6 +80,26 @@
   "durationContinuous": "Continuo",
   "durationSpecificDates": "Date specifiche",
   "durationAsNeeded": "Al bisogno",
+  "durationEveryDay": "Ogni giorno",
+  "durationUntilFinished": "Fino ad esaurimento",
+  "durationSpecificDatesCount": "{count} {count, plural, =1{data specifica} other{date specifiche}}",
+  "@durationSpecificDatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationWeeklyDaysCount": "{count} {count, plural, =1{giorno} other{giorni}} a settimana",
+  "@durationWeeklyDaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationEveryNDays": "Ogni {days} giorni",
+  "@durationEveryNDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
 
   "@_MAIN_SCREEN": {},
   "mainScreenTitle": "I Miei Farmaci",
@@ -1045,7 +1065,7 @@
       }
     }
   },
-  "pendingDose": "⚠️ Dose in sospeso: {time}",
+  "pendingDose": "Dose in sospeso: {time}",
   "@pendingDose": {
     "placeholders": {
       "time": {
