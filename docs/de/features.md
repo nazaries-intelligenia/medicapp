@@ -1058,7 +1058,7 @@ void main() {
 flutter test --coverage
 
 # Aktuelle Abdeckung
-Total: 432+ Tests
+Total: 601+ Tests
 Abdeckung: 75-80%
 - Models: ~90%
 - Services: ~80%
@@ -1511,6 +1511,62 @@ ListTile(
 
 ---
 
+## 16. Home-Screen-Widget (Android)
+
+### Beschreibung
+Natives Android-Widget für den Startbildschirm, das eine schnelle Übersicht über die täglichen Dosen ermöglicht.
+
+### Hauptmerkmale
+
+#### 16.1. Schnellansicht der täglichen Dosen
+**2x2 Größe**: Das Widget nimmt einen 2x2-Zellen-Platz auf dem Startbildschirm ein (ca. 146x146dp).
+
+**Tagesdosenliste**: Zeigt alle für den aktuellen Tag geplanten Dosen an:
+- Medikamentenname
+- Geplante Zeit für jede Dosis
+- Visueller Status (ausstehend, genommen oder ausgelassen)
+
+**Statusanzeigen**:
+- **Gefüllter grüner Kreis mit Häkchen**: Bereits genommene Dosis
+- **Kreis mit grünem Rand**: Ausstehende Dosis
+- **Gedämpfter Text**: Ausgelassene oder bereits abgeschlossene Dosis
+
+**Fortschrittszähler**: Im Widget-Header wird ein "X/Y"-Zähler angezeigt, der angibt, wie viele Dosen von den insgesamt für den Tag geplanten genommen wurden.
+
+#### 16.2. Integration mit der Anwendung
+**Automatische Aktualisierung**: Das Widget aktualisiert sich automatisch, wenn:
+- Eine Dosis registriert wird (genommen, ausgelassen oder extra)
+- Ein Medikament hinzugefügt oder geändert wird
+- Der Tag wechselt (um Mitternacht)
+
+**Flutter-Android-Kommunikation**: Die Integration verwendet einen MethodChannel (`com.medicapp.medicapp/widget`), der es der Flutter-Anwendung ermöglicht, das native Widget über Datenänderungen zu benachrichtigen.
+
+**Direkter Datenbankzugriff**: Das Widget greift direkt auf die SQLite-Datenbank der Anwendung zu, um Medikamentendaten zu erhalten und so aktualisierte Informationen sicherzustellen, auch wenn die App nicht läuft.
+
+#### 16.3. DeepEmerald Visuelles Theme
+Das Widget verwendet die DeepEmerald-Farbpalette, das Standard-Theme von MedicApp:
+
+- **Hintergrund**: Tiefes dunkles Grün (#1E2623) mit 90% Deckkraft
+- **Symbole und Akzente**: Hellgrün (#81C784)
+- **Text**: Weiß mit verschiedenen Deckkraftstufen je nach Status
+- **Trenner**: Hellgrün mit Transparenz
+
+#### 16.4. Technische Einschränkungen
+**Nur Android**: Das Widget ist eine native Android-Funktionalität und ist nicht auf iOS, Web oder anderen Plattformen verfügbar.
+
+**Standardperson**: Das Widget zeigt die Dosen für die in der Anwendung als Standard konfigurierte Person an. Es ist nicht möglich, direkt aus dem Widget verschiedene Personen auszuwählen.
+
+**Keine direkten Aktionen**: Derzeit öffnet das Tippen auf das Widget die Hauptanwendung. Dosen können nicht direkt aus dem Widget registriert werden (dies kann in zukünftigen Versionen hinzugefügt werden).
+
+#### 16.5. Verwandte Dateien
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Hauptwidget-Provider
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Service für die ListView des Widgets
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Hauptlayout
+- `android/app/src/main/res/xml/medication_widget_info.xml` - Widget-Konfiguration
+- `lib/services/widget_service.dart` - Flutter-Service für die Kommunikation mit dem Widget
+
+---
+
 ## Zukünftige Funktionen
 
 ### In Planung
@@ -1520,8 +1576,7 @@ ListTile(
 4. **Interaktionen zwischen Medikamenten**: Warnungen bei Interaktionen
 5. **Erinnerungen zum Nachfüllen**: Automatische Erinnerungen zum Nachfüllen
 6. **Biometrische Authentifizierung**: Schutz sensibler Daten
-7. **Widgets**: Home-Screen-Widgets für schnellen Zugriff
-8. **Smartwatch-Integration**: Benachrichtigungen auf Wearables
+7. **Smartwatch-Integration**: Benachrichtigungen auf Wearables
 
 ---
 

@@ -537,6 +537,65 @@ Aquesta consideració ergonòmica redueix la fatiga física i fa que l'app sigui
 
 ---
 
+## 18. Widget de Pantalla d'Inici (Android)
+
+### Vista Ràpida de Dosis Diàries
+
+MedicApp inclou un widget natiu d'Android per a la pantalla d'inici que permet visualitzar les dosis programades del dia actual sense obrir l'aplicació. Aquest widget proporciona informació essencial d'un cop d'ull, ideal per a usuaris que necessiten un recordatori visual constant de la seva medicació.
+
+### Característiques del Widget
+
+**Mida 2x2**: El widget ocupa un espai de 2x2 cel·les a la pantalla d'inici (aproximadament 146x146dp), prou compacte per no ocupar massa espai però amb informació clarament llegible.
+
+**Llista de Dosis del Dia**: Mostra totes les dosis programades per al dia actual, incloent:
+- Nom del medicament
+- Hora programada de cada dosi
+- Estat visual (pendent, presa o omesa)
+
+**Indicadors d'Estat**:
+- **Cercle verd ple amb marca**: Dosi ja presa
+- **Cercle amb vora verda**: Dosi pendent
+- **Text atenuat**: Dosi omesa o ja completada
+
+**Comptador de Progrés**: A la capçalera del widget es mostra un comptador "X/Y" indicant quantes dosis s'han pres del total programat per al dia.
+
+### Integració amb l'Aplicació
+
+**Actualització Automàtica**: El widget s'actualitza automàticament cada vegada que:
+- Es registra una dosi (presa, omesa o extra)
+- S'afegeix o es modifica un medicament
+- Canvia el dia (a mitjanit)
+
+**Comunicació Flutter-Android**: La integració utilitza un MethodChannel (`com.medicapp.medicapp/widget`) que permet a l'aplicació Flutter notificar al widget natiu quan les dades canvien.
+
+**Lectura Directa de Base de Dades**: El widget accedeix directament a la base de dades SQLite de l'aplicació per obtenir les dades de medicaments, assegurant informació actualitzada fins i tot quan l'app no està en execució.
+
+### Tema Visual DeepEmerald
+
+El widget utilitza la paleta de colors DeepEmerald, el tema per defecte de MedicApp:
+
+- **Fons**: Verd fosc profund (#1E2623) amb 90% d'opacitat
+- **Icones i accents**: Verd clar (#81C784)
+- **Text**: Blanc amb diferents nivells d'opacitat segons l'estat
+- **Divisors**: Verd clar amb transparència
+
+### Limitacions Tècniques
+
+**Només Android**: El widget és una funcionalitat nativa d'Android i no està disponible a iOS, web o altres plataformes.
+
+**Persona per defecte**: El widget mostra les dosis de la persona configurada com a predeterminada a l'aplicació.
+
+**Sense accions directes**: Per ara, tocar el widget obre l'aplicació principal. Les dosis no es poden registrar directament des del widget.
+
+### Arxius Relacionats
+
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Proveïdor principal del widget
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Servei per a la ListView del widget
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
+- `lib/services/widget_service.dart` - Servei Flutter per a comunicació amb el widget
+
+---
+
 ## Integració de Funcionalitats
 
 Totes aquestes característiques no funcionen de forma aïllada, sinó que estan profundament integrades per crear una experiència cohesiva. Per exemple:

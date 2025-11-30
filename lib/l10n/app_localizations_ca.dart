@@ -207,6 +207,39 @@ class AppLocalizationsCa extends AppLocalizations {
   String get durationAsNeeded => 'Segons necessitat';
 
   @override
+  String get durationEveryDay => 'Cada dia';
+
+  @override
+  String get durationUntilFinished => 'Fins acabar';
+
+  @override
+  String durationSpecificDatesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'dates específiques',
+      one: 'data específica',
+    );
+    return '$count $_temp0';
+  }
+
+  @override
+  String durationWeeklyDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'dies',
+      one: 'dia',
+    );
+    return '$count $_temp0 per setmana';
+  }
+
+  @override
+  String durationEveryNDays(int days) {
+    return 'Cada $days dies';
+  }
+
+  @override
   String get mainScreenTitle => 'Els meus medicaments';
 
   @override
@@ -1824,7 +1857,7 @@ class AppLocalizationsCa extends AppLocalizations {
 
   @override
   String pendingDose(String time) {
-    return '⚠️ Dosi pendent: $time';
+    return 'Dosi pendent: $time';
   }
 
   @override

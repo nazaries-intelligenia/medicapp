@@ -797,6 +797,68 @@ Esta consideración ergonómica reduce la fatiga física y hace que la app sea m
 
 ---
 
+## 18. Widget de Pantalla de Inicio (Android)
+
+### Vista Rápida de Dosis Diarias
+
+MedicApp incluye un widget nativo de Android para la pantalla de inicio que permite visualizar las dosis programadas del día actual sin necesidad de abrir la aplicación. Este widget proporciona información esencial de un vistazo, ideal para usuarios que necesitan un recordatorio visual constante de su medicación.
+
+### Características del Widget
+
+**Tamaño 2x2**: El widget ocupa un espacio de 2x2 celdas en la pantalla de inicio (aproximadamente 146x146dp), siendo lo suficientemente compacto para no ocupar demasiado espacio pero con información claramente legible.
+
+**Lista de Dosis del Día**: Muestra todas las dosis programadas para el día actual, incluyendo:
+- Nombre del medicamento
+- Hora programada de cada dosis
+- Estado visual (pendiente, tomada u omitida)
+
+**Indicadores de Estado**:
+- **Círculo verde relleno con check**: Dosis ya tomada
+- **Círculo con borde verde**: Dosis pendiente
+- **Texto atenuado**: Dosis omitida o ya completada
+
+**Contador de Progreso**: En la cabecera del widget se muestra un contador "X/Y" indicando cuántas dosis se han tomado del total programado para el día.
+
+### Integración con la Aplicación
+
+**Actualización Automática**: El widget se actualiza automáticamente cada vez que:
+- Se registra una dosis (tomada, omitida o extra)
+- Se añade o modifica un medicamento
+- Se cambia el día (a medianoche)
+
+**Comunicación Flutter-Android**: La integración utiliza un MethodChannel (`com.medicapp.medicapp/widget`) que permite a la aplicación Flutter notificar al widget nativo cuando los datos cambian.
+
+**Lectura Directa de Base de Datos**: El widget accede directamente a la base de datos SQLite de la aplicación para obtener los datos de medicamentos, asegurando información actualizada incluso cuando la app no está en ejecución.
+
+### Tema Visual DeepEmerald
+
+El widget utiliza la paleta de colores DeepEmerald, el tema por defecto de MedicApp:
+
+- **Fondo**: Verde oscuro profundo (#1E2623) con 90% de opacidad
+- **Iconos y acentos**: Verde claro (#81C784)
+- **Texto**: Blanco con diferentes niveles de opacidad según el estado
+- **Divisores**: Verde claro con transparencia
+
+Esta coherencia visual asegura que el widget se integre perfectamente con la estética de la aplicación.
+
+### Limitaciones Técnicas
+
+**Solo Android**: El widget es una funcionalidad nativa de Android y no está disponible en iOS, web u otras plataformas.
+
+**Persona por Defecto**: El widget muestra las dosis de la persona configurada como predeterminada en la aplicación. No permite seleccionar diferentes personas directamente desde el widget.
+
+**Sin Acciones Directas**: Por ahora, tocar el widget abre la aplicación principal. No se pueden registrar dosis directamente desde el widget (esto se puede añadir en futuras versiones).
+
+### Archivos Relacionados
+
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Proveedor principal del widget
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Servicio para la ListView del widget
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
+- `android/app/src/main/res/xml/medication_widget_info.xml` - Configuración del widget
+- `lib/services/widget_service.dart` - Servicio Flutter para comunicación con el widget
+
+---
+
 ## Integración de Funcionalidades
 
 Todas estas características no funcionan de forma aislada, sino que están profundamente integradas para crear una experiencia cohesiva. Por ejemplo:
@@ -821,8 +883,9 @@ Para información más detallada sobre aspectos específicos:
 - **Sistema de Notificaciones**: Ver código fuente en `lib/services/notification_service.dart`
 - **Modelo de Datos**: Ver modelos en `lib/models/` (especialmente `medication.dart`, `person.dart`, `person_medication.dart`)
 - **Localización**: Ver archivos `.arb` en `lib/l10n/` para cada idioma
-- **Tests**: Ver suite de tests en `test/` con 432+ tests que validan todas estas funcionalidades
+- **Tests**: Ver suite de tests en `test/` con 601+ tests que validan todas estas funcionalidades
+- **Widget Android**: Ver `android/app/src/main/kotlin/.../MedicationWidget*.kt` para el widget de pantalla de inicio
 
 ---
 
-Esta documentación refleja el estado actual de MedicApp en su versión 1.0.0, una aplicación madura y completa para gestión de medicamentos familiares con más de 75% de cobertura de tests y soporte completo para 8 idiomas.
+Esta documentación refleja el estado actual de MedicApp en su versión 1.0.0, una aplicación madura y completa para gestión de medicamentos familiares con más de 75% de cobertura de tests, soporte completo para 8 idiomas, y widget de pantalla de inicio para Android.

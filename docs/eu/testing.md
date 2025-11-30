@@ -22,10 +22,11 @@
 
 MedicApp-ek test-suite sendo eta ondo egituratua du kodearen kalitatea eta egonkortasuna bermatzen duena:
 
-- **369+ test automatizatu** 50 fitxategitan banatuta
+- **601+ test automatizatu** 57 fitxategitan banatuta
 - **%75-80ko kode-estaldura** area kritikoetan
 - **Test-mota anitz**: unitarioak, widget-ak eta integrazioa
 - **Test-Driven Development (TDD)** funtzionalitate berrietarako
+- **Estaldura neurgarria**: `flutter test --coverage` erabiltzeko euskarri integratua
 
 ### Testing Filosofia
 

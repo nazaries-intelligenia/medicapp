@@ -97,9 +97,10 @@ void main() {
     });
 
     test('should detect near expiration (within 30 days)', () {
-      // Use current month - from any day to the last day of current month is always ≤ 30 days
+      // Use next month - guaranteed to be within 30 days but not expired
       final now = DateTime.now();
-      final expDate = '${now.month.toString().padLeft(2, '0')}/${now.year}';
+      final nextMonth = DateTime(now.year, now.month + 1, 1);
+      final expDate = '${nextMonth.month.toString().padLeft(2, '0')}/${nextMonth.year}';
 
       final medication = MedicationBuilder()
           .withId('med-exp-8')
@@ -152,16 +153,17 @@ void main() {
     });
 
     test('should handle edge case: exactly 30 days until expiration', () {
-      // Use current month to ensure we're within 30 days
+      // Use next month to ensure we're within 30 days but not expired
       final now = DateTime.now();
-      final expDate = '${now.month.toString().padLeft(2, '0')}/${now.year}';
+      final nextMonth = DateTime(now.year, now.month + 1, 1);
+      final expDate = '${nextMonth.month.toString().padLeft(2, '0')}/${nextMonth.year}';
 
       final medication = MedicationBuilder()
           .withId('med-exp-12')
           .withExpirationDate(expDate)
           .build();
 
-      // This should be near expiration since it's within current month
+      // This should be near expiration since it's within 30 days
       expect(medication.isNearExpiration, true);
       expect(medication.expirationStatus, ExpirationStatus.nearExpiration);
     });

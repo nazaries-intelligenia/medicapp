@@ -22,10 +22,11 @@
 
 MedicApp cuenta con una suite de tests robusta y bien estructurada que garantiza la calidad y estabilidad del código:
 
-- **369+ tests automatizados** distribuidos en 50 archivos
+- **601+ tests automatizados** distribuidos en 57 archivos
 - **75-80% de cobertura de código** en áreas críticas
 - **Múltiples tipos de tests**: unitarios, widgets e integración
 - **Test-Driven Development (TDD)** para nuevas funcionalidades
+- **Cobertura medible**: Soporte integrado para `flutter test --coverage`
 
 ### Filosofía de Testing
 
@@ -632,7 +633,7 @@ La suite de tests cubre las áreas más críticas de la aplicación.
 | **Pantallas** | ~93 tests | Tests de widgets y navegación de todas las pantallas |
 | **Integración** | ~52 tests | Flujos completos end-to-end |
 
-**Total: 369+ tests**
+**Total: 601+ tests**
 
 ### Áreas Bien Cubiertas
 
@@ -1506,7 +1507,7 @@ genhtml coverage/lcov.info -o coverage/html
 
 - [ ] Tests de backup/restore completo
 - [ ] Tests de notificaciones en background
-- [ ] Tests de widget de home screen
+- [x] Tests de widget de home screen (widget_service_test.dart)
 - [ ] Tests de deep links
 - [ ] Tests de compartir datos
 
@@ -1577,5 +1578,6 @@ genhtml coverage/lcov.info -o coverage/html
 
 **Última actualización**: Noviembre 2025
 **Versión de MedicApp**: V19+
-**Tests totales**: 369+
+**Tests totales**: 601+
 **Cobertura promedio**: 75-80%
+**Archivo de cobertura**: `coverage/lcov.info`

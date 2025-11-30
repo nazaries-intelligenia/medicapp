@@ -22,10 +22,11 @@
 
 MedicApp verfügt über eine robuste und gut strukturierte Test-Suite, die Codequalität und -stabilität gewährleistet:
 
-- **369+ automatisierte Tests** verteilt auf 50 Dateien
+- **601+ automatisierte Tests** verteilt auf 57 Dateien
 - **75-80% Code-Abdeckung** in kritischen Bereichen
 - **Mehrere Testtypen**: Unit-, Widget- und Integrationstests
 - **Test-Driven Development (TDD)** für neue Funktionen
+- **Messbare Abdeckung**: Integrierte Unterstützung für `flutter test --coverage`
 
 ### Testing-Philosophie
 
@@ -632,7 +633,7 @@ Die Test-Suite deckt die kritischsten Bereiche der Anwendung ab.
 | **Bildschirme** | ~93 Tests | Widget- und Navigationstests aller Bildschirme |
 | **Integration** | ~52 Tests | Vollständige End-to-End-Flows |
 
-**Gesamt: 369+ Tests**
+**Gesamt: 601+ Tests**
 
 ### Gut abgedeckte Bereiche
 
@@ -1506,7 +1507,7 @@ genhtml coverage/lcov.info -o coverage/html
 
 - [ ] Tests für vollständiges Backup/Restore
 - [ ] Tests für Hintergrundbenachrichtigungen
-- [ ] Tests für Home-Screen-Widget
+- [x] Tests für Home-Screen-Widget (widget_service_test.dart)
 - [ ] Tests für Deep Links
 - [ ] Tests für Datenfreigabe
 
@@ -1577,5 +1578,6 @@ genhtml coverage/lcov.info -o coverage/html
 
 **Letzte Aktualisierung**: November 2025
 **MedicApp-Version**: V19+
-**Gesamt-Tests**: 369+
+**Gesamt-Tests**: 601+
 **Durchschnittliche Abdeckung**: 75-80%
+**Abdeckungsdatei**: `coverage/lcov.info`

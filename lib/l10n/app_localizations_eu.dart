@@ -201,10 +201,43 @@ class AppLocalizationsEu extends AppLocalizations {
   String get durationContinuous => 'Etengabea';
 
   @override
-  String get durationSpecificDates => 'Fechas zehatzak';
+  String get durationSpecificDates => 'Data zehatzak';
 
   @override
-  String get durationAsNeeded => 'Según beharren arabera';
+  String get durationAsNeeded => 'Beharren arabera';
+
+  @override
+  String get durationEveryDay => 'Egunero';
+
+  @override
+  String get durationUntilFinished => 'Amaitu arte';
+
+  @override
+  String durationSpecificDatesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'zehatz',
+      one: 'zehatza',
+    );
+    return '$count data $_temp0';
+  }
+
+  @override
+  String durationWeeklyDaysCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'egun',
+      one: 'egun',
+    );
+    return '$count $_temp0 astean';
+  }
+
+  @override
+  String durationEveryNDays(int days) {
+    return '$days egunero';
+  }
 
   @override
   String get mainScreenTitle => 'Nire medikamentuak';
@@ -1825,7 +1858,7 @@ class AppLocalizationsEu extends AppLocalizations {
 
   @override
   String pendingDose(String time) {
-    return '⚠️ Dosi zain: $time';
+    return 'Dosi zain: $time';
   }
 
   @override

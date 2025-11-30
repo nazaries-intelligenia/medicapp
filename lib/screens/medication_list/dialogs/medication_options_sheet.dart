@@ -84,7 +84,7 @@ class MedicationOptionsSheet {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    medication.durationDisplayText,
+                                    medication.getDurationDisplayText(l10n),
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                                         ),

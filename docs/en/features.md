@@ -784,6 +784,68 @@ This ergonomic consideration reduces physical fatigue and makes the app more com
 
 ---
 
+## 18. Home Screen Widget (Android)
+
+### Quick View of Daily Doses
+
+MedicApp includes a native Android widget for the home screen that allows viewing scheduled doses for the current day without needing to open the application. This widget provides essential at-a-glance information, ideal for users who need a constant visual reminder of their medication.
+
+### Widget Characteristics
+
+**2x2 Size**: The widget occupies a 2x2 cell space on the home screen (approximately 146x146dp), being compact enough not to take up too much space but with clearly legible information.
+
+**Daily Dose List**: Displays all doses scheduled for the current day, including:
+- Medication name
+- Scheduled time for each dose
+- Visual status (pending, taken, or omitted)
+
+**Status Indicators**:
+- **Filled green circle with check**: Dose already taken
+- **Circle with green border**: Pending dose
+- **Dimmed text**: Omitted or already completed dose
+
+**Progress Counter**: In the widget header, a "X/Y" counter is displayed indicating how many doses have been taken out of the total scheduled for the day.
+
+### Integration with Application
+
+**Automatic Update**: The widget automatically updates whenever:
+- A dose is registered (taken, omitted, or extra)
+- A medication is added or modified
+- The day changes (at midnight)
+
+**Flutter-Android Communication**: The integration uses a MethodChannel (`com.medicapp.medicapp/widget`) that allows the Flutter application to notify the native widget when data changes.
+
+**Direct Database Reading**: The widget directly accesses the application's SQLite database to obtain medication data, ensuring updated information even when the app is not running.
+
+### DeepEmerald Visual Theme
+
+The widget uses the DeepEmerald color palette, MedicApp's default theme:
+
+- **Background**: Deep dark green (#1E2623) with 90% opacity
+- **Icons and accents**: Light green (#81C784)
+- **Text**: White with different opacity levels depending on status
+- **Dividers**: Light green with transparency
+
+This visual coherence ensures the widget integrates perfectly with the application's aesthetics.
+
+### Technical Limitations
+
+**Android Only**: The widget is a native Android functionality and is not available on iOS, web, or other platforms.
+
+**Default Person**: The widget displays doses for the person configured as default in the application. It doesn't allow selecting different people directly from the widget.
+
+**No Direct Actions**: For now, tapping the widget opens the main application. Doses cannot be registered directly from the widget (this can be added in future versions).
+
+### Related Files
+
+- `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Main widget provider
+- `android/app/src/main/kotlin/.../MedicationWidgetService.kt` - Service for the widget's ListView
+- `android/app/src/main/res/layout/medication_widget_layout.xml` - Main layout
+- `android/app/src/main/res/xml/medication_widget_info.xml` - Widget configuration
+- `lib/services/widget_service.dart` - Flutter service for communication with the widget
+
+---
+
 ## Integration of Functionalities
 
 All these features don't work in isolation, but are deeply integrated to create a cohesive experience. For example:
@@ -802,6 +864,8 @@ All these features don't work in isolation, but are deeply integrated to create 
 
 - The native dark theme smoothly transitions between light and dark modes without restarting the app, with colors optimized for readability in both modes and theme choice persisted between sessions.
 
+- The Android home screen widget provides quick at-a-glance access to daily medication status without opening the app, updating automatically whenever doses are recorded or medications are modified.
+
 This deep integration is what converts MedicApp from a simple medication list into a complete family therapeutic management system.
 
 ---
@@ -814,8 +878,9 @@ For more detailed information on specific aspects:
 - **Notification System**: See source code in `lib/services/notification_service.dart`
 - **Data Model**: See models in `lib/models/` (especially `medication.dart`, `person.dart`, `person_medication.dart`)
 - **Localization**: See `.arb` files in `lib/l10n/` for each language
-- **Tests**: See test suite in `test/` with 432+ tests validating all these functionalities
+- **Tests**: See test suite in `test/` with 601+ tests validating all these functionalities
+- **Android Widget**: See `android/app/src/main/kotlin/.../MedicationWidget*.kt` for the home screen widget
 
 ---
 
-This documentation reflects the current state of MedicApp in its version 1.0.0, a mature and complete application for family medication management with over 75% test coverage and full support for 8 languages.
+This documentation reflects the current state of MedicApp in its version 1.0.0, a mature and complete application for family medication management with over 75% test coverage, full support for 8 languages, and home screen widget for Android.

@@ -80,6 +80,26 @@
   "durationContinuous": "Continuo",
   "durationSpecificDates": "Datas específicas",
   "durationAsNeeded": "Segundo necesidade",
+  "durationEveryDay": "Todos os días",
+  "durationUntilFinished": "Ata rematar",
+  "durationSpecificDatesCount": "{count} {count, plural, =1{data específica} other{datas específicas}}",
+  "@durationSpecificDatesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationWeeklyDaysCount": "{count} {count, plural, =1{día} other{días}} por semana",
+  "@durationWeeklyDaysCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "durationEveryNDays": "Cada {days} días",
+  "@durationEveryNDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
 
   "@_MAIN_SCREEN": {},
   "mainScreenTitle": "Os meus medicamentos",
@@ -1060,7 +1080,7 @@
       }
     }
   },
-  "pendingDose": "⚠️ Dose pendente: {time}",
+  "pendingDose": "Dose pendente: {time}",
   "@pendingDose": {
     "placeholders": {
       "time": {

@@ -22,10 +22,11 @@
 
 MedicApp compta amb una suite de tests robusta i ben estructurada que garanteix la qualitat i estabilitat del codi:
 
-- **369+ tests automatitzats** distribuïts en 50 arxius
+- **601+ tests automatitzats** distribuïts en 57 arxius
 - **75-80% de cobertura de codi** en àrees crítiques
 - **Múltiples tipus de tests**: unitaris, widgets i integració
 - **Test-Driven Development (TDD)** per a noves funcionalitats
+- **Cobertura mesurable**: Suport integrat per `flutter test --coverage`
 
 ### Filosofia de Testing
 

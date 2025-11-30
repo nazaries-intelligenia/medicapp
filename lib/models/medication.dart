@@ -223,6 +223,9 @@ class Medication {
     );
   }
 
+  /// Legacy: Non-localized duration display text
+  /// Use getDurationDisplayText(l10n) instead for proper localization
+  @Deprecated('Use getDurationDisplayText(AppLocalizations l10n) instead')
   String get durationDisplayText {
     switch (durationType) {
       case TreatmentDurationType.everyday:
@@ -240,6 +243,28 @@ class Medication {
         return 'Every $interval days';
       case TreatmentDurationType.asNeeded:
         return 'As needed';
+    }
+  }
+
+  /// Get the localized duration display text
+  /// This is the preferred method for displaying duration information to users
+  String getDurationDisplayText(AppLocalizations l10n) {
+    switch (durationType) {
+      case TreatmentDurationType.everyday:
+        return l10n.durationEveryDay;
+      case TreatmentDurationType.untilFinished:
+        return l10n.durationUntilFinished;
+      case TreatmentDurationType.specificDates:
+        final count = selectedDates?.length ?? 0;
+        return l10n.durationSpecificDatesCount(count);
+      case TreatmentDurationType.weeklyPattern:
+        final count = weeklyDays?.length ?? 0;
+        return l10n.durationWeeklyDaysCount(count);
+      case TreatmentDurationType.intervalDays:
+        final interval = dayInterval ?? 2;
+        return l10n.durationEveryNDays(interval);
+      case TreatmentDurationType.asNeeded:
+        return l10n.durationAsNeeded;
     }
   }
 
