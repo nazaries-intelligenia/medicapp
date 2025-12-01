@@ -98,10 +98,6 @@ class ThemeProvider with ChangeNotifier {
     switch (value) {
       case 'deepEmerald':
         return ColorPalette.deepEmerald;
-      case 'seaGreen':
-        return ColorPalette.seaGreen;
-      case 'material3':
-        return ColorPalette.material3;
       case 'highContrast':
         return ColorPalette.highContrast;
       default:
@@ -114,10 +110,6 @@ class ThemeProvider with ChangeNotifier {
     switch (palette) {
       case ColorPalette.deepEmerald:
         return 'deepEmerald';
-      case ColorPalette.seaGreen:
-        return 'seaGreen';
-      case ColorPalette.material3:
-        return 'material3';
       case ColorPalette.highContrast:
         return 'highContrast';
     }

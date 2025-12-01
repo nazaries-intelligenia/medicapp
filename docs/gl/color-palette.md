@@ -1,8 +1,15 @@
 # Paleta de Cores - MedicApp
 
+MedicApp ofrece dúas paletas de cores optimizadas para accesibilidade:
+
+- **Deep Emerald** (por defecto): Verde esmeralda de alto contraste
+- **Alto Contraste**: Máximo contraste para persoas con problemas de visión
+
+---
+
 ## Tema "Deep Emerald" (Por Defecto)
 
-MedicApp utiliza por defecto o tema "Deep Emerald", deseñado especialmente para persoas maiores (Silver Surfers) con máxima lexibilidade mantendo a identidade verde da marca. Cumpre cos estándares WCAG AAA (ratio de contraste 19:1).
+Deseñado especialmente para persoas maiores (Silver Surfers) con máxima lexibilidade mantendo a identidade verde da marca. Cumpre cos estándares WCAG AAA (ratio de contraste 19:1).
 
 ### Principios de Deseño
 
@@ -46,129 +53,45 @@ MedicApp utiliza por defecto o tema "Deep Emerald", deseñado especialmente para
 | **Erro** | `#C62828` | Vermello profundo e serio |
 | **Información** | `#0277BD` | Azul forte, evita o cian claro |
 
-### Tema Escuro Deep Emerald
+### Tema Escuro "Night Forest" (Accesible)
+
+O tema escuro de Deep Emerald está deseñado especificamente para persoas maiores. Evita o negro absoluto (#000000) para reducir a fatiga visual e utiliza bordes iluminados para definir espazos.
+
+#### Principios de Deseño Escuro
+
+1. **Botóns como Lámpadas**: En modo escuro, os botóns teñen fondo claro e texto escuro para "brillar".
+2. **Bordes en lugar de Sombras**: As sombras non funcionan ben en modo escuro. Úsanse bordes sutís (#424242).
+3. **Sen Negro Puro**: O fondo é #121212 (gris moi escuro) para evitar o "smearing" en pantallas OLED.
+4. **Texto Gris Perla**: O texto principal é #E0E0E0 (90% branco) para evitar o deslumbramento.
+
+#### Cores Principais (Inversión Luminosa)
 
 | Rol | Mostra | Código HEX | Uso |
 |-----|---------|------------|-----|
-| **Fondo** | ⚫ | `#121212` | Escuro profundo pero non negro puro |
-| **Superficie** | ⚫ | `#1E1E1E` | Lixeiramente elevado |
-| **Tarxetas** | ⚫ | `#2C2C2C` | Gris escuro para tarxetas |
-| **Primario** | 🟢 | `#A5D6A7` | Verde claro para modo escuro |
-| **Acento** | 🟢 | `#66BB6A` | Verde medio visible |
-| **Texto Principal** | ⚪ | `#FAFAFA` | Case branco |
-| **Texto Secundario** | 🔘 | `#B0BEC5` | Gris claro |
+| **Primario (Marca)** | 🟢 | `#81C784` | Verde Folla Claro. Botóns principais e estados activos. |
+| **Texto sobre Primario** | ⚫ | `#003300` | O texto dentro do botón primario debe ser verde moi escuro. |
+| **Primario Variante** | 🟢 | `#66BB6A` | Tono máis saturado para estados de "foco". |
+| **Acento / Interactivo** | 🟢 | `#A5D6A7` | Para elementos flotantes (FAB) ou interruptores activados. |
 
----
+#### Cores de Fondo e Superficie
 
-## Tema Claro "Sea Green"
-
-MedicApp utiliza unha paleta de cores inspirada na natureza con tonos verdes que transmiten saúde, benestar e confianza.
-
-### Cores Principais
-
-| Rol | Muestra | Código HEX | Uso |
+| Rol | Mostra | Código HEX | Uso |
 |-----|---------|------------|-----|
-| **Primario (Marca)** | 🟢 | `#2E8B57` | Botóns principais, barra de navegación activa, logo. Un verde "Sea Green" sólido. |
-| **Primario Variante** | 🟢 | `#3CB371` | Estados "hover" ou "pressed" dos botóns principais. Un pouco máis claro. |
-| **Acento / Interactivo** | 🟢 | `#00C853` | Botóns de acción flotantes (FAB), notificacións importantes, "call to action" vibrante. |
-| **Secundario / Soporte** | 🟢 | `#81C784` | Elementos secundarios, conmutadores (toggles) activos, iconas de menor xerarquía. |
-| **Estado: Éxito** | 🟢 | `#43A047` | Mensaxes de confirmación, checks de completado. Un verde estándar funcional. |
+| **Fondo Principal** | ⚫ | `#121212` | Gris moi escuro estándar (Material Design). |
+| **Superficie (Tarxetas)** | ⚫ | `#1E2623` | Gris verdoso escuro. |
+| **Borde de Tarxeta** | 🔘 | `#424242` | Borde gris sutil arredor das tarxetas. |
+| **Divisores** | 🔘 | `#555555` | Liñas de separación con maior contraste. |
 
-### Cores de Texto
-
-| Rol | Muestra | Código HEX | Uso |
-|-----|---------|------------|-----|
-| **Texto Escuro / Títulos** | ⚫ | `#0D2E1C` | Cor principal para o texto. Non é negro puro, é un verde bosque moi profundo. |
-| **Texto Secundario** | 🔘 | `#577D6A` | Subtítulos, texto de axuda, iconas inactivas. |
-
-### Cores de Fondo e Superficie
-
-| Rol | Muestra | Código HEX | Uso |
-|-----|---------|------------|-----|
-| **Superficie (Tarxetas)** | 🟢 | `#C8E6C9` | Fondo para tarxetas ou contedores sobre o fondo principal. Menta suave. |
-| **Fondo Principal** | ⚪ | `#E8F5E9` | A cor de fondo xeral da pantalla. Case branco con un tinte verde imperceptible. |
-| **Divisor / Borde** | 🟢 | `#A5D6A7` | Liñas sutís para separar seccións ou bordos de inputs inactivos. |
-
-### Cores de Estado
+#### Cores de Estado (Versións Pastel)
 
 | Estado | Código HEX | Uso |
 |--------|------------|-----|
-| **Éxito** | `#43A047` | Operacións completadas exitosamente |
-| **Advertencia** | `#FF9800` | Alertas que requiren atención |
-| **Erro** | `#F44336` | Erros críticos ou accións destructivas |
-| **Información** | `#2196F3` | Mensaxes informativos xerais |
+| **Éxito** | `#81C784` | Mesmo verde claro do primario |
+| **Advertencia** | `#FFB74D` | Laranxa pastel claro |
+| **Erro** | `#E57373` | Vermello suave/rosado |
+| **Información** | `#64B5F6` | Azul ceo claro |
 
-## Tema Escuro "Dark Forest"
-
-O tema escuro utiliza unha paleta inspirada nun bosque nocturno con tonos verdes profundos e misteriosos:
-
-| Rol | Muestra | Código HEX | Uso |
-|-----|---------|------------|-----|
-| **Fondo Global** | ⚫ | `#050A06` | Un verde case imperceptiblemente negro. Profundo e misterioso. |
-| **Superficie (Nivel 1)** | ⚫ | `#0D1F14` | Un tono un pouco máis claro para a barra de navegación ou menús. |
-| **Superficie (Nivel 2)** | ⚫ | `#142B1E` | Para tarxetas flotantes ou modais. |
-| **Primario (Marca)** | 🟢 | `#A5D6A7` | Verde pálido desaturado. En dark mode, os cores pastel véense máis elegantes. |
-| **Acento Vibrante** | 🟢 | `#4CAF50` | Verde clásico para botóns de chamada á acción (CTA) importantes. |
-| **Texto Principal** | ⚪ | `#E8F5E9` | Un branco con un tinte verdoso moi sutil (menta xeo). |
-| **Texto Secundario** | 🔘 | `#819CA9` | Gris con matiz verde/azulado para xerarquía visual. |
-| **Iconas Inactivas** | 🔘 | `#455A64` | Para elementos que están aí pero non requiren atención. |
-| **Overlay (Capas)** | 🟢 | `#1E3B28` | Cor para destacar unha fila ou elemento seleccionado nunha lista. |
-| **Resplandor (Glow)** | 🟢 | `#004D40` | Un tono teal moi escuro para fondos degradados sutís. |
-
-## Uso no Código
-
-Os cores están definidos en `lib/theme/app_theme.dart`:
-
-```dart
-// Colores principales - Tema claro "Sea Green"
-static const Color primaryLight = Color(0xFF2E8B57);
-static const Color primaryVariantLight = Color(0xFF3CB371);
-static const Color accentLight = Color(0xFF00C853);
-
-// Colores principales - Tema escuro "Dark Forest"
-static const Color primaryDark = Color(0xFFA5D6A7);
-static const Color accentDark = Color(0xFF4CAF50);
-
-static const Color secondaryLight = Color(0xFF81C784);
-static const Color secondaryDark = Color(0xFF819CA9);
-
-// Colores de fondo
-static const Color backgroundLight = Color(0xFFE8F5E9);
-static const Color backgroundDark = Color(0xFF050A06);
-
-static const Color surfaceLight = Color(0xFFC8E6C9);
-static const Color surfaceDark = Color(0xFF0D1F14);
-
-// Colores de tarxetas
-static const Color cardLight = Color(0xFFC8E6C9);
-static const Color cardDark = Color(0xFF142B1E);
-
-// Colores de texto
-static const Color textPrimaryLight = Color(0xFF0D2E1C);
-static const Color textPrimaryDark = Color(0xFFE8F5E9);
-
-static const Color textSecondaryLight = Color(0xFF577D6A);
-static const Color textSecondaryDark = Color(0xFF819CA9);
-
-// Iconas inactivas
-static const Color inactiveIconDark = Color(0xFF455A64);
-
-// Overlay e selección
-static const Color overlayDark = Color(0xFF1E3B28);
-
-// Resplandor/Glow
-static const Color glowDark = Color(0xFF004D40);
-
-// Colores de divisores e bordos
-static const Color dividerLight = Color(0xFFA5D6A7);
-static const Color dividerDark = Color(0xFF455A64);
-
-// Colores de estado
-static const Color success = Color(0xFF43A047);
-static const Color warning = Color(0xFFFF9800);
-static const Color error = Color(0xFFF44336);
-static const Color info = Color(0xFF2196F3);
-```
+---
 
 ## Tema "Alto Contraste"
 
@@ -209,17 +132,43 @@ Deseñado especialmente para persoas maiores ou con problemas de visión. Cumpre
 - **Maior espazado**: Padding aumentado en botóns e elementos interactivos
 - **Ligazóns subliñadas**: TextButtons con subliñado para mellor identificación
 
+---
+
+## Uso no Código
+
+As cores están definidas en `lib/theme/app_theme.dart`:
+
+```dart
+// Deep Emerald - Tema Claro
+static const Color deepEmeraldPrimaryLight = Color(0xFF1B5E20);
+static const Color deepEmeraldBackgroundLight = Color(0xFFF5F5F5);
+static const Color deepEmeraldTextPrimaryLight = Color(0xFF051F12);
+
+// Deep Emerald - Tema Escuro
+static const Color deepEmeraldPrimaryDark = Color(0xFF81C784);
+static const Color deepEmeraldBackgroundDark = Color(0xFF121212);
+static const Color deepEmeraldTextPrimaryDark = Color(0xFFE0E0E0);
+
+// Alto Contraste - Tema Claro
+static const Color highContrastPrimaryLight = Color(0xFF0000CC);
+static const Color highContrastBackgroundLight = Color(0xFFFFFFFF);
+static const Color highContrastTextPrimaryLight = Color(0xFF000000);
+
+// Alto Contraste - Tema Escuro
+static const Color highContrastPrimaryDark = Color(0xFFFFFF00);
+static const Color highContrastBackgroundDark = Color(0xFF000000);
+static const Color highContrastTextPrimaryDark = Color(0xFFFFFFFF);
+```
+
 ## Principios de Deseño
 
 1. **Accesibilidade**: Todos os pares texto/fondo cumpren con WCAG 2.1 nivel AA para contraste (AAA para Alto Contraste).
-2. **Consistencia**: Os cores primarios utilízanse consistentemente en toda a aplicación.
+2. **Consistencia**: As cores primarias utilízanse consistentemente en toda a aplicación.
 3. **Xerarquía Visual**: O uso de diferentes tonos establece unha clara xerarquía de información.
-4. **Naturalidade**: A paleta verde transmite saúde, benestar e confianza, apropiado para unha aplicación médica.
+4. **Naturalidade**: A paleta verde transmite saúde, benestar e confianza.
 5. **Inclusividade**: A paleta Alto Contraste permite a persoas con problemas de visión usar a aplicación comodamente.
 
 ## Referencias
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Paleta tema claro: `Captura de pantalla 2025-11-22 101545.png`
-- Paleta tema escuro: `Captura de pantalla 2025-11-22 102516.png`

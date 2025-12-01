@@ -22,6 +22,16 @@ import 'notifications/fasting_notification_scheduler.dart';
 import 'notifications/notification_cancellation_manager.dart';
 import 'logger_service.dart';
 
+/// Initialize timezone for background isolate
+void _initializeTimezoneForBackground() {
+  try {
+    tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Europe/Madrid'));
+  } catch (e) {
+    // Already initialized or error - ignore
+  }
+}
+
 /// Top-level function to handle notification actions in background
 /// This MUST be a top-level function (not a class method) for background execution
 @pragma('vm:entry-point')
@@ -52,6 +62,9 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
   final personId = parts[2];
 
   try {
+    // Initialize timezone for background isolate (needed for snooze scheduling)
+    _initializeTimezoneForBackground();
+
     // Initialize database if needed (background isolate may not have it)
     await DatabaseHelper.instance.database;
 
@@ -79,6 +92,7 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
 
     final doseQuantity = medication.getDoseQuantity(doseTime);
     final now = DateTime.now();
+    final notificationsPlugin = fln.FlutterLocalNotificationsPlugin();
 
     switch (response.actionId) {
       case 'register_dose':
@@ -162,19 +176,35 @@ void onBackgroundNotificationResponse(fln.NotificationResponse response) async {
 
       case 'snooze_dose':
         LoggerService.info('⏰ Background: Snoozing dose for ${medication.name}');
-        // Snooze needs to reschedule - this is handled by the foreground service
-        // Store the snooze request for when the app opens
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('pending_snooze', '${medication.id}|$doseTime|$personId|${response.id}');
-        LoggerService.info('✅ Background: Snooze request stored');
-        break;
+
+        // Schedule new notification in 10 minutes directly from background
+        final snoozeTime = tz.TZDateTime.now(tz.local).add(const Duration(minutes: 10));
+
+        // Get person info for notification title
+        final person = await DatabaseHelper.instance.getPerson(personId);
+        final isDefault = person?.isDefault ?? false;
+
+        final notificationDetails = NotificationConfig.getNotificationDetails();
+
+        await notificationsPlugin.zonedSchedule(
+          response.id ?? 0, // Reuse same notification ID
+          NotificationConfig.buildNotificationTitle(person?.name, isDefault),
+          '${medication.name} - ${medication.type.displayName}',
+          snoozeTime,
+          notificationDetails,
+          androidScheduleMode: fln.AndroidScheduleMode.exactAllowWhileIdle,
+          payload: '${medication.id}|$doseTime|$personId',
+        );
+
+        LoggerService.info('✅ Background: Notification snoozed until ${snoozeTime.toString()}');
+        // Don't cancel - notification was already dismissed and we scheduled a new one
+        return;
 
       default:
         LoggerService.warning('⚠️ Background: Unknown action ${response.actionId}');
     }
 
-    // Cancel the notification after action
-    final notificationsPlugin = fln.FlutterLocalNotificationsPlugin();
+    // Cancel the notification after action (for register and skip)
     await notificationsPlugin.cancel(response.id ?? 0);
 
   } catch (e) {

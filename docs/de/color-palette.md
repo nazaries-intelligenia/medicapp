@@ -1,8 +1,15 @@
 # Farbpalette - MedicApp
 
+MedicApp bietet zwei für Barrierefreiheit optimierte Farbpaletten:
+
+- **Deep Emerald** (Standard): Smaragdgrün mit hohem Kontrast
+- **Hoher Kontrast**: Maximaler Kontrast für Menschen mit Sehproblemen
+
+---
+
 ## "Deep Emerald" Theme (Standard)
 
-MedicApp verwendet standardmäßig das "Deep Emerald" Theme, das speziell für ältere Benutzer (Silver Surfers) mit maximaler Lesbarkeit entwickelt wurde und gleichzeitig die grüne Markenidentität beibehält. Erfüllt WCAG AAA Standards (19:1 Kontrastverhältnis).
+Speziell für ältere Benutzer (Silver Surfers) mit maximaler Lesbarkeit entwickelt, unter Beibehaltung der grünen Markenidentität. Erfüllt WCAG AAA Standards (19:1 Kontrastverhältnis).
 
 ### Design-Prinzipien
 
@@ -46,135 +53,51 @@ MedicApp verwendet standardmäßig das "Deep Emerald" Theme, das speziell für �
 | **Fehler** | `#C62828` | Tiefes ernstes Rot |
 | **Information** | `#0277BD` | Kräftiges Blau, vermeidet helles Cyan |
 
-### Deep Emerald Dark Theme
+### Dunkles Theme "Night Forest" (Barrierefrei)
+
+Das Deep Emerald Dark Theme ist speziell für ältere Benutzer konzipiert. Vermeidet reines Schwarz (#000000) um Augenbelastung zu reduzieren und verwendet beleuchtete Rahmen zur Definition von Bereichen.
+
+#### Dunkle Design-Prinzipien
+
+1. **Schaltflächen als Lampen**: Im Dunkelmodus haben Schaltflächen hellen Hintergrund und dunklen Text zum "Leuchten".
+2. **Rahmen statt Schatten**: Schatten funktionieren im Dunkelmodus nicht gut. Subtile Rahmen (#424242) werden verwendet.
+3. **Kein reines Schwarz**: Hintergrund ist #121212 (sehr dunkles Grau) um "Smearing" auf OLED-Bildschirmen zu vermeiden.
+4. **Perlgrauer Text**: Primärtext ist #E0E0E0 (90% Weiß) um Blendung zu vermeiden.
+
+#### Primärfarben (Leuchtende Umkehrung)
 
 | Rolle | Muster | HEX-Code | Verwendung |
 |-------|--------|----------|-----------|
-| **Hintergrund** | ⚫ | `#121212` | Tiefes Dunkel aber nicht reines Schwarz |
-| **Oberfläche** | ⚫ | `#1E1E1E` | Leicht erhöht |
-| **Karten** | ⚫ | `#2C2C2C` | Dunkelgrau für Karten |
-| **Primär** | 🟢 | `#A5D6A7` | Hellgrün für Dunkelmodus |
-| **Akzent** | 🟢 | `#66BB6A` | Sichtbares mittleres Grün |
-| **Primärtext** | ⚪ | `#FAFAFA` | Fast Weiß |
-| **Sekundärtext** | 🔘 | `#B0BEC5` | Hellgrau |
+| **Primär (Marke)** | 🟢 | `#81C784` | Helles Blattgrün. Hauptschaltflächen und aktive Zustände. |
+| **Text auf Primär** | ⚫ | `#003300` | Text in Primärschaltfläche muss sehr dunkles Grün sein. |
+| **Primär-Variante** | 🟢 | `#66BB6A` | Gesättigterer Ton für "Fokus"-Zustände. |
+| **Akzent / Interaktiv** | 🟢 | `#A5D6A7` | Für schwebende Elemente (FAB) oder aktivierte Schalter. |
 
----
-
-## Light-Theme "Sea Green"
-
-MedicApp nutzt eine Farbpalette, die von der Natur inspiriert ist und grüne Töne verwendet, die Gesundheit, Wohlbefinden und Vertrauen vermitteln.
-
-### Primärfarben
+#### Hintergrund- und Oberflächenfarben
 
 | Rolle | Muster | HEX-Code | Verwendung |
 |-------|--------|----------|-----------|
-| **Primär (Marke)** | 🟢 | `#2E8B57` | Hauptschaltflächen, aktive Navigationsleiste, Logo. Ein solides "Sea Green" Grün. |
-| **Primär-Variante** | 🟢 | `#3CB371` | Status "hover" oder "pressed" von Hauptschaltflächen. Ein wenig heller. |
-| **Akzent / Interaktiv** | 🟢 | `#00C853` | Schwebende Aktionsschaltflächen (FAB), wichtige Benachrichtigungen, lebendiger "call to action". |
-| **Sekundär / Unterstützung** | 🟢 | `#81C784` | Sekundärelemente, aktive Schalter (toggles), Symbole mit niedrigerer Hierarchie. |
-| **Status: Erfolg** | 🟢 | `#43A047` | Bestätigungsmeldungen, abgeschlossene Häkchen. Ein funktionales Standardgrün. |
+| **Haupthintergrund** | ⚫ | `#121212` | Standard sehr dunkles Grau (Material Design). |
+| **Oberfläche (Karten)** | ⚫ | `#1E2623` | Dunkles grünliches Grau. |
+| **Kartenrahmen** | 🔘 | `#424242` | Subtiler grauer Rahmen um Karten. |
+| **Trenner** | 🔘 | `#555555` | Trennlinien mit höherem Kontrast. |
 
-### Textfarben
-
-| Rolle | Muster | HEX-Code | Verwendung |
-|-------|--------|----------|-----------|
-| **Dunkeltext / Titel** | ⚫ | `#0D2E1C` | Primärfarbe für Text. Keine reine Schwarz, sondern ein sehr tiefes Waldgrün. |
-| **Sekundärtext** | 🔘 | `#577D6A` | Untertitel, Hilfetext, inaktive Symbole. |
-
-### Hintergrund- und Oberflächenfarben
-
-| Rolle | Muster | HEX-Code | Verwendung |
-|-------|--------|----------|-----------|
-| **Oberfläche (Karten)** | 🟢 | `#C8E6C9` | Hintergrund für Karten oder Container über dem Haupthintergrund. Weiches Minz. |
-| **Haupthintergrund** | ⚪ | `#E8F5E9` | Die allgemeine Hintergrundfarbe des Bildschirms. Fast Weiß mit unmerklichem Grünstich. |
-| **Teiler / Rand** | 🟢 | `#A5D6A7` | Subtile Linien, um Abschnitte zu trennen oder Ränder von inaktiven Eingabefeldern. |
-
-### Statusfarben
+#### Statusfarben (Pastellversionen)
 
 | Status | HEX-Code | Verwendung |
 |--------|----------|-----------|
-| **Erfolg** | `#43A047` | Erfolgreich abgeschlossene Operationen |
-| **Warnung** | `#FF9800` | Warnungen, die Aufmerksamkeit erfordern |
-| **Fehler** | `#F44336` | Kritische Fehler oder destruktive Aktionen |
-| **Information** | `#2196F3` | Allgemeine Informationsmeldungen |
+| **Erfolg** | `#81C784` | Gleiches helles Grün wie Primär |
+| **Warnung** | `#FFB74D` | Helles Pastellorange |
+| **Fehler** | `#E57373` | Weiches Rosa-Rot |
+| **Information** | `#64B5F6` | Helles Himmelblau |
 
-## Dark-Theme "Dark Forest"
+---
 
-Das Dark-Theme verwendet eine Palette, die von einem nächtlichen Wald mit tiefen und geheimnisvollen Grüntönen inspiriert ist:
-
-| Rolle | Muster | HEX-Code | Verwendung |
-|-------|--------|----------|-----------|
-| **Globaler Hintergrund** | ⚫ | `#050A06` | Ein fast unmerklich schwarzes Grün. Tiefgreifend und geheimnisvoll. |
-| **Oberfläche (Ebene 1)** | ⚫ | `#0D1F14` | Ein etwas hellerer Ton für die Navigationsleiste oder Menüs. |
-| **Oberfläche (Ebene 2)** | ⚫ | `#142B1E` | Für schwebende Karten oder Modals. |
-| **Primär (Marke)** | 🟢 | `#A5D6A7` | Blasses entsättigtes Grün. Im Dark-Mode wirken Pastellfarben eleganter. |
-| **Akzent Vibrierend** | 🟢 | `#4CAF50` | Klassisches Grün für wichtige Call-to-Action (CTA) Schaltflächen. |
-| **Primärtext** | ⚪ | `#E8F5E9` | Ein Weiß mit einem sehr subtilen grünlichen Farbton (Eisminte). |
-| **Sekundärtext** | 🔘 | `#819CA9` | Grau mit Grün-/Blauton für visuelle Hierarchie. |
-| **Inaktive Symbole** | 🔘 | `#455A64` | Für Elemente, die vorhanden sind, aber keine Aufmerksamkeit erfordern. |
-| **Overlay (Schichten)** | 🟢 | `#1E3B28` | Farbe zur Hervorhebung einer Zeile oder eines ausgewählten Elements in einer Liste. |
-| **Resplandor (Glow)** | 🟢 | `#004D40` | Ein sehr dunkler Teal-Ton für subtile degradierte Hintergründe. |
-
-## Verwendung im Code
-
-Die Farben sind in `lib/theme/app_theme.dart` definiert:
-
-```dart
-// Primärfarben - Light-Theme "Sea Green"
-static const Color primaryLight = Color(0xFF2E8B57);
-static const Color primaryVariantLight = Color(0xFF3CB371);
-static const Color accentLight = Color(0xFF00C853);
-
-// Primärfarben - Dark-Theme "Dark Forest"
-static const Color primaryDark = Color(0xFFA5D6A7);
-static const Color accentDark = Color(0xFF4CAF50);
-
-static const Color secondaryLight = Color(0xFF81C784);
-static const Color secondaryDark = Color(0xFF819CA9);
-
-// Hintergrundfarben
-static const Color backgroundLight = Color(0xFFE8F5E9);
-static const Color backgroundDark = Color(0xFF050A06);
-
-static const Color surfaceLight = Color(0xFFC8E6C9);
-static const Color surfaceDark = Color(0xFF0D1F14);
-
-// Kartenfarben
-static const Color cardLight = Color(0xFFC8E6C9);
-static const Color cardDark = Color(0xFF142B1E);
-
-// Textfarben
-static const Color textPrimaryLight = Color(0xFF0D2E1C);
-static const Color textPrimaryDark = Color(0xFFE8F5E9);
-
-static const Color textSecondaryLight = Color(0xFF577D6A);
-static const Color textSecondaryDark = Color(0xFF819CA9);
-
-// Inaktive Symbole
-static const Color inactiveIconDark = Color(0xFF455A64);
-
-// Overlay und Auswahl
-static const Color overlayDark = Color(0xFF1E3B28);
-
-// Resplandor/Glow
-static const Color glowDark = Color(0xFF004D40);
-
-// Teiler- und Randfarben
-static const Color dividerLight = Color(0xFFA5D6A7);
-static const Color dividerDark = Color(0xFF455A64);
-
-// Statusfarben
-static const Color success = Color(0xFF43A047);
-static const Color warning = Color(0xFFFF9800);
-static const Color error = Color(0xFFF44336);
-static const Color info = Color(0xFF2196F3);
-```
-
-## "Hoher Kontrast" Thema
+## "Hoher Kontrast" Theme
 
 Speziell für ältere Menschen oder Personen mit Sehproblemen entwickelt. Erfüllt WCAG AAA (Kontrastverhältnis 7:1 oder höher).
 
-### Helles Thema Hoher Kontrast
+### Helles Theme Hoher Kontrast
 
 | Rolle | Muster | HEX-Code | Verwendung |
 |-----|---------|------------|-----|
@@ -187,7 +110,7 @@ Speziell für ältere Menschen oder Personen mit Sehproblemen entwickelt. Erfül
 | **Fehler** | 🔴 | `#CC0000` | Dunkelrot |
 | **Teiler/Rahmen** | ⚫ | `#000000` | Schwarz und dicker (2px) |
 
-### Dunkles Thema Hoher Kontrast
+### Dunkles Theme Hoher Kontrast
 
 | Rolle | Muster | HEX-Code | Verwendung |
 |-----|---------|------------|-----|
@@ -209,17 +132,43 @@ Speziell für ältere Menschen oder Personen mit Sehproblemen entwickelt. Erfül
 - **Mehr Abstand**: Erhöhtes Padding bei Schaltflächen und interaktiven Elementen
 - **Unterstrichene Links**: TextButtons mit Unterstreichung für bessere Identifizierung
 
+---
+
+## Verwendung im Code
+
+Die Farben sind in `lib/theme/app_theme.dart` definiert:
+
+```dart
+// Deep Emerald - Helles Theme
+static const Color deepEmeraldPrimaryLight = Color(0xFF1B5E20);
+static const Color deepEmeraldBackgroundLight = Color(0xFFF5F5F5);
+static const Color deepEmeraldTextPrimaryLight = Color(0xFF051F12);
+
+// Deep Emerald - Dunkles Theme
+static const Color deepEmeraldPrimaryDark = Color(0xFF81C784);
+static const Color deepEmeraldBackgroundDark = Color(0xFF121212);
+static const Color deepEmeraldTextPrimaryDark = Color(0xFFE0E0E0);
+
+// Hoher Kontrast - Helles Theme
+static const Color highContrastPrimaryLight = Color(0xFF0000CC);
+static const Color highContrastBackgroundLight = Color(0xFFFFFFFF);
+static const Color highContrastTextPrimaryLight = Color(0xFF000000);
+
+// Hoher Kontrast - Dunkles Theme
+static const Color highContrastPrimaryDark = Color(0xFFFFFF00);
+static const Color highContrastBackgroundDark = Color(0xFF000000);
+static const Color highContrastTextPrimaryDark = Color(0xFFFFFFFF);
+```
+
 ## Designprinzipien
 
 1. **Barrierefreiheit**: Alle Text-/Hintergrund-Paare erfüllen den WCAG 2.1 Level AA Kontrast (AAA für Hoher Kontrast).
 2. **Konsistenz**: Die Primärfarben werden in der gesamten Anwendung konsistent verwendet.
 3. **Visuelle Hierarchie**: Die Verwendung verschiedener Töne etabliert eine klare Informationshierarchie.
-4. **Natürlichkeit**: Die grüne Palette vermittelt Gesundheit, Wohlbefinden und Vertrauen, passend für eine medizinische Anwendung.
+4. **Natürlichkeit**: Die grüne Palette vermittelt Gesundheit, Wohlbefinden und Vertrauen.
 5. **Inklusivität**: Die Hoher Kontrast Palette ermöglicht Menschen mit Sehproblemen eine komfortable Nutzung der Anwendung.
 
 ## Referenzen
 
 - Material Design 3 Guidelines
 - WCAG 2.1 Accessibility Standards
-- Palette Light-Theme: `Captura de pantalla 2025-11-22 101545.png`
-- Palette Dark-Theme: `Captura de pantalla 2025-11-22 102516.png`
