@@ -797,14 +797,19 @@ MedicApp includes a native Android widget for the home screen that allows viewin
 **Daily Dose List**: Displays all doses scheduled for the current day, including:
 - Medication name
 - Scheduled time for each dose
-- Visual status (pending, taken, or omitted)
+- Visual status (pending, taken, or skipped)
 
 **Status Indicators**:
-- **Filled green circle with check**: Dose already taken
-- **Circle with green border**: Pending dose
-- **Dimmed text**: Omitted or already completed dose
+- **Green filled circle with checkmark (✓)**: Dose taken - medication text displayed at 70% opacity
+- **Green empty circle (○)**: Dose pending - medication text displayed at 100% opacity
+- **Gray dashed circle (◌)**: Dose skipped - medication text displayed at 50% opacity
 
 **Progress Counter**: In the widget header, a "X/Y" counter is displayed indicating how many doses have been taken out of the total scheduled for the day.
+
+**Smart Medication Filtering**: The widget intelligently filters medications to show only relevant doses:
+- Only displays medications scheduled for the current day based on their durationType configuration
+- Automatically excludes "asNeeded" medications since they don't have scheduled doses
+- Ensures the widget shows a focused view of today's medication schedule
 
 ### Integration with Application
 
@@ -817,13 +822,15 @@ MedicApp includes a native Android widget for the home screen that allows viewin
 
 **Direct Database Reading**: The widget directly accesses the application's SQLite database to obtain medication data, ensuring updated information even when the app is not running.
 
+**Interactive Tapping**: Tapping anywhere on the widget (header, list items, or empty space) opens the main MedicApp application, providing quick access to full medication management features.
+
 ### DeepEmerald Visual Theme
 
 The widget uses the DeepEmerald color palette, MedicApp's default theme:
 
 - **Background**: Deep dark green (#1E2623) with 90% opacity
 - **Icons and accents**: Light green (#81C784)
-- **Text**: White with different opacity levels depending on status
+- **Text**: White with different opacity levels depending on dose status (100% for pending, 70% for taken, 50% for skipped)
 - **Dividers**: Light green with transparency
 
 This visual coherence ensures the widget integrates perfectly with the application's aesthetics.
@@ -833,8 +840,6 @@ This visual coherence ensures the widget integrates perfectly with the applicati
 **Android Only**: The widget is a native Android functionality and is not available on iOS, web, or other platforms.
 
 **Default Person**: The widget displays doses for the person configured as default in the application. It doesn't allow selecting different people directly from the widget.
-
-**No Direct Actions**: For now, tapping the widget opens the main application. Doses cannot be registered directly from the widget (this can be added in future versions).
 
 ### Related Files
 

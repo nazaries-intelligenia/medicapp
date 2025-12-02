@@ -810,16 +810,25 @@ MedicApp include un widget nativo Android per la schermata home che permette di 
 **Lista delle Dosi del Giorno**: Mostra tutte le dosi programmate per il giorno corrente, incluso:
 - Nome del farmaco
 - Ora programmata di ogni dose
-- Stato visivo (in attesa, assunta o saltata)
+- Stato visivo (in sospeso, assunta o saltata)
 
-**Indicatori di Stato**:
-- **Cerchio verde pieno con spunta**: Dose già assunta
-- **Cerchio con bordo verde**: Dose in attesa
-- **Testo attenuato**: Dose saltata o già completata
+**Indicatori di Stato Visuali**:
+Il widget utilizza tre stati visuali distinti per rappresentare chiaramente lo stato di ogni dose:
+- **Cerchio verde pieno con segno di spunta (✓)**: Dose assunta - il testo viene visualizzato al 70% di opacità per indicare completamento
+- **Cerchio verde vuoto (○)**: Dose in sospeso - il testo viene visualizzato al 100% di opacità per evidenziare l'azione pendente
+- **Cerchio grigio tratteggiato (◌)**: Dose saltata - il testo viene visualizzato al 50% di opacità per indicare che la dose è stata omessa
 
 **Contatore di Progresso**: L'intestazione del widget mostra un contatore "X/Y" che indica quante dosi sono state assunte sul totale programmato per la giornata.
 
+### Filtraggio Intelligente dei Farmaci
+
+**Filtraggio per Tipo di Durata**: Il widget applica un filtraggio intelligente che mostra solo i farmaci rilevanti per la giornata corrente, basandosi sul `durationType` configurato per ogni farmaco. Questo assicura che vengano visualizzate solo le dosi effettivamente programmate per il giorno corrente secondo la frequenza del trattamento.
+
+**Esclusione di Farmaci al Bisogno**: I farmaci configurati come "asNeeded" (al bisogno o secondo necessità) non vengono mostrati nel widget, poiché non hanno orari programmati e quindi non necessitano di promemoria visuali nella schermata home. Questi farmaci si gestiscono esclusivamente dall'interno dell'applicazione.
+
 ### Integrazione con l'Applicazione
+
+**Apertura Diretta dell'App**: Toccando qualsiasi parte del widget - che sia l'intestazione, un elemento della lista, o uno spazio vuoto - si apre immediatamente l'applicazione principale di MedicApp. Questa interazione rapida permette di accedere istantaneamente a tutte le funzionalità dell'app per gestire le dosi, aggiornare la scorta o rivedere la cronologia.
 
 **Aggiornamento Automatico**: Il widget si aggiorna automaticamente ogni volta che:
 - Viene registrata una dose (assunta, saltata o extra)
@@ -836,7 +845,7 @@ Il widget utilizza la palette di colori DeepEmerald, il tema predefinito di Medi
 
 - **Sfondo**: Verde scuro profondo (#1E2623) con 90% di opacità
 - **Icone e accenti**: Verde chiaro (#81C784)
-- **Testo**: Bianco con diversi livelli di opacità secondo lo stato
+- **Testo**: Bianco con diversi livelli di opacità secondo lo stato (100% per dosi in sospeso, 70% per assunte, 50% per saltate)
 - **Divisori**: Verde chiaro con trasparenza
 
 ### Limitazioni Tecniche
@@ -844,8 +853,6 @@ Il widget utilizza la palette di colori DeepEmerald, il tema predefinito di Medi
 **Solo Android**: Il widget è una funzionalità nativa Android e non è disponibile su iOS, web o altre piattaforme.
 
 **Persona predefinita**: Il widget mostra le dosi della persona configurata come predefinita nell'applicazione.
-
-**Nessuna azione diretta**: Per ora, toccare il widget apre l'applicazione principale. Le dosi non possono essere registrate direttamente dal widget.
 
 ### File Correlati
 

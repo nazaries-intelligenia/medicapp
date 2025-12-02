@@ -89,7 +89,9 @@ class MedicationWidgetProvider : AppWidgetProvider() {
                 context, 0, openAppIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
+            // Set click handlers for all widget areas
+            views.setOnClickPendingIntent(R.id.widget_clickable_bg, openAppPendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_header, openAppPendingIntent)
 
             // Set up the ListView adapter
             val serviceIntent = Intent(context, MedicationWidgetService::class.java).apply {
@@ -98,6 +100,19 @@ class MedicationWidgetProvider : AppWidgetProvider() {
             }
             views.setRemoteAdapter(R.id.widget_list, serviceIntent)
             views.setEmptyView(R.id.widget_list, R.id.widget_empty)
+
+            // Set up click template for list items to open the app
+            val itemClickIntent = Intent(context, MedicationWidgetProvider::class.java).apply {
+                action = ACTION_OPEN_APP
+            }
+            val itemClickPendingIntent = PendingIntent.getBroadcast(
+                context, 1, itemClickIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setPendingIntentTemplate(R.id.widget_list, itemClickPendingIntent)
+
+            // Set click on empty view
+            views.setOnClickPendingIntent(R.id.widget_empty, openAppPendingIntent)
 
             // Get dose statistics
             val stats = getDoseStats(context)
@@ -190,15 +205,22 @@ fun getDosesFromDatabase(context: Context): List<DoseItem> {
             SELECT
                 m.id,
                 m.name,
+                m.stockQuantity,
                 pm.doseSchedule,
                 pm.takenDosesToday,
                 pm.skippedDosesToday,
                 pm.takenDosesDate,
-                pm.isSuspended
+                pm.durationType,
+                pm.selectedDates,
+                pm.weeklyDays,
+                pm.dayInterval,
+                pm.startDate,
+                pm.endDate
             FROM medications m
             INNER JOIN person_medications pm ON m.id = pm.medicationId
             WHERE pm.personId = ?
             AND pm.isSuspended = 0
+            AND pm.durationType != 'asNeeded'
         """.trimIndent()
 
         val cursor = db.rawQuery(query, arrayOf(defaultPersonId))
@@ -207,12 +229,41 @@ fun getDosesFromDatabase(context: Context): List<DoseItem> {
         while (cursor.moveToNext()) {
             val medicationId = cursor.getString(0)
             val medicationName = cursor.getString(1)
-            val doseScheduleJson = cursor.getString(2) ?: "{}"
-            val takenDosesTodayJson = cursor.getString(3) ?: "[]"
-            val skippedDosesTodayJson = cursor.getString(4) ?: "[]"
-            val takenDosesDate = cursor.getString(5)
+            val stockQuantity = cursor.getDouble(2)
+            val doseScheduleJson = cursor.getString(3) ?: "{}"
+            val takenDosesTodayStr = cursor.getString(4) ?: ""
+            val skippedDosesTodayStr = cursor.getString(5) ?: ""
+            val takenDosesDate = cursor.getString(6)
+            val durationType = cursor.getString(7) ?: "everyday"
+            val selectedDatesStr = cursor.getString(8)
+            val weeklyDaysStr = cursor.getString(9)
+            val dayInterval = cursor.getInt(10)
+            val startDateStr = cursor.getString(11)
+            val endDateStr = cursor.getString(12)
 
-            Log.d("MedicationWidget", "Processing medication: $medicationName, schedule: $doseScheduleJson")
+            Log.d("MedicationWidget", "Processing medication: $medicationName")
+            Log.d("MedicationWidget", "  - durationType: $durationType")
+            Log.d("MedicationWidget", "  - doseSchedule: $doseScheduleJson")
+            Log.d("MedicationWidget", "  - takenDosesToday: $takenDosesTodayStr")
+            Log.d("MedicationWidget", "  - skippedDosesToday: $skippedDosesTodayStr")
+            Log.d("MedicationWidget", "  - takenDosesDate: $takenDosesDate (today: $today)")
+
+            // Check if medication should be taken today based on duration type
+            val shouldTakeToday = shouldTakeMedicationToday(
+                durationType = durationType,
+                stockQuantity = stockQuantity,
+                selectedDatesStr = selectedDatesStr,
+                weeklyDaysStr = weeklyDaysStr,
+                dayInterval = dayInterval,
+                startDateStr = startDateStr,
+                endDateStr = endDateStr,
+                today = today
+            )
+
+            if (!shouldTakeToday) {
+                Log.d("MedicationWidget", "  - Skipping: not scheduled for today")
+                continue
+            }
 
             // Parse dose schedule (Map<String, Double> as JSON)
             val doseSchedule = try {
@@ -224,28 +275,24 @@ fun getDosesFromDatabase(context: Context): List<DoseItem> {
             }
 
             // Parse taken doses (only if from today)
+            // Flutter saves as comma-separated string: "08:00,12:00,18:00"
             val takenDoses = if (takenDosesDate == today) {
-                try {
-                    val jsonArray = org.json.JSONArray(takenDosesTodayJson)
-                    (0 until jsonArray.length()).map { jsonArray.getString(it) }
-                } catch (e: Exception) {
-                    emptyList()
-                }
+                takenDosesTodayStr.split(",").filter { it.isNotEmpty() }
             } else {
                 emptyList()
             }
 
             // Parse skipped doses (only if from today)
+            // Flutter saves as comma-separated string: "08:00,12:00"
             val skippedDoses = if (takenDosesDate == today) {
-                try {
-                    val jsonArray = org.json.JSONArray(skippedDosesTodayJson)
-                    (0 until jsonArray.length()).map { jsonArray.getString(it) }
-                } catch (e: Exception) {
-                    emptyList()
-                }
+                skippedDosesTodayStr.split(",").filter { it.isNotEmpty() }
             } else {
                 emptyList()
             }
+
+            Log.d("MedicationWidget", "  - Parsed schedule times: $doseSchedule")
+            Log.d("MedicationWidget", "  - Parsed taken doses: $takenDoses")
+            Log.d("MedicationWidget", "  - Parsed skipped doses: $skippedDoses")
 
             // Create dose items for each scheduled time
             for (time in doseSchedule) {
@@ -275,4 +322,68 @@ fun getDosesFromDatabase(context: Context): List<DoseItem> {
 
     // Sort by time, then by taken status (pending first)
     return doses.sortedWith(compareBy({ it.time }, { it.isTaken || it.isSkipped }))
+}
+
+/**
+ * Check if medication should be taken today based on duration type.
+ * Mirrors the logic from Flutter's Medication.shouldTakeToday().
+ */
+private fun shouldTakeMedicationToday(
+    durationType: String,
+    stockQuantity: Double,
+    selectedDatesStr: String?,
+    weeklyDaysStr: String?,
+    dayInterval: Int,
+    startDateStr: String?,
+    endDateStr: String?,
+    today: String
+): Boolean {
+    // Check if treatment has ended
+    if (endDateStr != null && endDateStr.isNotEmpty()) {
+        if (today > endDateStr) {
+            Log.d("MedicationWidget", "    Treatment ended: $endDateStr")
+            return false
+        }
+    }
+
+    // Check if treatment hasn't started yet
+    if (startDateStr != null && startDateStr.isNotEmpty()) {
+        if (today < startDateStr) {
+            Log.d("MedicationWidget", "    Treatment not started: $startDateStr")
+            return false
+        }
+    }
+
+    return when (durationType) {
+        "everyday" -> true
+        "untilFinished" -> stockQuantity > 0
+        "specificDates" -> {
+            val selectedDates = selectedDatesStr?.split(",")?.filter { it.isNotEmpty() } ?: emptyList()
+            selectedDates.contains(today)
+        }
+        "weeklyPattern" -> {
+            val calendar = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            calendar.time = dateFormat.parse(today) ?: Date()
+            // Calendar.DAY_OF_WEEK: Sunday=1, Monday=2, ... Saturday=7
+            // Flutter weekday: Monday=1, ... Sunday=7
+            val calendarDayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+            val flutterWeekday = if (calendarDayOfWeek == Calendar.SUNDAY) 7 else calendarDayOfWeek - 1
+            val weeklyDays = weeklyDaysStr?.split(",")
+                ?.filter { it.isNotEmpty() }
+                ?.map { it.toInt() } ?: emptyList()
+            weeklyDays.contains(flutterWeekday)
+        }
+        "intervalDays" -> {
+            if (startDateStr.isNullOrEmpty()) return true
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val startDate = dateFormat.parse(startDateStr) ?: return true
+            val todayDate = dateFormat.parse(today) ?: return true
+            val daysSinceStart = ((todayDate.time - startDate.time) / (1000 * 60 * 60 * 24)).toInt()
+            val interval = if (dayInterval > 0) dayInterval else 2
+            daysSinceStart % interval == 0
+        }
+        "asNeeded" -> false // Already filtered in SQL, but just in case
+        else -> true
+    }
 }

@@ -845,12 +845,16 @@ MedicApp inclut un widget natif Android pour l'écran d'accueil qui permet de vi
 - Heure programmée de chaque dose
 - État visuel (en attente, prise ou sautée)
 
-**Indicateurs d'État** :
-- **Cercle vert rempli avec coche** : Dose déjà prise
-- **Cercle avec bordure verte** : Dose en attente
-- **Texte atténué** : Dose sautée ou déjà complétée
+**Filtrage Intelligent** : Le widget affiche uniquement les médicaments dont le type de durée correspond au jour actuel (`durationType`), excluant automatiquement les médicaments "selon besoin" (`asNeeded`). Cela assure que seules les doses réellement programmées pour aujourd'hui sont affichées.
+
+**Indicateurs d'État Visuels** :
+- **Cercle vert rempli avec coche (✓)** : Dose prise - le texte s'affiche à 70% d'opacité
+- **Cercle vert vide (○)** : Dose en attente - le texte s'affiche à 100% d'opacité
+- **Cercle gris pointillé (◌)** : Dose sautée - le texte s'affiche à 50% d'opacité
 
 **Compteur de Progression** : L'en-tête du widget affiche un compteur "X/Y" indiquant combien de doses ont été prises sur le total programmé pour la journée.
+
+**Interactivité Complète** : Le widget est entièrement interactif - toucher n'importe quelle partie (en-tête, élément de liste ou espace vide) ouvre l'application principale MedicApp, permettant une gestion complète des doses.
 
 ### Intégration avec l'Application
 
@@ -877,8 +881,6 @@ Le widget utilise la palette de couleurs DeepEmerald, le thème par défaut de M
 **Android uniquement** : Le widget est une fonctionnalité native Android et n'est pas disponible sur iOS, web ou autres plateformes.
 
 **Personne par défaut** : Le widget affiche les doses de la personne configurée comme par défaut dans l'application.
-
-**Pas d'actions directes** : Pour l'instant, toucher le widget ouvre l'application principale. Les doses ne peuvent pas être enregistrées directement depuis le widget.
 
 ### Fichiers Associés
 

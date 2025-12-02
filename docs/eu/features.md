@@ -711,18 +711,25 @@ Android-en hasiera-pantailarako widget natiboa, eguneko dosien ikuspegi azkarra 
 **Eguneko Dosien Zerrenda**: Eguneko programatutako dosi guztiak erakusten ditu:
 - Sendagaiaren izena
 - Dosi bakoitzaren programatutako ordua
-- Egoera bisuala (zain, hartua edo omititua)
+- Egoera bisuala (zain, hartua edo saltatuta)
 
-**Egoera Adierazleak**:
-- **Berdez betetako zirkulua egiaztapen-marka batekin**: Jada hartutako dosia
-- **Ertz berdea duen zirkulua**: Zain dagoen dosia
-- **Testu ahuldua**: Omititutako edo jada amaitutako dosia
+**Egoera Adierazle Bisualak**:
+
+Widget-ak HIRU egoera bisual erakusten ditu dosien egoera adierazteko:
+
+- **Zirkulu berde betea egiaztapen-markarekin (✓)**: Dosia hartuta - testua %70 opakutasunarekin
+- **Zirkulu berde hutsa (○)**: Dosia zain - testua %100 opakutasunarekin
+- **Zirkulu gris marratua (◌)**: Dosia saltatuta - testua %50 opakutasunarekin
 
 **Progresio Kontagailua**: Widget-aren goiburuan "X/Y" kontagailua erakusten da, egunerako programatutako guztietatik zenbat dosi hartu diren adieraziz.
 
+**Sendagaien Iragazketa**: Widget-ak soilik egunean programatutako sendagaiak erakusten ditu (durationType arabera iragazten ditu), eta "behar den arabera" (asNeeded) sendagaiak automatikoki baztertzen ditu. Honek erakusten den informazioa eguneko dosia programatuetan fokalizatzen du.
+
 #### 18.2. Aplikazioarekin Integrazioa
+**Aplikazioa Irekitzeko Ukipena**: Widget-a edozein lekutan ukitzeak (goiburua, zerrenda elementuak edo espazio hutsa) aplikazio nagusia irekitzen du berehalako sarbide azkarra ahalbidetuz. Honek erabiltzaileak aplikazioan dosiak kudeatzeko eta informazio xehatuagoa kontsultatzeko aukera ematen du.
+
 **Eguneratze Automatikoa**: Widget-a automatikoki eguneratzen da:
-- Dosia erregistratzen denean (hartua, omititua edo gehigarria)
+- Dosia erregistratzen denean (hartua, saltatuta edo gehigarria)
 - Sendagaia gehitu edo aldatzen denean
 - Eguna aldatzen denean (gauerdian)
 
@@ -742,8 +749,6 @@ Widget-ak DeepEmerald kolore-paleta erabiltzen du, MedicApp-en gai lehenetsia:
 **Android bakarrik**: Widget-a Android funtzionalitate natiboa da eta ez dago iOS, web edo beste plataformetan eskuragarri.
 
 **Pertsona lehenetsia**: Widget-ak aplikazioan lehenetsi gisa konfiguratutako pertsonaren dosiak erakusten ditu. Ezin da pertsona desberdinak zuzenean widget-etik hautatu.
-
-**Zuzeneko ekintzarik gabe**: Gaur egun, widget-a ukitzeak aplikazio nagusia irekitzen du. Ezin dira dosiak zuzenean widget-etik erregistratu (etorkizuneko bertsioetan gehitu daiteke).
 
 #### 18.5. Lotutako Fitxategiak
 - `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Widget-aren hornitzaile nagusia
