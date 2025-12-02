@@ -541,34 +541,39 @@ Aquesta consideració ergonòmica redueix la fatiga física i fa que l'app sigui
 
 ### Vista Ràpida de Dosis Diàries
 
-MedicApp inclou un widget natiu d'Android per a la pantalla d'inici que permet visualitzar les dosis programades del dia actual sense obrir l'aplicació. Aquest widget proporciona informació essencial d'un cop d'ull, ideal per a usuaris que necessiten un recordatori visual constant de la seva medicació.
+MedicApp inclou un widget natiu d'Android per a la pantalla d'inici que permet visualitzar les dosis programades del dia actual sense obrir l'aplicació. Aquest widget proporciona informació essencial d'un cop d'ull, ideal per a usuaris que necessiten un recordatori visual constant de la seva medicació. Tocar qualsevol part del widget (capçalera, elements de la llista o espai buit) obre l'aplicació principal per a una gestió completa.
 
 ### Característiques del Widget
 
 **Mida 2x2**: El widget ocupa un espai de 2x2 cel·les a la pantalla d'inici (aproximadament 146x146dp), prou compacte per no ocupar massa espai però amb informació clarament llegible.
 
-**Llista de Dosis del Dia**: Mostra totes les dosis programades per al dia actual, incloent:
+**Llista de Dosis del Dia**: Mostra només les dosis programades per al dia actual, aplicant filtres intel·ligents:
+- **Filtrat per durationType**: Només mostra medicaments programats per al dia actual segons el seu patró de freqüència (tots els dies, dies específics de la setmana, cada N dies, etc.)
+- **Exclusió d'occasionals**: Els medicaments configurats com a "segons necessitat" (asNeeded) no apareixen al widget, ja que no tenen horaris programats
 - Nom del medicament
 - Hora programada de cada dosi
-- Estat visual (pendent, presa o omesa)
+- Estat visual amb tres indicadors diferents
 
-**Indicadors d'Estat**:
-- **Cercle verd ple amb marca**: Dosi ja presa
-- **Cercle amb vora verda**: Dosi pendent
-- **Text atenuat**: Dosi omesa o ja completada
+**Indicadors d'Estat Visual**:
+- **Cercle verd ple amb marca de verificació (✓)**: Dosi ja presa - el text es mostra amb 70% d'opacitat per indicar que està completada
+- **Cercle verd buit (○)**: Dosi pendent - el text es mostra al 100% d'opacitat per destacar que requereix atenció
+- **Cercle gris de punts (◌)**: Dosi omesa - el text es mostra amb 50% d'opacitat per indicar que ja no es prendrà
 
-**Comptador de Progrés**: A la capçalera del widget es mostra un comptador "X/Y" indicant quantes dosis s'han pres del total programat per al dia.
+**Comptador de Progrés**: A la capçalera del widget es mostra un comptador "X/Y" indicant quantes dosis s'han pres del total programat per al dia, proporcionant feedback immediat del compliment diari.
 
 ### Integració amb l'Aplicació
+
+**Interacció Completa**: Tocar qualsevol part del widget obre MedicApp directament a la pantalla principal. Això permet a l'usuari passar ràpidament d'un cop d'ull al widget a la gestió completa dins de l'aplicació per registrar dosis, consultar detalls o fer canvis.
 
 **Actualització Automàtica**: El widget s'actualitza automàticament cada vegada que:
 - Es registra una dosi (presa, omesa o extra)
 - S'afegeix o es modifica un medicament
 - Canvia el dia (a mitjanit)
+- Es modifica la persona predeterminada
 
 **Comunicació Flutter-Android**: La integració utilitza un MethodChannel (`com.medicapp.medicapp/widget`) que permet a l'aplicació Flutter notificar al widget natiu quan les dades canvien.
 
-**Lectura Directa de Base de Dades**: El widget accedeix directament a la base de dades SQLite de l'aplicació per obtenir les dades de medicaments, assegurant informació actualitzada fins i tot quan l'app no està en execució.
+**Lectura Directa de Base de Dades**: El widget accedeix directament a la base de dades SQLite de l'aplicació per obtenir les dades de medicaments, assegurant informació actualitzada fins i tot quan l'app no està en execució. Aplica els mateixos filtres que la pantalla principal per garantir coherència entre ambdues vistes.
 
 ### Tema Visual DeepEmerald
 
@@ -576,8 +581,9 @@ El widget utilitza la paleta de colors DeepEmerald, el tema per defecte de Medic
 
 - **Fons**: Verd fosc profund (#1E2623) amb 90% d'opacitat
 - **Icones i accents**: Verd clar (#81C784)
-- **Text**: Blanc amb diferents nivells d'opacitat segons l'estat
+- **Text**: Blanc amb diferents nivells d'opacitat segons l'estat (100% pendent, 70% presa, 50% omesa)
 - **Divisors**: Verd clar amb transparència
+- **Indicadors d'estat**: Cercles amb colors i estils diferenciats per a cada estat
 
 ### Limitacions Tècniques
 
@@ -585,7 +591,7 @@ El widget utilitza la paleta de colors DeepEmerald, el tema per defecte de Medic
 
 **Persona per defecte**: El widget mostra les dosis de la persona configurada com a predeterminada a l'aplicació.
 
-**Sense accions directes**: Per ara, tocar el widget obre l'aplicació principal. Les dosis no es poden registrar directament des del widget.
+**Vista de només lectura**: Les dosis no es poden registrar directament des del widget. L'usuari ha de tocar el widget per obrir l'aplicació i realitzar accions.
 
 ### Arxius Relacionats
 

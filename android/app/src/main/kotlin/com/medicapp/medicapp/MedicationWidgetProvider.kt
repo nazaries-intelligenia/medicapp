@@ -89,7 +89,9 @@ class MedicationWidgetProvider : AppWidgetProvider() {
                 context, 0, openAppIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
-            views.setOnClickPendingIntent(R.id.widget_container, openAppPendingIntent)
+            // Set click handlers for all widget areas
+            views.setOnClickPendingIntent(R.id.widget_clickable_bg, openAppPendingIntent)
+            views.setOnClickPendingIntent(R.id.widget_header, openAppPendingIntent)
 
             // Set up the ListView adapter
             val serviceIntent = Intent(context, MedicationWidgetService::class.java).apply {
@@ -98,6 +100,19 @@ class MedicationWidgetProvider : AppWidgetProvider() {
             }
             views.setRemoteAdapter(R.id.widget_list, serviceIntent)
             views.setEmptyView(R.id.widget_list, R.id.widget_empty)
+
+            // Set up click template for list items to open the app
+            val itemClickIntent = Intent(context, MedicationWidgetProvider::class.java).apply {
+                action = ACTION_OPEN_APP
+            }
+            val itemClickPendingIntent = PendingIntent.getBroadcast(
+                context, 1, itemClickIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            views.setPendingIntentTemplate(R.id.widget_list, itemClickPendingIntent)
+
+            // Set click on empty view
+            views.setOnClickPendingIntent(R.id.widget_empty, openAppPendingIntent)
 
             // Get dose statistics
             val stats = getDoseStats(context)

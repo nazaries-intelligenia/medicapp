@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/widget_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="8dp"
     android:background="@drawable/widget_background">
 
+    <!-- Clickable background layer (covers entire widget) -->
+    <TextView
+        android:id="@+id/widget_clickable_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true" />
+
     <!-- Header -->
     <LinearLayout
+        android:id="@+id/widget_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingBottom="8dp">
@@ -42,19 +50,20 @@
 
     </LinearLayout>
 
-    <!-- Divider (using TextView because View is not supported in RemoteViews) -->
-    <!-- DeepEmerald primary dark with 30% opacity -->
+    <!-- Divider -->
     <TextView
+        android:id="@+id/widget_divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_below="@id/widget_header"
         android:background="#4D81C784" />
 
     <!-- List of medications -->
     <ListView
         android:id="@+id/widget_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/widget_divider"
         android:layout_marginTop="4dp"
         android:divider="@null"
         android:dividerHeight="0dp"
@@ -64,12 +73,13 @@
     <TextView
         android:id="@+id/widget_empty"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_below="@id/widget_divider"
+        android:layout_marginTop="4dp"
         android:gravity="center"
         android:text="Sin dosis pendientes"
         android:textSize="12sp"
         android:textColor="#80FFFFFF"
         android:visibility="gone" />
 
-</LinearLayout>
+</RelativeLayout>

@@ -806,14 +806,19 @@ MedicApp inclúe un widget nativo de Android para a pantalla de inicio que permi
 - Hora programada de cada dose
 - Estado visual (pendente, tomada ou omitida)
 
-**Indicadores de Estado**:
-- **Círculo verde cheo con marca**: Dose xa tomada
-- **Círculo con borde verde**: Dose pendente
-- **Texto atenuado**: Dose omitida ou xa completada
+**Indicadores de Estado con Tres Estados Visuais**:
+
+O widget mostra o estado de cada dose mediante indicadores visuais claramente diferenciados:
+
+- **Círculo verde cheo con marca de verificación (✓)**: Dose tomada - o texto móstrase ao 70% de opacidade para indicar que xa está completada
+- **Círculo verde baleiro (○)**: Dose pendente - o texto móstrase ao 100% de opacidade para destacar que require atención
+- **Círculo gris de puntos (◌)**: Dose omitida - o texto móstrase ao 50% de opacidade para indicar que foi saltada deliberadamente
 
 **Contador de Progreso**: Na cabeceira do widget móstrase un contador "X/Y" indicando cantas doses se tomaron do total programado para o día.
 
 ### Integración coa Aplicación
+
+**Apertura Directa da App**: Ao tocar en calquera parte do widget (cabeceira, elementos da lista, ou espazo baleiro), ábrese a aplicación MedicApp na pantalla principal. Isto permite un acceso rápido á app para rexistrar doses ou consultar información detallada.
 
 **Actualización Automática**: O widget actualízase automaticamente cada vez que:
 - Se rexistra unha dose (tomada, omitida ou extra)
@@ -823,6 +828,16 @@ MedicApp inclúe un widget nativo de Android para a pantalla de inicio que permi
 **Comunicación Flutter-Android**: A integración utiliza un MethodChannel (`com.medicapp.medicapp/widget`) que permite á aplicación Flutter notificar ao widget nativo cando os datos cambian.
 
 **Lectura Directa de Base de Datos**: O widget accede directamente á base de datos SQLite da aplicación para obter os datos de medicamentos, asegurando información actualizada incluso cando a app non está en execución.
+
+### Filtrado Intelixente de Medicamentos
+
+O widget implementa lóxica avanzada para mostrar só a medicación relevante do día:
+
+**Filtrado por Tipo de Duración (durationType)**: O widget analiza o patrón de programación de cada medicamento e só mostra aqueles que corresponden ao día actual. Isto inclúe medicamentos con frecuencias diarias, semanais, en datas específicas, e cada N días, sempre que o día actual coincida coa programación.
+
+**Exclusión de Medicamentos "asNeeded"**: Os medicamentos configurados como "segundo necesidade" ou ocasionais non aparecen no widget, xa que non teñen horarios programados e non requiren recordatorios automáticos. Estes medicamentos rexístranse manualmente cando se necesitan desde a aplicación principal.
+
+Esta lóxica de filtrado garante que o widget só mostre información accionable e relevante, evitando sobrecargar ao usuario con medicamentos que non ten que tomar no día actual.
 
 ### Tema Visual DeepEmerald
 
@@ -838,8 +853,6 @@ O widget utiliza a paleta de cores DeepEmerald, o tema por defecto de MedicApp:
 **Só Android**: O widget é unha funcionalidade nativa de Android e non está dispoñible en iOS, web ou outras plataformas.
 
 **Persoa por defecto**: O widget mostra as doses da persoa configurada como predeterminada na aplicación.
-
-**Sen accións directas**: Por agora, tocar o widget abre a aplicación principal. As doses non se poden rexistrar directamente dende o widget.
 
 ### Arquivos Relacionados
 

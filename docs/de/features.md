@@ -1514,7 +1514,7 @@ ListTile(
 ## 16. Home-Screen-Widget (Android)
 
 ### Beschreibung
-Natives Android-Widget für den Startbildschirm, das eine schnelle Übersicht über die täglichen Dosen ermöglicht.
+Natives Android-Widget für den Startbildschirm, das eine schnelle Übersicht über die täglichen Dosen ermöglicht und beim Tippen die Anwendung öffnet.
 
 ### Hauptmerkmale
 
@@ -1526,14 +1526,23 @@ Natives Android-Widget für den Startbildschirm, das eine schnelle Übersicht ü
 - Geplante Zeit für jede Dosis
 - Visueller Status (ausstehend, genommen oder ausgelassen)
 
-**Statusanzeigen**:
-- **Gefüllter grüner Kreis mit Häkchen**: Bereits genommene Dosis
-- **Kreis mit grünem Rand**: Ausstehende Dosis
-- **Gedämpfter Text**: Ausgelassene oder bereits abgeschlossene Dosis
+**Intelligente Filterung**: Das Widget zeigt nur Medikamente an, die:
+- Für den heutigen Tag geplant sind (nach durationType)
+- Nicht als "nach Bedarf" (asNeeded) markiert sind
+
+**Statusanzeigen**: Das Widget verwendet drei verschiedene visuelle Zustände für jede Dosis:
+- **Grüner ausgefüllter Kreis mit Häkchen (✓)**: Dosis eingenommen - Text mit 70% Deckkraft
+- **Grüner leerer Kreis (○)**: Dosis ausstehend - Text mit 100% Deckkraft
+- **Grauer gestrichelter Kreis (◌)**: Dosis übersprungen - Text mit 50% Deckkraft
 
 **Fortschrittszähler**: Im Widget-Header wird ein "X/Y"-Zähler angezeigt, der angibt, wie viele Dosen von den insgesamt für den Tag geplanten genommen wurden.
 
 #### 16.2. Integration mit der Anwendung
+**Interaktive Aktionen**: Das Widget öffnet die Hauptanwendung beim Tippen auf:
+- Den Widget-Header
+- Beliebige Dosis in der Liste
+- Jeden leeren Bereich im Widget
+
 **Automatische Aktualisierung**: Das Widget aktualisiert sich automatisch, wenn:
 - Eine Dosis registriert wird (genommen, ausgelassen oder extra)
 - Ein Medikament hinzugefügt oder geändert wird
@@ -1555,8 +1564,6 @@ Das Widget verwendet die DeepEmerald-Farbpalette, das Standard-Theme von MedicAp
 **Nur Android**: Das Widget ist eine native Android-Funktionalität und ist nicht auf iOS, Web oder anderen Plattformen verfügbar.
 
 **Standardperson**: Das Widget zeigt die Dosen für die in der Anwendung als Standard konfigurierte Person an. Es ist nicht möglich, direkt aus dem Widget verschiedene Personen auszuwählen.
-
-**Keine direkten Aktionen**: Derzeit öffnet das Tippen auf das Widget die Hauptanwendung. Dosen können nicht direkt aus dem Widget registriert werden (dies kann in zukünftigen Versionen hinzugefügt werden).
 
 #### 16.5. Verwandte Dateien
 - `android/app/src/main/kotlin/.../MedicationWidgetProvider.kt` - Hauptwidget-Provider

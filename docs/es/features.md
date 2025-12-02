@@ -807,15 +807,15 @@ MedicApp incluye un widget nativo de Android para la pantalla de inicio que perm
 
 **Tamaño 2x2**: El widget ocupa un espacio de 2x2 celdas en la pantalla de inicio (aproximadamente 146x146dp), siendo lo suficientemente compacto para no ocupar demasiado espacio pero con información claramente legible.
 
-**Lista de Dosis del Día**: Muestra todas las dosis programadas para el día actual, incluyendo:
+**Lista de Dosis del Día**: Muestra todas las dosis programadas para el día actual, filtrando automáticamente por `durationType` para mostrar solo medicamentos que corresponden al día de hoy. Los medicamentos configurados como "según necesidad" (`asNeeded`) se excluyen automáticamente del widget. Para cada dosis se muestra:
 - Nombre del medicamento
 - Hora programada de cada dosis
 - Estado visual (pendiente, tomada u omitida)
 
-**Indicadores de Estado**:
-- **Círculo verde relleno con check**: Dosis ya tomada
-- **Círculo con borde verde**: Dosis pendiente
-- **Texto atenuado**: Dosis omitida o ya completada
+**Indicadores de Estado Visuales**: El widget utiliza tres estados visuales distintos para identificar rápidamente el estado de cada dosis:
+- **Círculo verde relleno con check (✓)**: Dosis ya tomada - El texto aparece al 70% de opacidad para indicar que está completada
+- **Círculo verde vacío (○)**: Dosis pendiente - El texto aparece al 100% de opacidad para máxima visibilidad
+- **Círculo gris punteado (◌)**: Dosis omitida/saltada - El texto aparece al 50% de opacidad indicando que fue saltada intencionalmente
 
 **Contador de Progreso**: En la cabecera del widget se muestra un contador "X/Y" indicando cuántas dosis se han tomado del total programado para el día.
 
@@ -825,6 +825,8 @@ MedicApp incluye un widget nativo de Android para la pantalla de inicio que perm
 - Se registra una dosis (tomada, omitida o extra)
 - Se añade o modifica un medicamento
 - Se cambia el día (a medianoche)
+
+**Acceso Rápido a la Aplicación**: Tocar cualquier parte del widget (cabecera, elementos de la lista o espacio vacío) abre instantáneamente la aplicación principal de MedicApp, proporcionando acceso inmediato para gestionar las dosis o consultar más información.
 
 **Comunicación Flutter-Android**: La integración utiliza un MethodChannel (`com.medicapp.medicapp/widget`) que permite a la aplicación Flutter notificar al widget nativo cuando los datos cambian.
 
@@ -846,8 +848,6 @@ Esta coherencia visual asegura que el widget se integre perfectamente con la est
 **Solo Android**: El widget es una funcionalidad nativa de Android y no está disponible en iOS, web u otras plataformas.
 
 **Persona por Defecto**: El widget muestra las dosis de la persona configurada como predeterminada en la aplicación. No permite seleccionar diferentes personas directamente desde el widget.
-
-**Sin Acciones Directas**: Por ahora, tocar el widget abre la aplicación principal. No se pueden registrar dosis directamente desde el widget (esto se puede añadir en futuras versiones).
 
 ### Archivos Relacionados
 

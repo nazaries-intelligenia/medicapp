@@ -63,21 +63,24 @@ class MedicationWidgetFactory(
             // Set the time
             views.setTextViewText(R.id.item_time, dose.time)
 
-            // Set the status icon
+            // Set the status icon and text colors based on dose status
             when {
                 dose.isTaken -> {
+                    // Green filled circle with checkmark
                     views.setImageViewResource(R.id.item_status_icon, R.drawable.ic_dose_taken)
-                    // Dim the text for taken doses
-                    views.setTextColor(R.id.item_name, 0x80FFFFFF.toInt())
-                    views.setTextColor(R.id.item_time, 0x60FFFFFF.toInt())
+                    // Dimmed but visible text for taken doses (70% opacity)
+                    views.setTextColor(R.id.item_name, 0xB3FFFFFF.toInt())
+                    views.setTextColor(R.id.item_time, 0x99FFFFFF.toInt())
                 }
                 dose.isSkipped -> {
-                    views.setImageViewResource(R.id.item_status_icon, R.drawable.ic_dose_pending)
-                    // Dim the text for skipped doses
-                    views.setTextColor(R.id.item_name, 0x50FFFFFF.toInt())
-                    views.setTextColor(R.id.item_time, 0x40FFFFFF.toInt())
+                    // Gray circle with X mark
+                    views.setImageViewResource(R.id.item_status_icon, R.drawable.ic_dose_skipped)
+                    // More dimmed for skipped doses (50% opacity)
+                    views.setTextColor(R.id.item_name, 0x80FFFFFF.toInt())
+                    views.setTextColor(R.id.item_time, 0x66FFFFFF.toInt())
                 }
                 else -> {
+                    // Green empty circle (pending)
                     views.setImageViewResource(R.id.item_status_icon, R.drawable.ic_dose_pending)
                     // Full opacity for pending doses
                     views.setTextColor(R.id.item_name, 0xFFFFFFFF.toInt())
