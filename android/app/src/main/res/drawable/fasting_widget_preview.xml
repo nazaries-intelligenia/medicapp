@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fasting widget preview with amber theme -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background: Dark amber surface with opacity -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E62D2518" />
+            <corners android:radius="16dp" />
+            <size
+                android:width="180dp"
+                android:height="110dp" />
+        </shape>
+    </item>
+    <!-- Title area simulation with amber -->
+    <item
+        android:top="12dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#40FF9800" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="156dp"
+                android:height="20dp" />
+        </shape>
+    </item>
+    <!-- Divider -->
+    <item
+        android:top="38dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#4DFF9800" />
+            <size
+                android:width="156dp"
+                android:height="1dp" />
+        </shape>
+    </item>
+    <!-- Countdown item simulation -->
+    <item
+        android:top="48dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#30FF9800" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="156dp"
+                android:height="24dp" />
+        </shape>
+    </item>
+    <!-- Second countdown item -->
+    <item
+        android:top="78dp"
+        android:left="12dp"
+        android:right="12dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#30FF9800" />
+            <corners android:radius="4dp" />
+            <size
+                android:width="156dp"
+                android:height="24dp" />
+        </shape>
+    </item>
+</layer-list>

@@ -889,6 +889,42 @@ Le widget utilise la palette de couleurs DeepEmerald, le thème par défaut de M
 - `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
 - `lib/services/widget_service.dart` - Service Flutter pour communication avec le widget
 
+### Widget de Compte à Rebours de Jeûne
+
+MedicApp inclut un second widget d'écran d'accueil dédié exclusivement à l'affichage des comptes à rebours de jeûne actifs. Ce widget est particulièrement utile pour les utilisateurs ayant des médicaments nécessitant un jeûne préalable.
+
+#### Caractéristiques du Widget de Jeûne
+
+**Taille 3x2**: Le widget occupe 3x2 cellules (environ 180x110dp), offrant suffisamment d'espace pour afficher plusieurs comptes à rebours.
+
+**Comptes à Rebours en Temps Réel**: Pour chaque médicament avec jeûne actif, il affiche:
+- Nom du médicament
+- Type de jeûne (complet, sans aliments, sans liquides)
+- Compte à rebours au format HH:MM:SS
+- Heure de fin du jeûne
+
+**Indicateurs d'État**:
+- **Cercle ambre rempli**: Jeûne actif en cours
+- **Cercle vert rempli**: Jeûne terminé
+
+**Thème Visuel Ambre**: Le widget utilise des tons ambre/orange pour se différencier visuellement du widget vert des doses:
+- Fond: Brun foncé (#2D2518) avec 90% d'opacité
+- Accents: Ambre (#FF9800)
+- Indicateur terminé: Vert (#4CAF50)
+
+#### Logique d'Affichage
+
+Le widget affiche les périodes de jeûne qui:
+- Sont actuellement en cours (l'heure actuelle est dans la période de jeûne)
+- Commenceront dans les 2 prochaines heures (aperçu des jeûnes à venir)
+
+#### Fichiers Associés du Widget de Jeûne
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Fournisseur du widget
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - Service ListView
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Layout principal
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Configuration du widget
+
 ---
 
 ## 19. Optimisation pour Tablettes

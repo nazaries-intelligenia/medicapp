@@ -861,6 +861,42 @@ O widget utiliza a paleta de cores DeepEmerald, o tema por defecto de MedicApp:
 - `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
 - `lib/services/widget_service.dart` - Servizo Flutter para comunicación co widget
 
+### Widget de Conta Atrás de Xaxún
+
+MedicApp inclúe un segundo widget de pantalla de inicio dedicado exclusivamente a mostrar as contas atrás dos xaxúns activos. Este widget é especialmente útil para usuarios que teñen medicamentos que requiren xaxún previo.
+
+#### Características do Widget de Xaxún
+
+**Tamaño 3x2**: O widget ocupa 3x2 celas (aproximadamente 180x110dp), proporcionando espazo suficiente para mostrar múltiples contas atrás.
+
+**Contas Atrás en Tempo Real**: Para cada medicamento con xaxún activo móstrase:
+- Nome do medicamento
+- Tipo de xaxún (completo, sen alimentos, sen líquidos)
+- Conta atrás en formato HH:MM:SS
+- Hora de fin do xaxún
+
+**Indicadores de Estado**:
+- **Círculo ámbar cheo**: Xaxún activo en progreso
+- **Círculo verde cheo**: Xaxún completado
+
+**Tema Visual Ámbar**: O widget utiliza tons ámbar/laranxa para diferenciarse visualmente do widget verde de doses:
+- Fondo: Marrón escuro (#2D2518) con 90% de opacidade
+- Acentos: Ámbar (#FF9800)
+- Indicador completado: Verde (#4CAF50)
+
+#### Lóxica de Visualización
+
+O widget mostra períodos de xaxún que:
+- Están actualmente en progreso (a hora actual está dentro do período de xaxún)
+- Comezarán nas próximas 2 horas (vista previa de xaxúns próximos)
+
+#### Ficheiros Relacionados do Widget de Xaxún
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Provedor do widget
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - Servizo para a ListView
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Layout principal
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Configuración do widget
+
 ---
 
 ## 19. Optimización para Tablets

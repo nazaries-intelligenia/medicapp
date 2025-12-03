@@ -857,6 +857,44 @@ Esta coherencia visual asegura que el widget se integre perfectamente con la est
 - `android/app/src/main/res/xml/medication_widget_info.xml` - Configuración del widget
 - `lib/services/widget_service.dart` - Servicio Flutter para comunicación con el widget
 
+### Widget de Cuenta Atrás de Ayunos
+
+MedicApp incluye un segundo widget de pantalla de inicio dedicado exclusivamente a mostrar las cuentas atrás de los ayunos activos. Este widget es especialmente útil para usuarios que tienen medicamentos que requieren ayuno previo.
+
+#### Características del Widget de Ayunos
+
+**Tamaño 3x2**: El widget ocupa 3x2 celdas (180x110dp aproximadamente), proporcionando espacio suficiente para mostrar múltiples cuentas atrás.
+
+**Cuentas Atrás en Tiempo Real**: Para cada medicamento con ayuno activo se muestra:
+- Nombre del medicamento
+- Tipo de ayuno (completo, sin alimentos, sin líquidos)
+- Cuenta atrás en formato HH:MM:SS
+- Hora de fin del ayuno
+
+**Indicadores de Estado**:
+- **Círculo ámbar relleno**: Ayuno activo en progreso
+- **Círculo verde relleno**: Ayuno completado
+
+**Tema Visual Ámbar**: El widget utiliza tonos ámbar/naranja para diferenciarse visualmente del widget verde de dosis:
+- Fondo: Marrón oscuro (#2D2518) con 90% opacidad
+- Acentos: Ámbar (#FF9800)
+- Indicador completado: Verde (#4CAF50)
+
+#### Lógica de Visualización
+
+El widget muestra ayunos que:
+- Están actualmente en progreso (la hora actual está dentro del período de ayuno)
+- Comenzarán en las próximas 2 horas (vista previa de ayunos próximos)
+
+El período de ayuno se calcula restando `fastingDurationMinutes` de la hora de la dosis programada.
+
+#### Archivos Relacionados del Widget de Ayunos
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Proveedor del widget
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - Servicio para la ListView
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Layout principal
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Configuración del widget
+
 ---
 
 ## Integración de Funcionalidades
