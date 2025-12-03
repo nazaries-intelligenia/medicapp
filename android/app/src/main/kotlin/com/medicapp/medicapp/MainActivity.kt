@@ -15,7 +15,14 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "updateWidget" -> {
+                        // Update both widgets
                         MedicationWidgetProvider.requestUpdate(this)
+                        FastingWidgetProvider.requestUpdate(this)
+                        result.success(null)
+                    }
+                    "updateFastingWidget" -> {
+                        // Update only fasting widget
+                        FastingWidgetProvider.requestUpdate(this)
                         result.success(null)
                     }
                     else -> result.notImplemented()

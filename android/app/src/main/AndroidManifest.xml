@@ -75,6 +75,26 @@
             android:name=".MedicationWidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
+
+        <!-- Fasting Countdown Widget -->
+        <receiver
+            android:name=".FastingWidgetProvider"
+            android:exported="true"
+            android:label="@string/fasting_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.medicapp.medicapp.UPDATE_FASTING_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/fasting_widget_info" />
+        </receiver>
+
+        <!-- Fasting Widget ListView Service -->
+        <service
+            android:name=".FastingWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            android:exported="false" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

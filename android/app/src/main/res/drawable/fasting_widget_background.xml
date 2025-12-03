@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fasting widget background using warm amber tones -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <!-- Dark amber surface (#2D2518) with 90% opacity -->
+    <solid android:color="#E62D2518" />
+    <corners android:radius="16dp" />
+</shape>

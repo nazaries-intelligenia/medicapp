@@ -1,8 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MedicApp</string>
+    <!-- Medication Widget -->
     <string name="widget_name">Dosis del día</string>
     <string name="widget_description">Muestra las dosis de medicamentos pendientes para hoy</string>
     <string name="widget_empty">Sin dosis pendientes</string>
     <string name="widget_today">Hoy</string>
+    <!-- Fasting Widget -->
+    <string name="fasting_widget_name">Ayunos activos</string>
+    <string name="fasting_widget_title">Ayunos</string>
+    <string name="fasting_widget_description">Muestra las cuentas atrás de los ayunos activos</string>
+    <string name="fasting_widget_empty">Sin ayunos activos</string>
+    <string name="fasting_complete">Completado</string>
+    <string name="fasting_until">hasta %1$s</string>
+    <string name="fasting_type_complete">Ayuno completo</string>
+    <string name="fasting_type_food">Sin alimentos</string>
+    <string name="fasting_type_liquids">Sin líquidos</string>
 </resources>

@@ -757,6 +757,42 @@ Widget-ak DeepEmerald kolore-paleta erabiltzen du, MedicApp-en gai lehenetsia:
 - `android/app/src/main/res/xml/medication_widget_info.xml` - Widget-aren konfigurazioa
 - `lib/services/widget_service.dart` - Flutter zerbitzua widget-arekin komunikatzeko
 
+### Barauaren Atzerako Kontaketa Widgeta
+
+MedicApp-ek bigarren hasierako pantailako widget bat dauka, barau aktiboen atzerako kontaketak erakusteko soilik. Widget hau bereziki erabilgarria da baraua behar duten sendagaiak dituzten erabiltzaileentzat.
+
+#### Barau Widgetaren Ezaugarriak
+
+**3x2 Tamaina**: Widget-ak 3x2 gelaxka hartzen ditu (180x110dp gutxi gorabehera), atzerako kontaketa anitz erakusteko nahikoa leku emanez.
+
+**Denbora Errealeko Atzerako Kontaketak**: Barau aktiboa duen sendagai bakoitzerako erakusten da:
+- Sendagaiaren izena
+- Barau mota (osoa, janarik gabe, likidorik gabe)
+- Atzerako kontaketa HH:MM:SS formatuan
+- Barauaren amaiera ordua
+
+**Egoera Adierazleak**:
+- **Anbar zirkulu betea**: Barau aktiboa martxan
+- **Berde zirkulu betea**: Baraua osatua
+
+**Anbar Ikus Gaia**: Widget-ak anbar/laranja tonuak erabiltzen ditu dosi widget berdetik bisualki bereizteko:
+- Atzeko planoa: Marroi iluna (#2D2518) %90 opakutasunarekin
+- Azentuak: Anbarra (#FF9800)
+- Osatutako adierazlea: Berdea (#4CAF50)
+
+#### Bistaratzeko Logika
+
+Widget-ak barau aldiak erakusten ditu:
+- Momentu honetan martxan daudenak (uneko ordua barau aldiaren barruan dago)
+- Hurrengo 2 orduetan hasiko direnak (datozen barauen aurrebista)
+
+#### Barau Widgetaren Fitxategi Erlazionatuak
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Widget hornitzailea
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - ListView zerbitzua
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Diseinu nagusia
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Widget konfigurazioa
+
 ---
 
 ## 19. Tabletetarako Optimizazioa

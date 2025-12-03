@@ -849,6 +849,44 @@ This visual coherence ensures the widget integrates perfectly with the applicati
 - `android/app/src/main/res/xml/medication_widget_info.xml` - Widget configuration
 - `lib/services/widget_service.dart` - Flutter service for communication with the widget
 
+### Fasting Countdown Widget
+
+MedicApp includes a second home screen widget dedicated exclusively to displaying active fasting countdowns. This widget is especially useful for users who have medications requiring prior fasting.
+
+#### Fasting Widget Features
+
+**Size 3x2**: The widget occupies 3x2 cells (approximately 180x110dp), providing enough space to display multiple countdowns.
+
+**Real-Time Countdowns**: For each medication with active fasting, it displays:
+- Medication name
+- Fasting type (complete, no food, no liquids)
+- Countdown in HH:MM:SS format
+- Fasting end time
+
+**Status Indicators**:
+- **Filled amber circle**: Active fasting in progress
+- **Filled green circle**: Fasting completed
+
+**Amber Visual Theme**: The widget uses amber/orange tones to visually differentiate from the green doses widget:
+- Background: Dark brown (#2D2518) with 90% opacity
+- Accents: Amber (#FF9800)
+- Completed indicator: Green (#4CAF50)
+
+#### Display Logic
+
+The widget shows fasting periods that:
+- Are currently in progress (current time is within the fasting period)
+- Will start within the next 2 hours (preview of upcoming fasting)
+
+The fasting period is calculated by subtracting `fastingDurationMinutes` from the scheduled dose time.
+
+#### Fasting Widget Related Files
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Widget provider
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - ListView service
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Main layout
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Widget configuration
+
 ---
 
 ## 19. Tablet Optimization

@@ -328,7 +328,7 @@ fun getDosesFromDatabase(context: Context): List<DoseItem> {
  * Check if medication should be taken today based on duration type.
  * Mirrors the logic from Flutter's Medication.shouldTakeToday().
  */
-private fun shouldTakeMedicationToday(
+internal fun shouldTakeMedicationToday(
     durationType: String,
     stockQuantity: Double,
     selectedDatesStr: String?,

@@ -115,9 +115,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -161,9 +159,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 6,
               padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -183,9 +179,7 @@ void main() {
               itemCount: 9,
               minCardWidth: 250,
               padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -208,9 +202,7 @@ void main() {
               minCardWidth: 200,
               maxColumns: 2,
               padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -229,9 +221,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               gridSpacing: 16,
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -250,9 +240,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               childAspectRatio: 1.5,
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -270,9 +258,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               itemExtent: 150,
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -290,9 +276,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               padding: const EdgeInsets.all(24),
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -308,9 +292,7 @@ void main() {
             child: AdaptiveGrid(
               itemCount: 4,
               shrinkWrap: true,
-              itemBuilder: (context, index) => Container(
-                child: Text('Item $index'),
-              ),
+              itemBuilder: (context, index) => Text('Item $index'),
             ),
           ),
         );
@@ -330,7 +312,7 @@ void main() {
                 AdaptiveGrid(
                   itemCount: 5,
                   sliver: true,
-                  itemBuilder: (context, index) => Container(
+                  itemBuilder: (context, index) => SizedBox(
                     key: ValueKey('item_$index'),
                     height: 100,
                     child: Text('Item $index'),
@@ -622,11 +604,11 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           width: 600,
-          child: ResponsiveRow(
+          child: const ResponsiveRow(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(child: const Text('Item 1')),
-              Container(child: const Text('Item 2')),
+              Text('Item 1'),
+              Text('Item 2'),
             ],
           ),
         ),
@@ -640,11 +622,11 @@ void main() {
       await tester.pumpWidget(
         createTestWidget(
           width: 600,
-          child: ResponsiveRow(
+          child: const ResponsiveRow(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(child: const Text('Item 1')),
-              Container(child: const Text('Item 2')),
+              Text('Item 1'),
+              Text('Item 2'),
             ],
           ),
         ),

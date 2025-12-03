@@ -1574,6 +1574,42 @@ Das Widget verwendet die DeepEmerald-Farbpalette, das Standard-Theme von MedicAp
 - `android/app/src/main/res/xml/medication_widget_info.xml` - Widget-Konfiguration
 - `lib/services/widget_service.dart` - Flutter-Service für die Kommunikation mit dem Widget
 
+### Fasten-Countdown-Widget
+
+MedicApp enthält ein zweites Startbildschirm-Widget, das ausschließlich der Anzeige aktiver Fasten-Countdowns gewidmet ist. Dieses Widget ist besonders nützlich für Benutzer, die Medikamente haben, die vorheriges Fasten erfordern.
+
+#### Funktionen des Fasten-Widgets
+
+**Größe 3x2**: Das Widget belegt 3x2 Zellen (ca. 180x110dp) und bietet genug Platz für mehrere Countdowns.
+
+**Echtzeit-Countdowns**: Für jedes Medikament mit aktivem Fasten wird angezeigt:
+- Medikamentenname
+- Fastentyp (vollständig, ohne Nahrung, ohne Flüssigkeiten)
+- Countdown im Format HH:MM:SS
+- Fastenende-Zeit
+
+**Statusanzeigen**:
+- **Gefüllter bernsteinfarbener Kreis**: Aktives Fasten läuft
+- **Gefüllter grüner Kreis**: Fasten abgeschlossen
+
+**Bernsteinfarbenes visuelles Thema**: Das Widget verwendet Bernstein-/Orangetöne zur visuellen Unterscheidung vom grünen Dosis-Widget:
+- Hintergrund: Dunkelbraun (#2D2518) mit 90% Deckkraft
+- Akzente: Bernstein (#FF9800)
+- Abgeschlossen-Anzeige: Grün (#4CAF50)
+
+#### Anzeigelogik
+
+Das Widget zeigt Fastenperioden, die:
+- Derzeit laufen (aktuelle Zeit liegt innerhalb der Fastenperiode)
+- Innerhalb der nächsten 2 Stunden beginnen (Vorschau kommender Fastenzeiten)
+
+#### Zugehörige Dateien des Fasten-Widgets
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Widget-Provider
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - ListView-Dienst
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Haupt-Layout
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Widget-Konfiguration
+
 ---
 
 ## 17. Tablet-Optimierung

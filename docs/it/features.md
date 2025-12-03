@@ -861,6 +861,42 @@ Il widget utilizza la palette di colori DeepEmerald, il tema predefinito di Medi
 - `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principale
 - `lib/services/widget_service.dart` - Servizio Flutter per comunicazione con il widget
 
+### Widget del Conto alla Rovescia per il Digiuno
+
+MedicApp include un secondo widget della schermata home dedicato esclusivamente alla visualizzazione dei conti alla rovescia per il digiuno attivo. Questo widget è particolarmente utile per gli utenti che hanno farmaci che richiedono il digiuno preventivo.
+
+#### Caratteristiche del Widget Digiuno
+
+**Dimensione 3x2**: Il widget occupa 3x2 celle (circa 180x110dp), fornendo spazio sufficiente per visualizzare più conti alla rovescia.
+
+**Conti alla Rovescia in Tempo Reale**: Per ogni farmaco con digiuno attivo viene visualizzato:
+- Nome del farmaco
+- Tipo di digiuno (completo, senza cibo, senza liquidi)
+- Conto alla rovescia in formato HH:MM:SS
+- Ora di fine del digiuno
+
+**Indicatori di Stato**:
+- **Cerchio ambra pieno**: Digiuno attivo in corso
+- **Cerchio verde pieno**: Digiuno completato
+
+**Tema Visivo Ambra**: Il widget utilizza toni ambra/arancione per differenziarsi visivamente dal widget verde delle dosi:
+- Sfondo: Marrone scuro (#2D2518) con 90% di opacità
+- Accenti: Ambra (#FF9800)
+- Indicatore completato: Verde (#4CAF50)
+
+#### Logica di Visualizzazione
+
+Il widget mostra i periodi di digiuno che:
+- Sono attualmente in corso (l'ora attuale è all'interno del periodo di digiuno)
+- Inizieranno entro le prossime 2 ore (anteprima dei digiuni imminenti)
+
+#### File Correlati del Widget Digiuno
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Provider del widget
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - Servizio ListView
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Layout principale
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Configurazione del widget
+
 ---
 
 ## 19. Ottimizzazione per Tablet

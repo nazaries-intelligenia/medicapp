@@ -600,6 +600,42 @@ El widget utilitza la paleta de colors DeepEmerald, el tema per defecte de Medic
 - `android/app/src/main/res/layout/medication_widget_layout.xml` - Layout principal
 - `lib/services/widget_service.dart` - Servei Flutter per a comunicació amb el widget
 
+### Widget de Compte Enrere de Dejuni
+
+MedicApp inclou un segon widget de pantalla d'inici dedicat exclusivament a mostrar els comptes enrere dels dejunis actius. Aquest widget és especialment útil per a usuaris que tenen medicaments que requereixen dejuni previ.
+
+#### Característiques del Widget de Dejuni
+
+**Mida 3x2**: El widget ocupa 3x2 cel·les (aproximadament 180x110dp), proporcionant espai suficient per mostrar múltiples comptes enrere.
+
+**Comptes Enrere en Temps Real**: Per a cada medicament amb dejuni actiu es mostra:
+- Nom del medicament
+- Tipus de dejuni (complet, sense aliments, sense líquids)
+- Compte enrere en format HH:MM:SS
+- Hora de fi del dejuni
+
+**Indicadors d'Estat**:
+- **Cercle ambre ple**: Dejuni actiu en curs
+- **Cercle verd ple**: Dejuni completat
+
+**Tema Visual Ambre**: El widget utilitza tons ambre/taronja per diferenciar-se visualment del widget verd de dosis:
+- Fons: Marró fosc (#2D2518) amb 90% d'opacitat
+- Accents: Ambre (#FF9800)
+- Indicador completat: Verd (#4CAF50)
+
+#### Lògica de Visualització
+
+El widget mostra períodes de dejuni que:
+- Estan actualment en curs (l'hora actual està dins del període de dejuni)
+- Començaran en les properes 2 hores (vista prèvia de dejunis propers)
+
+#### Fitxers Relacionats del Widget de Dejuni
+
+- `android/app/src/main/kotlin/.../FastingWidgetProvider.kt` - Proveïdor del widget
+- `android/app/src/main/kotlin/.../FastingWidgetService.kt` - Servei ListView
+- `android/app/src/main/res/layout/fasting_widget_layout.xml` - Layout principal
+- `android/app/src/main/res/xml/fasting_widget_info.xml` - Configuració del widget
+
 ---
 
 ## 19. Optimització per a Tauletes
