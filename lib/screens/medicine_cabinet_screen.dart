@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/medication.dart';
 import '../database/database_helper.dart';
+import '../widgets/responsive/adaptive_grid.dart';
 import 'medication_info_screen.dart';
 import 'medicine_cabinet/widgets/empty_cabinet_view.dart';
 import 'medicine_cabinet/widgets/no_search_results_view.dart';
@@ -127,9 +128,12 @@ class _MedicineCabinetScreenState extends State<MedicineCabinetScreen> {
                         ? const NoSearchResultsView()
                         : RefreshIndicator(
                             onRefresh: _loadMedications,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: AdaptiveGrid(
                               itemCount: _filteredMedications.length,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              minCardWidth: 320,
+                              maxColumns: 3,
+                              itemExtent: 120,
                               itemBuilder: (context, index) {
                                 final medication = _filteredMedications[index];
                                 return MedicationCard(

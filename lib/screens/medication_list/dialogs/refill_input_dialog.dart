@@ -16,7 +16,9 @@ class RefillInputDialog {
     final refillAmount = await showDialog<double>(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: AlertDialog(
           title: Text(l10n.refillMedicationTitle(medication.name)),
           content: SingleChildScrollView(
             child: Column(
@@ -100,6 +102,7 @@ class RefillInputDialog {
               child: Text(l10n.refillButton),
             ),
           ],
+          ),
         );
       },
     );

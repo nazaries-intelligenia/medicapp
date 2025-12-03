@@ -13,7 +13,9 @@ class EditTodayDoseDialog {
 
     return showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 400),
+        child: AlertDialog(
         title: Text(l10n.doseOfMedicationAt(medicationName, doseTime)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -62,6 +64,7 @@ class EditTodayDoseDialog {
             ),
           ),
         ],
+        ),
       ),
     );
   }

@@ -30,7 +30,9 @@ class ExpirationDateDialog {
     return showDialog<String>(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 450),
+          child: AlertDialog(
           title: Text(l10n.expirationDateDialogTitle),
           content: Form(
             key: formKey,
@@ -156,6 +158,7 @@ class ExpirationDateDialog {
               child: Text(l10n.btnAccept),
             ),
           ],
+          ),
         );
       },
     );

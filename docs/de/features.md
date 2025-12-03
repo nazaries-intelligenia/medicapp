@@ -21,6 +21,8 @@ Diese Dokumentation beschreibt detailliert alle Funktionen von **MedicApp**, ein
 - [13. Intelligentes Cache-System](#13-intelligentes-cache-system)
 - [14. Intelligente Erinnerungen](#14-intelligente-erinnerungen)
 - [15. Natives Dunkles Theme](#15-natives-dunkles-theme)
+- [16. Home-Screen-Widget (Android)](#16-home-screen-widget-android)
+- [17. Tablet-Optimierung](#17-tablet-optimierung)
 
 ---
 
@@ -1571,6 +1573,190 @@ Das Widget verwendet die DeepEmerald-Farbpalette, das Standard-Theme von MedicAp
 - `android/app/src/main/res/layout/medication_widget_layout.xml` - Hauptlayout
 - `android/app/src/main/res/xml/medication_widget_info.xml` - Widget-Konfiguration
 - `lib/services/widget_service.dart` - Flutter-Service für die Kommunikation mit dem Widget
+
+---
+
+## 17. Tablet-Optimierung
+
+### Beschreibung
+
+MedicApp ist für die perfekte Funktion auf Tablets und großen Bildschirmen optimiert und passt seine Oberfläche automatisch an die Gerätegröße an.
+
+### Hauptmerkmale
+
+#### 17.1. Breakpoint-System
+
+Die Anwendung verwendet ein Breakpoint-System basierend auf Material Design-Richtlinien:
+
+- **Telefon**: < 600dp - Einspaltiges Layout, untere Navigation
+- **Tablet**: 600-840dp - Adaptives Layout, seitliche NavigationRail
+- **Desktop**: > 840dp - Optimiertes Layout mit zentriertem Inhalt
+
+```dart
+// Utility: lib/utils/responsive_helper.dart
+class ResponsiveHelper {
+  static bool isPhone(BuildContext context) {
+    return MediaQuery.of(context).size.width < 600;
+  }
+
+  static bool isTablet(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width >= 600 && width < 840;
+  }
+
+  static bool isDesktop(BuildContext context) {
+    return MediaQuery.of(context).size.width >= 840;
+  }
+
+  static bool isLandscape(BuildContext context) {
+    return MediaQuery.of(context).orientation == Orientation.landscape;
+  }
+}
+```
+
+#### 17.2. Adaptive Navigation
+
+**Navigation nach Gerät:**
+- **Telefone im Hochformat**: Untere NavigationBar für einfachen Zugriff mit dem Daumen
+- **Tablets und Hochformat**: Seitliche NavigationRail für mehr Platz für Inhalte
+- **Große Bildschirme**: NavigationRail mit erweiterten Labels und Textbeschreibungen
+
+```dart
+// Implementierung: lib/widgets/responsive/adaptive_navigation.dart
+class AdaptiveNavigation extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isPhone = ResponsiveHelper.isPhone(context);
+    final isLandscape = ResponsiveHelper.isLandscape(context);
+
+    if (isPhone && !isLandscape) {
+      return NavigationBar(
+        destinations: destinations,
+        onDestinationSelected: onDestinationSelected,
+      );
+    } else {
+      return NavigationRail(
+        extended: ResponsiveHelper.isDesktop(context),
+        destinations: railDestinations,
+        onDestinationSelected: onDestinationSelected,
+      );
+    }
+  }
+}
+```
+
+#### 17.3. Zentrierter Inhalt
+
+**Maximale Breite für Lesbarkeit:**
+Auf großen Bildschirmen werden Inhalte mit einer maximalen Breite zentriert, um die Lesbarkeit zu verbessern und zu vermeiden, dass Text über die gesamte Bildschirmbreite verläuft.
+
+```dart
+// Widget: lib/widgets/responsive/centered_content.dart
+class CenteredContent extends StatelessWidget {
+  final Widget child;
+  final double maxWidth;
+
+  CenteredContent({
+    required this.child,
+    this.maxWidth = 800.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (ResponsiveHelper.isPhone(context)) {
+      return child;
+    }
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    );
+  }
+}
+```
+
+**Angewendete Breiten:**
+- Medikamentenlisten: 800px
+- Verlauf: 900px
+- Einstellungen: 700px
+- Formulare und Dialoge: 400-500px
+
+#### 17.4. Adaptive Grids
+
+**Responsive Grid-Layouts:**
+Der Medikamentenschrank und der Dosenverlauf verwenden Grid-Layouts, die sich automatisch an die verfügbare Breite anpassen.
+
+```dart
+// Widget: lib/widgets/responsive/adaptive_grid.dart
+class AdaptiveGrid extends StatelessWidget {
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    int crossAxisCount = 1;
+
+    if (ResponsiveHelper.isTablet(context)) {
+      crossAxisCount = 2;
+    } else if (ResponsiveHelper.isDesktop(context)) {
+      crossAxisCount = 3;
+    }
+
+    return GridView.count(
+      crossAxisCount: crossAxisCount,
+      childAspectRatio: 1.5,
+      children: children,
+    );
+  }
+}
+```
+
+**Grid-Spalten nach Gerät:**
+- Telefon: 1 Spalte
+- Tablet: 2 Spalten
+- Desktop: 3 Spalten
+
+#### 17.5. Optimierte Dialoge
+
+**Anpassung der Dialoggröße:**
+Dialoge und Formulare werden auf Tablets und Desktops mit einer maximalen Breite angezeigt, um zu vermeiden, dass sie zu groß werden.
+
+```dart
+// Verwendung in Dialogen
+showDialog(
+  context: context,
+  builder: (context) => Dialog(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: ResponsiveHelper.isPhone(context) ? 400 : 500,
+        maxHeight: 600,
+      ),
+      child: DialogContent(),
+    ),
+  ),
+);
+```
+
+### Verwandte Dateien
+
+- `lib/utils/responsive_helper.dart` - Responsive Design-Utilities
+- `lib/widgets/responsive/adaptive_navigation.dart` - Adaptive Navigationskomponente
+- `lib/widgets/responsive/centered_content.dart` - Widget für zentrierten Inhalt
+- `lib/widgets/responsive/adaptive_grid.dart` - Responsive Grid-Layout
+
+### Vorteile
+
+**Benutzererfahrung:**
+- Optimale Nutzung des verfügbaren Platzes
+- Verbesserte Lesbarkeit auf großen Bildschirmen
+- Intuitive Navigation an jedes Gerät angepasst
+- Konsistenz über alle Bildschirmgrößen
+
+**Flexibilität:**
+- Unterstützt Tablets von 7" bis 13"
+- Automatische Anpassung an Hoch- und Querformat
+- Skalierbar für zukünftige Gerätegrößen
 
 ---
 

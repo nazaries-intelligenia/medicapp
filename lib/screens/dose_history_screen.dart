@@ -8,6 +8,7 @@ import '../database/database_helper.dart';
 import '../services/dose_history_service.dart';
 import '../services/preferences_service.dart';
 import '../services/snackbar_service.dart';
+import '../widgets/responsive/adaptive_grid.dart';
 import 'dose_history/widgets/dose_history_card.dart';
 import 'dose_history/widgets/filter_dialog.dart';
 import 'dose_history/widgets/statistics_card.dart';
@@ -275,13 +276,17 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
           : Column(
               children: [
                 // Statistics card
-                StatisticsCard(statistics: _statistics),
+                ContentContainer(
+                  child: StatisticsCard(statistics: _statistics),
+                ),
 
                 // Active filters chip
                 if (hasFilters)
-                  ActiveFiltersChip(
-                    filterDescription: _getFilterDescription(l10n),
-                    onClear: _clearFilters,
+                  ContentContainer(
+                    child: ActiveFiltersChip(
+                      filterDescription: _getFilterDescription(l10n),
+                      onClear: _clearFilters,
+                    ),
                   ),
 
                 // History list
@@ -292,28 +297,33 @@ class DoseHistoryScreenState extends State<DoseHistoryScreen> with SingleTickerP
                               ? l10n.emptyDosesWithFilters
                               : l10n.emptyDoses,
                         )
-                      : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          itemCount: _historyEntries.length,
-                          itemBuilder: (context, index) {
-                            final entry = _historyEntries[index];
+                      : ContentContainer(
+                          child: AdaptiveGrid(
+                            itemCount: _historyEntries.length,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            minCardWidth: 350,
+                            maxColumns: 2,
+                            gridSpacing: 8,
+                            itemBuilder: (context, index) {
+                              final entry = _historyEntries[index];
 
-                            // In mixed view (no tabs), find and show person name
-                            String? personName;
-                            if (!_showPersonTabs || _persons.length <= 1) {
-                              final person = _persons.firstWhere(
-                                (p) => p.id == entry.personId,
-                                orElse: () => _persons.first,
+                              // In mixed view (no tabs), find and show person name
+                              String? personName;
+                              if (!_showPersonTabs || _persons.length <= 1) {
+                                final person = _persons.firstWhere(
+                                  (p) => p.id == entry.personId,
+                                  orElse: () => _persons.first,
+                                );
+                                personName = person.name;
+                              }
+
+                              return DoseHistoryCard(
+                                entry: entry,
+                                personName: personName,
+                                onTap: () => _showEditEntryDialog(entry),
                               );
-                              personName = person.name;
-                            }
-
-                            return DoseHistoryCard(
-                              entry: entry,
-                              personName: personName,
-                              onTap: () => _showEditEntryDialog(entry),
-                            );
-                          },
+                            },
+                          ),
                         ),
                 ),
               ],

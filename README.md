@@ -1,10 +1,11 @@
 # MedicApp
 
-[![Tests](https://img.shields.io/badge/tests-570%20passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-699%20passing-brightgreen)]()
 [![Coverage](https://img.shields.io/badge/coverage-80%2B%25-green)]()
-[![Flutter](https://img.shields.io/badge/Flutter-3.38.1-blue)]()
-[![Dart](https://img.shields.io/badge/Dart-3.10.0-blue)]()
+[![Flutter](https://img.shields.io/badge/Flutter-3.38.3-blue)]()
+[![Dart](https://img.shields.io/badge/Dart-3.10.1-blue)]()
 [![Material Design](https://img.shields.io/badge/Material%20Design-3-blueviolet)]()
+[![Responsive](https://img.shields.io/badge/Responsive-Phone%20%7C%20Tablet-orange)]()
 
 **Aplicación móvil de gestión de medicamentos con arquitectura multi-persona, diseñada para familias y cuidadores.**
 
@@ -30,11 +31,12 @@ Selecciona tu idioma / Select your language:
 ## 📊 Estado del Proyecto / Project Status
 
 - **Versión / Version:** 1.0.0+1
-- **Tests:** 570 pasando / passing ✅
+- **Tests:** 699 pasando / passing ✅
 - **Cobertura / Coverage:** 80%+
-- **Flutter:** 3.38.1
-- **Dart:** 3.10.0
+- **Flutter:** 3.38.3
+- **Dart:** 3.10.1
 - **Idiomas / Languages:** 8 (ES, EN, CA, DE, EU, FR, GL, IT)
+- **Responsive:** Phone + Tablet ✅
 - **Estado / Status:** Production Ready ✅
 
 ---
@@ -68,6 +70,8 @@ flutter test
 - ✅ Historial automático de dosis / Automatic dose history
 - ✅ Configuración de ayuno / Fasting configuration
 - ✅ 8 idiomas soportados / 8 supported languages
+- ✅ Diseño adaptativo para tablets / Adaptive tablet design
+- ✅ Widget de pantalla de inicio / Home screen widget (Android)
 
 ---
 

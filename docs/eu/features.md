@@ -759,6 +759,37 @@ Widget-ak DeepEmerald kolore-paleta erabiltzen du, MedicApp-en gai lehenetsia:
 
 ---
 
+## 19. Tabletetarako Optimizazioa
+
+### Diseinu Erantzukor Moldagarria
+
+MedicApp tabletetan eta pantaila handietan ezin hobeto funtzionatzeko optimizatuta dago, automatikoki bere interfazea gailuaren tamainaren arabera moldatuz.
+
+### Breakpoint Sistema
+
+Aplikazioak Material Design gidalerroak oinarri dituen breakpoint sistema bat erabiltzen du:
+
+- **Telefonoa**: < 600dp - Zutabe bakarreko diseinua, beheko nabigazioa
+- **Tableta**: 600-840dp - Diseinu moldagarria, alboko NavigationRail
+- **Mahaigaina**: > 840dp - Diseinu optimizatua eduki zentralizatuarekin
+
+### Ezaugarri Erantzukorrak
+
+**Nabigazio Moldagarria**: Tabletetan eta modu horizontalean, aplikazioak alboko NavigationRail bat erakusten du beheko nabigazio-barraren ordez.
+
+**Eduki Zentralizatua**: Pantaila handietan, medikamentuen zerrendak, historia eta ezarpenak 700-900px-ko gehienezko zabalerarekin zentralizatuta daude irakurgarritasuna hobetzeko.
+
+**Sareta Moldagarriak**: Sendagaien armairua eta dosi-historiak 2-3 zutabe erakusten dituzten sareta-diseinuak erabiltzen dituzte tabletetan.
+
+**Elkarrizketa-koadro Optimizatuak**: Elkarrizketa-koadroek eta formularioek 400-500px-ko gehienezko zabalera dute tabletetan.
+
+### Fitxategi Erlazionatuak
+
+- `lib/utils/responsive_helper.dart` - Diseinu erantzukorrerako utilitateak
+- `lib/widgets/responsive/adaptive_grid.dart` - Widget moldagarriak
+
+---
+
 ## Funtzionalitaten Integrazioa
 
 Ezaugarri hauek guztiak ez dira isolatuki funtzionatzen, esperientzia koherentea sortzeko sakonki integratuak daude baizik. Adibidez:

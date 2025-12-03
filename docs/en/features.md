@@ -851,6 +851,37 @@ This visual coherence ensures the widget integrates perfectly with the applicati
 
 ---
 
+## 19. Tablet Optimization
+
+### Adaptive Responsive Design
+
+MedicApp is optimized to work perfectly on tablets and large screens, automatically adapting its interface based on device size.
+
+### Breakpoint System
+
+The application uses a breakpoint system based on Material Design guidelines:
+
+- **Phone**: < 600dp - Single column layout, bottom navigation
+- **Tablet**: 600-840dp - Adaptive layout, side NavigationRail
+- **Desktop**: > 840dp - Optimized layout with centered content
+
+### Responsive Features
+
+**Adaptive Navigation**: On tablets and landscape mode, the app displays a side NavigationRail instead of the bottom navigation bar, providing more space for main content.
+
+**Centered Content**: On large screens, medication lists, history, and settings are centered with a maximum width of 700-900px to improve readability and avoid excessively long text lines.
+
+**Adaptive Grids**: The medicine cabinet and dose history use grid layouts that display 2-3 columns on tablets, making better use of available space.
+
+**Optimized Dialogs**: Dialogs and forms have a maximum width of 400-500px on tablets to prevent them from stretching too wide.
+
+### Related Files
+
+- `lib/utils/responsive_helper.dart` - Responsive design utilities
+- `lib/widgets/responsive/adaptive_grid.dart` - Adaptive widgets (AdaptiveGrid, ContentContainer, ResponsiveRow)
+
+---
+
 ## Integration of Functionalities
 
 All these features don't work in isolation, but are deeply integrated to create a cohesive experience. For example:
@@ -871,6 +902,8 @@ All these features don't work in isolation, but are deeply integrated to create 
 
 - The Android home screen widget provides quick at-a-glance access to daily medication status without opening the app, updating automatically whenever doses are recorded or medications are modified.
 
+- The tablet optimization system automatically adapts the interface layout based on device size, using a side NavigationRail on tablets instead of bottom navigation, centering content for better readability, and displaying adaptive grids that make efficient use of larger screens.
+
 This deep integration is what converts MedicApp from a simple medication list into a complete family therapeutic management system.
 
 ---
@@ -885,7 +918,8 @@ For more detailed information on specific aspects:
 - **Localization**: See `.arb` files in `lib/l10n/` for each language
 - **Tests**: See test suite in `test/` with 601+ tests validating all these functionalities
 - **Android Widget**: See `android/app/src/main/kotlin/.../MedicationWidget*.kt` for the home screen widget
+- **Tablet Optimization**: See `lib/utils/responsive_helper.dart` and `lib/widgets/responsive/adaptive_grid.dart` for responsive design implementation
 
 ---
 
-This documentation reflects the current state of MedicApp in its version 1.0.0, a mature and complete application for family medication management with over 75% test coverage, full support for 8 languages, and home screen widget for Android.
+This documentation reflects the current state of MedicApp in its version 1.0.0, a mature and complete application for family medication management with over 75% test coverage, full support for 8 languages, home screen widget for Android, and optimized tablet support.

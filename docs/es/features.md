@@ -888,4 +888,35 @@ Para información más detallada sobre aspectos específicos:
 
 ---
 
+## 19. Optimización para Tablets
+
+### Diseño Responsivo Adaptativo
+
+MedicApp está optimizada para funcionar perfectamente en tablets y pantallas grandes, adaptando automáticamente su interfaz según el tamaño del dispositivo.
+
+### Sistema de Breakpoints
+
+La aplicación utiliza un sistema de puntos de ruptura basado en las directrices de Material Design:
+
+- **Teléfono**: < 600dp - Diseño de una columna, navegación inferior
+- **Tablet**: 600-840dp - Diseño adaptativo, NavigationRail lateral
+- **Escritorio**: > 840dp - Diseño optimizado con contenido centrado
+
+### Características Responsivas
+
+**Navegación Adaptativa**: En tablets y modo horizontal, la aplicación muestra un NavigationRail lateral en lugar de la barra de navegación inferior, proporcionando más espacio para el contenido principal.
+
+**Contenido Centrado**: En pantallas grandes, las listas de medicamentos, historial y configuración se centran con un ancho máximo de 700-900px para mejorar la legibilidad y evitar líneas de texto excesivamente largas.
+
+**Grids Adaptativos**: El botiquín y el historial de dosis utilizan layouts de grid que muestran 2-3 columnas en tablets, aprovechando mejor el espacio disponible.
+
+**Diálogos Optimizados**: Los diálogos y formularios tienen un ancho máximo de 400-500px en tablets para evitar que se estiren demasiado.
+
+### Archivos Relacionados
+
+- `lib/utils/responsive_helper.dart` - Utilidades de diseño responsivo
+- `lib/widgets/responsive/adaptive_grid.dart` - Widgets adaptativos (AdaptiveGrid, ContentContainer, ResponsiveRow)
+
+---
+
 Esta documentación refleja el estado actual de MedicApp en su versión 1.0.0, una aplicación madura y completa para gestión de medicamentos familiares con más de 75% de cobertura de tests, soporte completo para 8 idiomas, y widget de pantalla de inicio para Android.
