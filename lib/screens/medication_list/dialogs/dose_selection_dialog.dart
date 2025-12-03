@@ -15,7 +15,9 @@ class DoseSelectionDialog {
     return showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: AlertDialog(
           title: Text(l10n.registerDoseOfMedication(medicationName)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -66,6 +68,7 @@ class DoseSelectionDialog {
               child: Text(l10n.btnCancel),
             ),
           ],
+          ),
         );
       },
     );

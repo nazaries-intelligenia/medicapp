@@ -602,6 +602,37 @@ El widget utilitza la paleta de colors DeepEmerald, el tema per defecte de Medic
 
 ---
 
+## 19. Optimització per a Tauletes
+
+### Disseny Responsiu Adaptatiu
+
+MedicApp està optimitzada per funcionar perfectament en tauletes i pantalles grans, adaptant automàticament la seva interfície segons la mida del dispositiu.
+
+### Sistema de Punts de Ruptura
+
+L'aplicació utilitza un sistema de breakpoints basat en les directrius de Material Design:
+
+- **Telèfon**: < 600dp - Disseny d'una columna, navegació inferior
+- **Tauleta**: 600-840dp - Disseny adaptatiu, NavigationRail lateral
+- **Escriptori**: > 840dp - Disseny optimitzat amb contingut centrat
+
+### Característiques Responsives
+
+**Navegació Adaptativa**: En tauletes i mode horitzontal, l'aplicació mostra una NavigationRail lateral en lloc de la barra de navegació inferior.
+
+**Contingut Centrat**: En pantalles grans, les llistes de medicaments, l'historial i la configuració es centren amb una amplada màxima de 700-900px per millorar la llegibilitat.
+
+**Graelles Adaptatives**: El farmaciola i l'historial de dosis utilitzen layouts de graella que mostren 2-3 columnes en tauletes.
+
+**Diàlegs Optimitzats**: Els diàlegs i formularis tenen una amplada màxima de 400-500px en tauletes.
+
+### Fitxers Relacionats
+
+- `lib/utils/responsive_helper.dart` - Utilitats de disseny responsiu
+- `lib/widgets/responsive/adaptive_grid.dart` - Widgets adaptatius
+
+---
+
 ## Integració de Funcionalitats
 
 Totes aquestes característiques no funcionen de forma aïllada, sinó que estan profundament integrades per crear una experiència cohesiva. Per exemple:

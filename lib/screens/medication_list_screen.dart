@@ -12,6 +12,7 @@ import '../services/snackbar_service.dart';
 import '../services/logger_service.dart';
 import '../utils/platform_helper.dart';
 import '../utils/date_formatter.dart';
+import '../widgets/responsive/adaptive_grid.dart';
 import 'medication_info_screen.dart';
 import 'edit_medication_menu_screen.dart';
 import 'medication_list/widgets/medication_card.dart';
@@ -1231,68 +1232,72 @@ class MedicationListScreenState extends State<MedicationListScreen>
                               Expanded(
                                 child: RefreshIndicator(
                                   onRefresh: _viewModel.loadMedications,
-                                  child: ListView.builder(
-                                    padding:
-                                        const EdgeInsets.only(left: 8, right: 8, bottom: 8),
-                                    itemCount: _viewModel.medications.length,
-                                    itemBuilder: (context, index) {
-                                      final medication = _viewModel.medications[index];
-                                      final nextDoseInfo =
-                                          DoseCalculationService.getNextDoseInfo(medication);
-                                      final nextDoseText = nextDoseInfo != null
-                                          ? DoseCalculationService.formatNextDose(
-                                              nextDoseInfo, context)
-                                          : null;
-                                      final asNeededDoseInfo =
-                                          _viewModel.getAsNeededDosesInfo(medication.id);
-                                      final todayDosesWidget = (medication
-                                                  .isTakenDosesDateToday &&
-                                              (medication.takenDosesToday.isNotEmpty ||
-                                                  medication.skippedDosesToday.isNotEmpty))
-                                          ? _buildTodayDosesSection(medication)
-                                          : null;
+                                  child: ContentContainer(
+                                    maxWidth: 800,
+                                    child: ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+                                      itemCount: _viewModel.medications.length,
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        final medication = _viewModel.medications[index];
+                                        final nextDoseInfo =
+                                            DoseCalculationService.getNextDoseInfo(medication);
+                                        final nextDoseText = nextDoseInfo != null
+                                            ? DoseCalculationService.formatNextDose(
+                                                nextDoseInfo, context)
+                                            : null;
+                                        final asNeededDoseInfo =
+                                            _viewModel.getAsNeededDosesInfo(medication.id);
+                                        final todayDosesWidget = (medication
+                                                    .isTakenDosesDateToday &&
+                                                (medication.takenDosesToday.isNotEmpty ||
+                                                    medication.skippedDosesToday.isNotEmpty))
+                                            ? _buildTodayDosesSection(medication)
+                                            : null;
 
-                                      // Get person names if in mixed view
-                                      final personNames = !_viewModel.showPersonTabs
-                                          ? _viewModel
-                                              .getPersonsForMedication(medication.id)
-                                              .map((p) => p.name)
-                                              .toList()
-                                          : null;
+                                        // Get person names if in mixed view
+                                        final personNames = !_viewModel.showPersonTabs
+                                            ? _viewModel
+                                                .getPersonsForMedication(medication.id)
+                                                .map((p) => p.name)
+                                                .toList()
+                                            : null;
 
-                                      // Get fasting period for this medication (filtered by selected person)
-                                      Map<String, dynamic>? fastingPeriod;
-                                      if (_viewModel.showFastingCountdown) {
-                                        // Find fasting period that matches this medication and person
-                                        for (final fp in _viewModel.activeFastingPeriods) {
-                                          if (fp['medicationId'] == medication.id) {
-                                            // If person tabs are enabled, filter by selected person
-                                            if (_viewModel.showPersonTabs) {
-                                              if (_viewModel.selectedPerson != null &&
-                                                  fp['personId'] == _viewModel.selectedPerson!.id) {
+                                        // Get fasting period for this medication (filtered by selected person)
+                                        Map<String, dynamic>? fastingPeriod;
+                                        if (_viewModel.showFastingCountdown) {
+                                          // Find fasting period that matches this medication and person
+                                          for (final fp in _viewModel.activeFastingPeriods) {
+                                            if (fp['medicationId'] == medication.id) {
+                                              // If person tabs are enabled, filter by selected person
+                                              if (_viewModel.showPersonTabs) {
+                                                if (_viewModel.selectedPerson != null &&
+                                                    fp['personId'] == _viewModel.selectedPerson!.id) {
+                                                  fastingPeriod = fp;
+                                                  break;
+                                                }
+                                              } else {
+                                                // In mixed view, show first fasting period for this medication
                                                 fastingPeriod = fp;
                                                 break;
                                               }
-                                            } else {
-                                              // In mixed view, show first fasting period for this medication
-                                              fastingPeriod = fp;
-                                              break;
                                             }
                                           }
                                         }
-                                      }
 
-                                      return MedicationCard(
-                                        medication: medication,
-                                        nextDoseInfo: nextDoseInfo,
-                                        nextDoseText: nextDoseText,
-                                        asNeededDoseInfo: asNeededDoseInfo,
-                                        fastingPeriod: fastingPeriod,
-                                        todayDosesWidget: todayDosesWidget,
-                                        personNames: personNames,
-                                        onTap: () => _showDeleteModal(medication),
-                                      );
-                                    },
+                                        return MedicationCard(
+                                          medication: medication,
+                                          nextDoseInfo: nextDoseInfo,
+                                          nextDoseText: nextDoseText,
+                                          asNeededDoseInfo: asNeededDoseInfo,
+                                          fastingPeriod: fastingPeriod,
+                                          todayDosesWidget: todayDosesWidget,
+                                          personNames: personNames,
+                                          onTap: () => _showDeleteModal(medication),
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
                               ),

@@ -891,6 +891,37 @@ Le widget utilise la palette de couleurs DeepEmerald, le thème par défaut de M
 
 ---
 
+## 19. Optimisation pour Tablettes
+
+### Design Responsive Adaptatif
+
+MedicApp est optimisée pour fonctionner parfaitement sur les tablettes et les grands écrans, adaptant automatiquement son interface selon la taille de l'appareil.
+
+### Système de Points de Rupture
+
+L'application utilise un système de breakpoints basé sur les directives Material Design:
+
+- **Téléphone**: < 600dp - Layout à une colonne, navigation inférieure
+- **Tablette**: 600-840dp - Layout adaptatif, NavigationRail latérale
+- **Bureau**: > 840dp - Layout optimisé avec contenu centré
+
+### Fonctionnalités Responsives
+
+**Navigation Adaptative**: Sur les tablettes et en mode paysage, l'application affiche une NavigationRail latérale au lieu de la barre de navigation inférieure.
+
+**Contenu Centré**: Sur les grands écrans, les listes de médicaments, l'historique et les paramètres sont centrés avec une largeur maximale de 700-900px pour améliorer la lisibilité.
+
+**Grilles Adaptatives**: L'armoire à pharmacie et l'historique des doses utilisent des layouts de grille qui affichent 2-3 colonnes sur les tablettes.
+
+**Dialogues Optimisés**: Les dialogues et formulaires ont une largeur maximale de 400-500px sur les tablettes.
+
+### Fichiers Associés
+
+- `lib/utils/responsive_helper.dart` - Utilitaires de design responsive
+- `lib/widgets/responsive/adaptive_grid.dart` - Widgets adaptatifs
+
+---
+
 ## Intégration des Fonctionnalités
 
 Toutes ces caractéristiques ne fonctionnent pas de manière isolée, mais sont profondément intégrées pour créer une expérience cohésive. Par exemple :

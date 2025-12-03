@@ -14,7 +14,9 @@ class ManualDoseInputDialog {
     final doseQuantity = await showDialog<double>(
       context: context,
       builder: (BuildContext dialogContext) {
-        return AlertDialog(
+        return ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: AlertDialog(
           title: Text(l10n.registerDoseOfMedication(medication.name)),
           content: SingleChildScrollView(
             child: Column(
@@ -93,6 +95,7 @@ class ManualDoseInputDialog {
               child: Text(l10n.registerButton),
             ),
           ],
+          ),
         );
       },
     );

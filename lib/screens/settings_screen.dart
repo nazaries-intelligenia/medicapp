@@ -8,9 +8,11 @@ import '../services/snackbar_service.dart';
 import '../services/notifications/notification_config.dart';
 import '../services/locale_provider.dart';
 import '../utils/platform_helper.dart';
+import '../utils/responsive_helper.dart';
 import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
+import '../widgets/responsive/adaptive_grid.dart';
 import 'settings/widgets/setting_option_card.dart';
 import 'settings/widgets/setting_switch_card.dart';
 import 'settings/widgets/info_card.dart';
@@ -385,8 +387,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: Text(l10n.settingsTitle),
       ),
-      body: ListView(
-        children: [
+      body: ContentContainer(
+        maxWidth: context.formMaxWidth,
+        child: ListView(
+          children: [
           // Persons Management Section
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -565,6 +569,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Info Section
           const InfoCard(),
         ],
+        ),
       ),
     );
   }
